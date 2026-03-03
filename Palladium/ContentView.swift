@@ -28,6 +28,7 @@ struct ContentView: View {
     }()
     @State private var progressText = "Enter a URL and tap Download."
     @State private var selectedPreset: DownloadPreset = .autoVideo
+    @State private var downloadSettings = DownloadSettings()
     @State private var packageStatusText = "idle"
     @State private var versionsText = "yt-dlp: unknown\nyt-dlp-apple-webkit-jsi: unknown"
     @State private var consoleLogText = ""
@@ -47,6 +48,11 @@ struct ContentView: View {
             packagesTab
                 .tabItem {
                     Label("Packages", systemImage: "shippingbox")
+                }
+
+            settingsTab
+                .tabItem {
+                    Label("Settings", systemImage: "slider.horizontal.3")
                 }
 
             consoleTab
@@ -188,6 +194,40 @@ struct ContentView: View {
         .padding()
     }
 
+    private var settingsTab: some View {
+        Form {
+            Section("Export") {
+                Picker("Container", selection: $downloadSettings.container) {
+                    ForEach(DownloadContainer.allCases) { option in
+                        Text(option.title).tag(option)
+                    }
+                }
+                .disabled(isRunning)
+
+                Picker("Max resolution", selection: $downloadSettings.maxResolution) {
+                    ForEach(DownloadMaxResolution.allCases) { option in
+                        Text(option.title).tag(option)
+                    }
+                }
+                .disabled(isRunning)
+
+                Picker("Audio format", selection: $downloadSettings.audioFormat) {
+                    ForEach(AudioFormatOption.allCases) { option in
+                        Text(option.title).tag(option)
+                    }
+                }
+                .disabled(isRunning)
+            }
+
+            Section("Behavior") {
+                Toggle("Single video only (--no-playlist)", isOn: $downloadSettings.noPlaylist)
+                    .disabled(isRunning)
+                Toggle("Embed subtitles when available", isOn: $downloadSettings.embedSubtitles)
+                    .disabled(isRunning)
+            }
+        }
+    }
+
     private func runDownloadFlow() {
         guard !isRunning else { return }
         let targetURL = urlText.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -201,6 +241,7 @@ struct ContentView: View {
         let readHandle = logPipe.fileHandleForReading
         let writeFD = logPipe.fileHandleForWriting.fileDescriptor
         let presetAtStart = selectedPreset.pythonValue
+        let settingsAtStart = downloadSettings.jsonString
         setenv("PALLADIUM_LOG_FD", "\(writeFD)", 1)
 
         readHandle.readabilityHandler = { handle in
@@ -215,7 +256,8 @@ struct ContentView: View {
         Task {
             let outcome = await PythonFlowRunner.executeDownloadFlow(
                 url: targetURL,
-                preset: presetAtStart
+                preset: presetAtStart,
+                settingsJSON: settingsAtStart
             )
 
             unsetenv("PALLADIUM_LOG_FD")
@@ -357,6 +399,79 @@ private enum DownloadPreset: String {
     case audio = "audio"
 
     var pythonValue: String { rawValue }
+}
+
+private struct DownloadSettings: Codable {
+    var container: DownloadContainer = .automatic
+    var maxResolution: DownloadMaxResolution = .source
+    var audioFormat: AudioFormatOption = .automatic
+    var noPlaylist: Bool = true
+    var embedSubtitles: Bool = false
+
+    var jsonString: String {
+        let encoder = JSONEncoder()
+        guard let data = try? encoder.encode(self),
+              let json = String(data: data, encoding: .utf8) else {
+            return "{}"
+        }
+        return json
+    }
+}
+
+private enum DownloadContainer: String, Codable, CaseIterable, Identifiable {
+    case automatic
+    case mp4
+    case webm
+
+    var id: String { rawValue }
+    var title: String {
+        switch self {
+        case .automatic: return "Automatic"
+        case .mp4: return "MP4"
+        case .webm: return "WEBM"
+        }
+    }
+}
+
+private enum DownloadMaxResolution: String, Codable, CaseIterable, Identifiable {
+    case source
+    case p2160
+    case p1440
+    case p1080
+    case p720
+    case p480
+    case p360
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .source: return "Source"
+        case .p2160: return "2160p"
+        case .p1440: return "1440p"
+        case .p1080: return "1080p"
+        case .p720: return "720p"
+        case .p480: return "480p"
+        case .p360: return "360p"
+        }
+    }
+}
+
+private enum AudioFormatOption: String, Codable, CaseIterable, Identifiable {
+    case automatic
+    case m4a
+    case mp3
+    case opus
+
+    var id: String { rawValue }
+    var title: String {
+        switch self {
+        case .automatic: return "Automatic"
+        case .m4a: return "M4A"
+        case .mp3: return "MP3"
+        case .opus: return "OPUS"
+        }
+    }
 }
 
 private struct ShareItem: Identifiable {

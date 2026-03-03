@@ -218,6 +218,65 @@ def cleanup_temp_download_files(downloads_dir):
         traceback.print_exc()
 
 
+def parse_download_settings(settings_json):
+    defaults = {
+        "container": "automatic",
+        "maxResolution": "source",
+        "audioFormat": "automatic",
+        "noPlaylist": True,
+        "embedSubtitles": False,
+    }
+    if not settings_json:
+        return defaults
+
+    try:
+        parsed = json.loads(str(settings_json))
+        if not isinstance(parsed, dict):
+            return defaults
+    except Exception:
+        print("[palladium] failed to parse settings JSON, using defaults")
+        traceback.print_exc()
+        return defaults
+
+    settings = defaults.copy()
+    for key in defaults.keys():
+        if key in parsed:
+            settings[key] = parsed[key]
+    return settings
+
+
+def build_settings_args(settings, preset):
+    args = []
+
+    if bool(settings.get("noPlaylist", True)):
+        args.append("--no-playlist")
+
+    if bool(settings.get("embedSubtitles", False)):
+        args.extend(["--embed-subs", "--write-subs", "--sub-langs", "all"])
+
+    max_resolution = str(settings.get("maxResolution", "source"))
+    resolution_map = {
+        "p2160": "2160",
+        "p1440": "1440",
+        "p1080": "1080",
+        "p720": "720",
+        "p480": "480",
+        "p360": "360",
+    }
+    if max_resolution in resolution_map:
+        args.extend(["-S", f"res:<={resolution_map[max_resolution]}"])
+
+    container = str(settings.get("container", "automatic"))
+    if container in ("mp4", "webm"):
+        args.extend(["--remux-video", container])
+
+    audio_format = str(settings.get("audioFormat", "automatic"))
+    if preset == "audio" and audio_format in ("m4a", "mp3", "opus"):
+        args.extend(["--extract-audio", "--audio-format", audio_format])
+
+    return args
+
+
 @contextlib.contextmanager
 def patch_subprocess_for_swiftffmpeg(bridge):
     original_popen = subprocess.Popen
@@ -623,7 +682,7 @@ def patch_ytdlp_ffmpeg_detection():
             ffmpeg_pp.probe_basename = original_probe_basename
 
 
-def run_yt_dlp_flow(download_url_override=None, download_preset_override=None):
+def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, download_settings_json_override=None):
     output = io.StringIO()
     console_stdout = sys.__stdout__ if sys.__stdout__ is not None else None
     console_stderr = sys.__stderr__ if sys.__stderr__ is not None else None
@@ -641,6 +700,10 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None):
         download_preset = os.environ.get("PALLADIUM_DOWNLOAD_PRESET", "auto_video").strip()
     else:
         download_preset = str(download_preset_override).strip()
+    if download_settings_json_override is None:
+        download_settings_json = os.environ.get("PALLADIUM_DOWNLOAD_SETTINGS_JSON", "").strip()
+    else:
+        download_settings_json = str(download_settings_json_override).strip()
     downloads_dir = os.environ.get("PALLADIUM_DOWNLOADS", "").strip()
     install_target = os.environ.get("PALLADIUM_PYTHON_PACKAGES")
     live_fd_value = os.environ.get("PALLADIUM_LOG_FD")
@@ -795,6 +858,10 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None):
                         preset_args = ["-f", "bestvideo*+bestaudio/best"]
                         print("[palladium] preset: auto_video")
 
+                    settings = parse_download_settings(download_settings_json)
+                    settings_args = build_settings_args(settings, download_preset)
+                    print(f"[palladium] settings: {settings}")
+
                     sys.argv = [
                         "yt-dlp",
                         "-v",
@@ -808,6 +875,7 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None):
                         "-o",
                         "%(title)s [%(id)s].%(ext)s",
                         *preset_args,
+                        *settings_args,
                         download_url,
                     ]
 
