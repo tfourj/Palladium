@@ -134,11 +134,6 @@ struct ContentView: View {
         .onChange(of: selectedPostDownloadAction) { _ in
             persistPreferences()
         }
-        .onChange(of: selectedTab) { _, newTab in
-            if newTab == .packages, !isRunning {
-                refreshPackageVersions()
-            }
-        }
         .sheet(item: $shareItem) { item in
             ShareSheet(activityItems: [item.url])
         }
