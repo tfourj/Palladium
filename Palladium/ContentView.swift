@@ -332,8 +332,8 @@ struct ContentView: View {
         let lines = normalized.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
         for line in lines {
             let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
-            if trimmed.contains("[download]") {
-                progressText = trimmed
+            if let summarized = summarizedDownloadProgress(from: trimmed) {
+                progressText = summarized
             } else if trimmed.contains("[Merger]") {
                 progressText = trimmed
             } else if trimmed.contains("yt-dlp Popen running ffmpeg") {
@@ -348,6 +348,35 @@ struct ContentView: View {
                 progressText = "Downloading..."
             }
         }
+    }
+
+    private func summarizedDownloadProgress(from line: String) -> String? {
+        guard line.contains("[download]") else { return nil }
+
+        if line.contains("Destination:") {
+            return "Preparing download..."
+        }
+        if line.contains("has already been downloaded") {
+            return "Already downloaded"
+        }
+        if line.contains("100%") {
+            return "Download finished"
+        }
+        if line.contains("% of") {
+            let percentage = line
+                .replacingOccurrences(of: "[download]", with: "")
+                .split(separator: " ")
+                .first { $0.contains("%") }
+                .map(String.init) ?? ""
+
+            if let etaRange = line.range(of: "ETA ") {
+                let eta = String(line[etaRange.lowerBound...]).replacingOccurrences(of: "(frag", with: "• frag")
+                return percentage.isEmpty ? "Downloading... \(eta)" : "Downloading \(percentage) • \(eta)"
+            }
+            return percentage.isEmpty ? "Downloading..." : "Downloading \(percentage)"
+        }
+
+        return line
     }
 
     private func enqueueConsoleChunk(_ chunk: String, trackProgress: Bool) {
