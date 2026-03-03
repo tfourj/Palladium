@@ -17,6 +17,15 @@ struct PackagesTabView: View {
             Text("status: \(packageStatusText)")
                 .font(.subheadline.monospaced())
 
+            if isRunning {
+                HStack(spacing: 8) {
+                    ProgressView()
+                    Text(packageStatusText == "updating" ? "Updating packages..." : "Checking versions...")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
             Text(versionsText)
                 .font(.system(.footnote, design: .monospaced))
                 .frame(maxWidth: .infinity, alignment: .leading)
