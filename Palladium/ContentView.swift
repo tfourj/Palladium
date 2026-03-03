@@ -37,6 +37,8 @@ struct ContentView: View {
     @State private var alertMessage: String?
     @State private var showAlert = false
     @State private var shareItem: ShareItem?
+    @State private var currentDownloadTask: Task<Void, Never>?
+    @State private var cancelMarkerURL: URL?
 
     init() {
         #if DEBUG
@@ -57,7 +59,8 @@ struct ContentView: View {
                 selectedPreset: $selectedPreset,
                 isRunning: isRunning,
                 progressText: progressText,
-                onDownload: runDownloadFlow
+                onDownload: runDownloadFlow,
+                onCancel: cancelDownloadFlow
             )
             .tabItem {
                 Label("Download", systemImage: "arrow.down.circle")
@@ -140,7 +143,15 @@ struct ContentView: View {
         let presetAtStart = selectedPreset.pythonValue
         let customArgsAtStart = customArgsText.trimmingCharacters(in: .whitespacesAndNewlines)
         let extraArgsAtStart = extraArgsText.trimmingCharacters(in: .whitespacesAndNewlines)
+        let cancelMarker = makeCancelMarkerURL()
+        cancelMarkerURL = cancelMarker
         setenv("PALLADIUM_LOG_FD", "\(writeFD)", 1)
+        if let cancelMarker {
+            setenv("PALLADIUM_CANCEL_FILE", cancelMarker.path, 1)
+            try? FileManager.default.removeItem(at: cancelMarker)
+        } else {
+            unsetenv("PALLADIUM_CANCEL_FILE")
+        }
 
         readHandle.readabilityHandler = { handle in
             let data = handle.availableData
@@ -151,7 +162,7 @@ struct ContentView: View {
             }
         }
 
-        Task {
+        let task = Task {
             let outcome = await PythonFlowRunner.executeDownloadFlow(
                 url: targetURL,
                 preset: presetAtStart,
@@ -160,13 +171,23 @@ struct ContentView: View {
             )
 
             unsetenv("PALLADIUM_LOG_FD")
+            unsetenv("PALLADIUM_CANCEL_FILE")
             readHandle.readabilityHandler = nil
             try? readHandle.close()
             try? logPipe.fileHandleForWriting.close()
+            if let cancelMarkerURL {
+                try? FileManager.default.removeItem(at: cancelMarkerURL)
+            }
+            self.cancelMarkerURL = nil
+            self.currentDownloadTask = nil
 
             isRunning = false
             statusText = outcome.statusText
-            progressText = outcome.statusText == "success" ? "download complete" : "download failed"
+            if outcome.statusText == "cancelled" {
+                progressText = "download cancelled"
+            } else {
+                progressText = outcome.statusText == "success" ? "download complete" : "download failed"
+            }
             let outputBody = outcome.outputText
             consoleLogText += "\n\(outcome.summaryText)\n\n\(outputBody)\n"
             Self.logger.info("yt-dlp flow finished with status: \(outcome.statusText, privacy: .public)")
@@ -180,6 +201,16 @@ struct ContentView: View {
                 showDownloadActionDialog = true
             }
         }
+        currentDownloadTask = task
+    }
+
+    private func cancelDownloadFlow() {
+        guard isRunning else { return }
+        if let markerURL = cancelMarkerURL {
+            try? "cancel".write(to: markerURL, atomically: true, encoding: .utf8)
+        }
+        currentDownloadTask?.cancel()
+        progressText = "Cancelling..."
     }
 
     private func runPackageFlow(action: String) {
@@ -341,6 +372,13 @@ struct ContentView: View {
 
     private static func loadExtraArgs() -> String {
         UserDefaults.standard.string(forKey: extraArgsDefaultsKey) ?? ""
+    }
+
+    private func makeCancelMarkerURL() -> URL? {
+        if let downloadsPath = ProcessInfo.processInfo.environment["PALLADIUM_DOWNLOADS"], !downloadsPath.isEmpty {
+            return URL(fileURLWithPath: downloadsPath).appendingPathComponent(".palladium-cancel-\(UUID().uuidString)")
+        }
+        return FileManager.default.temporaryDirectory.appendingPathComponent(".palladium-cancel-\(UUID().uuidString)")
     }
 }
 

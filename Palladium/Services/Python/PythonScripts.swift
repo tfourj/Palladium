@@ -266,6 +266,47 @@ def parse_extra_args(extra_args_value):
         return []
 
 
+def is_cancel_requested(cancel_file_path):
+    return bool(cancel_file_path) and os.path.exists(cancel_file_path)
+
+
+@contextlib.contextmanager
+def patch_ytdlp_cancel(cancel_file_path):
+    if not cancel_file_path:
+        yield
+        return
+
+    try:
+        from yt_dlp import YoutubeDL as YDLClass
+        from yt_dlp.downloader.common import FileDownloader
+    except Exception:
+        yield
+        return
+
+    original_to_screen = YDLClass.to_screen
+    original_report_progress = FileDownloader.report_progress
+
+    def maybe_cancel():
+        if is_cancel_requested(cancel_file_path):
+            raise KeyboardInterrupt("cancel requested")
+
+    def patched_to_screen(self, message, *args, **kwargs):
+        maybe_cancel()
+        return original_to_screen(self, message, *args, **kwargs)
+
+    def patched_report_progress(self, s):
+        maybe_cancel()
+        return original_report_progress(self, s)
+
+    YDLClass.to_screen = patched_to_screen
+    FileDownloader.report_progress = patched_report_progress
+    try:
+        yield
+    finally:
+        YDLClass.to_screen = original_to_screen
+        FileDownloader.report_progress = original_report_progress
+
+
 @contextlib.contextmanager
 def patch_subprocess_for_swiftffmpeg(bridge):
     original_popen = subprocess.Popen
@@ -679,6 +720,7 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, c
     pip_exit_code = None
     yt_exit_code = None
     downloaded_path = None
+    cancelled = False
     success = False
     if download_url_override is None:
         download_url = os.environ.get("PALLADIUM_DOWNLOAD_URL", "").strip()
@@ -699,6 +741,7 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, c
         extra_args_text = str(extra_args_override).strip()
     downloads_dir = os.environ.get("PALLADIUM_DOWNLOADS", "").strip()
     install_target = os.environ.get("PALLADIUM_PYTHON_PACKAGES")
+    cancel_file_path = os.environ.get("PALLADIUM_CANCEL_FILE", "").strip()
     live_fd_value = os.environ.get("PALLADIUM_LOG_FD")
     live_log_stream = None
     if live_fd_value:
@@ -815,6 +858,10 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, c
         if not download_url:
             print("[palladium] no URL provided")
             yt_exit_code = 1
+        elif is_cancel_requested(cancel_file_path):
+            print("[palladium] cancellation requested before run")
+            cancelled = True
+            yt_exit_code = 130
         else:
             print(f"[palladium] running yt-dlp -v {download_url}")
 
@@ -840,52 +887,63 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, c
                     cleanup_temp_download_files(downloads_dir)
                     cleanup_existing_downloads(downloads_dir, download_url)
 
-                    if download_preset == "custom":
-                        preset_args = parse_custom_args(custom_args_text)
-                        print("[palladium] preset: custom")
-                    else:
-                        preset_args = build_preset_args(download_preset)
-                    extra_args = parse_extra_args(extra_args_text)
+                    if is_cancel_requested(cancel_file_path):
+                        print("[palladium] cancellation requested before yt-dlp start")
+                        cancelled = True
+                        yt_exit_code = 130
 
-                    sys.argv = [
-                        "yt-dlp",
-                        "-v",
-                        "--no-check-certificate",
-                        "--remote-components",
-                        "ejs:github",
-                        "--force-overwrites",
-                        "--no-continue",
-                        "--ffmpeg-location",
-                        ffmpeg_bridge_dir if ffmpeg_bridge_dir else ".",
-                        "-P",
-                        downloads_dir if downloads_dir else ".",
-                        "-o",
-                        "%(title)s [%(id)s].%(ext)s",
-                        *preset_args,
-                        *extra_args,
-                        download_url,
-                    ]
-
-                    try:
-                        with (
-                            patch_subprocess_for_swiftffmpeg(bridge),
-                            patch_ytdlp_popen_for_swiftffmpeg(bridge),
-                            patch_ytdlp_ffmpeg_detection(),
-                        ):
-                            runpy.run_module("yt_dlp", run_name="__main__", alter_sys=True)
-                        yt_exit_code = 0
-                    except SystemExit as exc:
-                        if exc.code is None:
-                            yt_exit_code = 0
-                        elif isinstance(exc.code, int):
-                            yt_exit_code = exc.code
+                    if yt_exit_code is None:
+                        if download_preset == "custom":
+                            preset_args = parse_custom_args(custom_args_text)
+                            print("[palladium] preset: custom")
                         else:
-                            print(f"[palladium] unexpected SystemExit code: {exc.code}")
+                            preset_args = build_preset_args(download_preset)
+                        extra_args = parse_extra_args(extra_args_text)
+
+                        sys.argv = [
+                            "yt-dlp",
+                            "-v",
+                            "--no-check-certificate",
+                            "--remote-components",
+                            "ejs:github",
+                            "--force-overwrites",
+                            "--no-continue",
+                            "--ffmpeg-location",
+                            ffmpeg_bridge_dir if ffmpeg_bridge_dir else ".",
+                            "-P",
+                            downloads_dir if downloads_dir else ".",
+                            "-o",
+                            "%(title)s [%(id)s].%(ext)s",
+                            *preset_args,
+                            *extra_args,
+                            download_url,
+                        ]
+
+                        try:
+                            with (
+                                patch_subprocess_for_swiftffmpeg(bridge),
+                                patch_ytdlp_popen_for_swiftffmpeg(bridge),
+                                patch_ytdlp_ffmpeg_detection(),
+                                patch_ytdlp_cancel(cancel_file_path),
+                            ):
+                                runpy.run_module("yt_dlp", run_name="__main__", alter_sys=True)
+                            yt_exit_code = 0
+                        except KeyboardInterrupt:
+                            cancelled = True
+                            yt_exit_code = 130
+                            print("[palladium] yt-dlp cancelled by user")
+                        except SystemExit as exc:
+                            if exc.code is None:
+                                yt_exit_code = 0
+                            elif isinstance(exc.code, int):
+                                yt_exit_code = exc.code
+                            else:
+                                print(f"[palladium] unexpected SystemExit code: {exc.code}")
+                                yt_exit_code = 1
+                        except Exception:
+                            print("[palladium] yt-dlp execution failed")
+                            traceback.print_exc()
                             yt_exit_code = 1
-                    except Exception:
-                        print("[palladium] yt-dlp execution failed")
-                        traceback.print_exc()
-                        yt_exit_code = 1
 
                 if yt_exit_code == 0:
                     try:
@@ -948,13 +1006,14 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, c
                 except Exception:
                     pass
 
-        success = (pip_exit_code in (None, 0)) and (yt_exit_code == 0)
+        success = (pip_exit_code in (None, 0)) and (yt_exit_code == 0) and not cancelled
         print(f"[palladium] flow success: {success}")
 
     return json.dumps({
         "pip_attempted": pip_attempted,
         "pip_exit_code": pip_exit_code,
         "yt_exit_code": yt_exit_code,
+        "cancelled": cancelled,
         "success": success,
         "downloaded_path": downloaded_path,
         "output": output.getvalue(),

@@ -43,6 +43,7 @@ enum PythonFlowRunner {
         let pipExitCode = result["pip_exit_code"] as? Int
         let ytExitCode = result["yt_exit_code"] as? Int
         let success = result["success"] as? Bool ?? false
+        let cancelled = result["cancelled"] as? Bool ?? false
         let output = result["output"] as? String ?? ""
         let downloadedPath = result["downloaded_path"] as? String
 
@@ -50,11 +51,12 @@ enum PythonFlowRunner {
         pip attempted: \(pipAttempted)
         pip exit code: \(pipExitCode.map(String.init) ?? "none")
         yt-dlp exit code: \(ytExitCode.map(String.init) ?? "none")
+        cancelled: \(cancelled)
         success: \(success)
         """
 
         return PythonFlowOutcome(
-            statusText: success ? "success" : "error",
+            statusText: cancelled ? "cancelled" : (success ? "success" : "error"),
             summaryText: summary,
             outputText: output,
             versionsText: nil,

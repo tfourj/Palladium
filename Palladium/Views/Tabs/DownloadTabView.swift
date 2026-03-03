@@ -9,6 +9,7 @@ struct DownloadTabView: View {
     let isRunning: Bool
     let progressText: String
     let onDownload: () -> Void
+    let onCancel: () -> Void
 
     var body: some View {
         ZStack {
@@ -101,6 +102,20 @@ struct DownloadTabView: View {
                     .buttonStyle(.borderedProminent)
                     .tint(.blue)
                     .disabled(isRunning || urlText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+
+                    if isRunning {
+                        Button(action: onCancel) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "stop.circle.fill")
+                                Text("Cancel")
+                            }
+                            .font(.headline)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 10)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(.red)
+                    }
                 }
                 .padding(12)
                 .background(Color.white.opacity(0.08))
