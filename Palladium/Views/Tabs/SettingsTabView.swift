@@ -11,7 +11,7 @@ struct SettingsTabView: View {
     var body: some View {
         NavigationView {
             List {
-                Section(header: Text("General")) {
+                Section(header: Text("Download")) {
                     NavigationLink {
                         DownloadArgumentsSettingsView(
                             customArgsText: $customArgsText,
@@ -19,12 +19,12 @@ struct SettingsTabView: View {
                             isRunning: isRunning
                         )
                     } label: {
-                        HStack {
-                            Image(systemName: "slider.horizontal.3")
-                                .foregroundColor(.blue)
-                                .frame(width: 24)
-                            Text("Download Arguments")
-                        }
+                        settingsRow(
+                            title: "Download Arguments",
+                            subtitle: "Custom and global yt-dlp args",
+                            icon: "slider.horizontal.3",
+                            color: .blue
+                        )
                     }
 
                     NavigationLink {
@@ -34,29 +34,58 @@ struct SettingsTabView: View {
                             isRunning: isRunning
                         )
                     } label: {
-                        HStack {
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundColor(.green)
-                                .frame(width: 24)
-                            Text("After Download")
-                        }
+                        settingsRow(
+                            title: "After Download",
+                            subtitle: "What to do when a download finishes",
+                            icon: "checkmark.circle.fill",
+                            color: .green
+                        )
                     }
+                }
 
+                Section(header: Text("About")) {
                     NavigationLink {
                         SettingsAboutView()
                     } label: {
-                        HStack {
-                            Image(systemName: "info.circle.fill")
-                                .foregroundColor(.orange)
-                                .frame(width: 24)
-                            Text("About")
-                        }
+                        settingsRow(
+                            title: "About",
+                            subtitle: "Version and quick help",
+                            icon: "info.circle.fill",
+                            color: .orange
+                        )
                     }
                 }
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
         }
+    }
+
+    private func settingsRow(
+        title: String,
+        subtitle: String,
+        icon: String,
+        color: Color
+    ) -> some View {
+        HStack(spacing: 12) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(color.opacity(0.18))
+                    .frame(width: 34, height: 34)
+                Image(systemName: icon)
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(color)
+            }
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .foregroundStyle(.primary)
+                Text(subtitle)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .padding(.vertical, 2)
     }
 }
 
