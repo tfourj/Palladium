@@ -6,8 +6,30 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		82BF06CE2F5762BC00133331 /* Python.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82BF06CD2F5762BC00133331 /* Python.xcframework */; };
+		82BF06CF2F5762BC00133331 /* Python.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 82BF06CD2F5762BC00133331 /* Python.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		82BF06D32F5762DD00133331 /* PythonKit in Frameworks */ = {isa = PBXBuildFile; productRef = 82BF06D22F5762DD00133331 /* PythonKit */; };
+		82BF06D62F5762EA00133331 /* SwiftFFmpeg in Frameworks */ = {isa = PBXBuildFile; productRef = 82BF06D52F5762EA00133331 /* SwiftFFmpeg */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		82BF06D02F5762BC00133331 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				82BF06CF2F5762BC00133331 /* Python.xcframework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		82BF06BE2F5761E800133331 /* Palladium.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Palladium.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		82BF06CD2F5762BC00133331 /* Python.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = Python.xcframework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -23,6 +45,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				82BF06CE2F5762BC00133331 /* Python.xcframework in Frameworks */,
+				82BF06D62F5762EA00133331 /* SwiftFFmpeg in Frameworks */,
+				82BF06D32F5762DD00133331 /* PythonKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -33,6 +58,7 @@
 			isa = PBXGroup;
 			children = (
 				82BF06C02F5761E800133331 /* Palladium */,
+				82BF06CC2F5762BC00133331 /* Frameworks */,
 				82BF06BF2F5761E800133331 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -45,6 +71,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		82BF06CC2F5762BC00133331 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				82BF06CD2F5762BC00133331 /* Python.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -55,6 +89,7 @@
 				82BF06BA2F5761E800133331 /* Sources */,
 				82BF06BB2F5761E800133331 /* Frameworks */,
 				82BF06BC2F5761E800133331 /* Resources */,
+				82BF06D02F5762BC00133331 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -65,6 +100,8 @@
 			);
 			name = Palladium;
 			packageProductDependencies = (
+				82BF06D22F5762DD00133331 /* PythonKit */,
+				82BF06D52F5762EA00133331 /* SwiftFFmpeg */,
 			);
 			productName = Palladium;
 			productReference = 82BF06BE2F5761E800133331 /* Palladium.app */;
@@ -94,6 +131,10 @@
 			);
 			mainGroup = 82BF06B52F5761E800133331;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				82BF06D12F5762DD00133331 /* XCRemoteSwiftPackageReference "PythonKit" */,
+				82BF06D42F5762EA00133331 /* XCLocalSwiftPackageReference "../SwiftFFmpeg-iOS" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 82BF06BF2F5761E800133331 /* Products */;
 			projectDirPath = "";
@@ -259,8 +300,9 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -269,6 +311,10 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.tfourj.Palladium;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -291,8 +337,9 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -301,6 +348,10 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.tfourj.Palladium;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -332,6 +383,36 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		82BF06D42F5762EA00133331 /* XCLocalSwiftPackageReference "../SwiftFFmpeg-iOS" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../SwiftFFmpeg-iOS";
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		82BF06D12F5762DD00133331 /* XCRemoteSwiftPackageReference "PythonKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pvieito/PythonKit";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		82BF06D22F5762DD00133331 /* PythonKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 82BF06D12F5762DD00133331 /* XCRemoteSwiftPackageReference "PythonKit" */;
+			productName = PythonKit;
+		};
+		82BF06D52F5762EA00133331 /* SwiftFFmpeg */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SwiftFFmpeg;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 82BF06B62F5761E800133331 /* Project object */;
 }
