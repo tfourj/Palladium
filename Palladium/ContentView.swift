@@ -11,6 +11,7 @@ import Foundation
 import UIKit
 import Photos
 import AVFoundation
+import UserNotifications
 
 struct ContentView: View {
     private enum AppTab: Hashable {
@@ -30,7 +31,9 @@ struct ContentView: View {
     private static let extraArgsDefaultsKey = "palladium.extraArgs"
     private static let askUserAfterDownloadDefaultsKey = "palladium.askUserAfterDownload"
     private static let selectedPostDownloadActionDefaultsKey = "palladium.selectedPostDownloadAction"
+    private static let notificationsEnabledDefaultsKey = "palladium.notificationsEnabled"
 
+    @Environment(\.scenePhase) private var scenePhase
     @State private var isRunning = false
     @State private var statusText = "idle"
     @State private var urlText: String
@@ -40,6 +43,7 @@ struct ContentView: View {
     @State private var extraArgsText: String
     @State private var askUserAfterDownload: Bool
     @State private var selectedPostDownloadAction: PostDownloadAction
+    @State private var notificationsEnabled: Bool
     @State private var selectedTab: AppTab = .download
     @State private var packageStatusText = "idle"
     @State private var versionsText = "yt-dlp: unknown\nyt-dlp-apple-webkit-jsi: unknown"
@@ -69,6 +73,7 @@ struct ContentView: View {
         _extraArgsText = State(initialValue: Self.loadExtraArgs())
         _askUserAfterDownload = State(initialValue: Self.loadAskUserAfterDownload())
         _selectedPostDownloadAction = State(initialValue: Self.loadSelectedPostDownloadAction())
+        _notificationsEnabled = State(initialValue: Self.loadNotificationsEnabled())
     }
 
     var body: some View {
@@ -106,6 +111,7 @@ struct ContentView: View {
                 extraArgsText: $extraArgsText,
                 askUserAfterDownload: $askUserAfterDownload,
                 selectedPostDownloadAction: $selectedPostDownloadAction,
+                notificationsEnabled: $notificationsEnabled,
                 isRunning: isRunning
             )
             .tabItem {
@@ -133,6 +139,12 @@ struct ContentView: View {
         }
         .onChange(of: selectedPostDownloadAction) { _ in
             persistPreferences()
+        }
+        .onChange(of: notificationsEnabled) { _ in
+            persistPreferences()
+            if notificationsEnabled {
+                requestNotificationAuthorizationIfNeeded()
+            }
         }
         .sheet(item: $shareItem) { item in
             ShareSheet(activityItems: [item.url])
@@ -239,6 +251,7 @@ struct ContentView: View {
                FileManager.default.fileExists(atPath: downloadedPath) {
                 let completedURL = URL(fileURLWithPath: downloadedPath)
                 completedDownloadURL = completedURL
+                notifyDownloadCompletionIfNeeded(fileURL: completedURL)
                 if askUserAfterDownloadAtStart {
                     showDownloadActionDialog = true
                 } else {
@@ -472,6 +485,7 @@ struct ContentView: View {
         defaults.set(extraArgsText, forKey: Self.extraArgsDefaultsKey)
         defaults.set(askUserAfterDownload, forKey: Self.askUserAfterDownloadDefaultsKey)
         defaults.set(selectedPostDownloadAction.rawValue, forKey: Self.selectedPostDownloadActionDefaultsKey)
+        defaults.set(notificationsEnabled, forKey: Self.notificationsEnabledDefaultsKey)
     }
 
     private static func loadSelectedPreset() -> DownloadPreset {
@@ -503,6 +517,48 @@ struct ContentView: View {
             return .openShareSheet
         }
         return action
+    }
+
+    private static func loadNotificationsEnabled() -> Bool {
+        if UserDefaults.standard.object(forKey: notificationsEnabledDefaultsKey) == nil {
+            return true
+        }
+        return UserDefaults.standard.bool(forKey: notificationsEnabledDefaultsKey)
+    }
+
+    private func requestNotificationAuthorizationIfNeeded() {
+        let center = UNUserNotificationCenter.current()
+        center.getNotificationSettings { settings in
+            guard settings.authorizationStatus == .notDetermined else { return }
+            center.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+                if let error {
+                    Self.logger.error("notification permission request failed: \(error.localizedDescription, privacy: .public)")
+                } else {
+                    Self.logger.info("notification permission granted: \(granted, privacy: .public)")
+                }
+            }
+        }
+    }
+
+    private func notifyDownloadCompletionIfNeeded(fileURL: URL) {
+        guard notificationsEnabled, scenePhase != .active else { return }
+
+        let content = UNMutableNotificationContent()
+        content.title = "Download Complete"
+        content.body = fileURL.lastPathComponent
+        content.sound = .default
+
+        let request = UNNotificationRequest(
+            identifier: "palladium-download-\(UUID().uuidString)",
+            content: content,
+            trigger: nil
+        )
+
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error {
+                Self.logger.error("failed to schedule completion notification: \(error.localizedDescription, privacy: .public)")
+            }
+        }
     }
 
     private func buildPresetArgumentsJSON() -> String {

@@ -4,6 +4,7 @@ struct SettingsTabView: View {
     private enum SettingsRoute: Hashable {
         case downloadArguments
         case afterDownload
+        case notifications
         case about
     }
 
@@ -11,6 +12,7 @@ struct SettingsTabView: View {
     @Binding var extraArgsText: String
     @Binding var askUserAfterDownload: Bool
     @Binding var selectedPostDownloadAction: PostDownloadAction
+    @Binding var notificationsEnabled: Bool
 
     let isRunning: Bool
 
@@ -33,6 +35,15 @@ struct SettingsTabView: View {
                             subtitle: "What to do when a download finishes",
                             icon: "checkmark.circle.fill",
                             color: .green
+                        )
+                    }
+
+                    NavigationLink(value: SettingsRoute.notifications) {
+                        settingsRow(
+                            title: "Notifications",
+                            subtitle: "Download completion alerts",
+                            icon: "bell.badge.fill",
+                            color: .orange
                         )
                     }
                 }
@@ -62,6 +73,11 @@ struct SettingsTabView: View {
                     AfterDownloadSettingsView(
                         askUserAfterDownload: $askUserAfterDownload,
                         selectedPostDownloadAction: $selectedPostDownloadAction,
+                        isRunning: isRunning
+                    )
+                case .notifications:
+                    NotificationsSettingsView(
+                        notificationsEnabled: $notificationsEnabled,
                         isRunning: isRunning
                     )
                 case .about:
@@ -96,6 +112,26 @@ struct SettingsTabView: View {
             }
         }
         .padding(.vertical, 2)
+    }
+}
+
+private struct NotificationsSettingsView: View {
+    @Binding var notificationsEnabled: Bool
+    let isRunning: Bool
+
+    var body: some View {
+        Form {
+            Section("Download Notifications") {
+                Toggle("Notify when download completes in background", isOn: $notificationsEnabled)
+                    .disabled(isRunning)
+
+                Text("A notification is sent when a download finishes and the app is not active.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .navigationTitle("Notifications")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
