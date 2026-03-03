@@ -218,97 +218,39 @@ def cleanup_temp_download_files(downloads_dir):
         traceback.print_exc()
 
 
-def parse_download_settings(settings_json):
-    defaults = {
-        "targetProfile": "automatic",
-        "container": "automatic",
-        "maxResolution": "source",
-        "audioFormat": "automatic",
-        "audioQuality": "automatic",
-        "noPlaylist": True,
-        "embedSubtitles": False,
-    }
-    if not settings_json:
-        return defaults
+def build_preset_args(preset):
+    if preset == "audio":
+        print("[palladium] preset: audio (mp3 template)")
+        return ["-f", "ba[acodec^=mp3]/ba/b", "-x", "--audio-format", "mp3"]
 
-    try:
-        parsed = json.loads(str(settings_json))
-        if not isinstance(parsed, dict):
-            return defaults
-    except Exception:
-        print("[palladium] failed to parse settings JSON, using defaults")
-        traceback.print_exc()
-        return defaults
-
-    settings = defaults.copy()
-    for key in defaults.keys():
-        if key in parsed:
-            settings[key] = parsed[key]
-    return settings
-
-
-def build_settings_args(settings, preset):
-    args = []
-
-    if bool(settings.get("noPlaylist", True)):
-        args.append("--no-playlist")
-
-    if bool(settings.get("embedSubtitles", False)):
-        args.extend(["--embed-subs", "--write-subs", "--sub-langs", "all"])
-
-    target_profile = str(settings.get("targetProfile", "automatic"))
-    if target_profile == "mp3":
-        args.extend(["-f", "ba[acodec^=mp3]/ba/b", "-x", "--audio-format", "mp3"])
-        return args
-    if target_profile == "aac":
-        args.extend(["-f", "ba[acodec^=aac]/ba[acodec^=mp4a.40.]/ba/b", "-x", "--audio-format", "aac"])
-        return args
-    if target_profile == "mp4":
-        args.extend([
+    if preset == "mute":
+        print("[palladium] preset: mute (mp4 no-audio)")
+        return [
+            "-f", "bv*/bestvideo",
             "--merge-output-format", "mp4",
             "--remux-video", "mp4",
-            "-S", "vcodec:h264,lang,quality,res,fps,hdr:12,acodec:aac",
-        ])
-        return args
+            "-S", "vcodec:h264,lang,quality,res,fps,hdr:12",
+        ]
 
-    max_resolution = str(settings.get("maxResolution", "source"))
-    resolution_map = {
-        "p2160": "2160",
-        "p1440": "1440",
-        "p1080": "1080",
-        "p720": "720",
-        "p480": "480",
-        "p360": "360",
-    }
-    if max_resolution in resolution_map:
-        args.extend(["-S", f"res:<={resolution_map[max_resolution]}"])
+    print("[palladium] preset: auto_video (mp4 template)")
+    return [
+        "--merge-output-format", "mp4",
+        "--remux-video", "mp4",
+        "-S", "vcodec:h264,lang,quality,res,fps,hdr:12,acodec:aac",
+    ]
 
-    container = str(settings.get("container", "automatic"))
-    allowed_containers = {
-        "avi", "flv", "gif", "mkv", "mov", "mp4", "webm",
-        "aac", "aiff", "alac", "flac", "m4a", "mka", "mp3", "ogg", "opus", "vorbis", "wav",
-    }
-    if container in allowed_containers:
-        args.extend(["--remux-video", container])
 
-    audio_format = str(settings.get("audioFormat", "automatic"))
-    audio_quality = str(settings.get("audioQuality", "automatic"))
-    audio_quality_map = {
-        "q0": "0", "q1": "1", "q2": "2", "q3": "3", "q4": "4",
-        "q5": "5", "q6": "6", "q7": "7", "q8": "8", "q9": "9", "q10": "10",
-        "k64": "64K", "k96": "96K", "k128": "128K", "k160": "160K",
-        "k192": "192K", "k256": "256K", "k320": "320K",
-    }
-
-    allowed_audio_formats = {"best", "aac", "alac", "flac", "m4a", "mp3", "opus", "vorbis", "wav"}
-    if preset == "audio":
-        args.append("--extract-audio")
-        if audio_format in allowed_audio_formats:
-            args.extend(["--audio-format", audio_format])
-        if audio_quality in audio_quality_map:
-            args.extend(["--audio-quality", audio_quality_map[audio_quality]])
-
-    return args
+def parse_custom_args(custom_args_value):
+    if not custom_args_value:
+        return []
+    try:
+        parsed = shlex.split(str(custom_args_value))
+        print(f"[palladium] custom args parsed: {parsed}")
+        return parsed
+    except Exception:
+        print("[palladium] failed to parse custom args")
+        traceback.print_exc()
+        return []
 
 
 @contextlib.contextmanager
@@ -716,7 +658,7 @@ def patch_ytdlp_ffmpeg_detection():
             ffmpeg_pp.probe_basename = original_probe_basename
 
 
-def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, download_settings_json_override=None):
+def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, custom_args_override=None):
     output = io.StringIO()
     console_stdout = sys.__stdout__ if sys.__stdout__ is not None else None
     console_stderr = sys.__stderr__ if sys.__stderr__ is not None else None
@@ -734,10 +676,10 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, d
         download_preset = os.environ.get("PALLADIUM_DOWNLOAD_PRESET", "auto_video").strip()
     else:
         download_preset = str(download_preset_override).strip()
-    if download_settings_json_override is None:
-        download_settings_json = os.environ.get("PALLADIUM_DOWNLOAD_SETTINGS_JSON", "").strip()
+    if custom_args_override is None:
+        custom_args_text = os.environ.get("PALLADIUM_CUSTOM_ARGS", "").strip()
     else:
-        download_settings_json = str(download_settings_json_override).strip()
+        custom_args_text = str(custom_args_override).strip()
     downloads_dir = os.environ.get("PALLADIUM_DOWNLOADS", "").strip()
     install_target = os.environ.get("PALLADIUM_PYTHON_PACKAGES")
     live_fd_value = os.environ.get("PALLADIUM_LOG_FD")
@@ -881,20 +823,11 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, d
                     cleanup_temp_download_files(downloads_dir)
                     cleanup_existing_downloads(downloads_dir, download_url)
 
-                    preset_args = []
-                    if download_preset == "mute":
-                        preset_args = ["-f", "bestvideo*/bestvideo/best"]
-                        print("[palladium] preset: mute")
-                    elif download_preset == "audio":
-                        preset_args = ["-f", "bestaudio/best"]
-                        print("[palladium] preset: audio")
+                    if download_preset == "custom":
+                        preset_args = parse_custom_args(custom_args_text)
+                        print("[palladium] preset: custom")
                     else:
-                        preset_args = ["-f", "bestvideo*+bestaudio/best"]
-                        print("[palladium] preset: auto_video")
-
-                    settings = parse_download_settings(download_settings_json)
-                    settings_args = build_settings_args(settings, download_preset)
-                    print(f"[palladium] settings: {settings}")
+                        preset_args = build_preset_args(download_preset)
 
                     sys.argv = [
                         "yt-dlp",
@@ -911,7 +844,6 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, d
                         "-o",
                         "%(title)s [%(id)s].%(ext)s",
                         *preset_args,
-                        *settings_args,
                         download_url,
                     ]
 

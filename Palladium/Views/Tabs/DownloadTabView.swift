@@ -4,6 +4,7 @@ struct DownloadTabView: View {
     @Binding var statusText: String
     @Binding var urlText: String
     @Binding var selectedPreset: DownloadPreset
+    @Binding var customArgsText: String
 
     let isRunning: Bool
     let progressText: String
@@ -26,6 +27,14 @@ struct DownloadTabView: View {
                 presetButton(.autoVideo, title: "Auto (Video)")
                 presetButton(.mute, title: "Mute")
                 presetButton(.audio, title: "Audio")
+                presetButton(.custom, title: "Custom")
+            }
+
+            if selectedPreset == .custom {
+                TextField("--format best --no-playlist", text: $customArgsText)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                    .textFieldStyle(.roundedBorder)
             }
 
             Button(action: onDownload) {

@@ -19,14 +19,14 @@ struct ContentView: View {
     )
 
     private static let presetDefaultsKey = "palladium.selectedPreset"
-    private static let settingsDefaultsKey = "palladium.downloadSettings"
+    private static let customArgsDefaultsKey = "palladium.customArgs"
 
     @State private var isRunning = false
     @State private var statusText = "idle"
     @State private var urlText: String
     @State private var progressText = "Enter a URL and tap Download."
     @State private var selectedPreset: DownloadPreset
-    @State private var downloadSettings: DownloadSettings
+    @State private var customArgsText: String
     @State private var packageStatusText = "idle"
     @State private var versionsText = "yt-dlp: unknown\nyt-dlp-apple-webkit-jsi: unknown"
     @State private var consoleLogText = ""
@@ -43,7 +43,7 @@ struct ContentView: View {
         _urlText = State(initialValue: "")
         #endif
         _selectedPreset = State(initialValue: Self.loadSelectedPreset())
-        _downloadSettings = State(initialValue: Self.loadDownloadSettings())
+        _customArgsText = State(initialValue: Self.loadCustomArgs())
     }
 
     var body: some View {
@@ -52,6 +52,7 @@ struct ContentView: View {
                 statusText: $statusText,
                 urlText: $urlText,
                 selectedPreset: $selectedPreset,
+                customArgsText: $customArgsText,
                 isRunning: isRunning,
                 progressText: progressText,
                 onDownload: runDownloadFlow
@@ -71,11 +72,6 @@ struct ContentView: View {
                 Label("Packages", systemImage: "shippingbox")
             }
 
-            SettingsTabView(settings: $downloadSettings, isRunning: isRunning)
-                .tabItem {
-                    Label("Settings", systemImage: "slider.horizontal.3")
-                }
-
             ConsoleTabView(consoleLogText: $consoleLogText)
                 .tabItem {
                     Label("Console", systemImage: "terminal")
@@ -84,7 +80,7 @@ struct ContentView: View {
         .onChange(of: selectedPreset) { _ in
             persistPreferences()
         }
-        .onChange(of: downloadSettings) { _ in
+        .onChange(of: customArgsText) { _ in
             persistPreferences()
         }
         .sheet(item: $shareItem) { item in
@@ -127,7 +123,7 @@ struct ContentView: View {
         let readHandle = logPipe.fileHandleForReading
         let writeFD = logPipe.fileHandleForWriting.fileDescriptor
         let presetAtStart = selectedPreset.pythonValue
-        let settingsAtStart = downloadSettings.jsonString
+        let customArgsAtStart = customArgsText.trimmingCharacters(in: .whitespacesAndNewlines)
         setenv("PALLADIUM_LOG_FD", "\(writeFD)", 1)
 
         readHandle.readabilityHandler = { handle in
@@ -143,7 +139,7 @@ struct ContentView: View {
             let outcome = await PythonFlowRunner.executeDownloadFlow(
                 url: targetURL,
                 preset: presetAtStart,
-                settingsJSON: settingsAtStart
+                customArgs: customArgsAtStart
             )
 
             unsetenv("PALLADIUM_LOG_FD")
@@ -310,9 +306,7 @@ struct ContentView: View {
     private func persistPreferences() {
         let defaults = UserDefaults.standard
         defaults.set(selectedPreset.rawValue, forKey: Self.presetDefaultsKey)
-        if let data = try? JSONEncoder().encode(downloadSettings) {
-            defaults.set(data, forKey: Self.settingsDefaultsKey)
-        }
+        defaults.set(customArgsText, forKey: Self.customArgsDefaultsKey)
     }
 
     private static func loadSelectedPreset() -> DownloadPreset {
@@ -323,12 +317,8 @@ struct ContentView: View {
         return preset
     }
 
-    private static func loadDownloadSettings() -> DownloadSettings {
-        guard let data = UserDefaults.standard.data(forKey: settingsDefaultsKey),
-              let settings = try? JSONDecoder().decode(DownloadSettings.self, from: data) else {
-            return DownloadSettings()
-        }
-        return settings
+    private static func loadCustomArgs() -> String {
+        UserDefaults.standard.string(forKey: customArgsDefaultsKey) ?? ""
     }
 }
 
