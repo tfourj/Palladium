@@ -3,6 +3,8 @@ import SwiftUI
 struct PackagesTabView: View {
     let packageStatusText: String
     let versionsText: String
+    let updatesSummaryText: String
+    let updatesAvailable: Bool
     let isRunning: Bool
     let onRefreshVersions: () -> Void
     let onUpdatePackages: () -> Void
@@ -22,9 +24,16 @@ struct PackagesTabView: View {
                 .background(Color(.secondarySystemBackground))
                 .clipShape(RoundedRectangle(cornerRadius: 12))
 
+            Text(updatesSummaryText)
+                .font(.system(.footnote, design: .monospaced))
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(12)
+                .background(Color(.secondarySystemBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+
             HStack(spacing: 12) {
                 Button(action: onRefreshVersions) {
-                    Text(isRunning ? "Running..." : "Refresh Versions")
+                    Text(isRunning ? "Running..." : "Check for Updates")
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
@@ -35,7 +44,7 @@ struct PackagesTabView: View {
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
-                .disabled(isRunning)
+                .disabled(isRunning || !updatesAvailable)
             }
             Spacer(minLength: 0)
         }

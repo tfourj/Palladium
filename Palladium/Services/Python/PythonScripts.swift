@@ -53,6 +53,62 @@ def collect_versions():
     return versions
 
 
+def check_package_updates(install_target=None):
+    pip_main = ensure_pip_entrypoint()
+    if pip_main is None:
+        return False, "Unable to check updates (pip unavailable)."
+
+    try:
+        pip_args = ["list", "--outdated", "--format=json"]
+        if install_target:
+            pip_args.extend(["--path", install_target])
+
+        capture = io.StringIO()
+        with contextlib.redirect_stdout(capture):
+            pip_rc = pip_main(pip_args)
+
+        if pip_rc not in (None, 0):
+            return False, f"Unable to check updates (pip exit code {pip_rc})."
+
+        raw = capture.getvalue().strip()
+        if not raw:
+            return False, "All packages are up to date."
+
+        items = None
+        try:
+            items = json.loads(raw)
+        except Exception:
+            lines = [line.strip() for line in raw.splitlines() if line.strip()]
+            for line in reversed(lines):
+                if line.startswith("[") and line.endswith("]"):
+                    try:
+                        items = json.loads(line)
+                        break
+                    except Exception:
+                        continue
+        if items is None:
+            return False, "All packages are up to date."
+        if not isinstance(items, list):
+            return False, "All packages are up to date."
+
+        tracked = {"yt-dlp", "yt-dlp-apple-webkit-jsi"}
+        relevant = [item for item in items if str(item.get("name", "")).lower() in tracked]
+        if not relevant:
+            return False, "All packages are up to date."
+
+        lines = []
+        for item in relevant:
+            name = str(item.get("name", "package"))
+            old_ver = str(item.get("version", "?"))
+            new_ver = str(item.get("latest_version", "?"))
+            lines.append(f"{name}: {old_ver} -> {new_ver}")
+
+        return True, "\\n".join(lines)
+    except Exception:
+        traceback.print_exc()
+        return False, "Unable to check updates."
+
+
 class SwiftFFmpegBridge:
     def __init__(self):
         lib = ctypes.CDLL(None)
@@ -1063,6 +1119,8 @@ def run_package_maintenance(action):
     pip_attempted = False
     pip_exit_code = None
     success = False
+    updates_available = False
+    updates_summary = "Not checked yet."
     install_target = os.environ.get("PALLADIUM_PYTHON_PACKAGES")
     live_fd_value = os.environ.get("PALLADIUM_LOG_FD")
     live_log_stream = None
@@ -1100,24 +1158,35 @@ def run_package_maintenance(action):
             print(f"[palladium] package install target: {install_target}")
 
         print(f"[palladium] package action: {action}")
+        updates_available, updates_summary = check_package_updates(install_target)
+        print(f"[palladium] updates available: {updates_available}")
+        print(f"[palladium] updates summary: {updates_summary}")
+
         if action == "update":
-            pip_attempted = True
-            pip_main = ensure_pip_entrypoint()
-            if pip_main is not None:
-                try:
-                    packages = ["yt-dlp", "yt-dlp-apple-webkit-jsi"]
-                    pip_args = ["install", "-U", "--no-cache-dir", "--progress-bar", "off", "--no-color", *packages]
-                    if install_target:
-                        pip_args[1:1] = ["--target", install_target]
-                    pip_result = pip_main(pip_args)
-                    pip_exit_code = 0 if pip_result is None else int(pip_result)
-                    print(f"[palladium] pip exit code: {pip_exit_code}")
-                except Exception:
+            if updates_available:
+                pip_attempted = True
+                pip_main = ensure_pip_entrypoint()
+                if pip_main is not None:
+                    try:
+                        packages = ["yt-dlp", "yt-dlp-apple-webkit-jsi"]
+                        pip_args = ["install", "-U", "--no-cache-dir", "--progress-bar", "off", "--no-color", *packages]
+                        if install_target:
+                            pip_args[1:1] = ["--target", install_target]
+                        pip_result = pip_main(pip_args)
+                        pip_exit_code = 0 if pip_result is None else int(pip_result)
+                        print(f"[palladium] pip exit code: {pip_exit_code}")
+                    except Exception:
+                        pip_exit_code = 1
+                        print("[palladium] pip update failed")
+                        traceback.print_exc()
+                else:
                     pip_exit_code = 1
-                    print("[palladium] pip update failed")
-                    traceback.print_exc()
             else:
-                pip_exit_code = 1
+                print("[palladium] no updates available; skipping update")
+
+            updates_available, updates_summary = check_package_updates(install_target)
+            print(f"[palladium] post-update updates available: {updates_available}")
+            print(f"[palladium] post-update updates summary: {updates_summary}")
 
         versions = collect_versions()
         print(f"[palladium] yt-dlp version: {versions.get('yt-dlp')}")
@@ -1130,6 +1199,8 @@ def run_package_maintenance(action):
         "pip_attempted": pip_attempted,
         "pip_exit_code": pip_exit_code,
         "success": success,
+        "updates_available": updates_available,
+        "updates_summary": updates_summary,
         "versions": versions,
         "output": output.getvalue(),
     })

@@ -13,6 +13,13 @@ import Photos
 import AVFoundation
 
 struct ContentView: View {
+    private enum AppTab: Hashable {
+        case download
+        case packages
+        case settings
+        case console
+    }
+
     private static let logger = Logger(
         subsystem: Bundle.main.bundleIdentifier ?? "com.tfourj.Palladium",
         category: "python"
@@ -33,8 +40,11 @@ struct ContentView: View {
     @State private var extraArgsText: String
     @State private var askUserAfterDownload: Bool
     @State private var selectedPostDownloadAction: PostDownloadAction
+    @State private var selectedTab: AppTab = .download
     @State private var packageStatusText = "idle"
     @State private var versionsText = "yt-dlp: unknown\nyt-dlp-apple-webkit-jsi: unknown"
+    @State private var packageUpdatesAvailable = false
+    @State private var packageUpdatesSummaryText = "Updates not checked yet."
     @State private var consoleLogText = ""
     @State private var completedDownloadURL: URL?
     @State private var showDownloadActionDialog = false
@@ -62,7 +72,7 @@ struct ContentView: View {
     }
 
     var body: some View {
-        TabView {
+        TabView(selection: $selectedTab) {
             DownloadTabView(
                 statusText: $statusText,
                 urlText: $urlText,
@@ -75,10 +85,13 @@ struct ContentView: View {
             .tabItem {
                 Label("Download", systemImage: "arrow.down.circle")
             }
+            .tag(AppTab.download)
 
             PackagesTabView(
                 packageStatusText: packageStatusText,
                 versionsText: versionsText,
+                updatesSummaryText: packageUpdatesSummaryText,
+                updatesAvailable: packageUpdatesAvailable,
                 isRunning: isRunning,
                 onRefreshVersions: refreshPackageVersions,
                 onUpdatePackages: updatePackages
@@ -86,6 +99,7 @@ struct ContentView: View {
             .tabItem {
                 Label("Packages", systemImage: "shippingbox")
             }
+            .tag(AppTab.packages)
 
             SettingsTabView(
                 customArgsText: $customArgsText,
@@ -97,11 +111,13 @@ struct ContentView: View {
             .tabItem {
                 Label("Settings", systemImage: "slider.horizontal.3")
             }
+            .tag(AppTab.settings)
 
             ConsoleTabView(consoleLogText: $consoleLogText)
                 .tabItem {
                     Label("Console", systemImage: "terminal")
                 }
+                .tag(AppTab.console)
         }
         .onChange(of: selectedPreset) { _ in
             persistPreferences()
@@ -117,6 +133,11 @@ struct ContentView: View {
         }
         .onChange(of: selectedPostDownloadAction) { _ in
             persistPreferences()
+        }
+        .onChange(of: selectedTab) { _, newTab in
+            if newTab == .packages, !isRunning {
+                refreshPackageVersions()
+            }
         }
         .sheet(item: $shareItem) { item in
             ShareSheet(activityItems: [item.url])
@@ -276,6 +297,12 @@ struct ContentView: View {
             appendConsoleText("\n\(outcome.summaryText)\n\n\(outputBody)\n")
             if let versionsText = outcome.versionsText {
                 self.versionsText = versionsText
+            }
+            if let updatesAvailable = outcome.updatesAvailable {
+                self.packageUpdatesAvailable = updatesAvailable
+            }
+            if let updatesSummary = outcome.updatesSummary {
+                self.packageUpdatesSummaryText = updatesSummary
             }
             Self.logger.info("package flow finished with status: \(outcome.statusText, privacy: .public)")
             Self.logger.info("\(consoleLogText, privacy: .public)")

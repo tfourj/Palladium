@@ -35,7 +35,9 @@ enum PythonFlowRunner {
                 \(payload)
                 """,
                 versionsText: nil,
-                downloadedPath: nil
+                downloadedPath: nil,
+                updatesAvailable: nil,
+                updatesSummary: nil
             )
         }
 
@@ -60,7 +62,9 @@ enum PythonFlowRunner {
             summaryText: summary,
             outputText: output,
             versionsText: nil,
-            downloadedPath: downloadedPath
+            downloadedPath: downloadedPath,
+            updatesAvailable: nil,
+            updatesSummary: nil
         )
     }
 
@@ -77,19 +81,25 @@ enum PythonFlowRunner {
                 \(payload)
                 """,
                 versionsText: nil,
-                downloadedPath: nil
+                downloadedPath: nil,
+                updatesAvailable: nil,
+                updatesSummary: nil
             )
         }
 
         let pipAttempted = result["pip_attempted"] as? Bool ?? false
         let pipExitCode = result["pip_exit_code"] as? Int
         let success = result["success"] as? Bool ?? false
+        let updatesAvailable = result["updates_available"] as? Bool ?? false
+        let updatesSummary = result["updates_summary"] as? String ?? "Not checked yet."
         let output = result["output"] as? String ?? ""
         let versions = result["versions"] as? [String: String] ?? [:]
 
         let summary = """
         pip attempted: \(pipAttempted)
         pip exit code: \(pipExitCode.map(String.init) ?? "none")
+        updates available: \(updatesAvailable)
+        updates summary: \(updatesSummary)
         success: \(success)
         """
 
@@ -103,7 +113,9 @@ enum PythonFlowRunner {
             summaryText: summary,
             outputText: output,
             versionsText: versionsText,
-            downloadedPath: nil
+            downloadedPath: nil,
+            updatesAvailable: updatesAvailable,
+            updatesSummary: updatesSummary
         )
     }
 
@@ -120,6 +132,8 @@ struct PythonFlowOutcome: Sendable {
     let outputText: String
     let versionsText: String?
     let downloadedPath: String?
+    let updatesAvailable: Bool?
+    let updatesSummary: String?
 }
 
 private final class PythonExecutor: NSObject {
