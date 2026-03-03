@@ -765,11 +765,7 @@ def run_yt_dlp_flow():
                 try:
                     bridge = SwiftFFmpegBridge()
                     print("[palladium][ffmpeg-bridge] bridge loaded")
-                    for tool_name in ("ffmpeg", "ffprobe"):
-                        version_code, _ = bridge.run(tool_name, ["-version"])
-                        if int(version_code) != 0:
-                            raise RuntimeError(f"{tool_name} -version failed with code {version_code}")
-                        print(f"[palladium][ffmpeg-bridge] {tool_name} probe ok")
+                    print("[palladium][ffmpeg-bridge] startup probes skipped")
                 except Exception as bridge_error:
                     print(f"[palladium] swift ffmpeg bridge error: {bridge_error}")
                     traceback.print_exc()
