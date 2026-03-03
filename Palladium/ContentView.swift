@@ -43,6 +43,10 @@ struct ContentView: View {
     @State private var shareItem: ShareItem?
     @State private var currentDownloadTask: Task<Void, Never>?
     @State private var cancelMarkerURL: URL?
+    @State private var pendingConsoleChunks = ""
+    @State private var isConsoleFlushScheduled = false
+
+    private let consoleMaxChars = 200_000
 
     init() {
         #if DEBUG
@@ -177,8 +181,7 @@ struct ContentView: View {
             let data = handle.availableData
             guard !data.isEmpty, let chunk = String(data: data, encoding: .utf8) else { return }
             Task { @MainActor in
-                consoleLogText.append(chunk)
-                updateProgress(from: chunk)
+                enqueueConsoleChunk(chunk, trackProgress: true)
             }
         }
 
@@ -195,6 +198,7 @@ struct ContentView: View {
             readHandle.readabilityHandler = nil
             try? readHandle.close()
             try? logPipe.fileHandleForWriting.close()
+            await MainActor.run { flushConsoleChunks() }
             if let cancelMarkerURL {
                 try? FileManager.default.removeItem(at: cancelMarkerURL)
             }
@@ -209,7 +213,7 @@ struct ContentView: View {
                 progressText = outcome.statusText == "success" ? "download complete" : "download failed"
             }
             let outputBody = outcome.outputText
-            consoleLogText += "\n\(outcome.summaryText)\n\n\(outputBody)\n"
+            appendConsoleText("\n\(outcome.summaryText)\n\n\(outputBody)\n")
             Self.logger.info("yt-dlp flow finished with status: \(outcome.statusText, privacy: .public)")
             Self.logger.info("\(consoleLogText, privacy: .public)")
             print(consoleLogText)
@@ -253,7 +257,7 @@ struct ContentView: View {
             let data = handle.availableData
             guard !data.isEmpty, let chunk = String(data: data, encoding: .utf8) else { return }
             Task { @MainActor in
-                consoleLogText.append(chunk)
+                enqueueConsoleChunk(chunk, trackProgress: false)
             }
         }
 
@@ -264,11 +268,12 @@ struct ContentView: View {
             readHandle.readabilityHandler = nil
             try? readHandle.close()
             try? logPipe.fileHandleForWriting.close()
+            await MainActor.run { flushConsoleChunks() }
 
             isRunning = false
             packageStatusText = outcome.statusText
             let outputBody = outcome.outputText
-            consoleLogText += "\n\(outcome.summaryText)\n\n\(outputBody)\n"
+            appendConsoleText("\n\(outcome.summaryText)\n\n\(outputBody)\n")
             if let versionsText = outcome.versionsText {
                 self.versionsText = versionsText
             }
@@ -306,6 +311,34 @@ struct ContentView: View {
             } else if trimmed.hasPrefix("[palladium] running yt-dlp") {
                 progressText = "Downloading..."
             }
+        }
+    }
+
+    private func enqueueConsoleChunk(_ chunk: String, trackProgress: Bool) {
+        pendingConsoleChunks.append(chunk)
+        if trackProgress {
+            updateProgress(from: chunk)
+        }
+        guard !isConsoleFlushScheduled else { return }
+        isConsoleFlushScheduled = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.08) {
+            flushConsoleChunks()
+        }
+    }
+
+    private func flushConsoleChunks() {
+        isConsoleFlushScheduled = false
+        guard !pendingConsoleChunks.isEmpty else { return }
+        appendConsoleText(pendingConsoleChunks)
+        pendingConsoleChunks = ""
+    }
+
+    private func appendConsoleText(_ text: String) {
+        consoleLogText.append(text)
+        if consoleLogText.count > consoleMaxChars {
+            let overflow = consoleLogText.count - consoleMaxChars
+            let dropCount = min(overflow + 5_000, consoleLogText.count)
+            consoleLogText.removeFirst(dropCount)
         }
     }
 
