@@ -142,6 +142,7 @@ struct ContentView: View {
         }
         .onChange(of: notificationsEnabled) { _ in
             persistPreferences()
+            debugNotification("setting changed notificationsEnabled=\(notificationsEnabled)")
             if notificationsEnabled {
                 requestNotificationAuthorizationIfNeeded()
             }
@@ -545,19 +546,34 @@ struct ContentView: View {
     private func requestNotificationAuthorizationIfNeeded() {
         let center = UNUserNotificationCenter.current()
         center.getNotificationSettings { settings in
-            guard settings.authorizationStatus == .notDetermined else { return }
+            debugNotification("permission status=\(settings.authorizationStatus.rawValue)")
+            guard settings.authorizationStatus == .notDetermined else {
+                debugNotification("permission request skipped (already determined)")
+                return
+            }
             center.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
                 if let error {
                     Self.logger.error("notification permission request failed: \(error.localizedDescription, privacy: .public)")
+                    debugNotification("permission request failed: \(error.localizedDescription)")
                 } else {
                     Self.logger.info("notification permission granted: \(granted, privacy: .public)")
+                    debugNotification("permission request result granted=\(granted)")
                 }
             }
         }
     }
 
     private func notifyDownloadCompletionIfNeeded(fileURL: URL) {
-        guard notificationsEnabled, scenePhase != .active else { return }
+        guard notificationsEnabled else {
+            debugNotification("completion notification skipped (disabled)")
+            return
+        }
+        guard scenePhase != .active else {
+            debugNotification("completion notification skipped (app active)")
+            return
+        }
+
+        debugNotification("scheduling notification scenePhase=\(String(describing: scenePhase)) file=\(fileURL.lastPathComponent)")
 
         let content = UNMutableNotificationContent()
         content.title = "Download Complete"
@@ -573,7 +589,19 @@ struct ContentView: View {
         UNUserNotificationCenter.current().add(request) { error in
             if let error {
                 Self.logger.error("failed to schedule completion notification: \(error.localizedDescription, privacy: .public)")
+                debugNotification("schedule failed: \(error.localizedDescription)")
+            } else {
+                debugNotification("schedule success id=\(request.identifier)")
             }
+        }
+    }
+
+    private func debugNotification(_ message: String) {
+        let line = "[notify] \(message)"
+        Self.logger.info("\(line, privacy: .public)")
+        print(line)
+        Task { @MainActor in
+            appendConsoleText("\(line)\n")
         }
     }
 
