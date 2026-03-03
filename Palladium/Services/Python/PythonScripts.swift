@@ -223,6 +223,7 @@ def parse_download_settings(settings_json):
         "container": "automatic",
         "maxResolution": "source",
         "audioFormat": "automatic",
+        "audioQuality": "automatic",
         "noPlaylist": True,
         "embedSubtitles": False,
     }
@@ -267,12 +268,29 @@ def build_settings_args(settings, preset):
         args.extend(["-S", f"res:<={resolution_map[max_resolution]}"])
 
     container = str(settings.get("container", "automatic"))
-    if container in ("mp4", "webm"):
+    allowed_containers = {
+        "avi", "flv", "gif", "mkv", "mov", "mp4", "webm",
+        "aac", "aiff", "alac", "flac", "m4a", "mka", "mp3", "ogg", "opus", "vorbis", "wav",
+    }
+    if container in allowed_containers:
         args.extend(["--remux-video", container])
 
     audio_format = str(settings.get("audioFormat", "automatic"))
-    if preset == "audio" and audio_format in ("m4a", "mp3", "opus"):
-        args.extend(["--extract-audio", "--audio-format", audio_format])
+    audio_quality = str(settings.get("audioQuality", "automatic"))
+    audio_quality_map = {
+        "q0": "0", "q1": "1", "q2": "2", "q3": "3", "q4": "4",
+        "q5": "5", "q6": "6", "q7": "7", "q8": "8", "q9": "9", "q10": "10",
+        "k64": "64K", "k96": "96K", "k128": "128K", "k160": "160K",
+        "k192": "192K", "k256": "256K", "k320": "320K",
+    }
+
+    allowed_audio_formats = {"best", "aac", "alac", "flac", "m4a", "mp3", "opus", "vorbis", "wav"}
+    if preset == "audio":
+        args.append("--extract-audio")
+        if audio_format in allowed_audio_formats:
+            args.extend(["--audio-format", audio_format])
+        if audio_quality in audio_quality_map:
+            args.extend(["--audio-quality", audio_quality_map[audio_quality]])
 
     return args
 
