@@ -8,6 +8,7 @@
 import SwiftUI
 import PythonKit
 import OSLog
+import Foundation
 
 struct ContentView: View {
     private static let logger = Logger(
@@ -52,19 +53,43 @@ struct ContentView: View {
         guard !isRunning else { return }
         isRunning = true
         statusText = "running"
-        logText = "Running Python flow..."
+        logText = ""
+
+        let liveLogURL = Self.createLiveLogFileURL()
+        if let liveLogURL {
+            setenv("PALLADIUM_LOG_FILE", liveLogURL.path, 1)
+        }
+
+        let liveLogTask: Task<Void, Never>? = liveLogURL.map { fileURL in
+            Task {
+                var offset: UInt64 = 0
+                while !Task.isCancelled {
+                    if let chunk = Self.readLiveLogChunk(from: fileURL, offset: &offset), !chunk.isEmpty {
+                        logText.append(chunk)
+                    }
+                    try? await Task.sleep(nanoseconds: 200_000_000)
+                }
+                if let finalChunk = Self.readLiveLogChunk(from: fileURL, offset: &offset), !finalChunk.isEmpty {
+                    logText.append(finalChunk)
+                }
+            }
+        }
 
         Task {
             let outcome = await Task.detached(priority: .userInitiated) {
                 ContentView.executePythonFlow()
             }.value
 
+            liveLogTask?.cancel()
+            unsetenv("PALLADIUM_LOG_FILE")
+
             isRunning = false
             statusText = outcome.statusText
-            logText = outcome.logText
+            let outputBody = logText.isEmpty ? outcome.outputText : logText
+            logText = "\(outcome.summaryText)\n\n\(outputBody)"
             Self.logger.info("yt-dlp flow finished with status: \(outcome.statusText, privacy: .public)")
-            Self.logger.info("\(outcome.logText, privacy: .public)")
-            print(outcome.logText)
+            Self.logger.info("\(logText, privacy: .public)")
+            print(logText)
         }
     }
 
@@ -78,7 +103,8 @@ struct ContentView: View {
               let result = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] else {
             return PythonFlowOutcome(
                 statusText: "error",
-                logText: """
+                summaryText: "success: false",
+                outputText: """
                 Failed to decode Python result.
 
                 Raw payload:
@@ -101,8 +127,27 @@ struct ContentView: View {
         """
 
         let status = success ? "success" : "error"
-        let combinedLog = "\(summary)\n\n\(output)"
-        return PythonFlowOutcome(statusText: status, logText: combinedLog)
+        return PythonFlowOutcome(statusText: status, summaryText: summary, outputText: output)
+    }
+
+    nonisolated private static func createLiveLogFileURL() -> URL? {
+        let fileURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("palladium-python-\(UUID().uuidString).log")
+        let created = FileManager.default.createFile(atPath: fileURL.path, contents: Data())
+        return created ? fileURL : nil
+    }
+
+    nonisolated private static func readLiveLogChunk(from fileURL: URL, offset: inout UInt64) -> String? {
+        guard let handle = try? FileHandle(forReadingFrom: fileURL) else {
+            return nil
+        }
+        defer { try? handle.close() }
+        let fileSize = (try? handle.seekToEnd()) ?? 0
+        guard fileSize > offset else { return "" }
+        try? handle.seek(toOffset: offset)
+        let data = handle.readDataToEndOfFile()
+        offset = fileSize
+        return String(data: data, encoding: .utf8)
     }
 
     nonisolated private static let pythonRunnerScript = #"""
@@ -110,6 +155,7 @@ import contextlib
 import io
 import json
 import os
+import runpy
 import sys
 import traceback
 
@@ -122,6 +168,14 @@ def run_yt_dlp_flow():
     yt_exit_code = None
     success = False
     install_target = os.environ.get("PALLADIUM_PYTHON_PACKAGES")
+    live_log_path = os.environ.get("PALLADIUM_LOG_FILE")
+    live_log_stream = None
+
+    if live_log_path:
+        try:
+            live_log_stream = open(live_log_path, "a", encoding="utf-8", errors="replace")
+        except Exception:
+            live_log_stream = None
 
     class Tee:
         def __init__(self, *streams):
@@ -142,7 +196,7 @@ def run_yt_dlp_flow():
                 if hasattr(stream, "flush"):
                     stream.flush()
 
-    with contextlib.redirect_stdout(Tee(output, console_stdout)), contextlib.redirect_stderr(Tee(output, console_stderr)):
+    with contextlib.redirect_stdout(Tee(output, console_stdout, live_log_stream)), contextlib.redirect_stderr(Tee(output, console_stderr, live_log_stream)):
         os.environ["PYTHONIOENCODING"] = "utf-8"
         if install_target:
             os.makedirs(install_target, exist_ok=True)
@@ -201,11 +255,10 @@ def run_yt_dlp_flow():
         print("[palladium] running yt-dlp -v")
         argv_backup = sys.argv[:]
         try:
-            import yt_dlp.__main__ as ytdlp_main
             sys.argv = ["yt-dlp", "-v"]
             try:
-                run_result = ytdlp_main.main()
-                yt_exit_code = 0 if run_result is None else int(run_result)
+                runpy.run_module("yt_dlp", run_name="__main__", alter_sys=True)
+                yt_exit_code = 0
             except SystemExit as exc:
                 if exc.code is None:
                     yt_exit_code = 0
@@ -219,11 +272,16 @@ def run_yt_dlp_flow():
                 traceback.print_exc()
                 yt_exit_code = 1
         except Exception:
-            print("[palladium] unable to import yt_dlp.__main__")
+            print("[palladium] unable to execute yt_dlp as __main__")
             traceback.print_exc()
             yt_exit_code = 1
         finally:
             sys.argv = argv_backup
+            if live_log_stream is not None:
+                try:
+                    live_log_stream.close()
+                except Exception:
+                    pass
 
         success = (pip_exit_code in (None, 0)) and (yt_exit_code == 0)
         print(f"[palladium] flow success: {success}")
@@ -240,7 +298,8 @@ def run_yt_dlp_flow():
 
 private struct PythonFlowOutcome: Sendable {
     let statusText: String
-    let logText: String
+    let summaryText: String
+    let outputText: String
 }
 
 #Preview {
