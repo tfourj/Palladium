@@ -17,7 +17,6 @@ struct ContentView: View {
         subsystem: Bundle.main.bundleIdentifier ?? "com.tfourj.Palladium",
         category: "python"
     )
-    nonisolated private static let pythonQueue = DispatchQueue(label: "com.tfourj.Palladium.python")
 
     @State private var isRunning = false
     @State private var statusText = "idle"
@@ -407,11 +406,7 @@ struct ContentView: View {
     nonisolated private static func runOnPythonQueue(
         _ work: @escaping @Sendable () -> PythonFlowOutcome
     ) async -> PythonFlowOutcome {
-        await withCheckedContinuation { continuation in
-            pythonQueue.async {
-                continuation.resume(returning: work())
-            }
-        }
+        await PythonExecutor.shared.run(work)
     }
 
     nonisolated private static let pythonRunnerScript = #"""
@@ -759,6 +754,59 @@ private struct ShareSheet: UIViewControllerRepresentable {
     }
 
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
+}
+
+private final class PythonExecutor: NSObject {
+    static let shared = PythonExecutor()
+
+    private let threadReady = DispatchSemaphore(value: 0)
+    private var pythonThread: Thread!
+
+    private override init() {
+        super.init()
+        pythonThread = Thread(target: self, selector: #selector(threadMain), object: nil)
+        pythonThread.name = "com.tfourj.Palladium.python-thread"
+        pythonThread.qualityOfService = .userInitiated
+        pythonThread.stackSize = 8 * 1024 * 1024
+        pythonThread.start()
+        threadReady.wait()
+    }
+
+    @objc private func threadMain() {
+        autoreleasepool {
+            let runLoop = RunLoop.current
+            runLoop.add(Port(), forMode: .default)
+            threadReady.signal()
+            while !Thread.current.isCancelled {
+                runLoop.run(mode: .default, before: .distantFuture)
+            }
+        }
+    }
+
+    @objc private func executeWorkItem(_ item: PythonWorkItem) {
+        item.execute()
+    }
+
+    func run<T: Sendable>(_ work: @escaping @Sendable () -> T) async -> T {
+        await withCheckedContinuation { continuation in
+            let task = PythonWorkItem {
+                continuation.resume(returning: work())
+            }
+            perform(#selector(executeWorkItem(_:)), on: pythonThread, with: task, waitUntilDone: false)
+        }
+    }
+}
+
+private final class PythonWorkItem: NSObject {
+    private let block: () -> Void
+
+    init(block: @escaping () -> Void) {
+        self.block = block
+    }
+
+    @objc func execute() {
+        block()
+    }
 }
 
 #Preview {
