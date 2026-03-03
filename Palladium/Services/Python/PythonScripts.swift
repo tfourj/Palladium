@@ -599,6 +599,7 @@ def run_yt_dlp_flow():
     downloaded_path = None
     success = False
     download_url = os.environ.get("PALLADIUM_DOWNLOAD_URL", "").strip()
+    download_preset = os.environ.get("PALLADIUM_DOWNLOAD_PRESET", "auto_video").strip()
     downloads_dir = os.environ.get("PALLADIUM_DOWNLOADS", "").strip()
     install_target = os.environ.get("PALLADIUM_PYTHON_PACKAGES")
     live_fd_value = os.environ.get("PALLADIUM_LOG_FD")
@@ -745,6 +746,17 @@ def run_yt_dlp_flow():
                         os.chdir(downloads_dir)
                     cleanup_existing_downloads(downloads_dir, download_url)
 
+                    preset_args = []
+                    if download_preset == "mute":
+                        preset_args = ["-f", "bestvideo*/bestvideo/best"]
+                        print("[palladium] preset: mute")
+                    elif download_preset == "audio":
+                        preset_args = ["-f", "bestaudio/best"]
+                        print("[palladium] preset: audio")
+                    else:
+                        preset_args = ["-f", "bestvideo*+bestaudio/best"]
+                        print("[palladium] preset: auto_video")
+
                     sys.argv = [
                         "yt-dlp",
                         "-v",
@@ -757,6 +769,7 @@ def run_yt_dlp_flow():
                         downloads_dir if downloads_dir else ".",
                         "-o",
                         "%(title)s [%(id)s].%(ext)s",
+                        *preset_args,
                         download_url,
                     ]
 

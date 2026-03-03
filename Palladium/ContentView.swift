@@ -27,6 +27,7 @@ struct ContentView: View {
         #endif
     }()
     @State private var progressText = "Enter a URL and tap Download."
+    @State private var selectedPreset: DownloadPreset = .autoVideo
     @State private var packageStatusText = "idle"
     @State private var versionsText = "yt-dlp: unknown\nyt-dlp-apple-webkit-jsi: unknown"
     @State private var consoleLogText = ""
@@ -93,12 +94,26 @@ struct ContentView: View {
                 .autocorrectionDisabled()
                 .textFieldStyle(.roundedBorder)
 
+            HStack(spacing: 8) {
+                presetButton(.autoVideo, title: "Auto (Video)")
+                presetButton(.mute, title: "Mute")
+                presetButton(.audio, title: "Audio")
+            }
+
             Button(action: runDownloadFlow) {
                 Text(isRunning ? "Running..." : "Download")
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
             .disabled(isRunning || urlText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+
+            if isRunning {
+                HStack(spacing: 8) {
+                    ProgressView()
+                    Text("Downloading...")
+                        .font(.footnote)
+                }
+            }
 
             Text(progressText)
                 .font(.system(.footnote, design: .monospaced))
@@ -180,13 +195,14 @@ struct ContentView: View {
 
         isRunning = true
         statusText = "running"
-        progressText = "starting..."
+        progressText = "Downloading..."
 
         let logPipe = Pipe()
         let readHandle = logPipe.fileHandleForReading
         let writeFD = logPipe.fileHandleForWriting.fileDescriptor
         setenv("PALLADIUM_LOG_FD", "\(writeFD)", 1)
         setenv("PALLADIUM_DOWNLOAD_URL", targetURL, 1)
+        setenv("PALLADIUM_DOWNLOAD_PRESET", selectedPreset.pythonValue, 1)
 
         readHandle.readabilityHandler = { handle in
             let data = handle.availableData
@@ -202,6 +218,7 @@ struct ContentView: View {
 
             unsetenv("PALLADIUM_LOG_FD")
             unsetenv("PALLADIUM_DOWNLOAD_URL")
+            unsetenv("PALLADIUM_DOWNLOAD_PRESET")
             readHandle.readabilityHandler = nil
             try? readHandle.close()
             try? logPipe.fileHandleForWriting.close()
@@ -273,12 +290,24 @@ struct ContentView: View {
     }
 
     private func updateProgress(from chunk: String) {
-        let lines = chunk.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
+        let normalized = chunk.replacingOccurrences(of: "\r", with: "\n")
+        let lines = normalized.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
         for line in lines {
-            if line.hasPrefix("[download]") {
-                progressText = line
-            } else if line.contains("[palladium] downloaded file:") {
+            let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+            if trimmed.contains("[download]") {
+                progressText = trimmed
+            } else if trimmed.contains("[Merger]") {
+                progressText = trimmed
+            } else if trimmed.contains("yt-dlp Popen running ffmpeg") {
+                progressText = "Merging audio and video..."
+            } else if trimmed.contains("yt-dlp Popen ffmpeg finished") {
+                progressText = "Merge finished"
+            } else if trimmed.contains("[palladium] downloaded file:") {
                 progressText = "download complete"
+            } else if trimmed.hasPrefix("[ExtractAudio]") {
+                progressText = trimmed
+            } else if trimmed.hasPrefix("[palladium] running yt-dlp") {
+                progressText = "Downloading..."
             }
         }
     }
@@ -310,6 +339,24 @@ struct ContentView: View {
             }
         }
     }
+
+    private func presetButton(_ preset: DownloadPreset, title: String) -> some View {
+        Button(title) {
+            selectedPreset = preset
+        }
+        .buttonStyle(.borderedProminent)
+        .tint(selectedPreset == preset ? .blue : .gray)
+        .frame(maxWidth: .infinity)
+        .disabled(isRunning)
+    }
+}
+
+private enum DownloadPreset: String {
+    case autoVideo = "auto_video"
+    case mute = "mute"
+    case audio = "audio"
+
+    var pythonValue: String { rawValue }
 }
 
 private struct ShareItem: Identifiable {
