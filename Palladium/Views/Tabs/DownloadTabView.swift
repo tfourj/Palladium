@@ -19,8 +19,8 @@ struct DownloadTabView: View {
             )
             .ignoresSafeArea()
 
-            VStack(spacing: 14) {
-                VStack(spacing: 6) {
+            VStack(spacing: 12) {
+                VStack(spacing: 4) {
                     Image(systemName: "arrow.down.circle.fill")
                         .font(.system(size: 48, weight: .semibold))
                         .foregroundStyle(.white)
@@ -31,31 +31,30 @@ struct DownloadTabView: View {
                         .font(.footnote.monospaced())
                         .foregroundStyle(.white.opacity(0.8))
                 }
-                .padding(.top, 8)
+                .padding(.top, 10)
 
-                Spacer(minLength: 4)
-
-                VStack(spacing: 10) {
-                    HStack(spacing: 8) {
-                        TextField("Enter video URL", text: $urlText)
-                            .textInputAutocapitalization(.never)
-                            .autocorrectionDisabled()
-                            .foregroundStyle(.white)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 12)
-                            .background(Color.white.opacity(0.10))
-                            .clipShape(RoundedRectangle(cornerRadius: 10))
-
-                        Button(action: pasteOrClearURL) {
-                            Image(systemName: urlText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "doc.on.clipboard" : "xmark.circle.fill")
-                                .font(.system(size: 18, weight: .semibold))
-                                .frame(width: 44, height: 44)
+                VStack(alignment: .leading, spacing: 8) {
+                    if isRunning {
+                        HStack(spacing: 8) {
+                            ProgressView()
+                            Text("Downloading...")
+                                .font(.footnote)
+                                .foregroundStyle(.white)
                         }
-                        .buttonStyle(.borderedProminent)
-                        .tint(.gray)
-                        .disabled(isRunning)
                     }
 
+                    Text(progressText)
+                        .font(.system(.footnote, design: .monospaced))
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                        .padding(12)
+                        .background(Color.white.opacity(0.10))
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                }
+                .padding(.horizontal, 20)
+                .frame(maxHeight: .infinity)
+
+                VStack(spacing: 10) {
                     Picker("Preset", selection: $selectedPreset) {
                         ForEach(DownloadPreset.allCases) { preset in
                             Text(preset.title).tag(preset)
@@ -63,6 +62,30 @@ struct DownloadTabView: View {
                     }
                     .pickerStyle(.segmented)
                     .disabled(isRunning)
+
+                    HStack(spacing: 8) {
+                        TextField("Enter video URL", text: $urlText)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
+                            .foregroundStyle(.white)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 10)
+                            .background(Color.white.opacity(0.10))
+                            .clipShape(RoundedRectangle(cornerRadius: 6))
+
+                        Button(action: pasteOrClearURL) {
+                            Image(systemName: urlText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "doc.on.clipboard" : "xmark.circle.fill")
+                                .font(.system(size: 18, weight: .semibold))
+                                .frame(width: 42, height: 42)
+                                .background(Color.white.opacity(0.12))
+                                .clipShape(RoundedRectangle(cornerRadius: 6))
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(isRunning)
+                    }
+                    .padding(8)
+                    .background(Color.white.opacity(0.08))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
 
                     Button(action: onDownload) {
                         HStack(spacing: 8) {
@@ -79,28 +102,9 @@ struct DownloadTabView: View {
                 }
                 .padding(12)
                 .background(Color.white.opacity(0.08))
-                .clipShape(RoundedRectangle(cornerRadius: 14))
+                .clipShape(RoundedRectangle(cornerRadius: 10))
                 .padding(.horizontal, 20)
-
-                if isRunning {
-                    HStack(spacing: 8) {
-                        ProgressView()
-                        Text("Downloading...")
-                            .font(.footnote)
-                            .foregroundStyle(.white)
-                    }
-                }
-
-                Text(progressText)
-                    .font(.system(.footnote, design: .monospaced))
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(12)
-                    .background(Color.white.opacity(0.10))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                    .padding(.horizontal, 20)
-
-                Spacer(minLength: 0)
+                .padding(.bottom, 8)
             }
             .padding(.vertical, 14)
         }
