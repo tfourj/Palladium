@@ -177,6 +177,9 @@ struct ContentView: View {
         } message: {
             Text(alertMessage ?? "")
         }
+        .onOpenURL { incomingURL in
+            handleIncomingDownloadURL(incomingURL)
+        }
     }
 
     private func runDownloadFlow() {
@@ -270,6 +273,33 @@ struct ContentView: View {
             }
         }
         currentDownloadTask = task
+    }
+
+    private func handleIncomingDownloadURL(_ incomingURL: URL) {
+        guard incomingURL.scheme?.lowercased() == "palladium",
+              incomingURL.host?.lowercased() == "download" else {
+            return
+        }
+
+        guard let components = URLComponents(url: incomingURL, resolvingAgainstBaseURL: false),
+              let queryItems = components.queryItems,
+              let linkItem = queryItems.first(where: { $0.name == "url" }),
+              let sharedLink = linkItem.value,
+              !sharedLink.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            appendConsoleText("[palladium] url scheme received but missing url query param\n")
+            return
+        }
+
+        selectedTab = .download
+        urlText = sharedLink
+        appendConsoleText("[palladium] app opened via url scheme. link: \(sharedLink)\n")
+
+        if isRunning {
+            appendConsoleText("[palladium] download already running, queued link in input field only\n")
+            return
+        }
+
+        runDownloadFlow()
     }
 
     private func cancelDownloadFlow() {
