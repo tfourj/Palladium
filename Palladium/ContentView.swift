@@ -6,17 +6,182 @@
 //
 
 import SwiftUI
+import PythonKit
 
 struct ContentView: View {
+    @State private var isRunning = false
+    @State private var statusText = "idle"
+    @State private var logText = "Tap the button to install yt-dlp if needed and run -v."
+
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        VStack(alignment: .leading, spacing: 16) {
+            Text("yt-dlp setup check")
+                .font(.title2.bold())
+
+            Text("status: \(statusText)")
+                .font(.subheadline.monospaced())
+
+            Button(action: runYtDlpFlow) {
+                Text(isRunning ? "Running..." : "Install yt-dlp and run -v")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .disabled(isRunning)
+
+            ScrollView {
+                Text(logText)
+                    .font(.system(.footnote, design: .monospaced))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .textSelection(.enabled)
+            }
+            .frame(maxHeight: .infinity)
+            .padding(12)
+            .background(Color(.secondarySystemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
         }
         .padding()
     }
+
+    private func runYtDlpFlow() {
+        guard !isRunning else { return }
+        isRunning = true
+        statusText = "running"
+        logText = "Running Python flow..."
+
+        Task {
+            let outcome = await Task.detached(priority: .userInitiated) {
+                ContentView.executePythonFlow()
+            }.value
+
+            isRunning = false
+            statusText = outcome.statusText
+            logText = outcome.logText
+        }
+    }
+
+    nonisolated private static func executePythonFlow() -> PythonFlowOutcome {
+        let builtins = Python.import("builtins")
+        let main = Python.import("__main__")
+        _ = builtins.exec(pythonRunnerScript, main.__dict__)
+        let payload = String(main.run_yt_dlp_flow()) ?? ""
+
+        guard let data = payload.data(using: .utf8),
+              let result = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] else {
+            return PythonFlowOutcome(
+                statusText: "error",
+                logText: """
+                Failed to decode Python result.
+
+                Raw payload:
+                \(payload)
+                """
+            )
+        }
+
+        let pipAttempted = result["pip_attempted"] as? Bool ?? false
+        let pipExitCode = result["pip_exit_code"] as? Int
+        let ytExitCode = result["yt_exit_code"] as? Int
+        let success = result["success"] as? Bool ?? false
+        let output = result["output"] as? String ?? ""
+
+        let summary = """
+        pip attempted: \(pipAttempted)
+        pip exit code: \(pipExitCode.map(String.init) ?? "none")
+        yt-dlp exit code: \(ytExitCode.map(String.init) ?? "none")
+        success: \(success)
+        """
+
+        let status = success ? "success" : "error"
+        let combinedLog = "\(summary)\n\n\(output)"
+        return PythonFlowOutcome(statusText: status, logText: combinedLog)
+    }
+
+    nonisolated private static let pythonRunnerScript = #"""
+import contextlib
+import io
+import json
+import sys
+import traceback
+
+def run_yt_dlp_flow():
+    output = io.StringIO()
+    pip_attempted = False
+    pip_exit_code = None
+    yt_exit_code = None
+    success = False
+
+    with contextlib.redirect_stdout(output), contextlib.redirect_stderr(output):
+        print("[palladium] checking yt_dlp import")
+        try:
+            import yt_dlp  # noqa: F401
+            print("[palladium] yt_dlp already installed")
+        except Exception:
+            pip_attempted = True
+            print("[palladium] yt_dlp missing, installing via pip")
+            try:
+                from pip._internal.cli.main import main as pip_main
+            except Exception:
+                print("[palladium] pip entrypoint unavailable")
+                traceback.print_exc()
+            else:
+                try:
+                    pip_result = pip_main(["install", "yt-dlp"])
+                    pip_exit_code = 0 if pip_result is None else int(pip_result)
+                    print(f"[palladium] pip exit code: {pip_exit_code}")
+                except Exception:
+                    print("[palladium] pip install failed")
+                    traceback.print_exc()
+
+            try:
+                import yt_dlp  # noqa: F401
+                print("[palladium] yt_dlp import succeeded after install")
+            except Exception:
+                print("[palladium] yt_dlp still unavailable after install attempt")
+                traceback.print_exc()
+
+        print("[palladium] running yt-dlp -v")
+        argv_backup = sys.argv[:]
+        try:
+            import yt_dlp.__main__ as ytdlp_main
+            sys.argv = ["yt-dlp", "-v"]
+            try:
+                run_result = ytdlp_main.main()
+                yt_exit_code = 0 if run_result is None else int(run_result)
+            except SystemExit as exc:
+                if exc.code is None:
+                    yt_exit_code = 0
+                elif isinstance(exc.code, int):
+                    yt_exit_code = exc.code
+                else:
+                    print(f"[palladium] unexpected SystemExit code: {exc.code}")
+                    yt_exit_code = 1
+            except Exception:
+                print("[palladium] yt-dlp execution failed")
+                traceback.print_exc()
+                yt_exit_code = 1
+        except Exception:
+            print("[palladium] unable to import yt_dlp.__main__")
+            traceback.print_exc()
+            yt_exit_code = 1
+        finally:
+            sys.argv = argv_backup
+
+        success = (pip_exit_code in (None, 0)) and (yt_exit_code == 0)
+        print(f"[palladium] flow success: {success}")
+
+    return json.dumps({
+        "pip_attempted": pip_attempted,
+        "pip_exit_code": pip_exit_code,
+        "yt_exit_code": yt_exit_code,
+        "success": success,
+        "output": output.getvalue(),
+    })
+"""#
+}
+
+private struct PythonFlowOutcome: Sendable {
+    let statusText: String
+    let logText: String
 }
 
 #Preview {
