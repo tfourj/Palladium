@@ -128,7 +128,12 @@ def run_yt_dlp_flow():
             self.streams = [s for s in streams if s is not None]
         def write(self, data):
             for stream in self.streams:
-                stream.write(data)
+                try:
+                    stream.write(data)
+                except UnicodeEncodeError:
+                    # Some iOS-backed console streams report ASCII only.
+                    safe_data = data.encode("ascii", "replace").decode("ascii")
+                    stream.write(safe_data)
                 if hasattr(stream, "flush"):
                     stream.flush()
             return len(data)
@@ -138,6 +143,7 @@ def run_yt_dlp_flow():
                     stream.flush()
 
     with contextlib.redirect_stdout(Tee(output, console_stdout)), contextlib.redirect_stderr(Tee(output, console_stderr)):
+        os.environ["PYTHONIOENCODING"] = "utf-8"
         if install_target:
             os.makedirs(install_target, exist_ok=True)
             if install_target not in sys.path:
@@ -172,7 +178,7 @@ def run_yt_dlp_flow():
                     traceback.print_exc()
             if pip_main is not None:
                 try:
-                    pip_args = ["install", "--no-cache-dir", "yt-dlp"]
+                    pip_args = ["install", "--no-cache-dir", "--progress-bar", "off", "--no-color", "yt-dlp"]
                     if install_target:
                         pip_args[1:1] = ["--target", install_target]
                     pip_result = pip_main(pip_args)
