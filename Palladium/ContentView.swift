@@ -281,10 +281,11 @@ struct ContentView: View {
     private func detectedVideoCodecDescription(for url: URL) -> String {
         let asset = AVURLAsset(url: url)
         guard let track = asset.tracks(withMediaType: .video).first,
-              let format = track.formatDescriptions.first as? CMFormatDescription else {
+              let firstFormat = track.formatDescriptions.first else {
             return "unknown"
         }
 
+        let format = firstFormat as! CMFormatDescription
         let subtype = CMFormatDescriptionGetMediaSubType(format)
         return fourCC(subtype)
     }
