@@ -220,6 +220,7 @@ def cleanup_temp_download_files(downloads_dir):
 
 def parse_download_settings(settings_json):
     defaults = {
+        "targetProfile": "automatic",
         "container": "automatic",
         "maxResolution": "source",
         "audioFormat": "automatic",
@@ -254,6 +255,21 @@ def build_settings_args(settings, preset):
 
     if bool(settings.get("embedSubtitles", False)):
         args.extend(["--embed-subs", "--write-subs", "--sub-langs", "all"])
+
+    target_profile = str(settings.get("targetProfile", "automatic"))
+    if target_profile == "mp3":
+        args.extend(["-f", "ba[acodec^=mp3]/ba/b", "-x", "--audio-format", "mp3"])
+        return args
+    if target_profile == "aac":
+        args.extend(["-f", "ba[acodec^=aac]/ba[acodec^=mp4a.40.]/ba/b", "-x", "--audio-format", "aac"])
+        return args
+    if target_profile == "mp4":
+        args.extend([
+            "--merge-output-format", "mp4",
+            "--remux-video", "mp4",
+            "-S", "vcodec:h264,lang,quality,res,fps,hdr:12,acodec:aac",
+        ])
+        return args
 
     max_resolution = str(settings.get("maxResolution", "source"))
     resolution_map = {

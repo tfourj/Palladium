@@ -9,6 +9,7 @@ enum DownloadPreset: String, Codable {
 }
 
 struct DownloadSettings: Codable, Equatable {
+    var targetProfile: DownloadTargetProfile = .automatic
     var container: DownloadContainer = .automatic
     var maxResolution: DownloadMaxResolution = .source
     var audioFormat: AudioFormatOption = .automatic
@@ -23,6 +24,24 @@ struct DownloadSettings: Codable, Equatable {
             return "{}"
         }
         return json
+    }
+}
+
+enum DownloadTargetProfile: String, Codable, CaseIterable, Identifiable {
+    case automatic
+    case mp3
+    case aac
+    case mp4
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .automatic: return "None"
+        case .mp3: return "MP3 template"
+        case .aac: return "AAC template"
+        case .mp4: return "MP4 template"
+        }
     }
 }
 

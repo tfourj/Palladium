@@ -7,6 +7,13 @@ struct SettingsTabView: View {
     var body: some View {
         Form {
             Section("Export") {
+                Picker("Template", selection: $settings.targetProfile) {
+                    ForEach(DownloadTargetProfile.allCases) { option in
+                        Text(option.title).tag(option)
+                    }
+                }
+                .disabled(isRunning)
+
                 Picker("Container", selection: $settings.container) {
                     ForEach(DownloadContainer.allCases) { option in
                         Text(option.title).tag(option)
