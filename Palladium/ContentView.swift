@@ -184,6 +184,13 @@ struct ContentView: View {
         let targetURL = urlText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !targetURL.isEmpty else { return }
 
+        do {
+            let removedCount = try clearDownloadsDirectoryContents()
+            appendConsoleText("[palladium] cleared downloads folder entries: \(removedCount)\n")
+        } catch {
+            appendConsoleText("[palladium] failed to clear downloads folder: \(error.localizedDescription)\n")
+        }
+
         isRunning = true
         statusText = "running"
         progressText = "Downloading..."
@@ -634,6 +641,34 @@ struct ContentView: View {
             return URL(fileURLWithPath: downloadsPath).appendingPathComponent(".palladium-cancel-\(UUID().uuidString)")
         }
         return FileManager.default.temporaryDirectory.appendingPathComponent(".palladium-cancel-\(UUID().uuidString)")
+    }
+
+    private func clearDownloadsDirectoryContents() throws -> Int {
+        let downloadsURL: URL
+        if let downloadsPath = ProcessInfo.processInfo.environment["PALLADIUM_DOWNLOADS"], !downloadsPath.isEmpty {
+            downloadsURL = URL(fileURLWithPath: downloadsPath, isDirectory: true)
+        } else {
+            let documents = try FileManager.default.url(
+                for: .documentDirectory,
+                in: .userDomainMask,
+                appropriateFor: nil,
+                create: true
+            )
+            downloadsURL = documents.appendingPathComponent("Downloads", isDirectory: true)
+        }
+
+        try FileManager.default.createDirectory(at: downloadsURL, withIntermediateDirectories: true)
+        let contents = try FileManager.default.contentsOfDirectory(
+            at: downloadsURL,
+            includingPropertiesForKeys: nil
+        )
+
+        var removed = 0
+        for item in contents {
+            try FileManager.default.removeItem(at: item)
+            removed += 1
+        }
+        return removed
     }
 }
 
