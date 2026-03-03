@@ -185,8 +185,6 @@ struct ContentView: View {
         guard !targetURL.isEmpty else { return }
 
         consoleLogText = ""
-        pendingConsoleChunks = ""
-        isConsoleFlushScheduled = false
 
         do {
             let removedCount = try clearDownloadsDirectoryContents()
