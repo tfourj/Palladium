@@ -10,6 +10,7 @@ import PythonKit
 import OSLog
 import Foundation
 import UIKit
+import Photos
 
 struct ContentView: View {
     private static let logger = Logger(
@@ -21,10 +22,14 @@ struct ContentView: View {
     @State private var isRunning = false
     @State private var statusText = "idle"
     @State private var urlText = ""
-    @State private var logText = "Enter a URL and tap Download."
+    @State private var progressText = "Enter a URL and tap Download."
     @State private var packageStatusText = "idle"
-    @State private var packageLogText = "Use Refresh Versions or Update Packages."
     @State private var versionsText = "yt-dlp: unknown\nyt-dlp-apple-webkit-jsi: unknown"
+    @State private var consoleLogText = ""
+    @State private var completedDownloadURL: URL?
+    @State private var showDownloadActionDialog = false
+    @State private var alertMessage: String?
+    @State private var showAlert = false
     @State private var shareItem: ShareItem?
 
     var body: some View {
@@ -38,9 +43,36 @@ struct ContentView: View {
                 .tabItem {
                     Label("Packages", systemImage: "shippingbox")
                 }
+
+            consoleTab
+                .tabItem {
+                    Label("Console", systemImage: "terminal")
+                }
         }
         .sheet(item: $shareItem) { item in
             ShareSheet(activityItems: [item.url])
+        }
+        .confirmationDialog("Download Complete", isPresented: $showDownloadActionDialog, titleVisibility: .visible) {
+            if completedDownloadURL != nil {
+                Button("Share") {
+                    if let url = completedDownloadURL {
+                        shareItem = ShareItem(url: url)
+                    }
+                }
+                Button("Save to Photos") {
+                    if let url = completedDownloadURL {
+                        saveDownloadedFileToPhotos(url)
+                    }
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Choose what to do with the downloaded file.")
+        }
+        .alert("Result", isPresented: $showAlert) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(alertMessage ?? "")
         }
     }
 
@@ -64,16 +96,14 @@ struct ContentView: View {
             .buttonStyle(.borderedProminent)
             .disabled(isRunning || urlText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
 
-            ScrollView {
-                Text(logText)
-                    .font(.system(.footnote, design: .monospaced))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .textSelection(.enabled)
-            }
-            .frame(maxHeight: .infinity)
-            .padding(12)
-            .background(Color(.secondarySystemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            Text(progressText)
+                .font(.system(.footnote, design: .monospaced))
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(12)
+                .background(Color(.secondarySystemBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+
+            Spacer(minLength: 0)
         }
         .padding()
     }
@@ -89,9 +119,9 @@ struct ContentView: View {
             Text(versionsText)
                 .font(.system(.footnote, design: .monospaced))
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(12)
-                .background(Color(.secondarySystemBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+            .padding(12)
+            .background(Color(.secondarySystemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
 
             HStack(spacing: 12) {
                 Button(action: refreshPackageVersions) {
@@ -108,17 +138,7 @@ struct ContentView: View {
                 .buttonStyle(.borderedProminent)
                 .disabled(isRunning)
             }
-
-            ScrollView {
-                Text(packageLogText)
-                    .font(.system(.footnote, design: .monospaced))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .textSelection(.enabled)
-            }
-            .frame(maxHeight: .infinity)
-            .padding(12)
-            .background(Color(.secondarySystemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            Spacer(minLength: 0)
         }
         .padding()
     }
@@ -130,7 +150,7 @@ struct ContentView: View {
 
         isRunning = true
         statusText = "running"
-        logText = ""
+        progressText = "starting..."
 
         let logPipe = Pipe()
         let readHandle = logPipe.fileHandleForReading
@@ -141,7 +161,8 @@ struct ContentView: View {
             let data = handle.availableData
             guard !data.isEmpty, let chunk = String(data: data, encoding: .utf8) else { return }
             Task { @MainActor in
-                logText.append(chunk)
+                consoleLogText.append(chunk)
+                updateProgress(from: chunk)
             }
         }
 
@@ -158,16 +179,18 @@ struct ContentView: View {
 
             isRunning = false
             statusText = outcome.statusText
-            let outputBody = logText.isEmpty ? outcome.outputText : logText
-            logText = "\(outcome.summaryText)\n\n\(outputBody)"
+            progressText = outcome.statusText == "success" ? "download complete" : "download failed"
+            let outputBody = outcome.outputText
+            consoleLogText += "\n\(outcome.summaryText)\n\n\(outputBody)\n"
             Self.logger.info("yt-dlp flow finished with status: \(outcome.statusText, privacy: .public)")
-            Self.logger.info("\(logText, privacy: .public)")
-            print(logText)
+            Self.logger.info("\(consoleLogText, privacy: .public)")
+            print(consoleLogText)
 
             if outcome.statusText == "success",
                let downloadedPath = outcome.downloadedPath,
                FileManager.default.fileExists(atPath: downloadedPath) {
-                shareItem = ShareItem(url: URL(fileURLWithPath: downloadedPath))
+                completedDownloadURL = URL(fileURLWithPath: downloadedPath)
+                showDownloadActionDialog = true
             }
         }
     }
@@ -185,7 +208,6 @@ struct ContentView: View {
 
         isRunning = true
         packageStatusText = action == "update" ? "updating" : "checking"
-        packageLogText = ""
 
         let logPipe = Pipe()
         let readHandle = logPipe.fileHandleForReading
@@ -195,7 +217,7 @@ struct ContentView: View {
             let data = handle.availableData
             guard !data.isEmpty, let chunk = String(data: data, encoding: .utf8) else { return }
             Task { @MainActor in
-                packageLogText.append(chunk)
+                consoleLogText.append(chunk)
             }
         }
 
@@ -211,14 +233,79 @@ struct ContentView: View {
 
             isRunning = false
             packageStatusText = outcome.statusText
-            let outputBody = packageLogText.isEmpty ? outcome.outputText : packageLogText
-            packageLogText = "\(outcome.summaryText)\n\n\(outputBody)"
+            let outputBody = outcome.outputText
+            consoleLogText += "\n\(outcome.summaryText)\n\n\(outputBody)\n"
             if let versionsText = outcome.versionsText {
                 self.versionsText = versionsText
             }
             Self.logger.info("package flow finished with status: \(outcome.statusText, privacy: .public)")
-            Self.logger.info("\(packageLogText, privacy: .public)")
-            print(packageLogText)
+            Self.logger.info("\(consoleLogText, privacy: .public)")
+            print(consoleLogText)
+        }
+    }
+
+    private var consoleTab: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                Text("console")
+                    .font(.title2.bold())
+                Spacer()
+                Button("Clear") {
+                    consoleLogText = ""
+                }
+                .buttonStyle(.bordered)
+            }
+
+            ScrollView {
+                Text(consoleLogText.isEmpty ? "No logs yet." : consoleLogText)
+                    .font(.system(.footnote, design: .monospaced))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .textSelection(.enabled)
+            }
+            .frame(maxHeight: .infinity)
+            .padding(12)
+            .background(Color(.secondarySystemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+        }
+        .padding()
+    }
+
+    private func updateProgress(from chunk: String) {
+        let lines = chunk.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
+        for line in lines {
+            if line.hasPrefix("[download]") {
+                progressText = line
+            } else if line.contains("[palladium] downloaded file:") {
+                progressText = "download complete"
+            }
+        }
+    }
+
+    private func saveDownloadedFileToPhotos(_ url: URL) {
+        Task {
+            let permission = await PHPhotoLibrary.requestAuthorization(for: .addOnly)
+            guard permission == .authorized || permission == .limited else {
+                await MainActor.run {
+                    alertMessage = "Photo library permission was denied."
+                    showAlert = true
+                }
+                return
+            }
+
+            do {
+                try await PHPhotoLibrary.shared().performChanges {
+                    PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: url)
+                }
+                await MainActor.run {
+                    alertMessage = "Saved to Photos."
+                    showAlert = true
+                }
+            } catch {
+                await MainActor.run {
+                    alertMessage = "Failed to save to Photos: \(error.localizedDescription)"
+                    showAlert = true
+                }
+            }
         }
     }
 
@@ -332,6 +419,7 @@ import contextlib
 import io
 import json
 import os
+import re
 import runpy
 import sys
 import traceback
@@ -512,17 +600,33 @@ def run_yt_dlp_flow():
                     yt_exit_code = 1
                 if yt_exit_code == 0:
                     try:
+                        destination_matches = re.findall(r"^\\[download\\] Destination: (.+)$", output.getvalue(), flags=re.MULTILINE)
+                        if destination_matches:
+                            candidate = destination_matches[-1].strip()
+                            if candidate:
+                                downloaded_path = candidate
                         scan_dir = downloads_dir if downloads_dir else os.getcwd()
-                        candidates = []
-                        for filename in os.listdir(scan_dir):
-                            full_path = os.path.join(scan_dir, filename)
-                            if os.path.isfile(full_path) and not filename.endswith(".part"):
-                                mtime = os.path.getmtime(full_path)
-                                if mtime >= (run_started_at - 5):
-                                    candidates.append((mtime, full_path))
-                        if candidates:
-                            downloaded_path = max(candidates, key=lambda item: item[0])[1]
+                        if downloaded_path:
+                            if not os.path.isabs(downloaded_path):
+                                downloaded_path = os.path.join(scan_dir, downloaded_path)
+                            if not os.path.isfile(downloaded_path):
+                                downloaded_path = None
+
+                        if downloaded_path is None:
+                            candidates = []
+                            for filename in os.listdir(scan_dir):
+                                full_path = os.path.join(scan_dir, filename)
+                                if os.path.isfile(full_path) and not filename.endswith(".part"):
+                                    mtime = os.path.getmtime(full_path)
+                                    if mtime >= (run_started_at - 3600):
+                                        candidates.append((mtime, full_path))
+                            if candidates:
+                                downloaded_path = max(candidates, key=lambda item: item[0])[1]
+
+                        if downloaded_path:
                             print(f"[palladium] downloaded file: {downloaded_path}")
+                        else:
+                            print("[palladium] downloaded file path not detected")
                     except Exception:
                         print("[palladium] unable to detect downloaded file path")
                         traceback.print_exc()
