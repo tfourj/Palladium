@@ -10,6 +10,7 @@ import OSLog
 import Foundation
 import UIKit
 import Photos
+import AVFoundation
 
 struct ContentView: View {
     private static let logger = Logger(
@@ -241,6 +242,16 @@ struct ContentView: View {
 
     private func saveDownloadedFileToPhotos(_ url: URL) {
         Task {
+            let codecDescription = detectedVideoCodecDescription(for: url)
+            let compatible = UIVideoAtPathIsCompatibleWithSavedPhotosAlbum(url.path)
+            guard compatible else {
+                await MainActor.run {
+                    alertMessage = "iOS Photos cannot import this video format. Detected codec: \(codecDescription). Try remuxing to MP4/H.264 or HEVC."
+                    showAlert = true
+                }
+                return
+            }
+
             let permission = await PHPhotoLibrary.requestAuthorization(for: .addOnly)
             guard permission == .authorized || permission == .limited else {
                 await MainActor.run {
@@ -255,7 +266,7 @@ struct ContentView: View {
                     PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: url)
                 }
                 await MainActor.run {
-                    alertMessage = "Saved to Photos."
+                    alertMessage = "Saved to Photos. Codec: \(codecDescription)"
                     showAlert = true
                 }
             } catch {
@@ -265,6 +276,34 @@ struct ContentView: View {
                 }
             }
         }
+    }
+
+    private func detectedVideoCodecDescription(for url: URL) -> String {
+        let asset = AVURLAsset(url: url)
+        guard let track = asset.tracks(withMediaType: .video).first,
+              let format = track.formatDescriptions.first as? CMFormatDescription else {
+            return "unknown"
+        }
+
+        let subtype = CMFormatDescriptionGetMediaSubType(format)
+        return fourCC(subtype)
+    }
+
+    private func fourCC(_ code: FourCharCode) -> String {
+        let n = UInt32(code).bigEndian
+        let bytes: [UInt8] = [
+            UInt8((n >> 24) & 0xFF),
+            UInt8((n >> 16) & 0xFF),
+            UInt8((n >> 8) & 0xFF),
+            UInt8(n & 0xFF)
+        ]
+        let chars = bytes.map { b -> Character in
+            if b >= 32 && b <= 126 {
+                return Character(UnicodeScalar(b))
+            }
+            return "."
+        }
+        return String(chars)
     }
 
     private func persistPreferences() {
