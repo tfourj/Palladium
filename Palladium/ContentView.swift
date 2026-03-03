@@ -597,12 +597,25 @@ struct ContentView: View {
             debugNotification("completion notification skipped (disabled)")
             return
         }
-        guard scenePhase != .active else {
-            debugNotification("completion notification skipped (app active)")
+        scheduleCompletionNotificationIfNeeded(fileURL: fileURL, attempt: 1)
+    }
+
+    private func scheduleCompletionNotificationIfNeeded(fileURL: URL, attempt: Int) {
+        let appState = UIApplication.shared.applicationState
+        debugNotification("completion check attempt=\(attempt) scenePhase=\(String(describing: scenePhase)) appState=\(appState.rawValue)")
+        if appState == .active {
+            if attempt == 1 {
+                debugNotification("app still active, retrying notification check shortly")
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                    scheduleCompletionNotificationIfNeeded(fileURL: fileURL, attempt: 2)
+                }
+            } else {
+                debugNotification("completion notification skipped (user in app)")
+            }
             return
         }
 
-        debugNotification("scheduling notification scenePhase=\(String(describing: scenePhase)) file=\(fileURL.lastPathComponent)")
+        debugNotification("scheduling notification file=\(fileURL.lastPathComponent)")
 
         let content = UNMutableNotificationContent()
         content.title = "Download Complete"
