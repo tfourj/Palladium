@@ -1,6 +1,12 @@
 import SwiftUI
 
 struct SettingsTabView: View {
+    private enum SettingsRoute: Hashable {
+        case downloadArguments
+        case afterDownload
+        case about
+    }
+
     @Binding var customArgsText: String
     @Binding var extraArgsText: String
     @Binding var askUserAfterDownload: Bool
@@ -9,16 +15,10 @@ struct SettingsTabView: View {
     let isRunning: Bool
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             List {
                 Section(header: Text("Download")) {
-                    NavigationLink {
-                        DownloadArgumentsSettingsView(
-                            customArgsText: $customArgsText,
-                            extraArgsText: $extraArgsText,
-                            isRunning: isRunning
-                        )
-                    } label: {
+                    NavigationLink(value: SettingsRoute.downloadArguments) {
                         settingsRow(
                             title: "Download Arguments",
                             subtitle: "Custom and global yt-dlp args",
@@ -27,13 +27,7 @@ struct SettingsTabView: View {
                         )
                     }
 
-                    NavigationLink {
-                        AfterDownloadSettingsView(
-                            askUserAfterDownload: $askUserAfterDownload,
-                            selectedPostDownloadAction: $selectedPostDownloadAction,
-                            isRunning: isRunning
-                        )
-                    } label: {
+                    NavigationLink(value: SettingsRoute.afterDownload) {
                         settingsRow(
                             title: "After Download",
                             subtitle: "What to do when a download finishes",
@@ -44,9 +38,7 @@ struct SettingsTabView: View {
                 }
 
                 Section(header: Text("About")) {
-                    NavigationLink {
-                        SettingsAboutView()
-                    } label: {
+                    NavigationLink(value: SettingsRoute.about) {
                         settingsRow(
                             title: "About",
                             subtitle: "Version and quick help",
@@ -58,6 +50,24 @@ struct SettingsTabView: View {
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
+            .navigationDestination(for: SettingsRoute.self) { route in
+                switch route {
+                case .downloadArguments:
+                    DownloadArgumentsSettingsView(
+                        customArgsText: $customArgsText,
+                        extraArgsText: $extraArgsText,
+                        isRunning: isRunning
+                    )
+                case .afterDownload:
+                    AfterDownloadSettingsView(
+                        askUserAfterDownload: $askUserAfterDownload,
+                        selectedPostDownloadAction: $selectedPostDownloadAction,
+                        isRunning: isRunning
+                    )
+                case .about:
+                    SettingsAboutView()
+                }
+            }
         }
     }
 
