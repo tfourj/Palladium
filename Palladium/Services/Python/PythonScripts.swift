@@ -184,6 +184,40 @@ def cleanup_existing_downloads(downloads_dir, download_url):
         traceback.print_exc()
 
 
+def cleanup_temp_download_files(downloads_dir):
+    if not downloads_dir:
+        return
+
+    removed = 0
+    try:
+        for name in os.listdir(downloads_dir):
+            full_path = os.path.join(downloads_dir, name)
+            if not os.path.isfile(full_path):
+                continue
+
+            lower = name.lower()
+            is_temp = (
+                lower.endswith(".part")
+                or lower.endswith(".ytdl")
+                or lower.endswith(".tmp")
+                or ".temp." in lower
+                or re.search(r"\.f\d+\.[a-z0-9]+\.part$", lower) is not None
+                or ".frag" in lower
+            )
+            if not is_temp:
+                continue
+
+            try:
+                os.remove(full_path)
+                removed += 1
+            except Exception:
+                pass
+        print(f"[palladium] temp cleanup: removed {removed} file(s)")
+    except Exception:
+        print("[palladium] temp cleanup failed")
+        traceback.print_exc()
+
+
 @contextlib.contextmanager
 def patch_subprocess_for_swiftffmpeg(bridge):
     original_popen = subprocess.Popen
@@ -744,6 +778,7 @@ def run_yt_dlp_flow():
                 if yt_exit_code != 1:
                     if downloads_dir:
                         os.chdir(downloads_dir)
+                    cleanup_temp_download_files(downloads_dir)
                     cleanup_existing_downloads(downloads_dir, download_url)
 
                     preset_args = []
