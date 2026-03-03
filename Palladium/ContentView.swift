@@ -9,6 +9,7 @@ import SwiftUI
 import PythonKit
 import OSLog
 import Foundation
+import UIKit
 
 struct ContentView: View {
     private static let logger = Logger(
@@ -24,6 +25,7 @@ struct ContentView: View {
     @State private var packageStatusText = "idle"
     @State private var packageLogText = "Use Refresh Versions or Update Packages."
     @State private var versionsText = "yt-dlp: unknown\nyt-dlp-apple-webkit-jsi: unknown"
+    @State private var shareItem: ShareItem?
 
     var body: some View {
         TabView {
@@ -36,6 +38,9 @@ struct ContentView: View {
                 .tabItem {
                     Label("Packages", systemImage: "shippingbox")
                 }
+        }
+        .sheet(item: $shareItem) { item in
+            ShareSheet(activityItems: [item.url])
         }
     }
 
@@ -158,6 +163,12 @@ struct ContentView: View {
             Self.logger.info("yt-dlp flow finished with status: \(outcome.statusText, privacy: .public)")
             Self.logger.info("\(logText, privacy: .public)")
             print(logText)
+
+            if outcome.statusText == "success",
+               let downloadedPath = outcome.downloadedPath,
+               FileManager.default.fileExists(atPath: downloadedPath) {
+                shareItem = ShareItem(url: URL(fileURLWithPath: downloadedPath))
+            }
         }
     }
 
@@ -228,7 +239,8 @@ struct ContentView: View {
                 Raw payload:
                 \(payload)
                 """,
-                versionsText: nil
+                versionsText: nil,
+                downloadedPath: nil
             )
         }
 
@@ -237,6 +249,7 @@ struct ContentView: View {
         let ytExitCode = result["yt_exit_code"] as? Int
         let success = result["success"] as? Bool ?? false
         let output = result["output"] as? String ?? ""
+        let downloadedPath = result["downloaded_path"] as? String
 
         let summary = """
         pip attempted: \(pipAttempted)
@@ -246,7 +259,13 @@ struct ContentView: View {
         """
 
         let status = success ? "success" : "error"
-        return PythonFlowOutcome(statusText: status, summaryText: summary, outputText: output, versionsText: nil)
+        return PythonFlowOutcome(
+            statusText: status,
+            summaryText: summary,
+            outputText: output,
+            versionsText: nil,
+            downloadedPath: downloadedPath
+        )
     }
 
     nonisolated private static func executePackageFlow(action: String) -> PythonFlowOutcome {
@@ -266,7 +285,8 @@ struct ContentView: View {
                 Raw payload:
                 \(payload)
                 """,
-                versionsText: nil
+                versionsText: nil,
+                downloadedPath: nil
             )
         }
 
@@ -288,7 +308,13 @@ struct ContentView: View {
         """
 
         let status = success ? "success" : "error"
-        return PythonFlowOutcome(statusText: status, summaryText: summary, outputText: output, versionsText: versionsText)
+        return PythonFlowOutcome(
+            statusText: status,
+            summaryText: summary,
+            outputText: output,
+            versionsText: versionsText,
+            downloadedPath: nil
+        )
     }
 
     nonisolated private static func runOnPythonQueue(
@@ -310,6 +336,7 @@ import runpy
 import sys
 import traceback
 import importlib.metadata as importlib_metadata
+import time
 
 def ensure_pip_entrypoint():
     pip_main = None
@@ -350,6 +377,7 @@ def run_yt_dlp_flow():
     pip_attempted = False
     pip_exit_code = None
     yt_exit_code = None
+    downloaded_path = None
     success = False
     download_url = os.environ.get("PALLADIUM_DOWNLOAD_URL", "").strip()
     downloads_dir = os.environ.get("PALLADIUM_DOWNLOADS", "").strip()
@@ -452,6 +480,7 @@ def run_yt_dlp_flow():
             print(f"[palladium] running yt-dlp -v {download_url}")
         argv_backup = sys.argv[:]
         cwd_backup = os.getcwd()
+        run_started_at = time.time()
         try:
             if download_url:
                 if downloads_dir:
@@ -481,6 +510,22 @@ def run_yt_dlp_flow():
                     print("[palladium] yt-dlp execution failed")
                     traceback.print_exc()
                     yt_exit_code = 1
+                if yt_exit_code == 0:
+                    try:
+                        scan_dir = downloads_dir if downloads_dir else os.getcwd()
+                        candidates = []
+                        for filename in os.listdir(scan_dir):
+                            full_path = os.path.join(scan_dir, filename)
+                            if os.path.isfile(full_path) and not filename.endswith(".part"):
+                                mtime = os.path.getmtime(full_path)
+                                if mtime >= (run_started_at - 5):
+                                    candidates.append((mtime, full_path))
+                        if candidates:
+                            downloaded_path = max(candidates, key=lambda item: item[0])[1]
+                            print(f"[palladium] downloaded file: {downloaded_path}")
+                    except Exception:
+                        print("[palladium] unable to detect downloaded file path")
+                        traceback.print_exc()
         except Exception:
             print("[palladium] unable to execute yt_dlp as __main__")
             traceback.print_exc()
@@ -505,6 +550,7 @@ def run_yt_dlp_flow():
         "pip_exit_code": pip_exit_code,
         "yt_exit_code": yt_exit_code,
         "success": success,
+        "downloaded_path": downloaded_path,
         "output": output.getvalue(),
     })
 
@@ -593,6 +639,22 @@ private struct PythonFlowOutcome: Sendable {
     let summaryText: String
     let outputText: String
     let versionsText: String?
+    let downloadedPath: String?
+}
+
+private struct ShareItem: Identifiable {
+    let id = UUID()
+    let url: URL
+}
+
+private struct ShareSheet: UIViewControllerRepresentable {
+    let activityItems: [Any]
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+    }
+
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
 
 #Preview {
