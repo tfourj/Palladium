@@ -241,7 +241,7 @@ struct ContentView: View {
             } else {
                 progressText = outcome.statusText == "success" ? "download complete" : "download failed"
             }
-            let outputBody = outcome.outputText
+            let outputBody = filteredConsoleChunk(outcome.outputText)
             appendConsoleText("\n\(outcome.summaryText)\n\n\(outputBody)\n")
             Self.logger.info("yt-dlp flow finished with status: \(outcome.statusText, privacy: .public)")
             Self.logger.info("\(consoleLogText, privacy: .public)")
