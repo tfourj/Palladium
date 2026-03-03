@@ -350,10 +350,12 @@ struct ContentView: View {
     }
 
     private func enqueueConsoleChunk(_ chunk: String, trackProgress: Bool) {
-        pendingConsoleChunks.append(chunk)
         if trackProgress {
             updateProgress(from: chunk)
         }
+        let chunkForConsole = trackProgress ? filteredConsoleChunk(chunk) : chunk
+        guard !chunkForConsole.isEmpty else { return }
+        pendingConsoleChunks.append(chunkForConsole)
         guard !isConsoleFlushScheduled else { return }
         isConsoleFlushScheduled = true
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.08) {
@@ -375,6 +377,20 @@ struct ContentView: View {
             let dropCount = min(overflow + 5_000, consoleLogText.count)
             consoleLogText.removeFirst(dropCount)
         }
+    }
+
+    private func filteredConsoleChunk(_ chunk: String) -> String {
+        let normalized = chunk.replacingOccurrences(of: "\r", with: "\n")
+        let lines = normalized.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
+        let filtered = lines.filter { line in
+            let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+            if trimmed.contains("[download]") && trimmed.contains("% of") {
+                return false
+            }
+            return true
+        }
+        guard !filtered.isEmpty else { return "" }
+        return filtered.joined(separator: "\n") + "\n"
     }
 
     private func saveDownloadedFileToPhotos(_ url: URL) {
