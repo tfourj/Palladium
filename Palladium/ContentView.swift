@@ -17,18 +17,15 @@ struct ContentView: View {
         category: "python"
     )
 
+    private static let presetDefaultsKey = "palladium.selectedPreset"
+    private static let settingsDefaultsKey = "palladium.downloadSettings"
+
     @State private var isRunning = false
     @State private var statusText = "idle"
-    @State private var urlText = {
-        #if DEBUG
-        return "https://www.youtube.com/watch?v=jNQXAC9IVRw"
-        #else
-        return ""
-        #endif
-    }()
+    @State private var urlText: String
     @State private var progressText = "Enter a URL and tap Download."
-    @State private var selectedPreset: DownloadPreset = .autoVideo
-    @State private var downloadSettings = DownloadSettings()
+    @State private var selectedPreset: DownloadPreset
+    @State private var downloadSettings: DownloadSettings
     @State private var packageStatusText = "idle"
     @State private var versionsText = "yt-dlp: unknown\nyt-dlp-apple-webkit-jsi: unknown"
     @State private var consoleLogText = ""
@@ -38,27 +35,56 @@ struct ContentView: View {
     @State private var showAlert = false
     @State private var shareItem: ShareItem?
 
+    init() {
+        #if DEBUG
+        _urlText = State(initialValue: "https://www.youtube.com/watch?v=jNQXAC9IVRw")
+        #else
+        _urlText = State(initialValue: "")
+        #endif
+        _selectedPreset = State(initialValue: Self.loadSelectedPreset())
+        _downloadSettings = State(initialValue: Self.loadDownloadSettings())
+    }
+
     var body: some View {
         TabView {
-            downloadTab
-                .tabItem {
-                    Label("Download", systemImage: "arrow.down.circle")
-                }
+            DownloadTabView(
+                statusText: $statusText,
+                urlText: $urlText,
+                selectedPreset: $selectedPreset,
+                isRunning: isRunning,
+                progressText: progressText,
+                onDownload: runDownloadFlow
+            )
+            .tabItem {
+                Label("Download", systemImage: "arrow.down.circle")
+            }
 
-            packagesTab
-                .tabItem {
-                    Label("Packages", systemImage: "shippingbox")
-                }
+            PackagesTabView(
+                packageStatusText: packageStatusText,
+                versionsText: versionsText,
+                isRunning: isRunning,
+                onRefreshVersions: refreshPackageVersions,
+                onUpdatePackages: updatePackages
+            )
+            .tabItem {
+                Label("Packages", systemImage: "shippingbox")
+            }
 
-            settingsTab
+            SettingsTabView(settings: $downloadSettings, isRunning: isRunning)
                 .tabItem {
                     Label("Settings", systemImage: "slider.horizontal.3")
                 }
 
-            consoleTab
+            ConsoleTabView(consoleLogText: $consoleLogText)
                 .tabItem {
                     Label("Console", systemImage: "terminal")
                 }
+        }
+        .onChange(of: selectedPreset) { _ in
+            persistPreferences()
+        }
+        .onChange(of: downloadSettings) { _ in
+            persistPreferences()
         }
         .sheet(item: $shareItem) { item in
             ShareSheet(activityItems: [item.url])
@@ -84,154 +110,6 @@ struct ContentView: View {
             Button("OK", role: .cancel) {}
         } message: {
             Text(alertMessage ?? "")
-        }
-    }
-
-    private var downloadTab: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("yt-dlp downloader")
-                .font(.title2.bold())
-
-            Text("status: \(statusText)")
-                .font(.subheadline.monospaced())
-
-            TextField("https://example.com/video", text: $urlText)
-                .textInputAutocapitalization(.never)
-                .autocorrectionDisabled()
-                .textFieldStyle(.roundedBorder)
-
-            HStack(spacing: 8) {
-                presetButton(.autoVideo, title: "Auto (Video)")
-                presetButton(.mute, title: "Mute")
-                presetButton(.audio, title: "Audio")
-            }
-
-            Button(action: runDownloadFlow) {
-                Text(isRunning ? "Running..." : "Download")
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.borderedProminent)
-            .disabled(isRunning || urlText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-
-            if isRunning {
-                HStack(spacing: 8) {
-                    ProgressView()
-                    Text("Downloading...")
-                        .font(.footnote)
-                }
-            }
-
-            Text(progressText)
-                .font(.system(.footnote, design: .monospaced))
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(12)
-                .background(Color(.secondarySystemBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-
-            Spacer(minLength: 0)
-        }
-        .padding()
-    }
-
-    private var packagesTab: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("package manager")
-                .font(.title2.bold())
-
-            Text("status: \(packageStatusText)")
-                .font(.subheadline.monospaced())
-
-            Text(versionsText)
-                .font(.system(.footnote, design: .monospaced))
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(12)
-                .background(Color(.secondarySystemBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-
-            HStack(spacing: 12) {
-                Button(action: refreshPackageVersions) {
-                    Text(isRunning ? "Running..." : "Refresh Versions")
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.bordered)
-                .disabled(isRunning)
-
-                Button(action: updatePackages) {
-                    Text(isRunning ? "Running..." : "Update Packages")
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.borderedProminent)
-                .disabled(isRunning)
-            }
-            Spacer(minLength: 0)
-        }
-        .padding()
-    }
-
-    private var consoleTab: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                Text("console")
-                    .font(.title2.bold())
-                Spacer()
-                Button("Clear") {
-                    consoleLogText = ""
-                }
-                .buttonStyle(.bordered)
-            }
-
-            ScrollView {
-                Text(consoleLogText.isEmpty ? "No logs yet." : consoleLogText)
-                    .font(.system(.footnote, design: .monospaced))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .textSelection(.enabled)
-            }
-            .frame(maxHeight: .infinity)
-            .padding(12)
-            .background(Color(.secondarySystemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-        }
-        .padding()
-    }
-
-    private var settingsTab: some View {
-        Form {
-            Section("Export") {
-                Picker("Container", selection: $downloadSettings.container) {
-                    ForEach(DownloadContainer.allCases) { option in
-                        Text(option.title).tag(option)
-                    }
-                }
-                .disabled(isRunning)
-
-                Picker("Max resolution", selection: $downloadSettings.maxResolution) {
-                    ForEach(DownloadMaxResolution.allCases) { option in
-                        Text(option.title).tag(option)
-                    }
-                }
-                .disabled(isRunning)
-
-                Picker("Audio format", selection: $downloadSettings.audioFormat) {
-                    ForEach(AudioFormatOption.allCases) { option in
-                        Text(option.title).tag(option)
-                    }
-                }
-                .disabled(isRunning)
-
-                Picker("Audio quality", selection: $downloadSettings.audioQuality) {
-                    ForEach(AudioQualityOption.allCases) { option in
-                        Text(option.title).tag(option)
-                    }
-                }
-                .disabled(isRunning)
-            }
-
-            Section("Behavior") {
-                Toggle("Single video only (--no-playlist)", isOn: $downloadSettings.noPlaylist)
-                    .disabled(isRunning)
-                Toggle("Embed subtitles when available", isOn: $downloadSettings.embedSubtitles)
-                    .disabled(isRunning)
-            }
         }
     }
 
@@ -389,211 +267,28 @@ struct ContentView: View {
         }
     }
 
-    private func presetButton(_ preset: DownloadPreset, title: String) -> some View {
-        Button(title) {
-            selectedPreset = preset
-        }
-        .buttonStyle(.borderedProminent)
-        .tint(selectedPreset == preset ? .blue : .gray)
-        .frame(maxWidth: .infinity)
-        .disabled(isRunning)
-    }
-}
-
-private enum DownloadPreset: String {
-    case autoVideo = "auto_video"
-    case mute = "mute"
-    case audio = "audio"
-
-    var pythonValue: String { rawValue }
-}
-
-private struct DownloadSettings: Codable {
-    var container: DownloadContainer = .automatic
-    var maxResolution: DownloadMaxResolution = .source
-    var audioFormat: AudioFormatOption = .automatic
-    var audioQuality: AudioQualityOption = .automatic
-    var noPlaylist: Bool = true
-    var embedSubtitles: Bool = false
-
-    var jsonString: String {
-        let encoder = JSONEncoder()
-        guard let data = try? encoder.encode(self),
-              let json = String(data: data, encoding: .utf8) else {
-            return "{}"
-        }
-        return json
-    }
-}
-
-private enum DownloadContainer: String, Codable, CaseIterable, Identifiable {
-    case automatic
-    case avi
-    case flv
-    case gif
-    case mkv
-    case mov
-    case mp4
-    case webm
-    case aac
-    case aiff
-    case alac
-    case flac
-    case m4a
-    case mka
-    case mp3
-    case ogg
-    case opus
-    case vorbis
-    case wav
-
-    var id: String { rawValue }
-    var title: String {
-        switch self {
-        case .automatic: return "Automatic"
-        case .avi: return "AVI"
-        case .flv: return "FLV"
-        case .gif: return "GIF"
-        case .mkv: return "MKV"
-        case .mov: return "MOV"
-        case .mp4: return "MP4"
-        case .webm: return "WEBM"
-        case .aac: return "AAC"
-        case .aiff: return "AIFF"
-        case .alac: return "ALAC"
-        case .flac: return "FLAC"
-        case .m4a: return "M4A"
-        case .mka: return "MKA"
-        case .mp3: return "MP3"
-        case .ogg: return "OGG"
-        case .opus: return "OPUS"
-        case .vorbis: return "VORBIS"
-        case .wav: return "WAV"
-        }
-    }
-}
-
-private enum DownloadMaxResolution: String, Codable, CaseIterable, Identifiable {
-    case source
-    case p2160
-    case p1440
-    case p1080
-    case p720
-    case p480
-    case p360
-
-    var id: String { rawValue }
-
-    var title: String {
-        switch self {
-        case .source: return "Source"
-        case .p2160: return "2160p"
-        case .p1440: return "1440p"
-        case .p1080: return "1080p"
-        case .p720: return "720p"
-        case .p480: return "480p"
-        case .p360: return "360p"
-        }
-    }
-}
-
-private enum AudioFormatOption: String, Codable, CaseIterable, Identifiable {
-    case automatic
-    case best
-    case aac
-    case alac
-    case flac
-    case m4a
-    case mp3
-    case opus
-    case vorbis
-    case wav
-
-    var id: String { rawValue }
-    var title: String {
-        switch self {
-        case .automatic: return "Automatic"
-        case .best: return "Best"
-        case .aac: return "AAC"
-        case .alac: return "ALAC"
-        case .flac: return "FLAC"
-        case .m4a: return "M4A"
-        case .mp3: return "MP3"
-        case .opus: return "OPUS"
-        case .vorbis: return "VORBIS"
-        case .wav: return "WAV"
-        }
-    }
-}
-
-private enum AudioQualityOption: String, Codable, CaseIterable, Identifiable {
-    case automatic
-    case q0
-    case q1
-    case q2
-    case q3
-    case q4
-    case q5
-    case q6
-    case q7
-    case q8
-    case q9
-    case q10
-    case k64
-    case k96
-    case k128
-    case k160
-    case k192
-    case k256
-    case k320
-
-    var id: String { rawValue }
-    var title: String {
-        switch self {
-        case .automatic: return "Automatic"
-        case .q0: return "0 (best VBR)"
-        case .q1: return "1"
-        case .q2: return "2"
-        case .q3: return "3"
-        case .q4: return "4"
-        case .q5: return "5 (default)"
-        case .q6: return "6"
-        case .q7: return "7"
-        case .q8: return "8"
-        case .q9: return "9"
-        case .q10: return "10 (worst VBR)"
-        case .k64: return "64K"
-        case .k96: return "96K"
-        case .k128: return "128K"
-        case .k160: return "160K"
-        case .k192: return "192K"
-        case .k256: return "256K"
-        case .k320: return "320K"
+    private func persistPreferences() {
+        let defaults = UserDefaults.standard
+        defaults.set(selectedPreset.rawValue, forKey: Self.presetDefaultsKey)
+        if let data = try? JSONEncoder().encode(downloadSettings) {
+            defaults.set(data, forKey: Self.settingsDefaultsKey)
         }
     }
 
-    var pythonValue: String? {
-        switch self {
-        case .automatic: return nil
-        case .q0: return "0"
-        case .q1: return "1"
-        case .q2: return "2"
-        case .q3: return "3"
-        case .q4: return "4"
-        case .q5: return "5"
-        case .q6: return "6"
-        case .q7: return "7"
-        case .q8: return "8"
-        case .q9: return "9"
-        case .q10: return "10"
-        case .k64: return "64K"
-        case .k96: return "96K"
-        case .k128: return "128K"
-        case .k160: return "160K"
-        case .k192: return "192K"
-        case .k256: return "256K"
-        case .k320: return "320K"
+    private static func loadSelectedPreset() -> DownloadPreset {
+        guard let rawValue = UserDefaults.standard.string(forKey: presetDefaultsKey),
+              let preset = DownloadPreset(rawValue: rawValue) else {
+            return .autoVideo
         }
+        return preset
+    }
+
+    private static func loadDownloadSettings() -> DownloadSettings {
+        guard let data = UserDefaults.standard.data(forKey: settingsDefaultsKey),
+              let settings = try? JSONDecoder().decode(DownloadSettings.self, from: data) else {
+            return DownloadSettings()
+        }
+        return settings
     }
 }
 
