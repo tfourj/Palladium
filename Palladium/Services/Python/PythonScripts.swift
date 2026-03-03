@@ -866,6 +866,8 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, d
                         "yt-dlp",
                         "-v",
                         "--no-check-certificate",
+                        "--remote-components",
+                        "ejs:github",
                         "--force-overwrites",
                         "--no-continue",
                         "--ffmpeg-location",
