@@ -27,6 +27,7 @@ private enum PythonRuntimeBootstrap {
         let pythonRoot = bundle.bundleURL.appendingPathComponent("python")
         let libRoot = pythonRoot.appendingPathComponent("lib")
         let writablePackagesPath = makeWritablePackagesPath()
+        let writableDownloadsPath = makeWritableDownloadsPath()
 
         guard let versionFolder = try? FileManager.default.contentsOfDirectory(
             atPath: libRoot.path
@@ -44,6 +45,9 @@ private enum PythonRuntimeBootstrap {
         if let writablePackagesPath {
             pythonPathComponents.insert(writablePackagesPath, at: 0)
             setenv("PALLADIUM_PYTHON_PACKAGES", writablePackagesPath, 1)
+        }
+        if let writableDownloadsPath {
+            setenv("PALLADIUM_DOWNLOADS", writableDownloadsPath, 1)
         }
 
         setenv("PYTHONHOME", pythonRoot.path, 1)
@@ -64,6 +68,25 @@ private enum PythonRuntimeBootstrap {
                 withIntermediateDirectories: true
             )
             return packagesDir.path
+        } catch {
+            return nil
+        }
+    }
+
+    private static func makeWritableDownloadsPath() -> String? {
+        do {
+            let documents = try FileManager.default.url(
+                for: .documentDirectory,
+                in: .userDomainMask,
+                appropriateFor: nil,
+                create: true
+            )
+            let downloadsDir = documents.appendingPathComponent("Downloads", isDirectory: true)
+            try FileManager.default.createDirectory(
+                at: downloadsDir,
+                withIntermediateDirectories: true
+            )
+            return downloadsDir.path
         } catch {
             return nil
         }

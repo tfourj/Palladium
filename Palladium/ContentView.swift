@@ -352,6 +352,7 @@ def run_yt_dlp_flow():
     yt_exit_code = None
     success = False
     download_url = os.environ.get("PALLADIUM_DOWNLOAD_URL", "").strip()
+    downloads_dir = os.environ.get("PALLADIUM_DOWNLOADS", "").strip()
     install_target = os.environ.get("PALLADIUM_PYTHON_PACKAGES")
     live_fd_value = os.environ.get("PALLADIUM_LOG_FD")
     live_log_stream = None
@@ -388,6 +389,9 @@ def run_yt_dlp_flow():
             if install_target not in sys.path:
                 sys.path.insert(0, install_target)
             print(f"[palladium] package install target: {install_target}")
+        if downloads_dir:
+            os.makedirs(downloads_dir, exist_ok=True)
+            print(f"[palladium] download target: {downloads_dir}")
 
         needs_yt_dlp_install = False
         needs_webkit_jsi_install = False
@@ -447,9 +451,21 @@ def run_yt_dlp_flow():
         else:
             print(f"[palladium] running yt-dlp -v {download_url}")
         argv_backup = sys.argv[:]
+        cwd_backup = os.getcwd()
         try:
             if download_url:
-                sys.argv = ["yt-dlp", "-v", "--no-check-certificate", download_url]
+                if downloads_dir:
+                    os.chdir(downloads_dir)
+                sys.argv = [
+                    "yt-dlp",
+                    "-v",
+                    "--no-check-certificate",
+                    "-P",
+                    downloads_dir if downloads_dir else ".",
+                    "-o",
+                    "%(title)s [%(id)s].%(ext)s",
+                    download_url,
+                ]
                 try:
                     runpy.run_module("yt_dlp", run_name="__main__", alter_sys=True)
                     yt_exit_code = 0
@@ -471,6 +487,10 @@ def run_yt_dlp_flow():
             yt_exit_code = 1
         finally:
             sys.argv = argv_backup
+            try:
+                os.chdir(cwd_backup)
+            except Exception:
+                pass
             if live_log_stream is not None:
                 try:
                     live_log_stream.flush()
