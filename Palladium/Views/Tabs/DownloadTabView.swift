@@ -4,7 +4,6 @@ struct DownloadTabView: View {
     @Binding var statusText: String
     @Binding var urlText: String
     @Binding var selectedPreset: DownloadPreset
-    @Binding var customArgsText: String
 
     let isRunning: Bool
     let progressText: String
@@ -23,19 +22,13 @@ struct DownloadTabView: View {
                 .autocorrectionDisabled()
                 .textFieldStyle(.roundedBorder)
 
-            HStack(spacing: 8) {
-                presetButton(.autoVideo, title: "Auto (Video)")
-                presetButton(.mute, title: "Mute")
-                presetButton(.audio, title: "Audio")
-                presetButton(.custom, title: "Custom")
+            Picker("Preset", selection: $selectedPreset) {
+                ForEach(DownloadPreset.allCases) { preset in
+                    Text(preset.title).tag(preset)
+                }
             }
-
-            if selectedPreset == .custom {
-                TextField("--format best --no-playlist", text: $customArgsText)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
-                    .textFieldStyle(.roundedBorder)
-            }
+            .pickerStyle(.segmented)
+            .disabled(isRunning)
 
             Button(action: onDownload) {
                 Text(isRunning ? "Running..." : "Download")
@@ -62,15 +55,5 @@ struct DownloadTabView: View {
             Spacer(minLength: 0)
         }
         .padding()
-    }
-
-    private func presetButton(_ preset: DownloadPreset, title: String) -> some View {
-        Button(title) {
-            selectedPreset = preset
-        }
-        .buttonStyle(.borderedProminent)
-        .tint(selectedPreset == preset ? .blue : .gray)
-        .frame(maxWidth: .infinity)
-        .disabled(isRunning)
     }
 }

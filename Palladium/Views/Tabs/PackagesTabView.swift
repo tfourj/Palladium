@@ -27,7 +27,7 @@ struct PackagesTabView: View {
                     Text(isRunning ? "Running..." : "Refresh Versions")
                         .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.bordered)
+                .buttonStyle(.borderedProminent)
                 .disabled(isRunning)
 
                 Button(action: onUpdatePackages) {

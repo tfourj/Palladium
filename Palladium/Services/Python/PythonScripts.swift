@@ -253,6 +253,19 @@ def parse_custom_args(custom_args_value):
         return []
 
 
+def parse_extra_args(extra_args_value):
+    if not extra_args_value:
+        return []
+    try:
+        parsed = shlex.split(str(extra_args_value))
+        print(f"[palladium] extra args parsed: {parsed}")
+        return parsed
+    except Exception:
+        print("[palladium] failed to parse extra args")
+        traceback.print_exc()
+        return []
+
+
 @contextlib.contextmanager
 def patch_subprocess_for_swiftffmpeg(bridge):
     original_popen = subprocess.Popen
@@ -658,7 +671,7 @@ def patch_ytdlp_ffmpeg_detection():
             ffmpeg_pp.probe_basename = original_probe_basename
 
 
-def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, custom_args_override=None):
+def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, custom_args_override=None, extra_args_override=None):
     output = io.StringIO()
     console_stdout = sys.__stdout__ if sys.__stdout__ is not None else None
     console_stderr = sys.__stderr__ if sys.__stderr__ is not None else None
@@ -680,6 +693,10 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, c
         custom_args_text = os.environ.get("PALLADIUM_CUSTOM_ARGS", "").strip()
     else:
         custom_args_text = str(custom_args_override).strip()
+    if extra_args_override is None:
+        extra_args_text = os.environ.get("PALLADIUM_EXTRA_ARGS", "").strip()
+    else:
+        extra_args_text = str(extra_args_override).strip()
     downloads_dir = os.environ.get("PALLADIUM_DOWNLOADS", "").strip()
     install_target = os.environ.get("PALLADIUM_PYTHON_PACKAGES")
     live_fd_value = os.environ.get("PALLADIUM_LOG_FD")
@@ -828,6 +845,7 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, c
                         print("[palladium] preset: custom")
                     else:
                         preset_args = build_preset_args(download_preset)
+                    extra_args = parse_extra_args(extra_args_text)
 
                     sys.argv = [
                         "yt-dlp",
@@ -844,6 +862,7 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, c
                         "-o",
                         "%(title)s [%(id)s].%(ext)s",
                         *preset_args,
+                        *extra_args,
                         download_url,
                     ]
 

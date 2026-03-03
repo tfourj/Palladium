@@ -20,6 +20,7 @@ struct ContentView: View {
 
     private static let presetDefaultsKey = "palladium.selectedPreset"
     private static let customArgsDefaultsKey = "palladium.customArgs"
+    private static let extraArgsDefaultsKey = "palladium.extraArgs"
 
     @State private var isRunning = false
     @State private var statusText = "idle"
@@ -27,6 +28,7 @@ struct ContentView: View {
     @State private var progressText = "Enter a URL and tap Download."
     @State private var selectedPreset: DownloadPreset
     @State private var customArgsText: String
+    @State private var extraArgsText: String
     @State private var packageStatusText = "idle"
     @State private var versionsText = "yt-dlp: unknown\nyt-dlp-apple-webkit-jsi: unknown"
     @State private var consoleLogText = ""
@@ -44,6 +46,7 @@ struct ContentView: View {
         #endif
         _selectedPreset = State(initialValue: Self.loadSelectedPreset())
         _customArgsText = State(initialValue: Self.loadCustomArgs())
+        _extraArgsText = State(initialValue: Self.loadExtraArgs())
     }
 
     var body: some View {
@@ -52,7 +55,6 @@ struct ContentView: View {
                 statusText: $statusText,
                 urlText: $urlText,
                 selectedPreset: $selectedPreset,
-                customArgsText: $customArgsText,
                 isRunning: isRunning,
                 progressText: progressText,
                 onDownload: runDownloadFlow
@@ -72,6 +74,16 @@ struct ContentView: View {
                 Label("Packages", systemImage: "shippingbox")
             }
 
+            SettingsTabView(
+                customArgsText: $customArgsText,
+                extraArgsText: $extraArgsText,
+                selectedPreset: $selectedPreset,
+                isRunning: isRunning
+            )
+            .tabItem {
+                Label("Settings", systemImage: "slider.horizontal.3")
+            }
+
             ConsoleTabView(consoleLogText: $consoleLogText)
                 .tabItem {
                     Label("Console", systemImage: "terminal")
@@ -81,6 +93,9 @@ struct ContentView: View {
             persistPreferences()
         }
         .onChange(of: customArgsText) { _ in
+            persistPreferences()
+        }
+        .onChange(of: extraArgsText) { _ in
             persistPreferences()
         }
         .sheet(item: $shareItem) { item in
@@ -124,6 +139,7 @@ struct ContentView: View {
         let writeFD = logPipe.fileHandleForWriting.fileDescriptor
         let presetAtStart = selectedPreset.pythonValue
         let customArgsAtStart = customArgsText.trimmingCharacters(in: .whitespacesAndNewlines)
+        let extraArgsAtStart = extraArgsText.trimmingCharacters(in: .whitespacesAndNewlines)
         setenv("PALLADIUM_LOG_FD", "\(writeFD)", 1)
 
         readHandle.readabilityHandler = { handle in
@@ -139,7 +155,8 @@ struct ContentView: View {
             let outcome = await PythonFlowRunner.executeDownloadFlow(
                 url: targetURL,
                 preset: presetAtStart,
-                customArgs: customArgsAtStart
+                customArgs: customArgsAtStart,
+                extraArgs: extraArgsAtStart
             )
 
             unsetenv("PALLADIUM_LOG_FD")
@@ -307,6 +324,7 @@ struct ContentView: View {
         let defaults = UserDefaults.standard
         defaults.set(selectedPreset.rawValue, forKey: Self.presetDefaultsKey)
         defaults.set(customArgsText, forKey: Self.customArgsDefaultsKey)
+        defaults.set(extraArgsText, forKey: Self.extraArgsDefaultsKey)
     }
 
     private static func loadSelectedPreset() -> DownloadPreset {
@@ -319,6 +337,10 @@ struct ContentView: View {
 
     private static func loadCustomArgs() -> String {
         UserDefaults.standard.string(forKey: customArgsDefaultsKey) ?? ""
+    }
+
+    private static func loadExtraArgs() -> String {
+        UserDefaults.standard.string(forKey: extraArgsDefaultsKey) ?? ""
     }
 }
 
