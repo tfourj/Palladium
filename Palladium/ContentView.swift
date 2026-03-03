@@ -392,6 +392,9 @@ struct ContentView: View {
         let lines = normalized.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
         let filtered = lines.filter { line in
             let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+            if trimmed.isEmpty {
+                return false
+            }
             if trimmed.contains("[download]") && trimmed.contains("% of") {
                 return false
             }
