@@ -82,10 +82,27 @@ private enum PythonRuntimeBootstrap {
                 create: true
             )
             let downloadsDir = documents.appendingPathComponent("Downloads", isDirectory: true)
+            let savedDir = documents.appendingPathComponent("Saved", isDirectory: true)
             try FileManager.default.createDirectory(
                 at: downloadsDir,
                 withIntermediateDirectories: true
             )
+            try FileManager.default.createDirectory(
+                at: savedDir,
+                withIntermediateDirectories: true
+            )
+
+            // Keep a visible file in Documents so Files app reliably shows app storage.
+            let readmeURL = documents.appendingPathComponent("README.txt")
+            if !FileManager.default.fileExists(atPath: readmeURL.path) {
+                let text = """
+                Palladium app storage
+
+                Downloads: video/audio output files
+                Saved: files copied via "Save to App Folder"
+                """
+                try text.write(to: readmeURL, atomically: true, encoding: .utf8)
+            }
             return downloadsDir.path
         } catch {
             return nil
