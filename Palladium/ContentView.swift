@@ -12,6 +12,7 @@ import UIKit
 import Photos
 import AVFoundation
 import UserNotifications
+import Darwin
 
 struct ContentView: View {
     private enum AppTab: Hashable {
@@ -63,11 +64,7 @@ struct ContentView: View {
     private let consoleMaxChars = 200_000
 
     init() {
-        #if DEBUG
-        _urlText = State(initialValue: "https://www.youtube.com/watch?v=jNQXAC9IVRw")
-        #else
-        _urlText = State(initialValue: "")
-        #endif
+        _urlText = State(initialValue: Self.isDebuggerAttached() ? "https://www.youtube.com/watch?v=jNQXAC9IVRw" : "")
         _selectedPreset = State(initialValue: Self.loadSelectedPreset())
         _customArgsText = State(initialValue: Self.loadCustomArgs())
         _extraArgsText = State(initialValue: Self.loadExtraArgs())
@@ -553,6 +550,22 @@ struct ContentView: View {
             return .autoVideo
         }
         return preset
+    }
+
+    private static func isDebuggerAttached() -> Bool {
+        var info = kinfo_proc()
+        var mib: [Int32] = [CTL_KERN, KERN_PROC, KERN_PROC_PID, getpid()]
+        var size = MemoryLayout<kinfo_proc>.stride
+
+        let result = mib.withUnsafeMutableBufferPointer { mibPointer in
+            sysctl(mibPointer.baseAddress, u_int(mib.count), &info, &size, nil, 0)
+        }
+
+        if result != 0 {
+            return false
+        }
+
+        return (info.kp_proc.p_flag & P_TRACED) != 0
     }
 
     private static func loadCustomArgs() -> String {
