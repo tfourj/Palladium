@@ -226,7 +226,8 @@ struct ContentView: View {
 
                 Raw payload:
                 \(payload)
-                """
+                """,
+                versionsText: nil
             )
         }
 
@@ -437,7 +438,7 @@ def run_yt_dlp_flow():
         argv_backup = sys.argv[:]
         try:
             if download_url:
-                sys.argv = ["yt-dlp", "-v", download_url]
+                sys.argv = ["yt-dlp", "-v", "--no-check-certificate", download_url]
                 try:
                     runpy.run_module("yt_dlp", run_name="__main__", alter_sys=True)
                     yt_exit_code = 0
