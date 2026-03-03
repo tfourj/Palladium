@@ -7,8 +7,14 @@
 
 import SwiftUI
 import PythonKit
+import OSLog
 
 struct ContentView: View {
+    private static let logger = Logger(
+        subsystem: Bundle.main.bundleIdentifier ?? "com.tfourj.Palladium",
+        category: "python"
+    )
+
     @State private var isRunning = false
     @State private var statusText = "idle"
     @State private var logText = "Tap the button to install yt-dlp if needed and run -v."
@@ -56,6 +62,9 @@ struct ContentView: View {
             isRunning = false
             statusText = outcome.statusText
             logText = outcome.logText
+            Self.logger.info("yt-dlp flow finished with status: \(outcome.statusText, privacy: .public)")
+            Self.logger.info("\(outcome.logText, privacy: .public)")
+            print(outcome.logText)
         }
     }
 
@@ -100,24 +109,48 @@ struct ContentView: View {
 import contextlib
 import io
 import json
+import os
 import sys
 import traceback
 
 def run_yt_dlp_flow():
     output = io.StringIO()
+    console_stdout = sys.__stdout__ if sys.__stdout__ is not None else None
+    console_stderr = sys.__stderr__ if sys.__stderr__ is not None else None
     pip_attempted = False
     pip_exit_code = None
     yt_exit_code = None
     success = False
+    install_target = os.environ.get("PALLADIUM_PYTHON_PACKAGES")
 
-    with contextlib.redirect_stdout(output), contextlib.redirect_stderr(output):
+    class Tee:
+        def __init__(self, *streams):
+            self.streams = [s for s in streams if s is not None]
+        def write(self, data):
+            for stream in self.streams:
+                stream.write(data)
+                if hasattr(stream, "flush"):
+                    stream.flush()
+            return len(data)
+        def flush(self):
+            for stream in self.streams:
+                if hasattr(stream, "flush"):
+                    stream.flush()
+
+    with contextlib.redirect_stdout(Tee(output, console_stdout)), contextlib.redirect_stderr(Tee(output, console_stderr)):
+        if install_target:
+            os.makedirs(install_target, exist_ok=True)
+            if install_target not in sys.path:
+                sys.path.insert(0, install_target)
+            print(f"[palladium] package install target: {install_target}")
+
         print("[palladium] checking yt_dlp import")
         try:
             import yt_dlp  # noqa: F401
             print("[palladium] yt_dlp already installed")
         except Exception:
             pip_attempted = True
-            print("[palladium] yt_dlp missing, installing via pip")
+            print("[palladium] yt_dlp module missing; installing package yt-dlp via pip")
             try:
                 from pip._internal.cli.main import main as pip_main
             except Exception:
@@ -125,7 +158,10 @@ def run_yt_dlp_flow():
                 traceback.print_exc()
             else:
                 try:
-                    pip_result = pip_main(["install", "yt-dlp"])
+                    pip_args = ["install", "yt-dlp"]
+                    if install_target:
+                        pip_args[1:1] = ["--target", install_target]
+                    pip_result = pip_main(pip_args)
                     pip_exit_code = 0 if pip_result is None else int(pip_result)
                     print(f"[palladium] pip exit code: {pip_exit_code}")
                 except Exception:
@@ -133,6 +169,8 @@ def run_yt_dlp_flow():
                     traceback.print_exc()
 
             try:
+                if install_target and install_target not in sys.path:
+                    sys.path.insert(0, install_target)
                 import yt_dlp  # noqa: F401
                 print("[palladium] yt_dlp import succeeded after install")
             except Exception:
