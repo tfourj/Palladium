@@ -15,6 +15,7 @@ struct ContentView: View {
         subsystem: Bundle.main.bundleIdentifier ?? "com.tfourj.Palladium",
         category: "python"
     )
+    nonisolated private static let pythonQueue = DispatchQueue(label: "com.tfourj.Palladium.python")
 
     @State private var isRunning = false
     @State private var statusText = "idle"
@@ -140,9 +141,9 @@ struct ContentView: View {
         }
 
         Task {
-            let outcome = await Task.detached(priority: .userInitiated) {
+            let outcome = await ContentView.runOnPythonQueue {
                 ContentView.executePythonFlow()
-            }.value
+            }
 
             unsetenv("PALLADIUM_LOG_FD")
             unsetenv("PALLADIUM_DOWNLOAD_URL")
@@ -188,9 +189,9 @@ struct ContentView: View {
         }
 
         Task {
-            let outcome = await Task.detached(priority: .userInitiated) {
+            let outcome = await ContentView.runOnPythonQueue {
                 ContentView.executePackageFlow(action: action)
-            }.value
+            }
 
             unsetenv("PALLADIUM_LOG_FD")
             readHandle.readabilityHandler = nil
@@ -288,6 +289,16 @@ struct ContentView: View {
 
         let status = success ? "success" : "error"
         return PythonFlowOutcome(statusText: status, summaryText: summary, outputText: output, versionsText: versionsText)
+    }
+
+    nonisolated private static func runOnPythonQueue(
+        _ work: @escaping @Sendable () -> PythonFlowOutcome
+    ) async -> PythonFlowOutcome {
+        await withCheckedContinuation { continuation in
+            pythonQueue.async {
+                continuation.resume(returning: work())
+            }
+        }
     }
 
     nonisolated private static let pythonRunnerScript = #"""
