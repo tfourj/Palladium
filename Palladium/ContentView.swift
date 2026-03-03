@@ -15,6 +15,8 @@ struct ContentView: View {
         subsystem: Bundle.main.bundleIdentifier ?? "com.tfourj.Palladium",
         category: "python"
     )
+    nonisolated(unsafe) private static var pythonRunnerInstalled = false
+    nonisolated private static let pythonRunnerInstallLock = NSLock()
 
     @State private var isRunning = false
     @State private var statusText = "idle"
@@ -55,23 +57,15 @@ struct ContentView: View {
         statusText = "running"
         logText = ""
 
-        let liveLogURL = Self.createLiveLogFileURL()
-        if let liveLogURL {
-            setenv("PALLADIUM_LOG_FILE", liveLogURL.path, 1)
-        }
-
-        let liveLogTask: Task<Void, Never>? = liveLogURL.map { fileURL in
-            Task {
-                var offset: UInt64 = 0
-                while !Task.isCancelled {
-                    if let chunk = Self.readLiveLogChunk(from: fileURL, offset: &offset), !chunk.isEmpty {
-                        logText.append(chunk)
-                    }
-                    try? await Task.sleep(nanoseconds: 200_000_000)
+        let liveLogTask = Task {
+            while !Task.isCancelled {
+                if let chunk = ContentView.drainPythonLiveLogs(), !chunk.isEmpty {
+                    logText.append(chunk)
                 }
-                if let finalChunk = Self.readLiveLogChunk(from: fileURL, offset: &offset), !finalChunk.isEmpty {
-                    logText.append(finalChunk)
-                }
+                try? await Task.sleep(nanoseconds: 200_000_000)
+            }
+            if let finalChunk = ContentView.drainPythonLiveLogs(), !finalChunk.isEmpty {
+                logText.append(finalChunk)
             }
         }
 
@@ -80,8 +74,7 @@ struct ContentView: View {
                 ContentView.executePythonFlow()
             }.value
 
-            liveLogTask?.cancel()
-            unsetenv("PALLADIUM_LOG_FILE")
+            liveLogTask.cancel()
 
             isRunning = false
             statusText = outcome.statusText
@@ -94,9 +87,8 @@ struct ContentView: View {
     }
 
     nonisolated private static func executePythonFlow() -> PythonFlowOutcome {
-        let builtins = Python.import("builtins")
+        ensurePythonRunnerInstalled()
         let main = Python.import("__main__")
-        _ = builtins.exec(pythonRunnerScript, main.__dict__)
         let payload = String(main.run_yt_dlp_flow()) ?? ""
 
         guard let data = payload.data(using: .utf8),
@@ -130,24 +122,20 @@ struct ContentView: View {
         return PythonFlowOutcome(statusText: status, summaryText: summary, outputText: output)
     }
 
-    nonisolated private static func createLiveLogFileURL() -> URL? {
-        let fileURL = FileManager.default.temporaryDirectory
-            .appendingPathComponent("palladium-python-\(UUID().uuidString).log")
-        let created = FileManager.default.createFile(atPath: fileURL.path, contents: Data())
-        return created ? fileURL : nil
+    nonisolated private static func drainPythonLiveLogs() -> String? {
+        ensurePythonRunnerInstalled()
+        let main = Python.import("__main__")
+        return String(main.drain_live_logs())
     }
 
-    nonisolated private static func readLiveLogChunk(from fileURL: URL, offset: inout UInt64) -> String? {
-        guard let handle = try? FileHandle(forReadingFrom: fileURL) else {
-            return nil
-        }
-        defer { try? handle.close() }
-        let fileSize = (try? handle.seekToEnd()) ?? 0
-        guard fileSize > offset else { return "" }
-        try? handle.seek(toOffset: offset)
-        let data = handle.readDataToEndOfFile()
-        offset = fileSize
-        return String(data: data, encoding: .utf8)
+    nonisolated private static func ensurePythonRunnerInstalled() {
+        pythonRunnerInstallLock.lock()
+        defer { pythonRunnerInstallLock.unlock() }
+        if pythonRunnerInstalled { return }
+        let builtins = Python.import("builtins")
+        let main = Python.import("__main__")
+        _ = builtins.exec(pythonRunnerScript, main.__dict__)
+        pythonRunnerInstalled = true
     }
 
     nonisolated private static let pythonRunnerScript = #"""
@@ -157,7 +145,23 @@ import json
 import os
 import runpy
 import sys
+import threading
 import traceback
+
+_live_log_chunks = []
+_live_log_lock = threading.Lock()
+
+def drain_live_logs():
+    with _live_log_lock:
+        if not _live_log_chunks:
+            return ""
+        chunk = "".join(_live_log_chunks)
+        _live_log_chunks.clear()
+        return chunk
+
+def _push_live_log(data):
+    with _live_log_lock:
+        _live_log_chunks.append(data)
 
 def run_yt_dlp_flow():
     output = io.StringIO()
@@ -168,19 +172,15 @@ def run_yt_dlp_flow():
     yt_exit_code = None
     success = False
     install_target = os.environ.get("PALLADIUM_PYTHON_PACKAGES")
-    live_log_path = os.environ.get("PALLADIUM_LOG_FILE")
-    live_log_stream = None
 
-    if live_log_path:
-        try:
-            live_log_stream = open(live_log_path, "a", encoding="utf-8", errors="replace")
-        except Exception:
-            live_log_stream = None
+    with _live_log_lock:
+        _live_log_chunks.clear()
 
     class Tee:
         def __init__(self, *streams):
             self.streams = [s for s in streams if s is not None]
         def write(self, data):
+            _push_live_log(data)
             for stream in self.streams:
                 try:
                     stream.write(data)
@@ -196,7 +196,7 @@ def run_yt_dlp_flow():
                 if hasattr(stream, "flush"):
                     stream.flush()
 
-    with contextlib.redirect_stdout(Tee(output, console_stdout, live_log_stream)), contextlib.redirect_stderr(Tee(output, console_stderr, live_log_stream)):
+    with contextlib.redirect_stdout(Tee(output, console_stdout)), contextlib.redirect_stderr(Tee(output, console_stderr)):
         os.environ["PYTHONIOENCODING"] = "utf-8"
         if install_target:
             os.makedirs(install_target, exist_ok=True)
@@ -255,7 +255,7 @@ def run_yt_dlp_flow():
         print("[palladium] running yt-dlp -v")
         argv_backup = sys.argv[:]
         try:
-            sys.argv = ["yt-dlp", "-v"]
+            sys.argv = ["yt-dlp", "-v", "--version"]
             try:
                 runpy.run_module("yt_dlp", run_name="__main__", alter_sys=True)
                 yt_exit_code = 0
@@ -277,11 +277,6 @@ def run_yt_dlp_flow():
             yt_exit_code = 1
         finally:
             sys.argv = argv_backup
-            if live_log_stream is not None:
-                try:
-                    live_log_stream.close()
-                except Exception:
-                    pass
 
         success = (pip_exit_code in (None, 0)) and (yt_exit_code == 0)
         print(f"[palladium] flow success: {success}")
