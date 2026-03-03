@@ -623,7 +623,7 @@ def patch_ytdlp_ffmpeg_detection():
             ffmpeg_pp.probe_basename = original_probe_basename
 
 
-def run_yt_dlp_flow():
+def run_yt_dlp_flow(download_url_override=None, download_preset_override=None):
     output = io.StringIO()
     console_stdout = sys.__stdout__ if sys.__stdout__ is not None else None
     console_stderr = sys.__stderr__ if sys.__stderr__ is not None else None
@@ -632,8 +632,15 @@ def run_yt_dlp_flow():
     yt_exit_code = None
     downloaded_path = None
     success = False
-    download_url = os.environ.get("PALLADIUM_DOWNLOAD_URL", "").strip()
-    download_preset = os.environ.get("PALLADIUM_DOWNLOAD_PRESET", "auto_video").strip()
+    if download_url_override is None:
+        download_url = os.environ.get("PALLADIUM_DOWNLOAD_URL", "").strip()
+    else:
+        download_url = str(download_url_override).strip()
+
+    if download_preset_override is None:
+        download_preset = os.environ.get("PALLADIUM_DOWNLOAD_PRESET", "auto_video").strip()
+    else:
+        download_preset = str(download_preset_override).strip()
     downloads_dir = os.environ.get("PALLADIUM_DOWNLOADS", "").strip()
     install_target = os.environ.get("PALLADIUM_PYTHON_PACKAGES")
     live_fd_value = os.environ.get("PALLADIUM_LOG_FD")

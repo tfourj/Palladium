@@ -200,9 +200,8 @@ struct ContentView: View {
         let logPipe = Pipe()
         let readHandle = logPipe.fileHandleForReading
         let writeFD = logPipe.fileHandleForWriting.fileDescriptor
+        let presetAtStart = selectedPreset.pythonValue
         setenv("PALLADIUM_LOG_FD", "\(writeFD)", 1)
-        setenv("PALLADIUM_DOWNLOAD_URL", targetURL, 1)
-        setenv("PALLADIUM_DOWNLOAD_PRESET", selectedPreset.pythonValue, 1)
 
         readHandle.readabilityHandler = { handle in
             let data = handle.availableData
@@ -214,11 +213,12 @@ struct ContentView: View {
         }
 
         Task {
-            let outcome = await PythonFlowRunner.executeDownloadFlow()
+            let outcome = await PythonFlowRunner.executeDownloadFlow(
+                url: targetURL,
+                preset: presetAtStart
+            )
 
             unsetenv("PALLADIUM_LOG_FD")
-            unsetenv("PALLADIUM_DOWNLOAD_URL")
-            unsetenv("PALLADIUM_DOWNLOAD_PRESET")
             readHandle.readabilityHandler = nil
             try? readHandle.close()
             try? logPipe.fileHandleForWriting.close()
