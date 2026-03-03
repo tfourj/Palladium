@@ -33,26 +33,28 @@ struct DownloadTabView: View {
                 }
                 .padding(.top, 10)
 
-                VStack(alignment: .leading, spacing: 8) {
-                    if isRunning {
+                if isRunning {
+                    VStack(alignment: .leading, spacing: 8) {
                         HStack(spacing: 8) {
                             ProgressView()
                             Text("Downloading...")
                                 .font(.footnote)
                                 .foregroundStyle(.white)
                         }
-                    }
 
-                    Text(progressText)
-                        .font(.system(.footnote, design: .monospaced))
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-                        .padding(12)
-                        .background(Color.white.opacity(0.10))
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        Text(progressText)
+                            .font(.system(.footnote, design: .monospaced))
+                            .foregroundStyle(.white)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                            .padding(12)
+                            .background(Color.white.opacity(0.10))
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                    }
+                    .padding(.horizontal, 20)
+                    .frame(maxHeight: .infinity)
+                } else {
+                    Spacer(minLength: 0)
                 }
-                .padding(.horizontal, 20)
-                .frame(maxHeight: .infinity)
 
                 VStack(spacing: 10) {
                     Picker("Preset", selection: $selectedPreset) {
