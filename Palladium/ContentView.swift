@@ -151,20 +151,35 @@ def run_yt_dlp_flow():
         except Exception:
             pip_attempted = True
             print("[palladium] yt_dlp module missing; installing package yt-dlp via pip")
+            pip_main = None
             try:
                 from pip._internal.cli.main import main as pip_main
             except Exception:
                 print("[palladium] pip entrypoint unavailable")
                 traceback.print_exc()
-            else:
+                print("[palladium] attempting ensurepip fallback")
                 try:
-                    pip_args = ["install", "yt-dlp"]
+                    import ensurepip
+                    with ensurepip._get_pip_whl_path_ctx() as pip_wheel:
+                        pip_wheel_str = str(pip_wheel)
+                        if pip_wheel_str not in sys.path:
+                            sys.path.insert(0, pip_wheel_str)
+                        from pip._internal.cli.main import main as pip_main
+                        print("[palladium] pip loaded from ensurepip bundled wheel")
+                except Exception:
+                    pip_exit_code = 1
+                    print("[palladium] ensurepip fallback failed")
+                    traceback.print_exc()
+            if pip_main is not None:
+                try:
+                    pip_args = ["install", "--no-cache-dir", "yt-dlp"]
                     if install_target:
                         pip_args[1:1] = ["--target", install_target]
                     pip_result = pip_main(pip_args)
                     pip_exit_code = 0 if pip_result is None else int(pip_result)
                     print(f"[palladium] pip exit code: {pip_exit_code}")
                 except Exception:
+                    pip_exit_code = 1
                     print("[palladium] pip install failed")
                     traceback.print_exc()
 
