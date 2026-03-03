@@ -184,6 +184,10 @@ struct ContentView: View {
         let targetURL = urlText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !targetURL.isEmpty else { return }
 
+        consoleLogText = ""
+        pendingConsoleChunks = ""
+        isConsoleFlushScheduled = false
+
         do {
             let removedCount = try clearDownloadsDirectoryContents()
             appendConsoleText("[palladium] cleared downloads folder entries: \(removedCount)\n")
