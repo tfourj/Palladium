@@ -28,6 +28,7 @@ private enum PythonRuntimeBootstrap {
         let libRoot = pythonRoot.appendingPathComponent("lib")
         let writablePackagesPath = makeWritablePackagesPath()
         let writableDownloadsPath = makeWritableDownloadsPath()
+        let writableCachePath = makeWritableCachePath()
 
         guard let versionFolder = try? FileManager.default.contentsOfDirectory(
             atPath: libRoot.path
@@ -48,6 +49,10 @@ private enum PythonRuntimeBootstrap {
         }
         if let writableDownloadsPath {
             setenv("PALLADIUM_DOWNLOADS", writableDownloadsPath, 1)
+        }
+        if let writableCachePath {
+            setenv("PALLADIUM_CACHE_DIR", writableCachePath, 1)
+            setenv("XDG_CACHE_HOME", writableCachePath, 1)
         }
 
         setenv("PYTHONHOME", pythonRoot.path, 1)
@@ -104,6 +109,25 @@ private enum PythonRuntimeBootstrap {
                 try text.write(to: readmeURL, atomically: true, encoding: .utf8)
             }
             return downloadsDir.path
+        } catch {
+            return nil
+        }
+    }
+
+    private static func makeWritableCachePath() -> String? {
+        do {
+            let caches = try FileManager.default.url(
+                for: .cachesDirectory,
+                in: .userDomainMask,
+                appropriateFor: nil,
+                create: true
+            )
+            let ytdlpCacheDir = caches.appendingPathComponent("yt-dlp", isDirectory: true)
+            try FileManager.default.createDirectory(
+                at: ytdlpCacheDir,
+                withIntermediateDirectories: true
+            )
+            return ytdlpCacheDir.path
         } catch {
             return nil
         }

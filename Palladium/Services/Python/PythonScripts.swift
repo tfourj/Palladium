@@ -766,6 +766,7 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, p
         extra_args_text = str(extra_args_override).strip()
     downloads_dir = os.environ.get("PALLADIUM_DOWNLOADS", "").strip()
     install_target = os.environ.get("PALLADIUM_PYTHON_PACKAGES")
+    cache_dir = os.environ.get("PALLADIUM_CACHE_DIR", "").strip()
     cancel_file_path = os.environ.get("PALLADIUM_CANCEL_FILE", "").strip()
     live_fd_value = os.environ.get("PALLADIUM_LOG_FD")
     live_log_stream = None
@@ -804,6 +805,9 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, p
         if downloads_dir:
             os.makedirs(downloads_dir, exist_ok=True)
             print(f"[palladium] download target: {downloads_dir}")
+        if cache_dir:
+            os.makedirs(cache_dir, exist_ok=True)
+            print(f"[palladium] cache target: {cache_dir}")
 
         ffmpeg_bridge_dir = ""
         if downloads_dir:
@@ -936,6 +940,8 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, p
                             "--no-check-certificate",
                             "--remote-components",
                             "ejs:github",
+                            "--cache-dir",
+                            cache_dir if cache_dir else os.path.join(downloads_dir if downloads_dir else ".", ".cache"),
                             "--force-overwrites",
                             "--no-continue",
                             "--ffmpeg-location",
