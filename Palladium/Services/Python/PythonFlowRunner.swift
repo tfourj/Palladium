@@ -2,12 +2,12 @@ import Foundation
 import PythonKit
 
 enum PythonFlowRunner {
-    static func executeDownloadFlow(url: String, preset: String, customArgs: String, extraArgs: String) async -> PythonFlowOutcome {
+    static func executeDownloadFlow(url: String, preset: String, presetArgsJSON: String, extraArgs: String) async -> PythonFlowOutcome {
         await runOnPythonThread {
             let builtins = Python.import("builtins")
             let main = Python.import("__main__")
             _ = builtins.exec(PythonScripts.ytDlpScript, main.__dict__)
-            let payload = String(main.run_yt_dlp_flow(url, preset, customArgs, extraArgs)) ?? ""
+            let payload = String(main.run_yt_dlp_flow(url, preset, presetArgsJSON, extraArgs)) ?? ""
             return decodeDownloadPayload(payload)
         }
     }

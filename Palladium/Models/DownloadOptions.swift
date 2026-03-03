@@ -17,4 +17,41 @@ enum DownloadPreset: String, Codable, CaseIterable, Identifiable {
         case .custom: return "Custom"
         }
     }
+
+    var defaultArguments: String {
+        switch self {
+        case .autoVideo:
+            return "--merge-output-format mp4 --remux-video mp4 -S vcodec:h264,lang,quality,res,fps,hdr:12,acodec:aac"
+        case .mute:
+            return "-f bv*/bestvideo --merge-output-format mp4 --remux-video mp4 -S vcodec:h264,lang,quality,res,fps,hdr:12"
+        case .audio:
+            return "-f ba[acodec^=mp3]/ba/b -x --audio-format mp3"
+        case .custom:
+            return ""
+        }
+    }
+}
+
+enum PostDownloadAction: String, Codable, CaseIterable, Identifiable {
+    case saveToPhotos
+    case openShareSheet
+    case saveToApplicationFolder
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .saveToPhotos: return "Save to Photos"
+        case .openShareSheet: return "Open Share Sheet"
+        case .saveToApplicationFolder: return "Save to App Folder"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .saveToPhotos: return "photo.on.rectangle"
+        case .openShareSheet: return "square.and.arrow.up"
+        case .saveToApplicationFolder: return "folder"
+        }
+    }
 }

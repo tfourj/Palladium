@@ -21,6 +21,8 @@ struct ContentView: View {
     private static let presetDefaultsKey = "palladium.selectedPreset"
     private static let customArgsDefaultsKey = "palladium.customArgs"
     private static let extraArgsDefaultsKey = "palladium.extraArgs"
+    private static let askUserAfterDownloadDefaultsKey = "palladium.askUserAfterDownload"
+    private static let selectedPostDownloadActionDefaultsKey = "palladium.selectedPostDownloadAction"
 
     @State private var isRunning = false
     @State private var statusText = "idle"
@@ -29,6 +31,8 @@ struct ContentView: View {
     @State private var selectedPreset: DownloadPreset
     @State private var customArgsText: String
     @State private var extraArgsText: String
+    @State private var askUserAfterDownload: Bool
+    @State private var selectedPostDownloadAction: PostDownloadAction
     @State private var packageStatusText = "idle"
     @State private var versionsText = "yt-dlp: unknown\nyt-dlp-apple-webkit-jsi: unknown"
     @State private var consoleLogText = ""
@@ -49,6 +53,8 @@ struct ContentView: View {
         _selectedPreset = State(initialValue: Self.loadSelectedPreset())
         _customArgsText = State(initialValue: Self.loadCustomArgs())
         _extraArgsText = State(initialValue: Self.loadExtraArgs())
+        _askUserAfterDownload = State(initialValue: Self.loadAskUserAfterDownload())
+        _selectedPostDownloadAction = State(initialValue: Self.loadSelectedPostDownloadAction())
     }
 
     var body: some View {
@@ -80,7 +86,8 @@ struct ContentView: View {
             SettingsTabView(
                 customArgsText: $customArgsText,
                 extraArgsText: $extraArgsText,
-                selectedPreset: $selectedPreset,
+                askUserAfterDownload: $askUserAfterDownload,
+                selectedPostDownloadAction: $selectedPostDownloadAction,
                 isRunning: isRunning
             )
             .tabItem {
@@ -101,6 +108,12 @@ struct ContentView: View {
         .onChange(of: extraArgsText) { _ in
             persistPreferences()
         }
+        .onChange(of: askUserAfterDownload) { _ in
+            persistPreferences()
+        }
+        .onChange(of: selectedPostDownloadAction) { _ in
+            persistPreferences()
+        }
         .sheet(item: $shareItem) { item in
             ShareSheet(activityItems: [item.url])
         }
@@ -108,12 +121,17 @@ struct ContentView: View {
             if completedDownloadURL != nil {
                 Button("Share") {
                     if let url = completedDownloadURL {
-                        shareItem = ShareItem(url: url)
+                        handlePostDownloadAction(.openShareSheet, for: url)
                     }
                 }
                 Button("Save to Photos") {
                     if let url = completedDownloadURL {
-                        saveDownloadedFileToPhotos(url)
+                        handlePostDownloadAction(.saveToPhotos, for: url)
+                    }
+                }
+                Button("Save to App Folder") {
+                    if let url = completedDownloadURL {
+                        handlePostDownloadAction(.saveToApplicationFolder, for: url)
                     }
                 }
             }
@@ -141,8 +159,10 @@ struct ContentView: View {
         let readHandle = logPipe.fileHandleForReading
         let writeFD = logPipe.fileHandleForWriting.fileDescriptor
         let presetAtStart = selectedPreset.pythonValue
-        let customArgsAtStart = customArgsText.trimmingCharacters(in: .whitespacesAndNewlines)
         let extraArgsAtStart = extraArgsText.trimmingCharacters(in: .whitespacesAndNewlines)
+        let presetArgsJSONAtStart = buildPresetArgumentsJSON()
+        let askUserAfterDownloadAtStart = askUserAfterDownload
+        let selectedPostDownloadActionAtStart = selectedPostDownloadAction
         let cancelMarker = makeCancelMarkerURL()
         cancelMarkerURL = cancelMarker
         setenv("PALLADIUM_LOG_FD", "\(writeFD)", 1)
@@ -166,7 +186,7 @@ struct ContentView: View {
             let outcome = await PythonFlowRunner.executeDownloadFlow(
                 url: targetURL,
                 preset: presetAtStart,
-                customArgs: customArgsAtStart,
+                presetArgsJSON: presetArgsJSONAtStart,
                 extraArgs: extraArgsAtStart
             )
 
@@ -197,8 +217,13 @@ struct ContentView: View {
             if outcome.statusText == "success",
                let downloadedPath = outcome.downloadedPath,
                FileManager.default.fileExists(atPath: downloadedPath) {
-                completedDownloadURL = URL(fileURLWithPath: downloadedPath)
-                showDownloadActionDialog = true
+                let completedURL = URL(fileURLWithPath: downloadedPath)
+                completedDownloadURL = completedURL
+                if askUserAfterDownloadAtStart {
+                    showDownloadActionDialog = true
+                } else {
+                    handlePostDownloadAction(selectedPostDownloadActionAtStart, for: completedURL)
+                }
             }
         }
         currentDownloadTask = task
@@ -322,6 +347,40 @@ struct ContentView: View {
         }
     }
 
+    private func saveDownloadedFileToApplicationFolder(_ url: URL) {
+        do {
+            let documents = try FileManager.default.url(
+                for: .documentDirectory,
+                in: .userDomainMask,
+                appropriateFor: nil,
+                create: true
+            )
+            let appFolder = documents.appendingPathComponent("Saved", isDirectory: true)
+            try FileManager.default.createDirectory(at: appFolder, withIntermediateDirectories: true)
+            let destination = appFolder.appendingPathComponent(url.lastPathComponent)
+            if FileManager.default.fileExists(atPath: destination.path) {
+                try FileManager.default.removeItem(at: destination)
+            }
+            try FileManager.default.copyItem(at: url, to: destination)
+            alertMessage = "Saved to app folder: \(destination.lastPathComponent)"
+            showAlert = true
+        } catch {
+            alertMessage = "Failed to save to app folder: \(error.localizedDescription)"
+            showAlert = true
+        }
+    }
+
+    private func handlePostDownloadAction(_ action: PostDownloadAction, for url: URL) {
+        switch action {
+        case .saveToPhotos:
+            saveDownloadedFileToPhotos(url)
+        case .openShareSheet:
+            shareItem = ShareItem(url: url)
+        case .saveToApplicationFolder:
+            saveDownloadedFileToApplicationFolder(url)
+        }
+    }
+
     private func detectedVideoCodecDescription(for url: URL) -> String {
         let asset = AVURLAsset(url: url)
         guard let track = asset.tracks(withMediaType: .video).first,
@@ -356,6 +415,8 @@ struct ContentView: View {
         defaults.set(selectedPreset.rawValue, forKey: Self.presetDefaultsKey)
         defaults.set(customArgsText, forKey: Self.customArgsDefaultsKey)
         defaults.set(extraArgsText, forKey: Self.extraArgsDefaultsKey)
+        defaults.set(askUserAfterDownload, forKey: Self.askUserAfterDownloadDefaultsKey)
+        defaults.set(selectedPostDownloadAction.rawValue, forKey: Self.selectedPostDownloadActionDefaultsKey)
     }
 
     private static func loadSelectedPreset() -> DownloadPreset {
@@ -372,6 +433,32 @@ struct ContentView: View {
 
     private static func loadExtraArgs() -> String {
         UserDefaults.standard.string(forKey: extraArgsDefaultsKey) ?? ""
+    }
+
+    private static func loadAskUserAfterDownload() -> Bool {
+        if UserDefaults.standard.object(forKey: askUserAfterDownloadDefaultsKey) == nil {
+            return true
+        }
+        return UserDefaults.standard.bool(forKey: askUserAfterDownloadDefaultsKey)
+    }
+
+    private static func loadSelectedPostDownloadAction() -> PostDownloadAction {
+        guard let raw = UserDefaults.standard.string(forKey: selectedPostDownloadActionDefaultsKey),
+              let action = PostDownloadAction(rawValue: raw) else {
+            return .openShareSheet
+        }
+        return action
+    }
+
+    private func buildPresetArgumentsJSON() -> String {
+        let payload: [String: String] = [
+            "custom": customArgsText
+        ]
+        guard let data = try? JSONSerialization.data(withJSONObject: payload),
+              let json = String(data: data, encoding: .utf8) else {
+            return "{}"
+        }
+        return json
     }
 
     private func makeCancelMarkerURL() -> URL? {

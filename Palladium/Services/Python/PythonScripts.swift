@@ -253,6 +253,31 @@ def parse_custom_args(custom_args_value):
         return []
 
 
+def parse_preset_args_map(preset_args_json_value):
+    defaults = {
+        "auto_video": "",
+        "mute": "",
+        "audio": "",
+        "custom": "",
+    }
+    if not preset_args_json_value:
+        return defaults
+
+    try:
+        parsed = json.loads(str(preset_args_json_value))
+        if not isinstance(parsed, dict):
+            return defaults
+        output = defaults.copy()
+        for key in output.keys():
+            if key in parsed and isinstance(parsed[key], str):
+                output[key] = parsed[key].strip()
+        return output
+    except Exception:
+        print("[palladium] failed to parse preset args json")
+        traceback.print_exc()
+        return defaults
+
+
 def parse_extra_args(extra_args_value):
     if not extra_args_value:
         return []
@@ -712,7 +737,7 @@ def patch_ytdlp_ffmpeg_detection():
             ffmpeg_pp.probe_basename = original_probe_basename
 
 
-def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, custom_args_override=None, extra_args_override=None):
+def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, preset_args_json_override=None, extra_args_override=None):
     output = io.StringIO()
     console_stdout = sys.__stdout__ if sys.__stdout__ is not None else None
     console_stderr = sys.__stderr__ if sys.__stderr__ is not None else None
@@ -731,10 +756,10 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, c
         download_preset = os.environ.get("PALLADIUM_DOWNLOAD_PRESET", "auto_video").strip()
     else:
         download_preset = str(download_preset_override).strip()
-    if custom_args_override is None:
-        custom_args_text = os.environ.get("PALLADIUM_CUSTOM_ARGS", "").strip()
+    if preset_args_json_override is None:
+        preset_args_json = os.environ.get("PALLADIUM_PRESET_ARGS_JSON", "").strip()
     else:
-        custom_args_text = str(custom_args_override).strip()
+        preset_args_json = str(preset_args_json_override).strip()
     if extra_args_override is None:
         extra_args_text = os.environ.get("PALLADIUM_EXTRA_ARGS", "").strip()
     else:
@@ -893,9 +918,14 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, c
                         yt_exit_code = 130
 
                     if yt_exit_code is None:
-                        if download_preset == "custom":
-                            preset_args = parse_custom_args(custom_args_text)
-                            print("[palladium] preset: custom")
+                        preset_args_map = parse_preset_args_map(preset_args_json)
+                        selected_args = preset_args_map.get(download_preset, "")
+                        if selected_args:
+                            preset_args = parse_custom_args(selected_args)
+                            print(f"[palladium] preset args override: {download_preset}")
+                        elif download_preset == "custom":
+                            preset_args = []
+                            print("[palladium] preset: custom (no args)")
                         else:
                             preset_args = build_preset_args(download_preset)
                         extra_args = parse_extra_args(extra_args_text)
