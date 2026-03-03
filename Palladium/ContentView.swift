@@ -18,22 +18,28 @@ struct ContentView: View {
 
     @State private var isRunning = false
     @State private var statusText = "idle"
-    @State private var logText = "Tap the button to install yt-dlp if needed and run -v."
+    @State private var urlText = ""
+    @State private var logText = "Enter a URL and tap Download."
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("yt-dlp setup check")
+            Text("yt-dlp downloader")
                 .font(.title2.bold())
 
             Text("status: \(statusText)")
                 .font(.subheadline.monospaced())
 
-            Button(action: runYtDlpFlow) {
-                Text(isRunning ? "Running..." : "Install yt-dlp and run -v")
+            TextField("https://example.com/video", text: $urlText)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+                .textFieldStyle(.roundedBorder)
+
+            Button(action: runDownloadFlow) {
+                Text(isRunning ? "Running..." : "Download")
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
-            .disabled(isRunning)
+            .disabled(isRunning || urlText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
 
             ScrollView {
                 Text(logText)
@@ -49,8 +55,11 @@ struct ContentView: View {
         .padding()
     }
 
-    private func runYtDlpFlow() {
+    private func runDownloadFlow() {
         guard !isRunning else { return }
+        let targetURL = urlText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !targetURL.isEmpty else { return }
+
         isRunning = true
         statusText = "running"
         logText = ""
@@ -59,6 +68,7 @@ struct ContentView: View {
         let readHandle = logPipe.fileHandleForReading
         let writeFD = logPipe.fileHandleForWriting.fileDescriptor
         setenv("PALLADIUM_LOG_FD", "\(writeFD)", 1)
+        setenv("PALLADIUM_DOWNLOAD_URL", targetURL, 1)
         readHandle.readabilityHandler = { handle in
             let data = handle.availableData
             guard !data.isEmpty, let chunk = String(data: data, encoding: .utf8) else { return }
@@ -73,6 +83,7 @@ struct ContentView: View {
             }.value
 
             unsetenv("PALLADIUM_LOG_FD")
+            unsetenv("PALLADIUM_DOWNLOAD_URL")
             readHandle.readabilityHandler = nil
             try? readHandle.close()
             try? logPipe.fileHandleForWriting.close()
@@ -132,6 +143,7 @@ import os
 import runpy
 import sys
 import traceback
+import importlib.metadata as importlib_metadata
 
 def run_yt_dlp_flow():
     output = io.StringIO()
@@ -141,6 +153,7 @@ def run_yt_dlp_flow():
     pip_exit_code = None
     yt_exit_code = None
     success = False
+    download_url = os.environ.get("PALLADIUM_DOWNLOAD_URL", "").strip()
     install_target = os.environ.get("PALLADIUM_PYTHON_PACKAGES")
     live_fd_value = os.environ.get("PALLADIUM_LOG_FD")
     live_log_stream = None
@@ -170,6 +183,29 @@ def run_yt_dlp_flow():
                 if hasattr(stream, "flush"):
                     stream.flush()
 
+    def ensure_pip_entrypoint():
+        pip_main = None
+        try:
+            from pip._internal.cli.main import main as pip_main
+            return pip_main
+        except Exception:
+            print("[palladium] pip entrypoint unavailable")
+            traceback.print_exc()
+            print("[palladium] attempting ensurepip fallback")
+            try:
+                import ensurepip
+                with ensurepip._get_pip_whl_path_ctx() as pip_wheel:
+                    pip_wheel_str = str(pip_wheel)
+                    if pip_wheel_str not in sys.path:
+                        sys.path.insert(0, pip_wheel_str)
+                    from pip._internal.cli.main import main as pip_main
+                    print("[palladium] pip loaded from ensurepip bundled wheel")
+                    return pip_main
+            except Exception:
+                print("[palladium] ensurepip fallback failed")
+                traceback.print_exc()
+                return None
+
     with contextlib.redirect_stdout(Tee(output, console_stdout, live_log_stream)), contextlib.redirect_stderr(Tee(output, console_stderr, live_log_stream)):
         os.environ["PYTHONIOENCODING"] = "utf-8"
         if install_target:
@@ -178,35 +214,37 @@ def run_yt_dlp_flow():
                 sys.path.insert(0, install_target)
             print(f"[palladium] package install target: {install_target}")
 
+        needs_yt_dlp_install = False
+        needs_webkit_jsi_install = False
+
         print("[palladium] checking yt_dlp import")
         try:
             import yt_dlp  # noqa: F401
             print("[palladium] yt_dlp already installed")
         except Exception:
+            needs_yt_dlp_install = True
+            print("[palladium] yt_dlp module missing")
+
+        print("[palladium] checking yt-dlp-apple-webkit-jsi package")
+        try:
+            importlib_metadata.version("yt-dlp-apple-webkit-jsi")
+            print("[palladium] yt-dlp-apple-webkit-jsi already installed")
+        except Exception:
+            needs_webkit_jsi_install = True
+            print("[palladium] yt-dlp-apple-webkit-jsi missing")
+
+        if needs_yt_dlp_install or needs_webkit_jsi_install:
             pip_attempted = True
-            print("[palladium] yt_dlp module missing; installing package yt-dlp via pip")
-            pip_main = None
-            try:
-                from pip._internal.cli.main import main as pip_main
-            except Exception:
-                print("[palladium] pip entrypoint unavailable")
-                traceback.print_exc()
-                print("[palladium] attempting ensurepip fallback")
-                try:
-                    import ensurepip
-                    with ensurepip._get_pip_whl_path_ctx() as pip_wheel:
-                        pip_wheel_str = str(pip_wheel)
-                        if pip_wheel_str not in sys.path:
-                            sys.path.insert(0, pip_wheel_str)
-                        from pip._internal.cli.main import main as pip_main
-                        print("[palladium] pip loaded from ensurepip bundled wheel")
-                except Exception:
-                    pip_exit_code = 1
-                    print("[palladium] ensurepip fallback failed")
-                    traceback.print_exc()
+            pip_main = ensure_pip_entrypoint()
             if pip_main is not None:
+                packages = []
+                if needs_yt_dlp_install:
+                    packages.append("yt-dlp")
+                if needs_webkit_jsi_install:
+                    packages.append("yt-dlp-apple-webkit-jsi")
+
                 try:
-                    pip_args = ["install", "--no-cache-dir", "--progress-bar", "off", "--no-color", "yt-dlp"]
+                    pip_args = ["install", "--no-cache-dir", "--progress-bar", "off", "--no-color", *packages]
                     if install_target:
                         pip_args[1:1] = ["--target", install_target]
                     pip_result = pip_main(pip_args)
@@ -216,6 +254,8 @@ def run_yt_dlp_flow():
                     pip_exit_code = 1
                     print("[palladium] pip install failed")
                     traceback.print_exc()
+            else:
+                pip_exit_code = 1
 
             try:
                 if install_target and install_target not in sys.path:
@@ -226,25 +266,30 @@ def run_yt_dlp_flow():
                 print("[palladium] yt_dlp still unavailable after install attempt")
                 traceback.print_exc()
 
-        print("[palladium] running yt-dlp -v")
+        if not download_url:
+            print("[palladium] no URL provided")
+            yt_exit_code = 1
+        else:
+            print(f"[palladium] running yt-dlp -v {download_url}")
         argv_backup = sys.argv[:]
         try:
-            sys.argv = ["yt-dlp", "-v", "--version"]
-            try:
-                runpy.run_module("yt_dlp", run_name="__main__", alter_sys=True)
-                yt_exit_code = 0
-            except SystemExit as exc:
-                if exc.code is None:
+            if download_url:
+                sys.argv = ["yt-dlp", "-v", download_url]
+                try:
+                    runpy.run_module("yt_dlp", run_name="__main__", alter_sys=True)
                     yt_exit_code = 0
-                elif isinstance(exc.code, int):
-                    yt_exit_code = exc.code
-                else:
-                    print(f"[palladium] unexpected SystemExit code: {exc.code}")
+                except SystemExit as exc:
+                    if exc.code is None:
+                        yt_exit_code = 0
+                    elif isinstance(exc.code, int):
+                        yt_exit_code = exc.code
+                    else:
+                        print(f"[palladium] unexpected SystemExit code: {exc.code}")
+                        yt_exit_code = 1
+                except Exception:
+                    print("[palladium] yt-dlp execution failed")
+                    traceback.print_exc()
                     yt_exit_code = 1
-            except Exception:
-                print("[palladium] yt-dlp execution failed")
-                traceback.print_exc()
-                yt_exit_code = 1
         except Exception:
             print("[palladium] unable to execute yt_dlp as __main__")
             traceback.print_exc()
