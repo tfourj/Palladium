@@ -20,8 +20,25 @@ struct ContentView: View {
     @State private var statusText = "idle"
     @State private var urlText = ""
     @State private var logText = "Enter a URL and tap Download."
+    @State private var packageStatusText = "idle"
+    @State private var packageLogText = "Use Refresh Versions or Update Packages."
+    @State private var versionsText = "yt-dlp: unknown\nyt-dlp-apple-webkit-jsi: unknown"
 
     var body: some View {
+        TabView {
+            downloadTab
+                .tabItem {
+                    Label("Download", systemImage: "arrow.down.circle")
+                }
+
+            packagesTab
+                .tabItem {
+                    Label("Packages", systemImage: "shippingbox")
+                }
+        }
+    }
+
+    private var downloadTab: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("yt-dlp downloader")
                 .font(.title2.bold())
@@ -43,6 +60,51 @@ struct ContentView: View {
 
             ScrollView {
                 Text(logText)
+                    .font(.system(.footnote, design: .monospaced))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .textSelection(.enabled)
+            }
+            .frame(maxHeight: .infinity)
+            .padding(12)
+            .background(Color(.secondarySystemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+        }
+        .padding()
+    }
+
+    private var packagesTab: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("package manager")
+                .font(.title2.bold())
+
+            Text("status: \(packageStatusText)")
+                .font(.subheadline.monospaced())
+
+            Text(versionsText)
+                .font(.system(.footnote, design: .monospaced))
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(12)
+                .background(Color(.secondarySystemBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+
+            HStack(spacing: 12) {
+                Button(action: refreshPackageVersions) {
+                    Text(isRunning ? "Running..." : "Refresh Versions")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .disabled(isRunning)
+
+                Button(action: updatePackages) {
+                    Text(isRunning ? "Running..." : "Update Packages")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(isRunning)
+            }
+
+            ScrollView {
+                Text(packageLogText)
                     .font(.system(.footnote, design: .monospaced))
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .textSelection(.enabled)
@@ -98,6 +160,56 @@ struct ContentView: View {
         }
     }
 
+    private func refreshPackageVersions() {
+        runPackageFlow(action: "check")
+    }
+
+    private func updatePackages() {
+        runPackageFlow(action: "update")
+    }
+
+    private func runPackageFlow(action: String) {
+        guard !isRunning else { return }
+
+        isRunning = true
+        packageStatusText = action == "update" ? "updating" : "checking"
+        packageLogText = ""
+
+        let logPipe = Pipe()
+        let readHandle = logPipe.fileHandleForReading
+        let writeFD = logPipe.fileHandleForWriting.fileDescriptor
+        setenv("PALLADIUM_LOG_FD", "\(writeFD)", 1)
+        readHandle.readabilityHandler = { handle in
+            let data = handle.availableData
+            guard !data.isEmpty, let chunk = String(data: data, encoding: .utf8) else { return }
+            Task { @MainActor in
+                packageLogText.append(chunk)
+            }
+        }
+
+        Task {
+            let outcome = await Task.detached(priority: .userInitiated) {
+                ContentView.executePackageFlow(action: action)
+            }.value
+
+            unsetenv("PALLADIUM_LOG_FD")
+            readHandle.readabilityHandler = nil
+            try? readHandle.close()
+            try? logPipe.fileHandleForWriting.close()
+
+            isRunning = false
+            packageStatusText = outcome.statusText
+            let outputBody = packageLogText.isEmpty ? outcome.outputText : packageLogText
+            packageLogText = "\(outcome.summaryText)\n\n\(outputBody)"
+            if let versionsText = outcome.versionsText {
+                self.versionsText = versionsText
+            }
+            Self.logger.info("package flow finished with status: \(outcome.statusText, privacy: .public)")
+            Self.logger.info("\(packageLogText, privacy: .public)")
+            print(packageLogText)
+        }
+    }
+
     nonisolated private static func executePythonFlow() -> PythonFlowOutcome {
         let builtins = Python.import("builtins")
         let main = Python.import("__main__")
@@ -132,7 +244,49 @@ struct ContentView: View {
         """
 
         let status = success ? "success" : "error"
-        return PythonFlowOutcome(statusText: status, summaryText: summary, outputText: output)
+        return PythonFlowOutcome(statusText: status, summaryText: summary, outputText: output, versionsText: nil)
+    }
+
+    nonisolated private static func executePackageFlow(action: String) -> PythonFlowOutcome {
+        let builtins = Python.import("builtins")
+        let main = Python.import("__main__")
+        _ = builtins.exec(pythonRunnerScript, main.__dict__)
+        let payload = String(main.run_package_maintenance(action)) ?? ""
+
+        guard let data = payload.data(using: .utf8),
+              let result = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] else {
+            return PythonFlowOutcome(
+                statusText: "error",
+                summaryText: "success: false",
+                outputText: """
+                Failed to decode Python result.
+
+                Raw payload:
+                \(payload)
+                """,
+                versionsText: nil
+            )
+        }
+
+        let pipAttempted = result["pip_attempted"] as? Bool ?? false
+        let pipExitCode = result["pip_exit_code"] as? Int
+        let success = result["success"] as? Bool ?? false
+        let output = result["output"] as? String ?? ""
+        let versions = result["versions"] as? [String: String] ?? [:]
+
+        let summary = """
+        pip attempted: \(pipAttempted)
+        pip exit code: \(pipExitCode.map(String.init) ?? "none")
+        success: \(success)
+        """
+
+        let versionsText = """
+        yt-dlp: \(versions["yt-dlp"] ?? "unknown")
+        yt-dlp-apple-webkit-jsi: \(versions["yt-dlp-apple-webkit-jsi"] ?? "unknown")
+        """
+
+        let status = success ? "success" : "error"
+        return PythonFlowOutcome(statusText: status, summaryText: summary, outputText: output, versionsText: versionsText)
     }
 
     nonisolated private static let pythonRunnerScript = #"""
@@ -144,6 +298,38 @@ import runpy
 import sys
 import traceback
 import importlib.metadata as importlib_metadata
+
+def ensure_pip_entrypoint():
+    pip_main = None
+    try:
+        from pip._internal.cli.main import main as pip_main
+        return pip_main
+    except Exception:
+        print("[palladium] pip entrypoint unavailable")
+        traceback.print_exc()
+        print("[palladium] attempting ensurepip fallback")
+        try:
+            import ensurepip
+            with ensurepip._get_pip_whl_path_ctx() as pip_wheel:
+                pip_wheel_str = str(pip_wheel)
+                if pip_wheel_str not in sys.path:
+                    sys.path.insert(0, pip_wheel_str)
+                from pip._internal.cli.main import main as pip_main
+                print("[palladium] pip loaded from ensurepip bundled wheel")
+                return pip_main
+        except Exception:
+            print("[palladium] ensurepip fallback failed")
+            traceback.print_exc()
+            return None
+
+def collect_versions():
+    versions = {}
+    for package_name in ("yt-dlp", "yt-dlp-apple-webkit-jsi"):
+        try:
+            versions[package_name] = importlib_metadata.version(package_name)
+        except Exception:
+            versions[package_name] = "not installed"
+    return versions
 
 def run_yt_dlp_flow():
     output = io.StringIO()
@@ -182,29 +368,6 @@ def run_yt_dlp_flow():
             for stream in self.streams:
                 if hasattr(stream, "flush"):
                     stream.flush()
-
-    def ensure_pip_entrypoint():
-        pip_main = None
-        try:
-            from pip._internal.cli.main import main as pip_main
-            return pip_main
-        except Exception:
-            print("[palladium] pip entrypoint unavailable")
-            traceback.print_exc()
-            print("[palladium] attempting ensurepip fallback")
-            try:
-                import ensurepip
-                with ensurepip._get_pip_whl_path_ctx() as pip_wheel:
-                    pip_wheel_str = str(pip_wheel)
-                    if pip_wheel_str not in sys.path:
-                        sys.path.insert(0, pip_wheel_str)
-                    from pip._internal.cli.main import main as pip_main
-                    print("[palladium] pip loaded from ensurepip bundled wheel")
-                    return pip_main
-            except Exception:
-                print("[palladium] ensurepip fallback failed")
-                traceback.print_exc()
-                return None
 
     with contextlib.redirect_stdout(Tee(output, console_stdout, live_log_stream)), contextlib.redirect_stderr(Tee(output, console_stderr, live_log_stream)):
         os.environ["PYTHONIOENCODING"] = "utf-8"
@@ -312,6 +475,84 @@ def run_yt_dlp_flow():
         "success": success,
         "output": output.getvalue(),
     })
+
+def run_package_maintenance(action):
+    output = io.StringIO()
+    console_stdout = sys.__stdout__ if sys.__stdout__ is not None else None
+    console_stderr = sys.__stderr__ if sys.__stderr__ is not None else None
+    pip_attempted = False
+    pip_exit_code = None
+    success = False
+    install_target = os.environ.get("PALLADIUM_PYTHON_PACKAGES")
+    live_fd_value = os.environ.get("PALLADIUM_LOG_FD")
+    live_log_stream = None
+    if live_fd_value:
+        try:
+            live_fd = int(live_fd_value)
+            live_log_stream = os.fdopen(live_fd, "w", buffering=1, encoding="utf-8", errors="replace", closefd=False)
+        except Exception:
+            live_log_stream = None
+
+    class Tee:
+        def __init__(self, *streams):
+            self.streams = [s for s in streams if s is not None]
+        def write(self, data):
+            for stream in self.streams:
+                try:
+                    stream.write(data)
+                except UnicodeEncodeError:
+                    safe_data = data.encode("ascii", "replace").decode("ascii")
+                    stream.write(safe_data)
+                if hasattr(stream, "flush"):
+                    stream.flush()
+            return len(data)
+        def flush(self):
+            for stream in self.streams:
+                if hasattr(stream, "flush"):
+                    stream.flush()
+
+    with contextlib.redirect_stdout(Tee(output, console_stdout, live_log_stream)), contextlib.redirect_stderr(Tee(output, console_stderr, live_log_stream)):
+        os.environ["PYTHONIOENCODING"] = "utf-8"
+        if install_target:
+            os.makedirs(install_target, exist_ok=True)
+            if install_target not in sys.path:
+                sys.path.insert(0, install_target)
+            print(f"[palladium] package install target: {install_target}")
+
+        print(f"[palladium] package action: {action}")
+        if action == "update":
+            pip_attempted = True
+            pip_main = ensure_pip_entrypoint()
+            if pip_main is not None:
+                try:
+                    packages = ["yt-dlp", "yt-dlp-apple-webkit-jsi"]
+                    pip_args = ["install", "-U", "--no-cache-dir", "--progress-bar", "off", "--no-color", *packages]
+                    if install_target:
+                        pip_args[1:1] = ["--target", install_target]
+                    pip_result = pip_main(pip_args)
+                    pip_exit_code = 0 if pip_result is None else int(pip_result)
+                    print(f"[palladium] pip exit code: {pip_exit_code}")
+                except Exception:
+                    pip_exit_code = 1
+                    print("[palladium] pip update failed")
+                    traceback.print_exc()
+            else:
+                pip_exit_code = 1
+
+        versions = collect_versions()
+        print(f"[palladium] yt-dlp version: {versions.get('yt-dlp')}")
+        print(f"[palladium] yt-dlp-apple-webkit-jsi version: {versions.get('yt-dlp-apple-webkit-jsi')}")
+
+        success = (pip_exit_code in (None, 0))
+        print(f"[palladium] package flow success: {success}")
+
+    return json.dumps({
+        "pip_attempted": pip_attempted,
+        "pip_exit_code": pip_exit_code,
+        "success": success,
+        "versions": versions,
+        "output": output.getvalue(),
+    })
 """#
 }
 
@@ -319,6 +560,7 @@ private struct PythonFlowOutcome: Sendable {
     let statusText: String
     let summaryText: String
     let outputText: String
+    let versionsText: String?
 }
 
 #Preview {
