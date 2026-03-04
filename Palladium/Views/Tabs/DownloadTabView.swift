@@ -22,9 +22,10 @@ struct DownloadTabView: View {
 
             VStack(spacing: 12) {
                 VStack(spacing: 4) {
-                    Image(systemName: "arrow.down.circle.fill")
-                        .font(.system(size: 48, weight: .semibold))
-                        .foregroundStyle(.white)
+                    Image("palladium_dark")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 56, height: 56)
                     Text("Palladium")
                         .font(.title.bold())
                         .foregroundStyle(.white)
