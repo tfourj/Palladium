@@ -60,6 +60,7 @@ struct ContentView: View {
     @State private var cancelMarkerURL: URL?
     @State private var pendingConsoleChunks = ""
     @State private var isConsoleFlushScheduled = false
+    @State private var keyboardDismissTapInstalled = false
 
     private let consoleMaxChars = 200_000
 
@@ -173,6 +174,9 @@ struct ContentView: View {
             Button("OK", role: .cancel) {}
         } message: {
             Text(alertMessage ?? "")
+        }
+        .onAppear {
+            installKeyboardDismissTapIfNeeded()
         }
         .onOpenURL { incomingURL in
             handleIncomingDownloadURL(incomingURL)
@@ -297,6 +301,23 @@ struct ContentView: View {
         }
 
         runDownloadFlow()
+    }
+
+    private func installKeyboardDismissTapIfNeeded() {
+        guard !keyboardDismissTapInstalled else { return }
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = windowScene.windows.first else {
+            return
+        }
+
+        let recognizer = UITapGestureRecognizer(
+            target: KeyboardDismissTapHandler.shared,
+            action: #selector(KeyboardDismissTapHandler.handleTap)
+        )
+        recognizer.cancelsTouchesInView = false
+        recognizer.delegate = KeyboardDismissTapHandler.shared
+        window.addGestureRecognizer(recognizer)
+        keyboardDismissTapInstalled = true
     }
 
     private func cancelDownloadFlow() {
@@ -718,6 +739,26 @@ struct ContentView: View {
             removed += 1
         }
         return removed
+    }
+}
+
+private final class KeyboardDismissTapHandler: NSObject, UIGestureRecognizerDelegate {
+    static let shared = KeyboardDismissTapHandler()
+
+    @objc func handleTap() {
+        UIApplication.shared.sendAction(
+            #selector(UIResponder.resignFirstResponder),
+            to: nil,
+            from: nil,
+            for: nil
+        )
+    }
+
+    func gestureRecognizer(
+        _ gestureRecognizer: UIGestureRecognizer,
+        shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
+    ) -> Bool {
+        true
     }
 }
 
