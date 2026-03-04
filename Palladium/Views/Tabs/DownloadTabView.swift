@@ -29,9 +29,6 @@ struct DownloadTabView: View {
                     Text("Palladium")
                         .font(.title.bold())
                         .foregroundStyle(.white)
-                    Text("status: \(statusText)")
-                        .font(.footnote.monospaced())
-                        .foregroundStyle(.white.opacity(0.8))
                 }
                 .padding(.top, 10)
 
