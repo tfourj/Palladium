@@ -884,19 +884,36 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, p
         def __init__(self, *streams):
             self.streams = [s for s in streams if s is not None]
         def write(self, data):
-            for stream in self.streams:
+            for stream in list(self.streams):
                 try:
                     stream.write(data)
                 except UnicodeEncodeError:
                     safe_data = data.encode("ascii", "replace").decode("ascii")
-                    stream.write(safe_data)
+                    try:
+                        stream.write(safe_data)
+                    except Exception:
+                        if stream in self.streams:
+                            self.streams.remove(stream)
+                        continue
+                except Exception:
+                    if stream in self.streams:
+                        self.streams.remove(stream)
+                    continue
                 if hasattr(stream, "flush"):
-                    stream.flush()
+                    try:
+                        stream.flush()
+                    except Exception:
+                        if stream in self.streams:
+                            self.streams.remove(stream)
             return len(data)
         def flush(self):
-            for stream in self.streams:
+            for stream in list(self.streams):
                 if hasattr(stream, "flush"):
-                    stream.flush()
+                    try:
+                        stream.flush()
+                    except Exception:
+                        if stream in self.streams:
+                            self.streams.remove(stream)
 
     with contextlib.redirect_stdout(Tee(output, console_stdout, live_log_stream)), contextlib.redirect_stderr(Tee(output, console_stderr, live_log_stream)):
         os.environ["PYTHONIOENCODING"] = "utf-8"
@@ -1182,19 +1199,36 @@ def run_package_maintenance(action):
         def __init__(self, *streams):
             self.streams = [s for s in streams if s is not None]
         def write(self, data):
-            for stream in self.streams:
+            for stream in list(self.streams):
                 try:
                     stream.write(data)
                 except UnicodeEncodeError:
                     safe_data = data.encode("ascii", "replace").decode("ascii")
-                    stream.write(safe_data)
+                    try:
+                        stream.write(safe_data)
+                    except Exception:
+                        if stream in self.streams:
+                            self.streams.remove(stream)
+                        continue
+                except Exception:
+                    if stream in self.streams:
+                        self.streams.remove(stream)
+                    continue
                 if hasattr(stream, "flush"):
-                    stream.flush()
+                    try:
+                        stream.flush()
+                    except Exception:
+                        if stream in self.streams:
+                            self.streams.remove(stream)
             return len(data)
         def flush(self):
-            for stream in self.streams:
+            for stream in list(self.streams):
                 if hasattr(stream, "flush"):
-                    stream.flush()
+                    try:
+                        stream.flush()
+                    except Exception:
+                        if stream in self.streams:
+                            self.streams.remove(stream)
 
     with contextlib.redirect_stdout(Tee(output, console_stdout, live_log_stream)), contextlib.redirect_stderr(Tee(output, console_stderr, live_log_stream)):
         os.environ["PYTHONIOENCODING"] = "utf-8"
