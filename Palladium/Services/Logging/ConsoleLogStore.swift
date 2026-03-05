@@ -2,10 +2,10 @@ import Foundation
 import Combine
 
 enum ConsoleLogFilter: String, CaseIterable, Identifiable {
-    case all
     case app
-    case ffmpeg
     case download
+    case ffmpeg
+    case all
 
     var id: String { rawValue }
 
@@ -34,7 +34,7 @@ struct ConsoleLogEntry: Identifiable, Sendable {
 @MainActor
 final class ConsoleLogStore: ObservableObject {
     @Published private(set) var entries: [ConsoleLogEntry] = []
-    @Published var selectedFilter: ConsoleLogFilter = .all
+    @Published var selectedFilter: ConsoleLogFilter = .app
 
     let activeLogFileURL: URL
 
