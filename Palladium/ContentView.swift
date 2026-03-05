@@ -17,7 +17,6 @@ import Darwin
 struct ContentView: View {
     private enum AppTab: Hashable {
         case download
-        case packages
         case settings
         case console
     }
@@ -89,7 +88,12 @@ struct ContentView: View {
             }
             .tag(AppTab.download)
 
-            PackagesTabView(
+            SettingsTabView(
+                customArgsText: $customArgsText,
+                extraArgsText: $extraArgsText,
+                askUserAfterDownload: $askUserAfterDownload,
+                selectedPostDownloadAction: $selectedPostDownloadAction,
+                notificationsEnabled: $notificationsEnabled,
                 packageStatusText: packageStatusText,
                 versionsText: versionsText,
                 updatesSummaryText: packageUpdatesSummaryText,
@@ -97,19 +101,6 @@ struct ContentView: View {
                 isRunning: isRunning,
                 onRefreshVersions: refreshPackageVersions,
                 onUpdatePackages: updatePackages
-            )
-            .tabItem {
-                Label("Packages", systemImage: "shippingbox")
-            }
-            .tag(AppTab.packages)
-
-            SettingsTabView(
-                customArgsText: $customArgsText,
-                extraArgsText: $extraArgsText,
-                askUserAfterDownload: $askUserAfterDownload,
-                selectedPostDownloadAction: $selectedPostDownloadAction,
-                notificationsEnabled: $notificationsEnabled,
-                isRunning: isRunning
             )
             .tabItem {
                 Label("Settings", systemImage: "slider.horizontal.3")
