@@ -18,6 +18,53 @@ import urllib.parse
 import importlib.metadata as importlib_metadata
 import time
 
+MAX_CAPTURED_OUTPUT_CHARS = 250000
+
+
+class TailBuffer:
+    def __init__(self, max_chars=MAX_CAPTURED_OUTPUT_CHARS):
+        self.max_chars = max_chars
+        self.parts = []
+        self.length = 0
+        self.truncated = False
+
+    def write(self, data):
+        text = str(data)
+        if not text:
+            return 0
+        self.parts.append(text)
+        self.length += len(text)
+        self._trim_left_if_needed()
+        return len(text)
+
+    def flush(self):
+        return None
+
+    def getvalue(self):
+        value = "".join(self.parts)
+        if self.truncated:
+            return f"[palladium] output truncated to last {self.max_chars} chars\\n{value}"
+        return value
+
+    def _trim_left_if_needed(self):
+        overflow = self.length - self.max_chars
+        if overflow <= 0:
+            return
+
+        self.truncated = True
+        while overflow > 0 and self.parts:
+            head = self.parts[0]
+            head_len = len(head)
+            if head_len <= overflow:
+                self.parts.pop(0)
+                self.length -= head_len
+                overflow -= head_len
+                continue
+
+            self.parts[0] = head[overflow:]
+            self.length -= overflow
+            overflow = 0
+
 
 def ensure_pip_entrypoint():
     pip_main = None
@@ -794,7 +841,7 @@ def patch_ytdlp_ffmpeg_detection():
 
 
 def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, preset_args_json_override=None, extra_args_override=None):
-    output = io.StringIO()
+    output = TailBuffer()
     console_stdout = sys.__stdout__ if sys.__stdout__ is not None else None
     console_stderr = sys.__stderr__ if sys.__stderr__ is not None else None
     pip_attempted = False
@@ -1113,7 +1160,7 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, p
 
 
 def run_package_maintenance(action):
-    output = io.StringIO()
+    output = TailBuffer()
     console_stdout = sys.__stdout__ if sys.__stdout__ is not None else None
     console_stderr = sys.__stderr__ if sys.__stderr__ is not None else None
     pip_attempted = False

@@ -1,25 +1,58 @@
 import SwiftUI
 
 struct ConsoleTabView: View {
-    @Binding var consoleLogText: String
+    @ObservedObject var logStore: ConsoleLogStore
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        let visibleEntries = logStore.filteredEntries
+
+        VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Text("console")
                     .font(.title2.bold())
                 Spacer()
                 Button("Clear") {
-                    consoleLogText = ""
+                    logStore.clearAll()
                 }
                 .buttonStyle(.bordered)
             }
 
-            ScrollView {
-                Text(consoleLogText.isEmpty ? "No logs yet." : consoleLogText)
-                    .font(.system(.footnote, design: .monospaced))
-                    .frame(maxWidth: .infinity, alignment: .leading)
+            Picker("Source", selection: $logStore.selectedFilter) {
+                ForEach(ConsoleLogFilter.allCases) { filter in
+                    Text(filter.title).tag(filter)
+                }
+            }
+            .pickerStyle(.segmented)
+
+            Text("showing \(visibleEntries.count) of \(logStore.entryCount) lines")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            ScrollViewReader { proxy in
+                ScrollView {
+                    LazyVStack(alignment: .leading, spacing: 4) {
+                        if visibleEntries.isEmpty {
+                            Text("No logs yet.")
+                                .foregroundStyle(.secondary)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        } else {
+                            ForEach(visibleEntries) { entry in
+                                Text(entry.text)
+                                    .font(.system(.footnote, design: .monospaced))
+                                    .foregroundStyle(color(for: entry.source))
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .id(entry.id)
+                            }
+                        }
+                    }
                     .textSelection(.enabled)
+                }
+                .onChange(of: visibleEntries.last?.id) { lastID in
+                    guard let lastID else { return }
+                    withAnimation(.easeOut(duration: 0.12)) {
+                        proxy.scrollTo(lastID, anchor: .bottom)
+                    }
+                }
             }
             .frame(maxHeight: .infinity)
             .padding(12)
@@ -27,5 +60,16 @@ struct ConsoleTabView: View {
             .clipShape(RoundedRectangle(cornerRadius: 12))
         }
         .padding()
+    }
+
+    private func color(for source: ConsoleLogSource) -> Color {
+        switch source {
+        case .app:
+            return .primary
+        case .ffmpeg:
+            return .orange
+        case .download:
+            return .cyan
+        }
     }
 }

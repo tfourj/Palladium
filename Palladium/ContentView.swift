@@ -50,7 +50,7 @@ struct ContentView: View {
     @State private var versionsText = "yt-dlp: unknown\nyt-dlp-apple-webkit-jsi: unknown"
     @State private var packageUpdatesAvailable = false
     @State private var packageUpdatesSummaryText = "Updates not checked yet."
-    @State private var consoleLogText = ""
+    @StateObject private var consoleLogStore: ConsoleLogStore
     @State private var completedDownloadURL: URL?
     @State private var showDownloadActionDialog = false
     @State private var alertMessage: String?
@@ -62,8 +62,6 @@ struct ContentView: View {
     @State private var isConsoleFlushScheduled = false
     @State private var keyboardDismissTapInstalled = false
 
-    private let consoleMaxChars = 200_000
-
     init() {
         _urlText = State(initialValue: Self.isDebuggerAttached() ? "https://www.youtube.com/watch?v=jNQXAC9IVRw" : "")
         _selectedPreset = State(initialValue: Self.loadSelectedPreset())
@@ -72,6 +70,7 @@ struct ContentView: View {
         _askUserAfterDownload = State(initialValue: Self.loadAskUserAfterDownload())
         _selectedPostDownloadAction = State(initialValue: Self.loadSelectedPostDownloadAction())
         _notificationsEnabled = State(initialValue: Self.loadNotificationsEnabled())
+        _consoleLogStore = StateObject(wrappedValue: ConsoleLogStore())
     }
 
     var body: some View {
@@ -117,7 +116,7 @@ struct ContentView: View {
             }
             .tag(AppTab.settings)
 
-            ConsoleTabView(consoleLogText: $consoleLogText)
+            ConsoleTabView(logStore: consoleLogStore)
                 .tabItem {
                     Label("Console", systemImage: "terminal")
                 }
@@ -188,7 +187,7 @@ struct ContentView: View {
         let targetURL = urlText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !targetURL.isEmpty else { return }
 
-        consoleLogText = ""
+        consoleLogStore.clearAll()
 
         do {
             let removedCount = try clearDownloadsDirectoryContents()
@@ -254,11 +253,11 @@ struct ContentView: View {
             } else {
                 progressText = outcome.statusText == "success" ? "download complete" : "download failed"
             }
-            let outputBody = filteredConsoleChunk(outcome.outputText)
-            appendConsoleText("\n\(outcome.summaryText)\n\n\(outputBody)\n")
+            appendConsoleText("\n\(outcome.summaryText)\n")
+            if consoleLogStore.entryCount == 0, !outcome.outputText.isEmpty {
+                appendConsoleText("\n\(outcome.outputText)\n")
+            }
             Self.logger.info("yt-dlp flow finished with status: \(outcome.statusText, privacy: .public)")
-            Self.logger.info("\(consoleLogText, privacy: .public)")
-            print(consoleLogText)
 
             if outcome.statusText == "success",
                let downloadedPath = outcome.downloadedPath,
@@ -359,8 +358,7 @@ struct ContentView: View {
 
             isRunning = false
             packageStatusText = outcome.statusText
-            let outputBody = outcome.outputText
-            appendConsoleText("\n\(outcome.summaryText)\n\n\(outputBody)\n")
+            appendConsoleText("\n\(outcome.summaryText)\n")
             if let versionsText = outcome.versionsText {
                 self.versionsText = versionsText
             }
@@ -371,8 +369,6 @@ struct ContentView: View {
                 self.packageUpdatesSummaryText = updatesSummary
             }
             Self.logger.info("package flow finished with status: \(outcome.statusText, privacy: .public)")
-            Self.logger.info("\(consoleLogText, privacy: .public)")
-            print(consoleLogText)
         }
     }
 
@@ -411,9 +407,8 @@ struct ContentView: View {
         if trackProgress {
             updateProgress(from: chunk)
         }
-        let chunkForConsole = trackProgress ? filteredConsoleChunk(chunk) : chunk
-        guard !chunkForConsole.isEmpty else { return }
-        pendingConsoleChunks.append(chunkForConsole)
+        guard !chunk.isEmpty else { return }
+        pendingConsoleChunks.append(chunk)
         guard !isConsoleFlushScheduled else { return }
         isConsoleFlushScheduled = true
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.08) {
@@ -428,30 +423,8 @@ struct ContentView: View {
         pendingConsoleChunks = ""
     }
 
-    private func appendConsoleText(_ text: String) {
-        consoleLogText.append(text)
-        if consoleLogText.count > consoleMaxChars {
-            let overflow = consoleLogText.count - consoleMaxChars
-            let dropCount = min(overflow + 5_000, consoleLogText.count)
-            consoleLogText.removeFirst(dropCount)
-        }
-    }
-
-    private func filteredConsoleChunk(_ chunk: String) -> String {
-        let normalized = chunk.replacingOccurrences(of: "\r", with: "\n")
-        let lines = normalized.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
-        let filtered = lines.filter { line in
-            let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
-            if trimmed.isEmpty {
-                return false
-            }
-            if trimmed.contains("[download]") && trimmed.contains("% of") {
-                return false
-            }
-            return true
-        }
-        guard !filtered.isEmpty else { return "" }
-        return filtered.joined(separator: "\n") + "\n"
+    private func appendConsoleText(_ text: String, source: ConsoleLogSource? = nil) {
+        consoleLogStore.appendChunk(text, sourceHint: source)
     }
 
     private func saveDownloadedFileToPhotos(_ url: URL) {
@@ -691,7 +664,7 @@ struct ContentView: View {
         Self.logger.info("\(line, privacy: .public)")
         print(line)
         Task { @MainActor in
-            appendConsoleText("\(line)\n")
+            appendConsoleText("\(line)\n", source: .app)
         }
     }
 
