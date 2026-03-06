@@ -82,7 +82,8 @@ struct ContentView: View {
     @State private var packageUpdatesSummaryText = "Updates not checked yet."
     @State private var availablePackageVersions: [String: [String]] = [:]
     @State private var isLoadingPackageVersions = false
-    @State private var hasBootstrappedPackageVersions = false
+    @State private var isPackageRunning = false
+    @State private var hasLoadedPackageStatus = false
     @StateObject private var consoleLogStore: ConsoleLogStore
     @State private var completedDownloadURL: URL?
     @State private var completedPhotosCompatibility: PhotosCompatibilityState = .checking
@@ -162,10 +163,12 @@ struct ContentView: View {
                     availablePackageVersions: availablePackageVersions,
                     isLoadingPackageVersions: isLoadingPackageVersions,
                     isRunning: isRunning,
+                    isPackageRunning: isPackageRunning,
                     onRefreshVersions: refreshPackageVersions,
                     onUpdatePackages: updatePackages,
                     onCustomUpdatePackages: updatePackagesWithCustomVersions,
-                    onFetchPackageVersions: fetchPackageIndexVersions
+                    onFetchPackageVersions: fetchPackageIndexVersions,
+                    onOpenPackageManager: loadPackageStatusIfNeeded
                 )
                 .tabItem {
                     Label("Settings", systemImage: "slider.horizontal.3")
@@ -254,7 +257,6 @@ struct ContentView: View {
         }
         .onAppear {
             installKeyboardDismissTapIfNeeded()
-            bootstrapPackageVersionsIfNeeded()
         }
         .onOpenURL { incomingURL in
             handleIncomingDownloadURL(incomingURL)
@@ -593,7 +595,7 @@ struct ContentView: View {
     }
 
     private func runDownloadFlow(urlOverride: String? = nil, presetOverride: DownloadPreset? = nil) {
-        guard !isRunning else { return }
+        guard !isRunning, !isPackageRunning else { return }
         let targetURL = (urlOverride ?? urlText).trimmingCharacters(in: .whitespacesAndNewlines)
         guard !targetURL.isEmpty else { return }
 
@@ -772,9 +774,9 @@ struct ContentView: View {
     }
 
     private func runPackageFlow(action: String, customVersions: [String: String]? = nil) {
-        guard !isRunning else { return }
+        guard !isRunning, !isPackageRunning else { return }
 
-        isRunning = true
+        isPackageRunning = true
         switch action {
         case "update":
             packageStatusText = "updating"
@@ -807,7 +809,7 @@ struct ContentView: View {
             try? logPipe.fileHandleForWriting.close()
             await MainActor.run { flushConsoleChunks() }
 
-            isRunning = false
+            isPackageRunning = false
             isLoadingPackageVersions = false
             packageStatusText = outcome.statusText
             appendConsoleText("\n\(outcome.summaryText)\n")
@@ -824,6 +826,7 @@ struct ContentView: View {
             if let availableVersions = outcome.availableVersions {
                 self.availablePackageVersions = availableVersions
             }
+            self.hasLoadedPackageStatus = true
             Self.logger.info("package flow finished with status: \(outcome.statusText, privacy: .public)")
         }
     }
@@ -832,12 +835,9 @@ struct ContentView: View {
         runPackageFlow(action: "check")
     }
 
-    private func bootstrapPackageVersionsIfNeeded() {
-        guard !hasBootstrappedPackageVersions else { return }
-        hasBootstrappedPackageVersions = true
-        if versionsText.contains("unknown") || versionsText.contains("not installed") {
-            runPackageFlow(action: "versions")
-        }
+    private func loadPackageStatusIfNeeded() {
+        guard !hasLoadedPackageStatus else { return }
+        runPackageFlow(action: "check")
     }
 
     private func updatePackages() {

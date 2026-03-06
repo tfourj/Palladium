@@ -14,6 +14,7 @@ struct PackagesSettingsView: View {
     let onUpdatePackages: () -> Void
     let onCustomUpdatePackages: (_ ytDlpVersion: String?, _ webkitJSIVersion: String?, _ pipVersion: String?) -> Void
     let onFetchPackageVersions: () -> Void
+    let onAppear: () -> Void
 
     @State private var showCustomVersionSheet = false
     @State private var ytDlpSelectedVersion = "__latest__"
@@ -82,6 +83,7 @@ struct PackagesSettingsView: View {
         }
         .navigationTitle("Package Manager")
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear(perform: onAppear)
         .sheet(isPresented: $showCustomVersionSheet) {
             customVersionSheet
         }
