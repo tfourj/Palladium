@@ -13,6 +13,7 @@ struct SettingsTabView: View {
     @Binding var askUserAfterDownload: Bool
     @Binding var selectedPostDownloadAction: PostDownloadAction
     @Binding var notificationsEnabled: Bool
+    @Binding var rememberSelectedPreset: Bool
     @Binding var autoDownloadOnPaste: Bool
     @Binding var askShareSheetDownloadMode: Bool
     @Binding var rememberShareSheetMode: Bool
@@ -79,6 +80,7 @@ struct SettingsTabView: View {
                         askUserAfterDownload: $askUserAfterDownload,
                         selectedPostDownloadAction: $selectedPostDownloadAction,
                         notificationsEnabled: $notificationsEnabled,
+                        rememberSelectedPreset: $rememberSelectedPreset,
                         autoDownloadOnPaste: $autoDownloadOnPaste,
                         askShareSheetDownloadMode: $askShareSheetDownloadMode,
                         rememberShareSheetMode: $rememberShareSheetMode,

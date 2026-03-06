@@ -4,6 +4,7 @@ struct UseInterfaceSettingsView: View {
     @Binding var askUserAfterDownload: Bool
     @Binding var selectedPostDownloadAction: PostDownloadAction
     @Binding var notificationsEnabled: Bool
+    @Binding var rememberSelectedPreset: Bool
     @Binding var autoDownloadOnPaste: Bool
     @Binding var askShareSheetDownloadMode: Bool
     @Binding var rememberShareSheetMode: Bool
@@ -13,6 +14,9 @@ struct UseInterfaceSettingsView: View {
     var body: some View {
         Form {
             Section {
+                Toggle("Remember selected mode", isOn: $rememberSelectedPreset)
+                    .disabled(isRunning)
+
                 Toggle("Ask what to do after download", isOn: $askUserAfterDownload)
                     .disabled(isRunning)
 
@@ -26,8 +30,8 @@ struct UseInterfaceSettingsView: View {
                 Text("Download Behavior")
             } footer: {
                 Text(askUserAfterDownload
-                     ? "Default action is disabled while ask mode is enabled."
-                     : "Selected action runs automatically after each successful download.")
+                     ? "Default action is disabled while ask mode is enabled. If mode memory is off, the app starts with Auto every launch."
+                     : "Selected action runs automatically after each successful download. If mode memory is off, the app starts with Auto every launch.")
             }
 
             Section {

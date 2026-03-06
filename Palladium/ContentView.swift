@@ -32,6 +32,7 @@ struct ContentView: View {
     private static let askUserAfterDownloadDefaultsKey = "palladium.askUserAfterDownload"
     private static let selectedPostDownloadActionDefaultsKey = "palladium.selectedPostDownloadAction"
     private static let notificationsEnabledDefaultsKey = "palladium.notificationsEnabled"
+    private static let rememberSelectedPresetDefaultsKey = "palladium.rememberSelectedPreset"
     private static let autoDownloadOnPasteDefaultsKey = "palladium.autoDownloadOnPaste"
     private static let askShareSheetDownloadModeDefaultsKey = "palladium.askShareSheetDownloadMode"
     private static let rememberShareSheetModeDefaultsKey = "palladium.rememberShareSheetMode"
@@ -48,6 +49,7 @@ struct ContentView: View {
     @State private var askUserAfterDownload: Bool
     @State private var selectedPostDownloadAction: PostDownloadAction
     @State private var notificationsEnabled: Bool
+    @State private var rememberSelectedPreset: Bool
     @State private var autoDownloadOnPaste: Bool
     @State private var askShareSheetDownloadMode: Bool
     @State private var rememberShareSheetMode: Bool
@@ -72,13 +74,15 @@ struct ContentView: View {
     @State private var shareSheetURL = ""
 
     init() {
+        let rememberPreset = Self.loadRememberSelectedPreset()
         _urlText = State(initialValue: Self.isDebuggerAttached() ? "https://www.youtube.com/watch?v=jNQXAC9IVRw" : "")
-        _selectedPreset = State(initialValue: Self.loadSelectedPreset())
+        _selectedPreset = State(initialValue: Self.loadSelectedPreset(rememberSelection: rememberPreset))
         _customArgsText = State(initialValue: Self.loadCustomArgs())
         _extraArgsText = State(initialValue: Self.loadExtraArgs())
         _askUserAfterDownload = State(initialValue: Self.loadAskUserAfterDownload())
         _selectedPostDownloadAction = State(initialValue: Self.loadSelectedPostDownloadAction())
         _notificationsEnabled = State(initialValue: Self.loadNotificationsEnabled())
+        _rememberSelectedPreset = State(initialValue: rememberPreset)
         _autoDownloadOnPaste = State(initialValue: Self.loadAutoDownloadOnPaste())
         _askShareSheetDownloadMode = State(initialValue: Self.loadAskShareSheetDownloadMode())
         _rememberShareSheetMode = State(initialValue: Self.loadRememberShareSheetMode())
@@ -109,6 +113,7 @@ struct ContentView: View {
                 askUserAfterDownload: $askUserAfterDownload,
                 selectedPostDownloadAction: $selectedPostDownloadAction,
                 notificationsEnabled: $notificationsEnabled,
+                rememberSelectedPreset: $rememberSelectedPreset,
                 autoDownloadOnPaste: $autoDownloadOnPaste,
                 askShareSheetDownloadMode: $askShareSheetDownloadMode,
                 rememberShareSheetMode: $rememberShareSheetMode,
@@ -132,6 +137,12 @@ struct ContentView: View {
                 .tag(AppTab.console)
         }
         .onChange(of: selectedPreset) { _ in
+            persistPreferences()
+        }
+        .onChange(of: rememberSelectedPreset) { isEnabled in
+            if !isEnabled {
+                UserDefaults.standard.removeObject(forKey: Self.presetDefaultsKey)
+            }
             persistPreferences()
         }
         .onChange(of: customArgsText) { _ in
@@ -722,7 +733,12 @@ struct ContentView: View {
 
     private func persistPreferences() {
         let defaults = UserDefaults.standard
-        defaults.set(selectedPreset.rawValue, forKey: Self.presetDefaultsKey)
+        defaults.set(rememberSelectedPreset, forKey: Self.rememberSelectedPresetDefaultsKey)
+        if rememberSelectedPreset {
+            defaults.set(selectedPreset.rawValue, forKey: Self.presetDefaultsKey)
+        } else {
+            defaults.removeObject(forKey: Self.presetDefaultsKey)
+        }
         defaults.set(customArgsText, forKey: Self.customArgsDefaultsKey)
         defaults.set(extraArgsText, forKey: Self.extraArgsDefaultsKey)
         defaults.set(askUserAfterDownload, forKey: Self.askUserAfterDownloadDefaultsKey)
@@ -734,7 +750,10 @@ struct ContentView: View {
         defaults.set(shareSheetPreferredPreset.rawValue, forKey: Self.shareSheetPreferredPresetDefaultsKey)
     }
 
-    private static func loadSelectedPreset() -> DownloadPreset {
+    private static func loadSelectedPreset(rememberSelection: Bool) -> DownloadPreset {
+        guard rememberSelection else {
+            return .autoVideo
+        }
         guard let rawValue = UserDefaults.standard.string(forKey: presetDefaultsKey),
               let preset = DownloadPreset(rawValue: rawValue) else {
             return .autoVideo
@@ -787,6 +806,13 @@ struct ContentView: View {
             return true
         }
         return UserDefaults.standard.bool(forKey: notificationsEnabledDefaultsKey)
+    }
+
+    private static func loadRememberSelectedPreset() -> Bool {
+        if UserDefaults.standard.object(forKey: rememberSelectedPresetDefaultsKey) == nil {
+            return false
+        }
+        return UserDefaults.standard.bool(forKey: rememberSelectedPresetDefaultsKey)
     }
 
     private static func loadAutoDownloadOnPaste() -> Bool {
