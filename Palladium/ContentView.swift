@@ -95,6 +95,7 @@ struct ContentView: View {
     @State private var shareItem: ShareItem?
     @State private var currentDownloadTask: Task<Void, Never>?
     @State private var cancelMarkerURL: URL?
+    @State private var lastDownloadProgressPercent: Double?
     @State private var pendingConsoleChunks = ""
     @State private var isConsoleFlushScheduled = false
     @State private var keyboardDismissTapInstalled = false
@@ -608,6 +609,7 @@ struct ContentView: View {
         isRunning = true
         statusText = "running"
         progressText = "Downloading..."
+        lastDownloadProgressPercent = nil
 
         let logPipe = Pipe()
         let readHandle = logPipe.fileHandleForReading
@@ -657,6 +659,7 @@ struct ContentView: View {
             self.currentDownloadTask = nil
 
             isRunning = false
+            lastDownloadProgressPercent = nil
             statusText = outcome.statusText
             if outcome.statusText == "cancelled" {
                 progressText = "download cancelled"
@@ -863,6 +866,7 @@ struct ContentView: View {
         for line in lines {
             let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
             if trimmed.contains("[download]") {
+                guard shouldAcceptDownloadProgressLine(trimmed) else { continue }
                 progressText = trimmed
             } else if trimmed.contains("[Merger]") {
                 progressText = trimmed
@@ -876,8 +880,41 @@ struct ContentView: View {
                 progressText = trimmed
             } else if trimmed.hasPrefix("[palladium] running yt-dlp") {
                 progressText = "Downloading..."
+                lastDownloadProgressPercent = nil
             }
         }
+    }
+
+    private func shouldAcceptDownloadProgressLine(_ line: String) -> Bool {
+        guard let newPercent = extractDownloadPercent(from: line) else {
+            return true
+        }
+
+        guard let lastPercent = lastDownloadProgressPercent else {
+            lastDownloadProgressPercent = newPercent
+            return true
+        }
+
+        if newPercent + 0.05 >= lastPercent {
+            lastDownloadProgressPercent = newPercent
+            return true
+        }
+
+        // Allow a reset after near-completion when yt-dlp switches to another stream/file.
+        if lastPercent >= 99.5 && newPercent <= 5 {
+            lastDownloadProgressPercent = newPercent
+            return true
+        }
+
+        return false
+    }
+
+    private func extractDownloadPercent(from line: String) -> Double? {
+        guard let range = line.range(of: #"(\d+(?:\.\d+)?)%"#, options: .regularExpression) else {
+            return nil
+        }
+        let rawValue = line[range].dropLast()
+        return Double(rawValue)
     }
 
     private func enqueueConsoleChunk(_ chunk: String, trackProgress: Bool) {
