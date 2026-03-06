@@ -10,6 +10,7 @@ struct DownloadTabView: View {
     let progressText: String
     let onDownload: () -> Void
     let onCancel: () -> Void
+    let onPastedURL: (String) -> Void
 
     var body: some View {
         ZStack {
@@ -129,6 +130,7 @@ struct DownloadTabView: View {
         if urlText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             if let paste = UIPasteboard.general.string?.trimmingCharacters(in: .whitespacesAndNewlines), !paste.isEmpty {
                 urlText = paste
+                onPastedURL(paste)
             }
             return
         }

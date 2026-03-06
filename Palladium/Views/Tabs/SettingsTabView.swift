@@ -2,9 +2,8 @@ import SwiftUI
 
 struct SettingsTabView: View {
     private enum SettingsRoute: Hashable {
+        case useInterface
         case downloadArguments
-        case afterDownload
-        case notifications
         case packages
         case about
     }
@@ -14,6 +13,9 @@ struct SettingsTabView: View {
     @Binding var askUserAfterDownload: Bool
     @Binding var selectedPostDownloadAction: PostDownloadAction
     @Binding var notificationsEnabled: Bool
+    @Binding var autoDownloadOnPaste: Bool
+    @Binding var askShareSheetDownloadMode: Bool
+    @Binding var rememberShareSheetMode: Bool
 
     let packageStatusText: String
     let versionsText: String
@@ -26,36 +28,27 @@ struct SettingsTabView: View {
     var body: some View {
         NavigationStack {
             List {
-                Section(header: Text("Download")) {
-                    NavigationLink(value: SettingsRoute.downloadArguments) {
+                Section(header: Text("General")) {
+                    NavigationLink(value: SettingsRoute.useInterface) {
                         settingsRow(
-                            title: "Download Arguments",
-                            subtitle: "Custom and global yt-dlp args",
+                            title: "Use Interface",
+                            subtitle: "Download behavior and share sheet flow",
                             icon: "slider.horizontal.3",
-                            color: .blue
-                        )
-                    }
-
-                    NavigationLink(value: SettingsRoute.afterDownload) {
-                        settingsRow(
-                            title: "After Download",
-                            subtitle: "What to do when a download finishes",
-                            icon: "checkmark.circle.fill",
                             color: .green
                         )
                     }
 
-                    NavigationLink(value: SettingsRoute.notifications) {
+                    NavigationLink(value: SettingsRoute.downloadArguments) {
                         settingsRow(
-                            title: "Notifications",
-                            subtitle: "Download completion alerts",
-                            icon: "bell.badge.fill",
-                            color: .orange
+                            title: "Download Arguments",
+                            subtitle: "Custom and global yt-dlp args",
+                            icon: "terminal",
+                            color: .blue
                         )
                     }
                 }
 
-                Section(header: Text("Packages")) {
+                Section(header: Text("Maintenance")) {
                     NavigationLink(value: SettingsRoute.packages) {
                         settingsRow(
                             title: "Package Manager",
@@ -81,21 +74,20 @@ struct SettingsTabView: View {
             .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(for: SettingsRoute.self) { route in
                 switch route {
+                case .useInterface:
+                    UseInterfaceSettingsView(
+                        askUserAfterDownload: $askUserAfterDownload,
+                        selectedPostDownloadAction: $selectedPostDownloadAction,
+                        notificationsEnabled: $notificationsEnabled,
+                        autoDownloadOnPaste: $autoDownloadOnPaste,
+                        askShareSheetDownloadMode: $askShareSheetDownloadMode,
+                        rememberShareSheetMode: $rememberShareSheetMode,
+                        isRunning: isRunning
+                    )
                 case .downloadArguments:
                     DownloadArgumentsSettingsView(
                         customArgsText: $customArgsText,
                         extraArgsText: $extraArgsText,
-                        isRunning: isRunning
-                    )
-                case .afterDownload:
-                    AfterDownloadSettingsView(
-                        askUserAfterDownload: $askUserAfterDownload,
-                        selectedPostDownloadAction: $selectedPostDownloadAction,
-                        isRunning: isRunning
-                    )
-                case .notifications:
-                    NotificationsSettingsView(
-                        notificationsEnabled: $notificationsEnabled,
                         isRunning: isRunning
                     )
                 case .packages:

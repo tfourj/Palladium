@@ -32,6 +32,10 @@ struct ContentView: View {
     private static let askUserAfterDownloadDefaultsKey = "palladium.askUserAfterDownload"
     private static let selectedPostDownloadActionDefaultsKey = "palladium.selectedPostDownloadAction"
     private static let notificationsEnabledDefaultsKey = "palladium.notificationsEnabled"
+    private static let autoDownloadOnPasteDefaultsKey = "palladium.autoDownloadOnPaste"
+    private static let askShareSheetDownloadModeDefaultsKey = "palladium.askShareSheetDownloadMode"
+    private static let rememberShareSheetModeDefaultsKey = "palladium.rememberShareSheetMode"
+    private static let shareSheetPreferredPresetDefaultsKey = "palladium.shareSheetPreferredPreset"
 
     @Environment(\.scenePhase) private var scenePhase
     @State private var isRunning = false
@@ -44,6 +48,10 @@ struct ContentView: View {
     @State private var askUserAfterDownload: Bool
     @State private var selectedPostDownloadAction: PostDownloadAction
     @State private var notificationsEnabled: Bool
+    @State private var autoDownloadOnPaste: Bool
+    @State private var askShareSheetDownloadMode: Bool
+    @State private var rememberShareSheetMode: Bool
+    @State private var shareSheetPreferredPreset: DownloadPreset
     @State private var selectedTab: AppTab = .download
     @State private var packageStatusText = "idle"
     @State private var versionsText = "yt-dlp: unknown\nyt-dlp-apple-webkit-jsi: unknown"
@@ -60,6 +68,8 @@ struct ContentView: View {
     @State private var pendingConsoleChunks = ""
     @State private var isConsoleFlushScheduled = false
     @State private var keyboardDismissTapInstalled = false
+    @State private var showShareSheetDownloadPicker = false
+    @State private var shareSheetURL = ""
 
     init() {
         _urlText = State(initialValue: Self.isDebuggerAttached() ? "https://www.youtube.com/watch?v=jNQXAC9IVRw" : "")
@@ -69,6 +79,10 @@ struct ContentView: View {
         _askUserAfterDownload = State(initialValue: Self.loadAskUserAfterDownload())
         _selectedPostDownloadAction = State(initialValue: Self.loadSelectedPostDownloadAction())
         _notificationsEnabled = State(initialValue: Self.loadNotificationsEnabled())
+        _autoDownloadOnPaste = State(initialValue: Self.loadAutoDownloadOnPaste())
+        _askShareSheetDownloadMode = State(initialValue: Self.loadAskShareSheetDownloadMode())
+        _rememberShareSheetMode = State(initialValue: Self.loadRememberShareSheetMode())
+        _shareSheetPreferredPreset = State(initialValue: Self.loadShareSheetPreferredPreset())
         _consoleLogStore = StateObject(wrappedValue: ConsoleLogStore())
     }
 
@@ -80,8 +94,9 @@ struct ContentView: View {
                 selectedPreset: $selectedPreset,
                 isRunning: isRunning,
                 progressText: progressText,
-                onDownload: runDownloadFlow,
-                onCancel: cancelDownloadFlow
+                onDownload: { runDownloadFlow() },
+                onCancel: cancelDownloadFlow,
+                onPastedURL: handlePastedURL
             )
             .tabItem {
                 Label("Download", systemImage: "arrow.down.circle")
@@ -94,6 +109,9 @@ struct ContentView: View {
                 askUserAfterDownload: $askUserAfterDownload,
                 selectedPostDownloadAction: $selectedPostDownloadAction,
                 notificationsEnabled: $notificationsEnabled,
+                autoDownloadOnPaste: $autoDownloadOnPaste,
+                askShareSheetDownloadMode: $askShareSheetDownloadMode,
+                rememberShareSheetMode: $rememberShareSheetMode,
                 packageStatusText: packageStatusText,
                 versionsText: versionsText,
                 updatesSummaryText: packageUpdatesSummaryText,
@@ -135,8 +153,23 @@ struct ContentView: View {
                 requestNotificationAuthorizationIfNeeded()
             }
         }
+        .onChange(of: autoDownloadOnPaste) { _ in
+            persistPreferences()
+        }
+        .onChange(of: askShareSheetDownloadMode) { _ in
+            persistPreferences()
+        }
+        .onChange(of: rememberShareSheetMode) { _ in
+            persistPreferences()
+        }
+        .onChange(of: shareSheetPreferredPreset) { _ in
+            persistPreferences()
+        }
         .sheet(item: $shareItem) { item in
             ShareSheet(activityItems: [item.url])
+        }
+        .sheet(isPresented: $showShareSheetDownloadPicker) {
+            shareSheetModePickerSheet
         }
         .confirmationDialog("Download Complete", isPresented: $showDownloadActionDialog, titleVisibility: .visible) {
             if completedDownloadURL != nil {
@@ -173,9 +206,166 @@ struct ContentView: View {
         }
     }
 
-    private func runDownloadFlow() {
+    private var shareSheetDefaultPreset: DownloadPreset {
+        rememberShareSheetMode ? shareSheetPreferredPreset : .autoVideo
+    }
+
+    private var shareSheetModePickerSheet: some View {
+        VStack(spacing: 20) {
+            Text("Choose Download Mode")
+                .font(.title2)
+                .fontWeight(.bold)
+                .padding(.top)
+
+            Text("How would you like to download this content?")
+                .font(.body)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+
+            VStack(spacing: 14) {
+                shareSheetModeButton(
+                    title: "Auto",
+                    subtitle: "Best quality available",
+                    icon: "wand.and.stars",
+                    color: .blue,
+                    preset: .autoVideo
+                )
+                shareSheetModeButton(
+                    title: "Audio Only",
+                    subtitle: "Extract audio track",
+                    icon: "music.note",
+                    color: .green,
+                    preset: .audio
+                )
+                shareSheetModeButton(
+                    title: "Video (Muted)",
+                    subtitle: "Video without audio",
+                    icon: "speaker.slash",
+                    color: .orange,
+                    preset: .mute
+                )
+                shareSheetModeButton(
+                    title: "Custom",
+                    subtitle: "Use custom preset arguments",
+                    icon: "slider.horizontal.3",
+                    color: .indigo,
+                    preset: .custom
+                )
+            }
+            .padding(.horizontal)
+
+            Button(action: {
+                showShareSheetDownloadPicker = false
+                shareSheetURL = ""
+            }) {
+                Text("Cancel")
+                    .font(.headline)
+                    .foregroundStyle(.red)
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color.red.opacity(0.1))
+                    .cornerRadius(10)
+            }
+            .padding(.horizontal)
+            .padding(.bottom)
+        }
+        .padding()
+    }
+
+    private func shareSheetModeButton(
+        title: String,
+        subtitle: String,
+        icon: String,
+        color: Color,
+        preset: DownloadPreset
+    ) -> some View {
+        Button(action: {
+            handleShareSheetModeSelection(preset)
+        }) {
+            HStack {
+                Image(systemName: icon)
+                    .font(.title3)
+                Text(title)
+                    .font(.headline)
+                Spacer()
+                Text(subtitle)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            .padding()
+            .frame(maxWidth: .infinity)
+            .background(color.opacity(0.1))
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(shareSheetDefaultPreset == preset ? color.opacity(0.55) : .clear, lineWidth: 1)
+            )
+            .cornerRadius(10)
+        }
+    }
+
+    private func handleShareSheetModeSelection(_ preset: DownloadPreset) {
+        let sharedLink = shareSheetURL.trimmingCharacters(in: .whitespacesAndNewlines)
+        showShareSheetDownloadPicker = false
+        shareSheetURL = ""
+        guard !sharedLink.isEmpty else { return }
+        startDownloadFromSharedURL(sharedLink, preset: preset, savePresetIfRemembered: true)
+    }
+
+    private func startDownloadFromSharedURL(_ sharedLink: String, preset: DownloadPreset, savePresetIfRemembered: Bool) {
+        selectedTab = .download
+        urlText = sharedLink
+        if savePresetIfRemembered, rememberShareSheetMode {
+            shareSheetPreferredPreset = preset
+        }
+        appendConsoleText("[palladium] starting shared-link download preset=\(preset.rawValue)\n")
+        runDownloadFlow(urlOverride: sharedLink, presetOverride: preset)
+    }
+
+    private func resolveShareSheetPreset(incomingPreset: DownloadPreset?) -> DownloadPreset {
+        if let incomingPreset {
+            return incomingPreset
+        }
+        if rememberShareSheetMode {
+            return shareSheetPreferredPreset
+        }
+        return .autoVideo
+    }
+
+    private func parsePreset(from queryItems: [URLQueryItem]) -> DownloadPreset? {
+        guard let value = queryItems.first(where: { $0.name.lowercased() == "mode" })?.value?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .lowercased(),
+            !value.isEmpty else {
+            return nil
+        }
+        switch value {
+        case "auto", "auto_video", "video":
+            return .autoVideo
+        case "audio":
+            return .audio
+        case "mute", "muted":
+            return .mute
+        case "custom":
+            return .custom
+        default:
+            return nil
+        }
+    }
+
+    private func handlePastedURL(_ pastedURL: String) {
+        guard autoDownloadOnPaste else { return }
+        if isRunning {
+            appendConsoleText("[palladium] paste detected while download is already running\n")
+            return
+        }
+        appendConsoleText("[palladium] auto download started from pasted url\n")
+        runDownloadFlow(urlOverride: pastedURL, presetOverride: selectedPreset)
+    }
+
+    private func runDownloadFlow(urlOverride: String? = nil, presetOverride: DownloadPreset? = nil) {
         guard !isRunning else { return }
-        let targetURL = urlText.trimmingCharacters(in: .whitespacesAndNewlines)
+        let targetURL = (urlOverride ?? urlText).trimmingCharacters(in: .whitespacesAndNewlines)
         guard !targetURL.isEmpty else { return }
 
         consoleLogStore.clearAll()
@@ -194,7 +384,7 @@ struct ContentView: View {
         let logPipe = Pipe()
         let readHandle = logPipe.fileHandleForReading
         let writeFD = logPipe.fileHandleForWriting.fileDescriptor
-        let presetAtStart = selectedPreset.pythonValue
+        let presetAtStart = (presetOverride ?? selectedPreset).pythonValue
         let extraArgsAtStart = extraArgsText.trimmingCharacters(in: .whitespacesAndNewlines)
         let presetArgsJSONAtStart = buildPresetArgumentsJSON()
         let askUserAfterDownloadAtStart = askUserAfterDownload
@@ -281,6 +471,7 @@ struct ContentView: View {
             return
         }
 
+        let incomingPreset = parsePreset(from: queryItems)
         selectedTab = .download
         urlText = sharedLink
         appendConsoleText("[palladium] app opened via url scheme. link: \(sharedLink)\n")
@@ -290,7 +481,17 @@ struct ContentView: View {
             return
         }
 
-        runDownloadFlow()
+        if askShareSheetDownloadMode {
+            shareSheetURL = sharedLink
+            if rememberShareSheetMode, let incomingPreset {
+                shareSheetPreferredPreset = incomingPreset
+            }
+            showShareSheetDownloadPicker = true
+            return
+        }
+
+        let presetToUse = resolveShareSheetPreset(incomingPreset: incomingPreset)
+        startDownloadFromSharedURL(sharedLink, preset: presetToUse, savePresetIfRemembered: false)
     }
 
     private func installKeyboardDismissTapIfNeeded() {
@@ -527,6 +728,10 @@ struct ContentView: View {
         defaults.set(askUserAfterDownload, forKey: Self.askUserAfterDownloadDefaultsKey)
         defaults.set(selectedPostDownloadAction.rawValue, forKey: Self.selectedPostDownloadActionDefaultsKey)
         defaults.set(notificationsEnabled, forKey: Self.notificationsEnabledDefaultsKey)
+        defaults.set(autoDownloadOnPaste, forKey: Self.autoDownloadOnPasteDefaultsKey)
+        defaults.set(askShareSheetDownloadMode, forKey: Self.askShareSheetDownloadModeDefaultsKey)
+        defaults.set(rememberShareSheetMode, forKey: Self.rememberShareSheetModeDefaultsKey)
+        defaults.set(shareSheetPreferredPreset.rawValue, forKey: Self.shareSheetPreferredPresetDefaultsKey)
     }
 
     private static func loadSelectedPreset() -> DownloadPreset {
@@ -582,6 +787,35 @@ struct ContentView: View {
             return true
         }
         return UserDefaults.standard.bool(forKey: notificationsEnabledDefaultsKey)
+    }
+
+    private static func loadAutoDownloadOnPaste() -> Bool {
+        if UserDefaults.standard.object(forKey: autoDownloadOnPasteDefaultsKey) == nil {
+            return false
+        }
+        return UserDefaults.standard.bool(forKey: autoDownloadOnPasteDefaultsKey)
+    }
+
+    private static func loadAskShareSheetDownloadMode() -> Bool {
+        if UserDefaults.standard.object(forKey: askShareSheetDownloadModeDefaultsKey) == nil {
+            return false
+        }
+        return UserDefaults.standard.bool(forKey: askShareSheetDownloadModeDefaultsKey)
+    }
+
+    private static func loadRememberShareSheetMode() -> Bool {
+        if UserDefaults.standard.object(forKey: rememberShareSheetModeDefaultsKey) == nil {
+            return false
+        }
+        return UserDefaults.standard.bool(forKey: rememberShareSheetModeDefaultsKey)
+    }
+
+    private static func loadShareSheetPreferredPreset() -> DownloadPreset {
+        guard let rawValue = UserDefaults.standard.string(forKey: shareSheetPreferredPresetDefaultsKey),
+              let preset = DownloadPreset(rawValue: rawValue) else {
+            return .autoVideo
+        }
+        return preset
     }
 
     private func requestNotificationAuthorizationIfNeeded() {
