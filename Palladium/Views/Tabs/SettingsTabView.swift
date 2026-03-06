@@ -23,10 +23,13 @@ struct SettingsTabView: View {
     let versionsText: String
     let updatesSummaryText: String
     let updatesAvailable: Bool
+    let availablePackageVersions: [String: [String]]
+    let isLoadingPackageVersions: Bool
     let isRunning: Bool
     let onRefreshVersions: () -> Void
     let onUpdatePackages: () -> Void
     let onCustomUpdatePackages: (_ ytDlpVersion: String?, _ webkitJSIVersion: String?) -> Void
+    let onFetchPackageVersions: () -> Void
 
     var body: some View {
         NavigationStack {
@@ -101,10 +104,13 @@ struct SettingsTabView: View {
                         versionsText: versionsText,
                         updatesSummaryText: updatesSummaryText,
                         updatesAvailable: updatesAvailable,
+                        availablePackageVersions: availablePackageVersions,
+                        isLoadingPackageVersions: isLoadingPackageVersions,
                         isRunning: isRunning,
                         onRefreshVersions: onRefreshVersions,
                         onUpdatePackages: onUpdatePackages,
-                        onCustomUpdatePackages: onCustomUpdatePackages
+                        onCustomUpdatePackages: onCustomUpdatePackages,
+                        onFetchPackageVersions: onFetchPackageVersions
                     )
                 case .about:
                     SettingsAboutView()

@@ -80,6 +80,8 @@ struct ContentView: View {
     @State private var versionsText: String
     @State private var packageUpdatesAvailable = false
     @State private var packageUpdatesSummaryText = "Updates not checked yet."
+    @State private var availablePackageVersions: [String: [String]] = [:]
+    @State private var isLoadingPackageVersions = false
     @State private var hasBootstrappedPackageVersions = false
     @StateObject private var consoleLogStore: ConsoleLogStore
     @State private var completedDownloadURL: URL?
@@ -155,12 +157,15 @@ struct ContentView: View {
                     packageStatusText: packageStatusText,
                     versionsText: versionsText,
                     updatesSummaryText: packageUpdatesSummaryText,
-                updatesAvailable: packageUpdatesAvailable,
-                isRunning: isRunning,
-                onRefreshVersions: refreshPackageVersions,
-                onUpdatePackages: updatePackages,
-                onCustomUpdatePackages: updatePackagesWithCustomVersions
-            )
+                    updatesAvailable: packageUpdatesAvailable,
+                    availablePackageVersions: availablePackageVersions,
+                    isLoadingPackageVersions: isLoadingPackageVersions,
+                    isRunning: isRunning,
+                    onRefreshVersions: refreshPackageVersions,
+                    onUpdatePackages: updatePackages,
+                    onCustomUpdatePackages: updatePackagesWithCustomVersions,
+                    onFetchPackageVersions: fetchPackageIndexVersions
+                )
                 .tabItem {
                     Label("Settings", systemImage: "slider.horizontal.3")
                 }
@@ -767,7 +772,15 @@ struct ContentView: View {
         guard !isRunning else { return }
 
         isRunning = true
-        packageStatusText = action == "update" ? "updating" : "checking"
+        switch action {
+        case "update":
+            packageStatusText = "updating"
+        case "index_versions":
+            packageStatusText = "indexing"
+            isLoadingPackageVersions = true
+        default:
+            packageStatusText = "checking"
+        }
 
         let logPipe = Pipe()
         let readHandle = logPipe.fileHandleForReading
@@ -792,6 +805,7 @@ struct ContentView: View {
             await MainActor.run { flushConsoleChunks() }
 
             isRunning = false
+            isLoadingPackageVersions = false
             packageStatusText = outcome.statusText
             appendConsoleText("\n\(outcome.summaryText)\n")
             if let versionsText = outcome.versionsText {
@@ -803,6 +817,9 @@ struct ContentView: View {
             }
             if let updatesSummary = outcome.updatesSummary {
                 self.packageUpdatesSummaryText = updatesSummary
+            }
+            if let availableVersions = outcome.availableVersions {
+                self.availablePackageVersions = availableVersions
             }
             Self.logger.info("package flow finished with status: \(outcome.statusText, privacy: .public)")
         }
@@ -834,6 +851,10 @@ struct ContentView: View {
         }
         guard !customVersions.isEmpty else { return }
         runPackageFlow(action: "update", customVersions: customVersions)
+    }
+
+    private func fetchPackageIndexVersions() {
+        runPackageFlow(action: "index_versions")
     }
 
     private func updateProgress(from chunk: String) {

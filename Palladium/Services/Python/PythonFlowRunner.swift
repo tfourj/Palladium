@@ -45,7 +45,8 @@ enum PythonFlowRunner {
                 versionsText: nil,
                 downloadedPath: nil,
                 updatesAvailable: nil,
-                updatesSummary: nil
+                updatesSummary: nil,
+                availableVersions: nil
             )
         }
 
@@ -72,7 +73,8 @@ enum PythonFlowRunner {
             versionsText: nil,
             downloadedPath: downloadedPath,
             updatesAvailable: nil,
-            updatesSummary: nil
+            updatesSummary: nil,
+            availableVersions: nil
         )
     }
 
@@ -91,7 +93,8 @@ enum PythonFlowRunner {
                 versionsText: nil,
                 downloadedPath: nil,
                 updatesAvailable: nil,
-                updatesSummary: nil
+                updatesSummary: nil,
+                availableVersions: nil
             )
         }
 
@@ -102,6 +105,7 @@ enum PythonFlowRunner {
         let updatesSummary = result["updates_summary"] as? String ?? "Not checked yet."
         let output = result["output"] as? String ?? ""
         let versions = normalizedVersions(from: result["versions"])
+        let availableVersions = normalizedAvailableVersions(from: result["available_versions"])
 
         let summary = """
         pip attempted: \(pipAttempted)
@@ -123,7 +127,8 @@ enum PythonFlowRunner {
             versionsText: versionsText,
             downloadedPath: nil,
             updatesAvailable: updatesAvailable,
-            updatesSummary: updatesSummary
+            updatesSummary: updatesSummary,
+            availableVersions: availableVersions
         )
     }
 
@@ -145,6 +150,20 @@ enum PythonFlowRunner {
         }
         return result
     }
+
+    private static func normalizedAvailableVersions(from value: Any?) -> [String: [String]] {
+        guard let raw = value as? [String: Any] else { return [:] }
+        var result: [String: [String]] = [:]
+        for key in ["yt-dlp", "yt-dlp-apple-webkit-jsi"] {
+            guard let list = raw[key] as? [Any] else { continue }
+            let values = list.map { String(describing: $0).trimmingCharacters(in: .whitespacesAndNewlines) }
+                .filter { !$0.isEmpty }
+            if !values.isEmpty {
+                result[key] = values
+            }
+        }
+        return result
+    }
 }
 
 struct PythonFlowOutcome: Sendable {
@@ -155,6 +174,7 @@ struct PythonFlowOutcome: Sendable {
     let downloadedPath: String?
     let updatesAvailable: Bool?
     let updatesSummary: String?
+    let availableVersions: [String: [String]]?
 }
 
 private final class PythonExecutor: NSObject {

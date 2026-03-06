@@ -1,18 +1,23 @@
 import SwiftUI
 
 struct PackagesSettingsView: View {
+    private static let latestSelectionToken = "__latest__"
+
     let packageStatusText: String
     let versionsText: String
     let updatesSummaryText: String
     let updatesAvailable: Bool
+    let availablePackageVersions: [String: [String]]
+    let isLoadingPackageVersions: Bool
     let isRunning: Bool
     let onRefreshVersions: () -> Void
     let onUpdatePackages: () -> Void
     let onCustomUpdatePackages: (_ ytDlpVersion: String?, _ webkitJSIVersion: String?) -> Void
+    let onFetchPackageVersions: () -> Void
 
     @State private var showCustomVersionSheet = false
-    @State private var ytDlpCustomVersion = ""
-    @State private var webkitJSICustomVersion = ""
+    @State private var ytDlpSelectedVersion = "__latest__"
+    @State private var webkitJSISelectedVersion = "__latest__"
 
     var body: some View {
         Form {
@@ -23,7 +28,7 @@ struct PackagesSettingsView: View {
                 if isRunning {
                     HStack(spacing: 8) {
                         ProgressView()
-                        Text(packageStatusText == "updating" ? "Updating packages..." : "Checking versions...")
+                        Text(progressStatusMessage)
                             .font(.footnote)
                             .foregroundStyle(.secondary)
                     }
@@ -65,6 +70,7 @@ struct PackagesSettingsView: View {
                         guard !isRunning else { return }
                         prepareCustomVersionEditor()
                         showCustomVersionSheet = true
+                        onFetchPackageVersions()
                     }
                 )
 
@@ -84,16 +90,39 @@ struct PackagesSettingsView: View {
         NavigationStack {
             Form {
                 Section("Target Versions") {
-                    TextField("yt-dlp version", text: $ytDlpCustomVersion)
-                        .textInputAutocapitalization(.never)
-                        .autocorrectionDisabled()
-                    TextField("yt-dlp-apple-webkit-jsi version", text: $webkitJSICustomVersion)
-                        .textInputAutocapitalization(.never)
-                        .autocorrectionDisabled()
+                    packageVersionPicker(
+                        title: "yt-dlp",
+                        packageName: "yt-dlp",
+                        selection: $ytDlpSelectedVersion
+                    )
+                    packageVersionPicker(
+                        title: "yt-dlp-apple-webkit-jsi",
+                        packageName: "yt-dlp-apple-webkit-jsi",
+                        selection: $webkitJSISelectedVersion
+                    )
+                }
+
+                Section("Version Source") {
+                    Button(action: onFetchPackageVersions) {
+                        HStack {
+                            if isLoadingPackageVersions {
+                                ProgressView()
+                                    .controlSize(.small)
+                            }
+                            Text(isLoadingPackageVersions ? "Loading versions..." : "Reload Available Versions")
+                        }
+                    }
+                    .disabled(isRunning || isLoadingPackageVersions)
+
+                    if !isLoadingPackageVersions {
+                        Text("Uses pip index versions for each package.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                 }
 
                 Section {
-                    Text("Leave a field empty to keep the latest available release for that package.")
+                    Text("Select a version to pin for update or downgrade. Choose Latest available to skip pinning a package.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -108,13 +137,13 @@ struct PackagesSettingsView: View {
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Apply") {
-                        let ytDlp = normalizeVersionInput(ytDlpCustomVersion)
-                        let webkit = normalizeVersionInput(webkitJSICustomVersion)
+                        let ytDlp = normalizeSelection(ytDlpSelectedVersion)
+                        let webkit = normalizeSelection(webkitJSISelectedVersion)
                         onCustomUpdatePackages(ytDlp, webkit)
                         showCustomVersionSheet = false
                     }
-                    .disabled(normalizeVersionInput(ytDlpCustomVersion) == nil &&
-                              normalizeVersionInput(webkitJSICustomVersion) == nil)
+                    .disabled(normalizeSelection(ytDlpSelectedVersion) == nil &&
+                              normalizeSelection(webkitJSISelectedVersion) == nil)
                 }
             }
         }
@@ -122,23 +151,78 @@ struct PackagesSettingsView: View {
     }
 
     private func prepareCustomVersionEditor() {
-        ytDlpCustomVersion = installedVersion(for: "yt-dlp") ?? ""
-        webkitJSICustomVersion = installedVersion(for: "yt-dlp-apple-webkit-jsi") ?? ""
+        ytDlpSelectedVersion = installedVersion(for: "yt-dlp") ?? Self.latestSelectionToken
+        webkitJSISelectedVersion = installedVersion(for: "yt-dlp-apple-webkit-jsi") ?? Self.latestSelectionToken
     }
 
     private func installedVersion(for packageName: String) -> String? {
         let prefix = "\(packageName):"
         for line in versionsText.components(separatedBy: .newlines) {
             if line.lowercased().hasPrefix(prefix.lowercased()) {
-                return line.replacingOccurrences(of: prefix, with: "")
+                let value = line.replacingOccurrences(of: prefix, with: "")
                     .trimmingCharacters(in: .whitespacesAndNewlines)
+                let lowered = value.lowercased()
+                if value.isEmpty || lowered == "not installed" || lowered == "unknown" {
+                    return nil
+                }
+                return value
             }
         }
         return nil
     }
 
-    private func normalizeVersionInput(_ value: String) -> String? {
+    private func normalizeSelection(_ value: String) -> String? {
         let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed.isEmpty ? nil : trimmed
+        if trimmed.isEmpty || trimmed == Self.latestSelectionToken {
+            return nil
+        }
+        return trimmed
+    }
+
+    @ViewBuilder
+    private func packageVersionPicker(
+        title: String,
+        packageName: String,
+        selection: Binding<String>
+    ) -> some View {
+        let options = availableVersions(for: packageName)
+        Picker(title, selection: selection) {
+            Text("Latest available")
+                .tag(Self.latestSelectionToken)
+            ForEach(options, id: \.self) { version in
+                Text(version).tag(version)
+            }
+        }
+        .pickerStyle(.menu)
+        .onChange(of: availablePackageVersions[packageName]?.count ?? 0) { _ in
+            let current = selection.wrappedValue
+            if current == Self.latestSelectionToken {
+                return
+            }
+            if !options.contains(current) {
+                selection.wrappedValue = Self.latestSelectionToken
+            }
+        }
+    }
+
+    private func availableVersions(for packageName: String) -> [String] {
+        var values = availablePackageVersions[packageName] ?? []
+        if let installed = installedVersion(for: packageName),
+           !installed.isEmpty,
+           installed.lowercased() != "not installed",
+           !values.contains(installed) {
+            values.insert(installed, at: 0)
+        }
+        return values
+    }
+
+    private var progressStatusMessage: String {
+        if packageStatusText == "updating" {
+            return "Updating packages..."
+        }
+        if packageStatusText == "indexing" {
+            return "Loading package versions..."
+        }
+        return "Checking versions..."
     }
 }
