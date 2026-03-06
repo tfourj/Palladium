@@ -127,32 +127,24 @@ struct DownloadTabView: View {
                     .background(cardBackground)
                     .clipShape(RoundedRectangle(cornerRadius: 8))
 
-                    Button(action: onDownload) {
+                    Button(action: {
+                        if isRunning {
+                            onCancel()
+                        } else {
+                            onDownload()
+                        }
+                    }) {
                         HStack(spacing: 8) {
-                            Image(systemName: "arrow.down.circle.fill")
-                            Text(isRunning ? "Running..." : "Download")
+                            Image(systemName: isRunning ? "stop.circle.fill" : "arrow.down.circle.fill")
+                            Text(isRunning ? "Cancel" : "Download")
                         }
                         .font(.headline)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)
                     }
                     .buttonStyle(.borderedProminent)
-                    .tint(.blue)
-                    .disabled(isRunning || urlText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-
-                    if isRunning {
-                        Button(action: onCancel) {
-                            HStack(spacing: 8) {
-                                Image(systemName: "stop.circle.fill")
-                                Text("Cancel")
-                            }
-                            .font(.headline)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 10)
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .tint(.red)
-                    }
+                    .tint(isRunning ? .red : .blue)
+                    .disabled(!isRunning && urlText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
                 .padding(12)
                 .background(cardBackground)
