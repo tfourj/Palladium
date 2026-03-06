@@ -844,13 +844,16 @@ struct ContentView: View {
         runPackageFlow(action: "update")
     }
 
-    private func updatePackagesWithCustomVersions(_ ytDlpVersion: String?, _ webkitJSIVersion: String?) {
+    private func updatePackagesWithCustomVersions(_ ytDlpVersion: String?, _ webkitJSIVersion: String?, _ pipVersion: String?) {
         var customVersions: [String: String] = [:]
         if let ytDlpVersion {
             customVersions["yt-dlp"] = ytDlpVersion
         }
         if let webkitJSIVersion {
             customVersions["yt-dlp-apple-webkit-jsi"] = webkitJSIVersion
+        }
+        if let pipVersion {
+            customVersions["pip"] = pipVersion
         }
         guard !customVersions.isEmpty else { return }
         runPackageFlow(action: "update", customVersions: customVersions)

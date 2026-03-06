@@ -28,7 +28,7 @@ struct SettingsTabView: View {
     let isRunning: Bool
     let onRefreshVersions: () -> Void
     let onUpdatePackages: () -> Void
-    let onCustomUpdatePackages: (_ ytDlpVersion: String?, _ webkitJSIVersion: String?) -> Void
+    let onCustomUpdatePackages: (_ ytDlpVersion: String?, _ webkitJSIVersion: String?, _ pipVersion: String?) -> Void
     let onFetchPackageVersions: () -> Void
 
     var body: some View {
@@ -58,7 +58,7 @@ struct SettingsTabView: View {
                     NavigationLink(value: SettingsRoute.packages) {
                         settingsRow(
                             title: "Package Manager",
-                            subtitle: "Check and update yt-dlp packages",
+                            subtitle: "Check and update yt-dlp and pip",
                             icon: "shippingbox.fill",
                             color: .indigo
                         )

@@ -19,7 +19,9 @@ import importlib.metadata as importlib_metadata
 import time
 
 MAX_CAPTURED_OUTPUT_CHARS = 250000
-TRACKED_PACKAGES = ("yt-dlp", "yt-dlp-apple-webkit-jsi")
+TRACKED_PACKAGES = ("yt-dlp", "yt-dlp-apple-webkit-jsi", "pip")
+DISPLAY_PACKAGES = TRACKED_PACKAGES
+CLEANUP_PACKAGES = ("yt-dlp", "yt-dlp-apple-webkit-jsi")
 
 
 class TailBuffer:
@@ -296,7 +298,7 @@ def cleanup_target_package(install_target, package_name):
 def collect_versions(install_target=None, allow_cache_fallback=True):
     cached_versions = load_cached_versions(install_target) if allow_cache_fallback else {}
     versions = {}
-    for package_name in TRACKED_PACKAGES:
+    for package_name in DISPLAY_PACKAGES:
         target_version = version_from_install_target(package_name, install_target)
         if target_version:
             versions[package_name] = target_version
@@ -312,9 +314,12 @@ def collect_versions(install_target=None, allow_cache_fallback=True):
             versions[package_name] = resolved_version
             continue
 
-        cached_version = cached_versions.get(package_name, "").strip()
-        if allow_cache_fallback and cached_version:
-            versions[package_name] = cached_version
+        if package_name in TRACKED_PACKAGES:
+            cached_version = cached_versions.get(package_name, "").strip()
+            if allow_cache_fallback and cached_version:
+                versions[package_name] = cached_version
+            else:
+                versions[package_name] = "not installed"
         else:
             versions[package_name] = "not installed"
 
@@ -327,7 +332,39 @@ def check_package_updates(install_target=None):
     if pip_main is None:
         return False, "Unable to check updates (pip unavailable)."
 
+    def normalized_version(value):
+        return str(value or "").strip()
+
+    def build_update_lines(installed_versions, indexed_versions):
+        lines = []
+        for package_name in TRACKED_PACKAGES:
+            current_version = normalized_version(installed_versions.get(package_name))
+            if not current_version or current_version in ("not installed", "unknown"):
+                continue
+
+            indexed = indexed_versions.get(package_name) or []
+            latest_version = ""
+            for candidate in indexed:
+                latest_version = normalized_version(candidate)
+                if latest_version:
+                    break
+            if not latest_version:
+                continue
+
+            if latest_version != current_version:
+                lines.append(f"{package_name}: {current_version} -> {latest_version}")
+        return lines
+
     try:
+        installed_versions = collect_versions(install_target=install_target, allow_cache_fallback=False)
+        indexed_versions = fetch_package_index_versions(install_target=install_target, pip_main=pip_main)
+        update_lines = build_update_lines(installed_versions, indexed_versions)
+        if update_lines:
+            return True, "\\n".join(update_lines)
+        if indexed_versions:
+            return False, "All packages are up to date."
+
+        # Fallback path if index query failed.
         pip_args = ["list", "--outdated", "--format=json"]
         if install_target:
             pip_args.extend(["--path", install_target])
@@ -368,9 +405,21 @@ def check_package_updates(install_target=None):
         lines = []
         for item in relevant:
             name = str(item.get("name", "package"))
-            old_ver = str(item.get("version", "?"))
-            new_ver = str(item.get("latest_version", "?"))
+            package_key = name.lower()
+            old_ver = normalized_version(item.get("version", "?")) or "?"
+            new_ver = normalized_version(item.get("latest_version", "?")) or "?"
+
+            installed_ver = normalized_version(installed_versions.get(package_key))
+            if installed_ver and installed_ver not in ("not installed", "unknown"):
+                old_ver = installed_ver
+
+            if old_ver == new_ver:
+                continue
+
             lines.append(f"{name}: {old_ver} -> {new_ver}")
+
+        if not lines:
+            return False, "All packages are up to date."
 
         return True, "\\n".join(lines)
     except Exception:
@@ -414,8 +463,9 @@ def parse_index_versions_output(raw_output):
     return []
 
 
-def fetch_package_index_versions(install_target=None):
-    pip_main = ensure_pip_entrypoint(install_target)
+def fetch_package_index_versions(install_target=None, pip_main=None):
+    if pip_main is None:
+        pip_main = ensure_pip_entrypoint(install_target)
     if pip_main is None:
         return {}
 
@@ -1639,7 +1689,7 @@ def run_package_maintenance(action, custom_versions_json=None):
                         if custom_versions:
                             if install_target:
                                 stale_removed = 0
-                                for package_name in TRACKED_PACKAGES:
+                                for package_name in CLEANUP_PACKAGES:
                                     stale_removed += cleanup_target_package(install_target, package_name)
                                 print(f"[palladium] removed stale target package entries: {stale_removed}")
                             packages = []
@@ -1683,6 +1733,7 @@ def run_package_maintenance(action, custom_versions_json=None):
         versions = collect_versions(install_target=install_target)
         print(f"[palladium] yt-dlp version: {versions.get('yt-dlp')}")
         print(f"[palladium] yt-dlp-apple-webkit-jsi version: {versions.get('yt-dlp-apple-webkit-jsi')}")
+        print(f"[palladium] pip version: {versions.get('pip')}")
 
         success = (pip_exit_code in (None, 0))
         print(f"[palladium] package flow success: {success}")

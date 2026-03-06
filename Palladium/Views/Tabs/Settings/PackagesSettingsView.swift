@@ -12,12 +12,13 @@ struct PackagesSettingsView: View {
     let isRunning: Bool
     let onRefreshVersions: () -> Void
     let onUpdatePackages: () -> Void
-    let onCustomUpdatePackages: (_ ytDlpVersion: String?, _ webkitJSIVersion: String?) -> Void
+    let onCustomUpdatePackages: (_ ytDlpVersion: String?, _ webkitJSIVersion: String?, _ pipVersion: String?) -> Void
     let onFetchPackageVersions: () -> Void
 
     @State private var showCustomVersionSheet = false
     @State private var ytDlpSelectedVersion = "__latest__"
     @State private var webkitJSISelectedVersion = "__latest__"
+    @State private var pipSelectedVersion = "__latest__"
 
     var body: some View {
         Form {
@@ -100,6 +101,11 @@ struct PackagesSettingsView: View {
                         packageName: "yt-dlp-apple-webkit-jsi",
                         selection: $webkitJSISelectedVersion
                     )
+                    packageVersionPicker(
+                        title: "pip",
+                        packageName: "pip",
+                        selection: $pipSelectedVersion
+                    )
                 }
 
                 Section("Version Source") {
@@ -139,11 +145,13 @@ struct PackagesSettingsView: View {
                     Button("Apply") {
                         let ytDlp = normalizeSelection(ytDlpSelectedVersion)
                         let webkit = normalizeSelection(webkitJSISelectedVersion)
-                        onCustomUpdatePackages(ytDlp, webkit)
+                        let pip = normalizeSelection(pipSelectedVersion)
+                        onCustomUpdatePackages(ytDlp, webkit, pip)
                         showCustomVersionSheet = false
                     }
                     .disabled(normalizeSelection(ytDlpSelectedVersion) == nil &&
-                              normalizeSelection(webkitJSISelectedVersion) == nil)
+                              normalizeSelection(webkitJSISelectedVersion) == nil &&
+                              normalizeSelection(pipSelectedVersion) == nil)
                 }
             }
         }
@@ -153,6 +161,7 @@ struct PackagesSettingsView: View {
     private func prepareCustomVersionEditor() {
         ytDlpSelectedVersion = installedVersion(for: "yt-dlp") ?? Self.latestSelectionToken
         webkitJSISelectedVersion = installedVersion(for: "yt-dlp-apple-webkit-jsi") ?? Self.latestSelectionToken
+        pipSelectedVersion = installedVersion(for: "pip") ?? Self.latestSelectionToken
     }
 
     private func installedVersion(for packageName: String) -> String? {
