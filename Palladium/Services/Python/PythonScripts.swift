@@ -72,23 +72,26 @@ def ensure_pip_entrypoint():
     try:
         from pip._internal.cli.main import main as pip_main
         return pip_main
+    except ModuleNotFoundError:
+        # Expected on our embedded Python runtime before bootstrapping pip.
+        print("[palladium] pip module missing, loading ensurepip bundle")
     except Exception:
-        print("[palladium] pip entrypoint unavailable")
+        print("[palladium] pip entrypoint failed, attempting ensurepip fallback")
         traceback.print_exc()
-        print("[palladium] attempting ensurepip fallback")
-        try:
-            import ensurepip
-            with ensurepip._get_pip_whl_path_ctx() as pip_wheel:
-                pip_wheel_str = str(pip_wheel)
-                if pip_wheel_str not in sys.path:
-                    sys.path.insert(0, pip_wheel_str)
-                from pip._internal.cli.main import main as pip_main
-                print("[palladium] pip loaded from ensurepip bundled wheel")
-                return pip_main
-        except Exception:
-            print("[palladium] ensurepip fallback failed")
-            traceback.print_exc()
-            return None
+
+    try:
+        import ensurepip
+        with ensurepip._get_pip_whl_path_ctx() as pip_wheel:
+            pip_wheel_str = str(pip_wheel)
+            if pip_wheel_str not in sys.path:
+                sys.path.insert(0, pip_wheel_str)
+            from pip._internal.cli.main import main as pip_main
+            print("[palladium] pip loaded from ensurepip bundled wheel")
+            return pip_main
+    except Exception:
+        print("[palladium] ensurepip fallback failed")
+        traceback.print_exc()
+        return None
 
 
 def package_versions_cache_path(install_target=None):
