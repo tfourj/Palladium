@@ -61,7 +61,7 @@ struct UseInterfaceSettingsView: View {
                     .disabled(isRunning)
             }
         }
-        .navigationTitle("User Interface")
+        .navigationTitle("User interface")
         .navigationBarTitleDisplayMode(.inline)
     }
 }

@@ -31,7 +31,7 @@ struct SettingsTabView: View {
                 Section(header: Text("General")) {
                     NavigationLink(value: SettingsRoute.useInterface) {
                         settingsRow(
-                            title: "Use Interface",
+                            title: "User interface",
                             subtitle: "Download behavior and share sheet flow",
                             icon: "slider.horizontal.3",
                             color: .green
