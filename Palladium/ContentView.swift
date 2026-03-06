@@ -56,6 +56,7 @@ struct ContentView: View {
     private static let linkHistoryEnabledDefaultsKey = "palladium.linkHistoryEnabled"
     private static let linkHistoryEntriesDefaultsKey = "palladium.linkHistoryEntries"
     private static let appAppearanceModeDefaultsKey = "palladium.appAppearanceMode"
+    private static let packageVersionsTextDefaultsKey = "palladium.packageVersionsText"
 
     @Environment(\.scenePhase) private var scenePhase
     @State private var isRunning = false
@@ -76,9 +77,10 @@ struct ContentView: View {
     @State private var appAppearanceMode: AppAppearanceMode
     @State private var selectedTab: AppTab = .download
     @State private var packageStatusText = "idle"
-    @State private var versionsText = "yt-dlp: unknown\nyt-dlp-apple-webkit-jsi: unknown"
+    @State private var versionsText: String
     @State private var packageUpdatesAvailable = false
     @State private var packageUpdatesSummaryText = "Updates not checked yet."
+    @State private var hasBootstrappedPackageVersions = false
     @StateObject private var consoleLogStore: ConsoleLogStore
     @State private var completedDownloadURL: URL?
     @State private var completedPhotosCompatibility: PhotosCompatibilityState = .checking
@@ -112,6 +114,7 @@ struct ContentView: View {
         _linkHistoryEnabled = State(initialValue: Self.loadLinkHistoryEnabled())
         _linkHistoryEntries = State(initialValue: Self.loadLinkHistoryEntries())
         _appAppearanceMode = State(initialValue: Self.loadAppAppearanceMode())
+        _versionsText = State(initialValue: Self.loadCachedPackageVersionsText())
         _consoleLogStore = StateObject(wrappedValue: ConsoleLogStore())
     }
 
@@ -245,6 +248,7 @@ struct ContentView: View {
         }
         .onAppear {
             installKeyboardDismissTapIfNeeded()
+            bootstrapPackageVersionsIfNeeded()
         }
         .onOpenURL { incomingURL in
             handleIncomingDownloadURL(incomingURL)
@@ -792,6 +796,7 @@ struct ContentView: View {
             appendConsoleText("\n\(outcome.summaryText)\n")
             if let versionsText = outcome.versionsText {
                 self.versionsText = versionsText
+                persistPackageVersionsText(versionsText)
             }
             if let updatesAvailable = outcome.updatesAvailable {
                 self.packageUpdatesAvailable = updatesAvailable
@@ -805,6 +810,14 @@ struct ContentView: View {
 
     private func refreshPackageVersions() {
         runPackageFlow(action: "check")
+    }
+
+    private func bootstrapPackageVersionsIfNeeded() {
+        guard !hasBootstrappedPackageVersions else { return }
+        hasBootstrappedPackageVersions = true
+        if versionsText.contains("unknown") || versionsText.contains("not installed") {
+            runPackageFlow(action: "versions")
+        }
     }
 
     private func updatePackages() {
@@ -1068,6 +1081,10 @@ struct ContentView: View {
         defaults.set(data, forKey: Self.linkHistoryEntriesDefaultsKey)
     }
 
+    private func persistPackageVersionsText(_ text: String) {
+        UserDefaults.standard.set(text, forKey: Self.packageVersionsTextDefaultsKey)
+    }
+
     private static func loadSelectedPreset(rememberSelection: Bool) -> DownloadPreset {
         guard rememberSelection else {
             return .autoVideo
@@ -1169,6 +1186,15 @@ struct ContentView: View {
             return .system
         }
         return mode
+    }
+
+    private static func loadCachedPackageVersionsText() -> String {
+        let fallback = "yt-dlp: unknown\nyt-dlp-apple-webkit-jsi: unknown"
+        guard let value = UserDefaults.standard.string(forKey: packageVersionsTextDefaultsKey),
+              !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            return fallback
+        }
+        return value
     }
 
     private func requestNotificationAuthorizationIfNeeded() {

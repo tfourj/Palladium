@@ -19,6 +19,7 @@ import importlib.metadata as importlib_metadata
 import time
 
 MAX_CAPTURED_OUTPUT_CHARS = 250000
+TRACKED_PACKAGES = ("yt-dlp", "yt-dlp-apple-webkit-jsi")
 
 
 class TailBuffer:
@@ -90,13 +91,88 @@ def ensure_pip_entrypoint():
             return None
 
 
-def collect_versions():
-    versions = {}
-    for package_name in ("yt-dlp", "yt-dlp-apple-webkit-jsi"):
+def package_versions_cache_path(install_target=None):
+    base_dir = install_target or os.environ.get("PALLADIUM_PYTHON_PACKAGES")
+    if not base_dir:
+        return None
+    try:
+        os.makedirs(base_dir, exist_ok=True)
+    except Exception:
+        return None
+    return os.path.join(base_dir, ".palladium-package-versions.json")
+
+
+def load_cached_versions(install_target=None):
+    cache_path = package_versions_cache_path(install_target)
+    if not cache_path or not os.path.isfile(cache_path):
+        return {}
+
+    try:
+        with open(cache_path, "r", encoding="utf-8") as cache_file:
+            parsed = json.load(cache_file)
+        if not isinstance(parsed, dict):
+            return {}
+        resolved = {}
+        for package_name in TRACKED_PACKAGES:
+            value = parsed.get(package_name)
+            if value is None:
+                continue
+            version_text = str(value).strip()
+            if version_text:
+                resolved[package_name] = version_text
+        return resolved
+    except Exception:
+        return {}
+
+
+def save_cached_versions(versions, install_target=None):
+    cache_path = package_versions_cache_path(install_target)
+    if not cache_path:
+        return
+
+    payload = {}
+    for package_name in TRACKED_PACKAGES:
+        version_value = str(versions.get(package_name, "")).strip()
+        if version_value and version_value not in ("not installed", "unknown"):
+            payload[package_name] = version_value
+
+    if not payload:
+        return
+
+    temp_path = cache_path + ".tmp"
+    try:
+        with open(temp_path, "w", encoding="utf-8") as cache_file:
+            json.dump(payload, cache_file)
+        os.replace(temp_path, cache_path)
+    except Exception:
         try:
-            versions[package_name] = importlib_metadata.version(package_name)
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
         except Exception:
+            pass
+
+
+def collect_versions(install_target=None, allow_cache_fallback=True):
+    cached_versions = load_cached_versions(install_target) if allow_cache_fallback else {}
+    versions = {}
+    for package_name in TRACKED_PACKAGES:
+        resolved_version = None
+        try:
+            resolved_version = importlib_metadata.version(package_name)
+        except Exception:
+            resolved_version = None
+
+        if resolved_version:
+            versions[package_name] = resolved_version
+            continue
+
+        cached_version = cached_versions.get(package_name, "").strip()
+        if allow_cache_fallback and cached_version:
+            versions[package_name] = cached_version
+        else:
             versions[package_name] = "not installed"
+
+    save_cached_versions(versions, install_target)
     return versions
 
 
@@ -138,7 +214,7 @@ def check_package_updates(install_target=None):
         if not isinstance(items, list):
             return False, "All packages are up to date."
 
-        tracked = {"yt-dlp", "yt-dlp-apple-webkit-jsi"}
+        tracked = {name.lower() for name in TRACKED_PACKAGES}
         relevant = [item for item in items if str(item.get("name", "")).lower() in tracked]
         if not relevant:
             return False, "All packages are up to date."
@@ -1305,16 +1381,21 @@ def run_package_maintenance(action, custom_versions_json=None):
             print(f"[palladium] package install target: {install_target}")
 
         print(f"[palladium] package action: {action}")
-        updates_available, updates_summary = check_package_updates(install_target)
-        print(f"[palladium] updates available: {updates_available}")
-        print(f"[palladium] updates summary: {updates_summary}")
+        if action == "versions":
+            updates_available = False
+            updates_summary = "Skipped update check."
+            print("[palladium] quick version refresh only")
+        else:
+            updates_available, updates_summary = check_package_updates(install_target)
+            print(f"[palladium] updates available: {updates_available}")
+            print(f"[palladium] updates summary: {updates_summary}")
 
         custom_versions = {}
         if custom_versions_json:
             try:
                 parsed_versions = json.loads(custom_versions_json)
                 if isinstance(parsed_versions, dict):
-                    for package_name in ("yt-dlp", "yt-dlp-apple-webkit-jsi"):
+                    for package_name in TRACKED_PACKAGES:
                         raw_value = parsed_versions.get(package_name)
                         if raw_value is None:
                             continue
@@ -1335,16 +1416,25 @@ def run_package_maintenance(action, custom_versions_json=None):
                     try:
                         if custom_versions:
                             packages = []
-                            for package_name in ("yt-dlp", "yt-dlp-apple-webkit-jsi"):
+                            for package_name in TRACKED_PACKAGES:
                                 version = custom_versions.get(package_name)
                                 if version:
                                     packages.append(f"{package_name}=={version}")
                                 else:
                                     packages.append(package_name)
-                            pip_args = ["install", "--no-cache-dir", "--progress-bar", "off", "--no-color", *packages]
+                            pip_args = [
+                                "install",
+                                "--upgrade",
+                                "--force-reinstall",
+                                "--no-cache-dir",
+                                "--progress-bar",
+                                "off",
+                                "--no-color",
+                                *packages,
+                            ]
                         else:
-                            packages = ["yt-dlp", "yt-dlp-apple-webkit-jsi"]
-                            pip_args = ["install", "-U", "--no-cache-dir", "--progress-bar", "off", "--no-color", *packages]
+                            packages = list(TRACKED_PACKAGES)
+                            pip_args = ["install", "--upgrade", "--no-cache-dir", "--progress-bar", "off", "--no-color", *packages]
                         if install_target:
                             pip_args[1:1] = ["--target", install_target]
                         pip_result = pip_main(pip_args)
@@ -1363,7 +1453,7 @@ def run_package_maintenance(action, custom_versions_json=None):
             print(f"[palladium] post-update updates available: {updates_available}")
             print(f"[palladium] post-update updates summary: {updates_summary}")
 
-        versions = collect_versions()
+        versions = collect_versions(install_target=install_target)
         print(f"[palladium] yt-dlp version: {versions.get('yt-dlp')}")
         print(f"[palladium] yt-dlp-apple-webkit-jsi version: {versions.get('yt-dlp-apple-webkit-jsi')}")
 

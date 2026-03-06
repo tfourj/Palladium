@@ -101,7 +101,7 @@ enum PythonFlowRunner {
         let updatesAvailable = result["updates_available"] as? Bool ?? false
         let updatesSummary = result["updates_summary"] as? String ?? "Not checked yet."
         let output = result["output"] as? String ?? ""
-        let versions = result["versions"] as? [String: String] ?? [:]
+        let versions = normalizedVersions(from: result["versions"])
 
         let summary = """
         pip attempted: \(pipAttempted)
@@ -112,8 +112,8 @@ enum PythonFlowRunner {
         """
 
         let versionsText = """
-        yt-dlp: \(versions["yt-dlp"] ?? "unknown")
-        yt-dlp-apple-webkit-jsi: \(versions["yt-dlp-apple-webkit-jsi"] ?? "unknown")
+        yt-dlp: \(versions["yt-dlp"] ?? "not installed")
+        yt-dlp-apple-webkit-jsi: \(versions["yt-dlp-apple-webkit-jsi"] ?? "not installed")
         """
 
         return PythonFlowOutcome(
@@ -131,6 +131,19 @@ enum PythonFlowRunner {
         _ work: @escaping @Sendable () -> PythonFlowOutcome
     ) async -> PythonFlowOutcome {
         await PythonExecutor.shared.run(work)
+    }
+
+    private static func normalizedVersions(from value: Any?) -> [String: String] {
+        guard let raw = value as? [String: Any] else { return [:] }
+        var result: [String: String] = [:]
+        for key in ["yt-dlp", "yt-dlp-apple-webkit-jsi"] {
+            guard let item = raw[key] else { continue }
+            let versionText = String(describing: item).trimmingCharacters(in: .whitespacesAndNewlines)
+            if !versionText.isEmpty {
+                result[key] = versionText
+            }
+        }
+        return result
     }
 }
 
