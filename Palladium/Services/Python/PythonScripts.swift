@@ -1242,7 +1242,7 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, p
     })
 
 
-def run_package_maintenance(action):
+def run_package_maintenance(action, custom_versions_json=None):
     output = TailBuffer()
     console_stdout = sys.__stdout__ if sys.__stdout__ is not None else None
     console_stderr = sys.__stderr__ if sys.__stderr__ is not None else None
@@ -1309,14 +1309,42 @@ def run_package_maintenance(action):
         print(f"[palladium] updates available: {updates_available}")
         print(f"[palladium] updates summary: {updates_summary}")
 
+        custom_versions = {}
+        if custom_versions_json:
+            try:
+                parsed_versions = json.loads(custom_versions_json)
+                if isinstance(parsed_versions, dict):
+                    for package_name in ("yt-dlp", "yt-dlp-apple-webkit-jsi"):
+                        raw_value = parsed_versions.get(package_name)
+                        if raw_value is None:
+                            continue
+                        requested_version = str(raw_value).strip()
+                        if requested_version:
+                            custom_versions[package_name] = requested_version
+            except Exception:
+                print("[palladium] failed to parse custom version payload")
+                traceback.print_exc()
+        if custom_versions:
+            print(f"[palladium] custom package versions requested: {custom_versions}")
+
         if action == "update":
-            if updates_available:
+            if updates_available or bool(custom_versions):
                 pip_attempted = True
                 pip_main = ensure_pip_entrypoint()
                 if pip_main is not None:
                     try:
-                        packages = ["yt-dlp", "yt-dlp-apple-webkit-jsi"]
-                        pip_args = ["install", "-U", "--no-cache-dir", "--progress-bar", "off", "--no-color", *packages]
+                        if custom_versions:
+                            packages = []
+                            for package_name in ("yt-dlp", "yt-dlp-apple-webkit-jsi"):
+                                version = custom_versions.get(package_name)
+                                if version:
+                                    packages.append(f"{package_name}=={version}")
+                                else:
+                                    packages.append(package_name)
+                            pip_args = ["install", "--no-cache-dir", "--progress-bar", "off", "--no-color", *packages]
+                        else:
+                            packages = ["yt-dlp", "yt-dlp-apple-webkit-jsi"]
+                            pip_args = ["install", "-U", "--no-cache-dir", "--progress-bar", "off", "--no-color", *packages]
                         if install_target:
                             pip_args[1:1] = ["--target", install_target]
                         pip_result = pip_main(pip_args)

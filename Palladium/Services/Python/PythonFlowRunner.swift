@@ -12,12 +12,20 @@ enum PythonFlowRunner {
         }
     }
 
-    static func executePackageFlow(action: String) async -> PythonFlowOutcome {
+    static func executePackageFlow(action: String, customVersions: [String: String]? = nil) async -> PythonFlowOutcome {
         await runOnPythonThread {
             let builtins = Python.import("builtins")
             let main = Python.import("__main__")
             _ = builtins.exec(PythonScripts.ytDlpScript, main.__dict__)
-            let payload = String(main.run_package_maintenance(action)) ?? ""
+            let customVersionsJSON: String
+            if let customVersions,
+               let data = try? JSONSerialization.data(withJSONObject: customVersions),
+               let text = String(data: data, encoding: .utf8) {
+                customVersionsJSON = text
+            } else {
+                customVersionsJSON = ""
+            }
+            let payload = String(main.run_package_maintenance(action, customVersionsJSON)) ?? ""
             return decodePackagePayload(payload)
         }
     }

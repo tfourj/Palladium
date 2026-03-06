@@ -152,11 +152,12 @@ struct ContentView: View {
                     packageStatusText: packageStatusText,
                     versionsText: versionsText,
                     updatesSummaryText: packageUpdatesSummaryText,
-                    updatesAvailable: packageUpdatesAvailable,
-                    isRunning: isRunning,
-                    onRefreshVersions: refreshPackageVersions,
-                    onUpdatePackages: updatePackages
-                )
+                updatesAvailable: packageUpdatesAvailable,
+                isRunning: isRunning,
+                onRefreshVersions: refreshPackageVersions,
+                onUpdatePackages: updatePackages,
+                onCustomUpdatePackages: updatePackagesWithCustomVersions
+            )
                 .tabItem {
                     Label("Settings", systemImage: "slider.horizontal.3")
                 }
@@ -758,7 +759,7 @@ struct ContentView: View {
         progressText = "Cancelling..."
     }
 
-    private func runPackageFlow(action: String) {
+    private func runPackageFlow(action: String, customVersions: [String: String]? = nil) {
         guard !isRunning else { return }
 
         isRunning = true
@@ -778,7 +779,7 @@ struct ContentView: View {
         }
 
         Task {
-            let outcome = await PythonFlowRunner.executePackageFlow(action: action)
+            let outcome = await PythonFlowRunner.executePackageFlow(action: action, customVersions: customVersions)
 
             unsetenv("PALLADIUM_LOG_FD")
             readHandle.readabilityHandler = nil
@@ -808,6 +809,18 @@ struct ContentView: View {
 
     private func updatePackages() {
         runPackageFlow(action: "update")
+    }
+
+    private func updatePackagesWithCustomVersions(_ ytDlpVersion: String?, _ webkitJSIVersion: String?) {
+        var customVersions: [String: String] = [:]
+        if let ytDlpVersion {
+            customVersions["yt-dlp"] = ytDlpVersion
+        }
+        if let webkitJSIVersion {
+            customVersions["yt-dlp-apple-webkit-jsi"] = webkitJSIVersion
+        }
+        guard !customVersions.isEmpty else { return }
+        runPackageFlow(action: "update", customVersions: customVersions)
     }
 
     private func updateProgress(from chunk: String) {
