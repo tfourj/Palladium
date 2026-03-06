@@ -7,6 +7,7 @@ struct UseInterfaceSettingsView: View {
     @Binding var rememberSelectedPreset: Bool
     @Binding var autoDownloadOnPaste: Bool
     @Binding var shareSheetDownloadMode: ShareSheetDownloadMode
+    @Binding var linkHistoryEnabled: Bool
 
     let isRunning: Bool
 
@@ -54,6 +55,15 @@ struct UseInterfaceSettingsView: View {
                 Text("Paste")
             } footer: {
                 Text("Starts download immediately after pasting a URL from the Download tab.")
+            }
+
+            Section {
+                Toggle("Enable link history", isOn: $linkHistoryEnabled)
+                    .disabled(isRunning)
+            } header: {
+                Text("History")
+            } footer: {
+                Text("Stores up to 10 recent links with mode and title.")
             }
 
             Section("Notifications") {

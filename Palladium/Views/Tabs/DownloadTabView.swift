@@ -11,6 +11,12 @@ struct DownloadTabView: View {
     let onDownload: () -> Void
     let onCancel: () -> Void
     let onPastedURL: (String) -> Void
+    let linkHistoryEnabled: Bool
+    let historyEntries: [LinkHistoryEntry]
+    let onSelectHistoryEntry: (LinkHistoryEntry) -> Void
+    let onDeleteHistoryEntry: (LinkHistoryEntry) -> Void
+    let onCopyHistoryLink: (String) -> Void
+    @State private var showHistorySheet = false
 
     var body: some View {
         ZStack {
@@ -22,15 +28,49 @@ struct DownloadTabView: View {
             .ignoresSafeArea()
 
             VStack(spacing: 12) {
-                VStack(spacing: 4) {
-                    Image("palladium_dark")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 56, height: 56)
-                    Text("Palladium")
-                        .font(.title.bold())
-                        .foregroundStyle(.white)
+                ZStack {
+                    VStack(spacing: 4) {
+                        Image("palladium_dark")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 56, height: 56)
+                        Text("Palladium")
+                            .font(.title.bold())
+                            .foregroundStyle(.white)
+                    }
+
+                    HStack {
+                        Spacer()
+                        if linkHistoryEnabled {
+                            Button {
+                                showHistorySheet = true
+                            } label: {
+                                ZStack(alignment: .topTrailing) {
+                                    Image(systemName: "clock")
+                                        .font(.system(size: 18, weight: .semibold))
+                                        .foregroundStyle(.white)
+                                        .frame(width: 40, height: 40)
+                                        .background(Color.white.opacity(0.12))
+                                        .clipShape(RoundedRectangle(cornerRadius: 8))
+
+                                    if !historyEntries.isEmpty {
+                                        Text("\(historyEntries.count)")
+                                            .font(.caption2.bold())
+                                            .foregroundStyle(.white)
+                                            .padding(.horizontal, 5)
+                                            .padding(.vertical, 2)
+                                            .background(Color.blue)
+                                            .clipShape(Capsule())
+                                            .offset(x: 8, y: -8)
+                                    }
+                                }
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel("Open link history")
+                        }
+                    }
                 }
+                .padding(.horizontal, 20)
                 .padding(.top, 10)
 
                 if isRunning {
@@ -124,6 +164,9 @@ struct DownloadTabView: View {
             }
             .padding(.vertical, 14)
         }
+        .sheet(isPresented: $showHistorySheet) {
+            historySheet
+        }
     }
 
     private func pasteOrClearURL() {
@@ -135,5 +178,105 @@ struct DownloadTabView: View {
             return
         }
         urlText = ""
+    }
+
+    @ViewBuilder
+    private func historyRow(_ entry: LinkHistoryEntry) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            if let title = entry.title, !title.isEmpty {
+                Text(title)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.white)
+                    .lineLimit(2)
+            }
+
+            Text(entry.url)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+                .truncationMode(.middle)
+
+            HStack(spacing: 8) {
+                Text(entry.preset.title)
+                    .font(.caption2.weight(.semibold))
+                    .padding(.horizontal, 7)
+                    .padding(.vertical, 3)
+                    .background(presetColor(entry.preset).opacity(0.25))
+                    .foregroundStyle(.white)
+                    .clipShape(Capsule())
+
+                Text(entry.timestamp.formatted(date: .abbreviated, time: .shortened))
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .padding(.vertical, 4)
+    }
+
+    private var historySheet: some View {
+        NavigationStack {
+            Group {
+                if historyEntries.isEmpty {
+                    ContentUnavailableView(
+                        "No history yet",
+                        systemImage: "clock",
+                        description: Text("Downloaded links will appear here.")
+                    )
+                } else {
+                    List {
+                        ForEach(historyEntries) { entry in
+                            Button {
+                                onSelectHistoryEntry(entry)
+                                showHistorySheet = false
+                            } label: {
+                                historyRow(entry)
+                            }
+                            .buttonStyle(.plain)
+                            .listRowBackground(Color.white.opacity(0.04))
+                            .swipeActions(edge: .leading, allowsFullSwipe: false) {
+                                Button {
+                                    onCopyHistoryLink(entry.url)
+                                } label: {
+                                    Label("Copy", systemImage: "doc.on.doc")
+                                }
+                                .tint(.blue)
+                            }
+                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                Button(role: .destructive) {
+                                    onDeleteHistoryEntry(entry)
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
+                            }
+                        }
+                    }
+                    .listStyle(.plain)
+                    .scrollContentBackground(.hidden)
+                }
+            }
+            .navigationTitle("Link History")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") {
+                        showHistorySheet = false
+                    }
+                }
+            }
+        }
+        .presentationDetents([.medium, .large])
+    }
+
+    private func presetColor(_ preset: DownloadPreset) -> Color {
+        switch preset {
+        case .audio:
+            return .green
+        case .mute:
+            return .orange
+        case .custom:
+            return .indigo
+        case .autoVideo:
+            return .blue
+        }
     }
 }

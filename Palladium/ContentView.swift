@@ -35,6 +35,8 @@ struct ContentView: View {
     private static let rememberSelectedPresetDefaultsKey = "palladium.rememberSelectedPreset"
     private static let autoDownloadOnPasteDefaultsKey = "palladium.autoDownloadOnPaste"
     private static let shareSheetDownloadModeDefaultsKey = "palladium.shareSheetDownloadMode"
+    private static let linkHistoryEnabledDefaultsKey = "palladium.linkHistoryEnabled"
+    private static let linkHistoryEntriesDefaultsKey = "palladium.linkHistoryEntries"
 
     @Environment(\.scenePhase) private var scenePhase
     @State private var isRunning = false
@@ -50,6 +52,8 @@ struct ContentView: View {
     @State private var rememberSelectedPreset: Bool
     @State private var autoDownloadOnPaste: Bool
     @State private var shareSheetDownloadMode: ShareSheetDownloadMode
+    @State private var linkHistoryEnabled: Bool
+    @State private var linkHistoryEntries: [LinkHistoryEntry]
     @State private var selectedTab: AppTab = .download
     @State private var packageStatusText = "idle"
     @State private var versionsText = "yt-dlp: unknown\nyt-dlp-apple-webkit-jsi: unknown"
@@ -81,6 +85,8 @@ struct ContentView: View {
         _rememberSelectedPreset = State(initialValue: rememberPreset)
         _autoDownloadOnPaste = State(initialValue: Self.loadAutoDownloadOnPaste())
         _shareSheetDownloadMode = State(initialValue: Self.loadShareSheetDownloadMode())
+        _linkHistoryEnabled = State(initialValue: Self.loadLinkHistoryEnabled())
+        _linkHistoryEntries = State(initialValue: Self.loadLinkHistoryEntries())
         _consoleLogStore = StateObject(wrappedValue: ConsoleLogStore())
     }
 
@@ -94,7 +100,12 @@ struct ContentView: View {
                 progressText: progressText,
                 onDownload: { runDownloadFlow() },
                 onCancel: cancelDownloadFlow,
-                onPastedURL: handlePastedURL
+                onPastedURL: handlePastedURL,
+                linkHistoryEnabled: linkHistoryEnabled,
+                historyEntries: linkHistoryEntries,
+                onSelectHistoryEntry: handleHistoryEntrySelection,
+                onDeleteHistoryEntry: removeHistoryEntry,
+                onCopyHistoryLink: copyHistoryLink
             )
             .tabItem {
                 Label("Download", systemImage: "arrow.down.circle")
@@ -110,6 +121,7 @@ struct ContentView: View {
                 rememberSelectedPreset: $rememberSelectedPreset,
                 autoDownloadOnPaste: $autoDownloadOnPaste,
                 shareSheetDownloadMode: $shareSheetDownloadMode,
+                linkHistoryEnabled: $linkHistoryEnabled,
                 packageStatusText: packageStatusText,
                 versionsText: versionsText,
                 updatesSummaryText: packageUpdatesSummaryText,
@@ -161,6 +173,9 @@ struct ContentView: View {
             persistPreferences()
         }
         .onChange(of: shareSheetDownloadMode) { _ in
+            persistPreferences()
+        }
+        .onChange(of: linkHistoryEnabled) { _ in
             persistPreferences()
         }
         .sheet(item: $shareItem) { item in
@@ -327,6 +342,65 @@ struct ContentView: View {
         runDownloadFlow(urlOverride: pastedURL, presetOverride: selectedPreset)
     }
 
+    private func handleHistoryEntrySelection(_ entry: LinkHistoryEntry) {
+        selectedTab = .download
+        urlText = entry.url
+        selectedPreset = entry.preset
+    }
+
+    private func removeHistoryEntry(_ entry: LinkHistoryEntry) {
+        linkHistoryEntries.removeAll { $0.id == entry.id }
+        persistLinkHistoryEntries()
+    }
+
+    private func copyHistoryLink(_ url: String) {
+        UIPasteboard.general.string = url
+        appendConsoleText("[palladium] copied history link\n")
+    }
+
+    private func addLinkHistoryEntry(url: String, presetRawValue: String, downloadedPath: String, outputText: String) {
+        let trimmedURL = url.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedURL.isEmpty else { return }
+        let title = extractHistoryTitle(downloadedPath: downloadedPath, outputText: outputText)
+        let entry = LinkHistoryEntry(
+            id: UUID(),
+            url: trimmedURL,
+            presetRawValue: presetRawValue,
+            title: title,
+            timestamp: Date()
+        )
+
+        linkHistoryEntries.removeAll { $0.url == entry.url && $0.presetRawValue == entry.presetRawValue }
+        linkHistoryEntries.insert(entry, at: 0)
+        if linkHistoryEntries.count > 10 {
+            linkHistoryEntries = Array(linkHistoryEntries.prefix(10))
+        }
+        persistLinkHistoryEntries()
+    }
+
+    private func extractHistoryTitle(downloadedPath: String, outputText: String) -> String? {
+        if let destinationMatch = outputText.components(separatedBy: .newlines)
+            .reversed()
+            .first(where: { $0.hasPrefix("[download] Destination: ") }) {
+            let pathText = destinationMatch.replacingOccurrences(of: "[download] Destination: ", with: "")
+            if let parsed = normalizedHistoryTitle(fromPath: pathText) {
+                return parsed
+            }
+        }
+        return normalizedHistoryTitle(fromPath: downloadedPath)
+    }
+
+    private func normalizedHistoryTitle(fromPath path: String) -> String? {
+        let fileName = URL(fileURLWithPath: path).deletingPathExtension().lastPathComponent
+        guard !fileName.isEmpty else { return nil }
+        let cleaned = fileName.replacingOccurrences(
+            of: #"\s\[[^\]]+\]$"#,
+            with: "",
+            options: .regularExpression
+        ).trimmingCharacters(in: .whitespacesAndNewlines)
+        return cleaned.isEmpty ? nil : cleaned
+    }
+
     private func runDownloadFlow(urlOverride: String? = nil, presetOverride: DownloadPreset? = nil) {
         guard !isRunning else { return }
         let targetURL = (urlOverride ?? urlText).trimmingCharacters(in: .whitespacesAndNewlines)
@@ -353,6 +427,7 @@ struct ContentView: View {
         let presetArgsJSONAtStart = buildPresetArgumentsJSON()
         let askUserAfterDownloadAtStart = askUserAfterDownload
         let selectedPostDownloadActionAtStart = selectedPostDownloadAction
+        let linkHistoryEnabledAtStart = linkHistoryEnabled
         let cancelMarker = makeCancelMarkerURL()
         cancelMarkerURL = cancelMarker
         setenv("PALLADIUM_LOG_FD", "\(writeFD)", 1)
@@ -408,6 +483,14 @@ struct ContentView: View {
                let downloadedPath = outcome.downloadedPath,
                FileManager.default.fileExists(atPath: downloadedPath) {
                 let completedURL = URL(fileURLWithPath: downloadedPath)
+                if linkHistoryEnabledAtStart {
+                    addLinkHistoryEntry(
+                        url: targetURL,
+                        presetRawValue: presetAtStart,
+                        downloadedPath: downloadedPath,
+                        outputText: outcome.outputText
+                    )
+                }
                 completedDownloadURL = completedURL
                 notifyDownloadCompletionIfNeeded(fileURL: completedURL)
                 if askUserAfterDownloadAtStart {
@@ -695,6 +778,13 @@ struct ContentView: View {
         defaults.set(notificationsEnabled, forKey: Self.notificationsEnabledDefaultsKey)
         defaults.set(autoDownloadOnPaste, forKey: Self.autoDownloadOnPasteDefaultsKey)
         defaults.set(shareSheetDownloadMode.rawValue, forKey: Self.shareSheetDownloadModeDefaultsKey)
+        defaults.set(linkHistoryEnabled, forKey: Self.linkHistoryEnabledDefaultsKey)
+    }
+
+    private func persistLinkHistoryEntries() {
+        let defaults = UserDefaults.standard
+        guard let data = try? JSONEncoder().encode(linkHistoryEntries) else { return }
+        defaults.set(data, forKey: Self.linkHistoryEntriesDefaultsKey)
     }
 
     private static func loadSelectedPreset(rememberSelection: Bool) -> DownloadPreset {
@@ -775,6 +865,21 @@ struct ContentView: View {
             return .ask
         }
         return mode
+    }
+
+    private static func loadLinkHistoryEnabled() -> Bool {
+        if UserDefaults.standard.object(forKey: linkHistoryEnabledDefaultsKey) == nil {
+            return true
+        }
+        return UserDefaults.standard.bool(forKey: linkHistoryEnabledDefaultsKey)
+    }
+
+    private static func loadLinkHistoryEntries() -> [LinkHistoryEntry] {
+        guard let data = UserDefaults.standard.data(forKey: linkHistoryEntriesDefaultsKey),
+              let decoded = try? JSONDecoder().decode([LinkHistoryEntry].self, from: data) else {
+            return []
+        }
+        return Array(decoded.prefix(10))
     }
 
     private func requestNotificationAuthorizationIfNeeded() {
