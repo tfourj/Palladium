@@ -917,6 +917,22 @@ private final class KeyboardDismissTapHandler: NSObject, UIGestureRecognizerDele
     ) -> Bool {
         true
     }
+
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+        guard let touchedView = touch.view else { return true }
+        return !isTextInputViewHierarchy(touchedView)
+    }
+
+    private func isTextInputViewHierarchy(_ view: UIView) -> Bool {
+        var current: UIView? = view
+        while let node = current {
+            if node is UITextField || node is UITextView || node is UISearchBar {
+                return true
+            }
+            current = node.superview
+        }
+        return false
+    }
 }
 
 private struct ShareItem: Identifiable {
