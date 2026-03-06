@@ -622,6 +622,7 @@ struct ContentView: View {
         let askUserAfterDownloadAtStart = askUserAfterDownload
         let selectedPostDownloadActionAtStart = selectedPostDownloadAction
         let linkHistoryEnabledAtStart = linkHistoryEnabled
+        var receivedPythonLiveOutput = false
         let cancelMarker = makeCancelMarkerURL()
         cancelMarkerURL = cancelMarker
         setenv("PALLADIUM_LOG_FD", "\(writeFD)", 1)
@@ -635,6 +636,7 @@ struct ContentView: View {
         readHandle.readabilityHandler = { handle in
             let data = handle.availableData
             guard !data.isEmpty, let chunk = String(data: data, encoding: .utf8) else { return }
+            receivedPythonLiveOutput = true
             Task { @MainActor in
                 enqueueConsoleChunk(chunk, trackProgress: true)
             }
@@ -669,7 +671,7 @@ struct ContentView: View {
                 progressText = outcome.statusText == "success" ? "download complete" : "download failed"
             }
             appendConsoleText("\n\(outcome.summaryText)\n")
-            if consoleLogStore.entryCount == 0, !outcome.outputText.isEmpty {
+            if !receivedPythonLiveOutput, !outcome.outputText.isEmpty {
                 appendConsoleText("\n\(outcome.outputText)\n")
             }
             Self.logger.info("yt-dlp flow finished with status: \(outcome.statusText, privacy: .public)")
