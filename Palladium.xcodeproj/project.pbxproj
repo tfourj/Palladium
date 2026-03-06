@@ -171,7 +171,6 @@
 				82BF06BA2F5761E800133331 /* Sources */,
 				82BF06BB2F5761E800133331 /* Frameworks */,
 				82BF06BC2F5761E800133331 /* Resources */,
-				82BF06D72F57630001333331 /* Install Python Runtime */,
 				82BF06D02F5762BC00133331 /* Embed Frameworks */,
 				8256E3B72F57A8970067DF6E /* Embed Foundation Extensions */,
 			);
@@ -250,27 +249,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		82BF06D72F57630001333331 /* Install Python Runtime */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Install Python Runtime";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "set -e\nsource \"$PROJECT_DIR/Python.xcframework/build/utils.sh\"\ninstall_python Python.xcframework\n";
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		8256E3A82F57A8960067DF6E /* Sources */ = {

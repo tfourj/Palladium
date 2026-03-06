@@ -67,7 +67,26 @@ class TailBuffer:
             overflow = 0
 
 
-def ensure_pip_entrypoint():
+def has_pip_in_target(install_target):
+    if not install_target or not os.path.isdir(install_target):
+        return False
+
+    try:
+        for distribution in importlib_metadata.distributions(path=[install_target]):
+            metadata_name = ""
+            try:
+                metadata_name = str(distribution.metadata.get("Name", ""))
+            except Exception:
+                metadata_name = str(getattr(distribution, "name", ""))
+            if metadata_name.strip().lower() == "pip":
+                return True
+    except Exception:
+        return False
+
+    return False
+
+
+def ensure_pip_entrypoint(install_target=None):
     pip_main = None
     try:
         from pip._internal.cli.main import main as pip_main
@@ -87,6 +106,35 @@ def ensure_pip_entrypoint():
                 sys.path.insert(0, pip_wheel_str)
             from pip._internal.cli.main import main as pip_main
             print("[palladium] pip loaded from ensurepip bundled wheel")
+
+            if install_target and not has_pip_in_target(install_target):
+                try:
+                    os.makedirs(install_target, exist_ok=True)
+                    bootstrap_args = [
+                        "install",
+                        "--no-index",
+                        "--no-color",
+                        "--progress-bar",
+                        "off",
+                        "--no-input",
+                        "--target",
+                        install_target,
+                        "--upgrade",
+                        pip_wheel_str,
+                    ]
+                    pip_result = pip_main(bootstrap_args)
+                    pip_exit = 0 if pip_result is None else int(pip_result)
+                    if pip_exit == 0:
+                        print(f"[palladium] pip installed into target: {install_target}")
+                    else:
+                        print(f"[palladium] pip target install failed (exit={pip_exit})")
+                except Exception:
+                    print("[palladium] pip target install failed")
+                    traceback.print_exc()
+
+                if install_target not in sys.path:
+                    sys.path.insert(0, install_target)
+
             return pip_main
     except Exception:
         print("[palladium] ensurepip fallback failed")
@@ -275,7 +323,7 @@ def collect_versions(install_target=None, allow_cache_fallback=True):
 
 
 def check_package_updates(install_target=None):
-    pip_main = ensure_pip_entrypoint()
+    pip_main = ensure_pip_entrypoint(install_target)
     if pip_main is None:
         return False, "Unable to check updates (pip unavailable)."
 
@@ -366,8 +414,8 @@ def parse_index_versions_output(raw_output):
     return []
 
 
-def fetch_package_index_versions():
-    pip_main = ensure_pip_entrypoint()
+def fetch_package_index_versions(install_target=None):
+    pip_main = ensure_pip_entrypoint(install_target)
     if pip_main is None:
         return {}
 
@@ -1283,7 +1331,7 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, p
 
         if needs_yt_dlp_install or needs_webkit_jsi_install:
             pip_attempted = True
-            pip_main = ensure_pip_entrypoint()
+            pip_main = ensure_pip_entrypoint(install_target)
             if pip_main is not None:
                 packages = []
                 if needs_yt_dlp_install:
@@ -1557,7 +1605,7 @@ def run_package_maintenance(action, custom_versions_json=None):
         elif action == "index_versions":
             updates_available = False
             updates_summary = "Skipped update check."
-            available_versions = fetch_package_index_versions()
+            available_versions = fetch_package_index_versions(install_target)
             print("[palladium] fetched package index versions")
         else:
             updates_available, updates_summary = check_package_updates(install_target)
@@ -1585,7 +1633,7 @@ def run_package_maintenance(action, custom_versions_json=None):
         if action == "update":
             if updates_available or bool(custom_versions):
                 pip_attempted = True
-                pip_main = ensure_pip_entrypoint()
+                pip_main = ensure_pip_entrypoint(install_target)
                 if pip_main is not None:
                     try:
                         if custom_versions:
