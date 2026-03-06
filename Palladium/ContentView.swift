@@ -1359,7 +1359,7 @@ struct ContentView: View {
                 appropriateFor: nil,
                 create: true
             )
-            downloadsURL = documents.appendingPathComponent("Downloads", isDirectory: true)
+            downloadsURL = documents.appendingPathComponent("Temp", isDirectory: true)
         }
 
         try FileManager.default.createDirectory(at: downloadsURL, withIntermediateDirectories: true)
