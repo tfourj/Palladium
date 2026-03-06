@@ -236,6 +236,62 @@ def log_bridge_output(output):
         print(f"[palladium][ffmpeg-bridge][log] {line}")
 
 
+def extract_ffprobe_json_payload(output_text):
+    text = str(output_text or "")
+    stripped = text.strip()
+    if not stripped:
+        return "", ""
+
+    try:
+        parsed = json.loads(stripped)
+        if isinstance(parsed, dict):
+            return stripped, ""
+    except Exception:
+        pass
+
+    decoder = json.JSONDecoder()
+    for idx, char in enumerate(text):
+        if char != "{":
+            continue
+        snippet = text[idx:]
+        try:
+            parsed, end = decoder.raw_decode(snippet)
+        except Exception:
+            continue
+        if not isinstance(parsed, dict):
+            continue
+        if not any(key in parsed for key in ("streams", "format", "programs", "chapters", "frames", "packets", "error")):
+            continue
+        json_payload = snippet[:end].strip()
+        noise = (text[:idx] + snippet[end:]).strip()
+        return json_payload, noise
+
+    start = text.find("{")
+    end = text.rfind("}")
+    if start != -1 and end > start:
+        candidate = text[start:end + 1].strip()
+        try:
+            parsed = json.loads(candidate)
+            if isinstance(parsed, dict):
+                noise = (text[:start] + text[end + 1:]).strip()
+                return candidate, noise
+        except Exception:
+            pass
+
+    return None, stripped
+
+
+def split_bridge_output(tool, output):
+    text = str(output or "")
+    if tool != "ffprobe":
+        return text, text
+
+    stdout_text, stderr_text = extract_ffprobe_json_payload(text)
+    if stdout_text is None:
+        return text, text
+    return stdout_text, stderr_text
+
+
 def extract_probable_youtube_id(url):
     try:
         parsed = urllib.parse.urlparse(url)
@@ -494,6 +550,7 @@ def patch_subprocess_for_swiftffmpeg(bridge):
                 code, output = bridge.run(tool, bridged_args)
                 self.returncode = int(code)
                 log_bridge_output(output)
+                stdout_output, stderr_output = split_bridge_output(tool, output)
                 elapsed = time.time() - started_at
                 print(f"[palladium][ffmpeg-bridge] {tool} finished in {elapsed:.2f}s")
                 if tool == "ffmpeg" and bridged_args:
@@ -512,16 +569,17 @@ def patch_subprocess_for_swiftffmpeg(bridge):
             print(f"[palladium][ffmpeg-bridge] exit={self.returncode}")
 
             if text_mode:
-                self._stdout_value = output
-                self._stderr_value = output
-                stdout_stream = io.StringIO(output)
-                stderr_stream = io.StringIO(output)
+                self._stdout_value = stdout_output
+                self._stderr_value = stderr_output
+                stdout_stream = io.StringIO(stdout_output)
+                stderr_stream = io.StringIO(stderr_output)
             else:
-                out_bytes = output.encode(encoding, errors=errors)
+                out_bytes = stdout_output.encode(encoding, errors=errors)
+                err_bytes = stderr_output.encode(encoding, errors=errors)
                 self._stdout_value = out_bytes
-                self._stderr_value = out_bytes
+                self._stderr_value = err_bytes
                 stdout_stream = io.BytesIO(out_bytes)
-                stderr_stream = io.BytesIO(out_bytes)
+                stderr_stream = io.BytesIO(err_bytes)
 
             if kwargs.get("stdout") == subprocess.PIPE:
                 self.stdout = stdout_stream
@@ -684,6 +742,7 @@ def patch_ytdlp_popen_for_swiftffmpeg(bridge):
             code, output = bridge.run(tool, bridged_args)
             self.returncode = int(code)
             log_bridge_output(output)
+            stdout_output, stderr_output = split_bridge_output(tool, output)
             elapsed = time.time() - started_at
             print(f"[palladium][ffmpeg-bridge] yt-dlp Popen {tool} finished in {elapsed:.2f}s")
             if tool == "ffmpeg" and bridged_args:
@@ -697,12 +756,19 @@ def patch_ytdlp_popen_for_swiftffmpeg(bridge):
                 else:
                     print(f"[palladium][ffmpeg-bridge] yt-dlp Popen output file missing after run: {target_path}")
             if text_mode:
-                self._stdout_value = output
-                self._stderr_value = output
+                self._stdout_value = stdout_output
+                self._stderr_value = stderr_output
             else:
-                out_bytes = output.encode(encoding, errors=errors)
+                out_bytes = stdout_output.encode(encoding, errors=errors)
+                err_bytes = stderr_output.encode(encoding, errors=errors)
                 self._stdout_value = out_bytes
-                self._stderr_value = out_bytes
+                self._stderr_value = err_bytes
+            if kwargs.get("stderr") == subprocess.STDOUT:
+                if text_mode:
+                    self._stdout_value = f"{stdout_output}{stderr_output}"
+                else:
+                    self._stdout_value = out_bytes + err_bytes
+                self._stderr_value = None
             print(f"[palladium][ffmpeg-bridge] yt-dlp Popen exit={self.returncode}")
 
         @classmethod
