@@ -63,9 +63,12 @@ struct ContentView: View {
     @State private var packageUpdatesSummaryText = "Updates not checked yet."
     @StateObject private var consoleLogStore: ConsoleLogStore
     @State private var completedDownloadURL: URL?
-    @State private var showDownloadActionDialog = false
+    @State private var showDownloadActionSheet = false
     @State private var alertMessage: String?
     @State private var showAlert = false
+    @State private var reopenDownloadActionAfterAlert = false
+    @State private var toastMessage: String?
+    @State private var showToastMessage = false
     @State private var shareItem: ShareItem?
     @State private var currentDownloadTask: Task<Void, Never>?
     @State private var cancelMarkerURL: URL?
@@ -94,56 +97,69 @@ struct ContentView: View {
     }
 
     var body: some View {
-        TabView(selection: $selectedTab) {
-            DownloadTabView(
-                statusText: $statusText,
-                urlText: $urlText,
-                selectedPreset: $selectedPreset,
-                isRunning: isRunning,
-                progressText: progressText,
-                onDownload: { runDownloadFlow() },
-                onCancel: cancelDownloadFlow,
-                onPastedURL: handlePastedURL,
-                linkHistoryEnabled: linkHistoryEnabled,
-                historyEntries: linkHistoryEntries,
-                onSelectHistoryEntry: handleHistoryEntrySelection,
-                onDeleteHistoryEntry: removeHistoryEntry,
-                onCopyHistoryLink: copyHistoryLink
-            )
-            .tabItem {
-                Label("Download", systemImage: "arrow.down.circle")
-            }
-            .tag(AppTab.download)
-
-            SettingsTabView(
-                customArgsText: $customArgsText,
-                extraArgsText: $extraArgsText,
-                askUserAfterDownload: $askUserAfterDownload,
-                selectedPostDownloadAction: $selectedPostDownloadAction,
-                notificationsEnabled: $notificationsEnabled,
-                rememberSelectedPreset: $rememberSelectedPreset,
-                autoDownloadOnPaste: $autoDownloadOnPaste,
-                shareSheetDownloadMode: $shareSheetDownloadMode,
-                linkHistoryEnabled: $linkHistoryEnabled,
-                appAppearanceMode: $appAppearanceMode,
-                packageStatusText: packageStatusText,
-                versionsText: versionsText,
-                updatesSummaryText: packageUpdatesSummaryText,
-                updatesAvailable: packageUpdatesAvailable,
-                isRunning: isRunning,
-                onRefreshVersions: refreshPackageVersions,
-                onUpdatePackages: updatePackages
-            )
-            .tabItem {
-                Label("Settings", systemImage: "slider.horizontal.3")
-            }
-            .tag(AppTab.settings)
-
-            ConsoleTabView(logStore: consoleLogStore)
+        ZStack(alignment: .top) {
+            TabView(selection: $selectedTab) {
+                DownloadTabView(
+                    statusText: $statusText,
+                    urlText: $urlText,
+                    selectedPreset: $selectedPreset,
+                    isRunning: isRunning,
+                    progressText: progressText,
+                    onDownload: { runDownloadFlow() },
+                    onCancel: cancelDownloadFlow,
+                    onPastedURL: handlePastedURL,
+                    linkHistoryEnabled: linkHistoryEnabled,
+                    historyEntries: linkHistoryEntries,
+                    onSelectHistoryEntry: handleHistoryEntrySelection,
+                    onDeleteHistoryEntry: removeHistoryEntry,
+                    onCopyHistoryLink: copyHistoryLink
+                )
                 .tabItem {
-                    Label("Console", systemImage: "terminal")
+                    Label("Download", systemImage: "arrow.down.circle")
                 }
-                .tag(AppTab.console)
+                .tag(AppTab.download)
+
+                SettingsTabView(
+                    customArgsText: $customArgsText,
+                    extraArgsText: $extraArgsText,
+                    askUserAfterDownload: $askUserAfterDownload,
+                    selectedPostDownloadAction: $selectedPostDownloadAction,
+                    notificationsEnabled: $notificationsEnabled,
+                    rememberSelectedPreset: $rememberSelectedPreset,
+                    autoDownloadOnPaste: $autoDownloadOnPaste,
+                    shareSheetDownloadMode: $shareSheetDownloadMode,
+                    linkHistoryEnabled: $linkHistoryEnabled,
+                    appAppearanceMode: $appAppearanceMode,
+                    packageStatusText: packageStatusText,
+                    versionsText: versionsText,
+                    updatesSummaryText: packageUpdatesSummaryText,
+                    updatesAvailable: packageUpdatesAvailable,
+                    isRunning: isRunning,
+                    onRefreshVersions: refreshPackageVersions,
+                    onUpdatePackages: updatePackages
+                )
+                .tabItem {
+                    Label("Settings", systemImage: "slider.horizontal.3")
+                }
+                .tag(AppTab.settings)
+
+                ConsoleTabView(logStore: consoleLogStore)
+                    .tabItem {
+                        Label("Console", systemImage: "terminal")
+                    }
+                    .tag(AppTab.console)
+            }
+
+            if showToastMessage, let toastMessage {
+                Text(toastMessage)
+                    .font(.headline)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .background(.ultraThinMaterial, in: Capsule())
+                    .shadow(radius: 8)
+                    .padding(.top, 18)
+                    .transition(.opacity)
+            }
         }
         .onChange(of: selectedPreset) { _ in
             persistPreferences()
@@ -191,30 +207,19 @@ struct ContentView: View {
         .sheet(isPresented: $showShareSheetDownloadPicker) {
             shareSheetModePickerSheet
         }
-        .confirmationDialog("Download Complete", isPresented: $showDownloadActionDialog, titleVisibility: .visible) {
-            if completedDownloadURL != nil {
-                Button("Share") {
-                    if let url = completedDownloadURL {
-                        handlePostDownloadAction(.openShareSheet, for: url)
-                    }
-                }
-                Button("Save to Photos") {
-                    if let url = completedDownloadURL {
-                        handlePostDownloadAction(.saveToPhotos, for: url)
-                    }
-                }
-                Button("Save to App Folder") {
-                    if let url = completedDownloadURL {
-                        handlePostDownloadAction(.saveToApplicationFolder, for: url)
-                    }
-                }
-            }
-            Button("Cancel", role: .cancel) {}
-        } message: {
-            Text("Choose what to do with the downloaded file.")
+        .sheet(isPresented: $showDownloadActionSheet) {
+            downloadCompleteActionSheet
+                .interactiveDismissDisabled(true)
         }
         .alert("Result", isPresented: $showAlert) {
-            Button("OK", role: .cancel) {}
+            Button("OK", role: .cancel) {
+                if reopenDownloadActionAfterAlert, completedDownloadURL != nil {
+                    reopenDownloadActionAfterAlert = false
+                    showDownloadActionSheet = true
+                } else {
+                    reopenDownloadActionAfterAlert = false
+                }
+            }
         } message: {
             Text(alertMessage ?? "")
         }
@@ -322,6 +327,131 @@ struct ContentView: View {
                     .stroke(shareSheetDefaultPreset == preset ? color.opacity(0.55) : .clear, lineWidth: 1)
             )
             .cornerRadius(10)
+        }
+    }
+
+    private var downloadCompleteActionSheet: some View {
+        VStack(spacing: 20) {
+            Text("Download Complete")
+                .font(.title2)
+                .fontWeight(.bold)
+                .padding(.top)
+
+            if let fileName = completedDownloadURL?.lastPathComponent {
+                Text(fileName)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2)
+                    .padding(.horizontal)
+            }
+
+            Text("Choose what to do with the downloaded file.")
+                .font(.body)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+
+            VStack(spacing: 14) {
+                downloadCompleteActionButton(
+                    title: "Open Share Sheet",
+                    subtitle: "Share or save with other apps",
+                    icon: "square.and.arrow.up",
+                    color: .blue
+                ) {
+                    performPromptedPostDownloadAction(.openShareSheet)
+                }
+
+                downloadCompleteActionButton(
+                    title: "Save to Photos",
+                    subtitle: "Import video into Photos library",
+                    icon: "photo.on.rectangle",
+                    color: .green
+                ) {
+                    performPromptedPostDownloadAction(.saveToPhotos)
+                }
+
+                downloadCompleteActionButton(
+                    title: "Save to App Folder",
+                    subtitle: "Keep a copy in Palladium/Saved",
+                    icon: "folder.badge.plus",
+                    color: .orange
+                ) {
+                    performPromptedPostDownloadAction(.saveToApplicationFolder)
+                }
+            }
+            .padding(.horizontal)
+
+            Button(action: dismissDownloadActionSheet) {
+                Text("Cancel")
+                    .font(.headline)
+                    .foregroundStyle(.red)
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color.red.opacity(0.1))
+                    .cornerRadius(10)
+            }
+            .padding(.horizontal)
+            .padding(.bottom)
+        }
+        .padding()
+        .presentationDetents([.fraction(0.58), .large])
+        .presentationDragIndicator(.hidden)
+    }
+
+    private func downloadCompleteActionButton(
+        title: String,
+        subtitle: String,
+        icon: String,
+        color: Color,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            HStack {
+                Image(systemName: icon)
+                    .font(.title3)
+                Text(title)
+                    .font(.headline)
+                Spacer()
+                Text(subtitle)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            .padding()
+            .frame(maxWidth: .infinity)
+            .background(color.opacity(0.1))
+            .cornerRadius(10)
+        }
+    }
+
+    private func performPromptedPostDownloadAction(_ action: PostDownloadAction) {
+        guard let url = completedDownloadURL else {
+            showDownloadActionSheet = false
+            return
+        }
+        showDownloadActionSheet = false
+        handlePostDownloadAction(action, for: url)
+    }
+
+    private func dismissDownloadActionSheet() {
+        showDownloadActionSheet = false
+        completedDownloadURL = nil
+    }
+
+    private func showTemporaryToast(_ message: String) {
+        toastMessage = message
+        withAnimation(.easeIn(duration: 0.18)) {
+            showToastMessage = true
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            withAnimation(.easeOut(duration: 0.24)) {
+                showToastMessage = false
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.28) {
+                if !showToastMessage {
+                    toastMessage = nil
+                }
+            }
         }
     }
 
@@ -502,7 +632,7 @@ struct ContentView: View {
                 completedDownloadURL = completedURL
                 notifyDownloadCompletionIfNeeded(fileURL: completedURL)
                 if askUserAfterDownloadAtStart {
-                    showDownloadActionDialog = true
+                    showDownloadActionSheet = true
                 } else {
                     handlePostDownloadAction(selectedPostDownloadActionAtStart, for: completedURL)
                 }
@@ -676,6 +806,7 @@ struct ContentView: View {
             let compatible = UIVideoAtPathIsCompatibleWithSavedPhotosAlbum(url.path)
             guard compatible else {
                 await MainActor.run {
+                    reopenDownloadActionAfterAlert = true
                     alertMessage = "iOS Photos cannot import this video format. Detected codec: \(codecDescription). Try remuxing to MP4/H.264 or HEVC."
                     showAlert = true
                 }
@@ -685,6 +816,7 @@ struct ContentView: View {
             let permission = await PHPhotoLibrary.requestAuthorization(for: .addOnly)
             guard permission == .authorized || permission == .limited else {
                 await MainActor.run {
+                    reopenDownloadActionAfterAlert = true
                     alertMessage = "Photo library permission was denied."
                     showAlert = true
                 }
@@ -696,11 +828,12 @@ struct ContentView: View {
                     PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: url)
                 }
                 await MainActor.run {
-                    alertMessage = "Saved to Photos. Codec: \(codecDescription)"
-                    showAlert = true
+                    reopenDownloadActionAfterAlert = false
+                    showTemporaryToast("Saved to Photos")
                 }
             } catch {
                 await MainActor.run {
+                    reopenDownloadActionAfterAlert = true
                     alertMessage = "Failed to save to Photos: \(error.localizedDescription)"
                     showAlert = true
                 }
