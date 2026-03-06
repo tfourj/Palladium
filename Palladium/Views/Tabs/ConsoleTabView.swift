@@ -47,7 +47,7 @@ struct ConsoleTabView: View {
                     }
                     .textSelection(.enabled)
                 }
-                .onChange(of: visibleEntries.last?.id) { lastID in
+                .onChange(of: visibleEntries.last?.id, initial: false) { _, lastID in
                     guard let lastID else { return }
                     withAnimation(.easeOut(duration: 0.12)) {
                         proxy.scrollTo(lastID, anchor: .bottom)

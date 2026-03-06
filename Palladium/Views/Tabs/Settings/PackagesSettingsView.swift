@@ -203,7 +203,7 @@ struct PackagesSettingsView: View {
             }
         }
         .pickerStyle(.menu)
-        .onChange(of: availablePackageVersions[packageName]?.count ?? 0) { _ in
+        .onChange(of: availablePackageVersions[packageName]?.count ?? 0, initial: false) {
             let current = selection.wrappedValue
             if current == Self.latestSelectionToken {
                 return

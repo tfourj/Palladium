@@ -190,44 +190,44 @@ struct ContentView: View {
                     .transition(.opacity)
             }
         }
-        .onChange(of: selectedPreset) { _ in
+        .onChange(of: selectedPreset, initial: false) {
             persistPreferences()
         }
-        .onChange(of: rememberSelectedPreset) { isEnabled in
+        .onChange(of: rememberSelectedPreset, initial: false) { _, isEnabled in
             if !isEnabled {
                 UserDefaults.standard.removeObject(forKey: Self.presetDefaultsKey)
             }
             persistPreferences()
         }
-        .onChange(of: customArgsText) { _ in
+        .onChange(of: customArgsText, initial: false) {
             persistPreferences()
         }
-        .onChange(of: extraArgsText) { _ in
+        .onChange(of: extraArgsText, initial: false) {
             persistPreferences()
         }
-        .onChange(of: askUserAfterDownload) { _ in
+        .onChange(of: askUserAfterDownload, initial: false) {
             persistPreferences()
         }
-        .onChange(of: selectedPostDownloadAction) { _ in
+        .onChange(of: selectedPostDownloadAction, initial: false) {
             persistPreferences()
         }
-        .onChange(of: notificationsEnabled) { _ in
+        .onChange(of: notificationsEnabled, initial: false) {
             persistPreferences()
             debugNotification("setting changed notificationsEnabled=\(notificationsEnabled)")
             if notificationsEnabled {
                 requestNotificationAuthorizationIfNeeded()
             }
         }
-        .onChange(of: autoDownloadOnPaste) { _ in
+        .onChange(of: autoDownloadOnPaste, initial: false) {
             persistPreferences()
         }
-        .onChange(of: shareSheetDownloadMode) { _ in
+        .onChange(of: shareSheetDownloadMode, initial: false) {
             persistPreferences()
         }
-        .onChange(of: linkHistoryEnabled) { _ in
+        .onChange(of: linkHistoryEnabled, initial: false) {
             persistPreferences()
         }
-        .onChange(of: appAppearanceMode) { _ in
+        .onChange(of: appAppearanceMode, initial: false) {
             persistPreferences()
         }
         .sheet(item: $shareItem) { item in
