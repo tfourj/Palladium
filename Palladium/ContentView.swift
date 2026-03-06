@@ -953,6 +953,11 @@ struct ContentView: View {
             return .incompatible("Only MP4, MOV, or M4V can be saved.")
         }
 
+        // Keep the original iOS-native compatibility check as the primary signal.
+        if UIVideoAtPathIsCompatibleWithSavedPhotosAlbum(fileURL.path) {
+            return .compatible(.video)
+        }
+
         do {
             let asset = AVAsset(url: fileURL)
             let tracks = try await asset.loadTracks(withMediaType: .video)
@@ -961,11 +966,12 @@ struct ContentView: View {
             }
 
             for track in tracks {
-                let formatDescriptions = try await track.load(.formatDescriptions) as? [CMFormatDescription] ?? []
+                let formatDescriptions = try await track.load(.formatDescriptions)
                 for formatDescription in formatDescriptions {
                     let codecType = CMFormatDescriptionGetMediaSubType(formatDescription)
                     let codecString = fourCC(codecType)
-                    if codecString == "avc1" || codecString == "hvc1" || codecString == "hev1" {
+                    if codecString == "avc1" || codecString == "avc3" ||
+                        codecString == "hvc1" || codecString == "hev1" {
                         return .compatible(.video)
                     }
                 }
@@ -1021,7 +1027,7 @@ struct ContentView: View {
     }
 
     private func fourCC(_ code: FourCharCode) -> String {
-        let n = UInt32(code).bigEndian
+        let n = UInt32(code)
         let bytes: [UInt8] = [
             UInt8((n >> 24) & 0xFF),
             UInt8((n >> 16) & 0xFF),
