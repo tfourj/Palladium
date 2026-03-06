@@ -55,3 +55,38 @@ enum PostDownloadAction: String, Codable, CaseIterable, Identifiable {
         }
     }
 }
+
+enum ShareSheetDownloadMode: String, Codable, CaseIterable, Identifiable {
+    case ask
+    case autoVideo = "auto_video"
+    case audio
+    case mute
+    case custom
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .ask: return "Ask"
+        case .autoVideo: return "Auto"
+        case .audio: return "Audio"
+        case .mute: return "Mute"
+        case .custom: return "Custom"
+        }
+    }
+
+    var preset: DownloadPreset? {
+        switch self {
+        case .ask:
+            return nil
+        case .autoVideo:
+            return .autoVideo
+        case .audio:
+            return .audio
+        case .mute:
+            return .mute
+        case .custom:
+            return .custom
+        }
+    }
+}

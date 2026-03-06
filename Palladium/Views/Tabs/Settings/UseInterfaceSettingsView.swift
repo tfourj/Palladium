@@ -6,8 +6,7 @@ struct UseInterfaceSettingsView: View {
     @Binding var notificationsEnabled: Bool
     @Binding var rememberSelectedPreset: Bool
     @Binding var autoDownloadOnPaste: Bool
-    @Binding var askShareSheetDownloadMode: Bool
-    @Binding var rememberShareSheetMode: Bool
+    @Binding var shareSheetDownloadMode: ShareSheetDownloadMode
 
     let isRunning: Bool
 
@@ -35,15 +34,17 @@ struct UseInterfaceSettingsView: View {
             }
 
             Section {
-                Toggle("Ask for download mode on share", isOn: $askShareSheetDownloadMode)
-                    .disabled(isRunning)
-
-                Toggle("Remember selected share mode", isOn: $rememberShareSheetMode)
+                Picker("Selected mode for share sheet", selection: $shareSheetDownloadMode) {
+                    ForEach(ShareSheetDownloadMode.allCases) { mode in
+                        Text(mode.title).tag(mode)
+                    }
+                }
+                .pickerStyle(.menu)
                     .disabled(isRunning)
             } header: {
                 Text("Share Sheet")
             } footer: {
-                Text("When remember is off, share-sheet auto mode always defaults to Auto.")
+                Text("Ask opens a picker. Other options start downloads directly with that mode.")
             }
 
             Section {

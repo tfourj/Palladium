@@ -15,8 +15,7 @@ struct SettingsTabView: View {
     @Binding var notificationsEnabled: Bool
     @Binding var rememberSelectedPreset: Bool
     @Binding var autoDownloadOnPaste: Bool
-    @Binding var askShareSheetDownloadMode: Bool
-    @Binding var rememberShareSheetMode: Bool
+    @Binding var shareSheetDownloadMode: ShareSheetDownloadMode
 
     let packageStatusText: String
     let versionsText: String
@@ -82,8 +81,7 @@ struct SettingsTabView: View {
                         notificationsEnabled: $notificationsEnabled,
                         rememberSelectedPreset: $rememberSelectedPreset,
                         autoDownloadOnPaste: $autoDownloadOnPaste,
-                        askShareSheetDownloadMode: $askShareSheetDownloadMode,
-                        rememberShareSheetMode: $rememberShareSheetMode,
+                        shareSheetDownloadMode: $shareSheetDownloadMode,
                         isRunning: isRunning
                     )
                 case .downloadArguments:
