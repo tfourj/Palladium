@@ -21,6 +21,24 @@ struct ContentView: View {
         case console
     }
 
+    private enum PhotosMediaType {
+        case video
+        case image
+    }
+
+    private enum PhotosCompatibilityState: Equatable {
+        case checking
+        case compatible(PhotosMediaType)
+        case incompatible(String)
+
+        var isCompatible: Bool {
+            if case .compatible = self {
+                return true
+            }
+            return false
+        }
+    }
+
     private static let logger = Logger(
         subsystem: Bundle.main.bundleIdentifier ?? "com.tfourj.Palladium",
         category: "python"
@@ -63,6 +81,7 @@ struct ContentView: View {
     @State private var packageUpdatesSummaryText = "Updates not checked yet."
     @StateObject private var consoleLogStore: ConsoleLogStore
     @State private var completedDownloadURL: URL?
+    @State private var completedPhotosCompatibility: PhotosCompatibilityState = .checking
     @State private var showDownloadActionSheet = false
     @State private var alertMessage: String?
     @State private var showAlert = false
@@ -364,9 +383,10 @@ struct ContentView: View {
 
                 downloadCompleteActionButton(
                     title: "Save to Photos",
-                    subtitle: "Import video into Photos library",
+                    subtitle: saveToPhotosButtonSubtitle,
                     icon: "photo.on.rectangle",
-                    color: .green
+                    color: .green,
+                    isEnabled: completedPhotosCompatibility.isCompatible
                 ) {
                     performPromptedPostDownloadAction(.saveToPhotos)
                 }
@@ -404,6 +424,7 @@ struct ContentView: View {
         subtitle: String,
         icon: String,
         color: Color,
+        isEnabled: Bool = true,
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
@@ -416,12 +437,16 @@ struct ContentView: View {
                 Text(subtitle)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.trailing)
+                    .lineLimit(2)
             }
             .padding()
             .frame(maxWidth: .infinity)
             .background(color.opacity(0.1))
             .cornerRadius(10)
         }
+        .disabled(!isEnabled)
+        .opacity(isEnabled ? 1.0 : 0.45)
     }
 
     private func performPromptedPostDownloadAction(_ action: PostDownloadAction) {
@@ -433,9 +458,26 @@ struct ContentView: View {
         handlePostDownloadAction(action, for: url)
     }
 
+    private var saveToPhotosButtonSubtitle: String {
+        switch completedPhotosCompatibility {
+        case .checking:
+            return "Checking compatibility..."
+        case .compatible(let mediaType):
+            switch mediaType {
+            case .video:
+                return "Import video into Photos library"
+            case .image:
+                return "Import image into Photos library"
+            }
+        case .incompatible(let reason):
+            return reason
+        }
+    }
+
     private func dismissDownloadActionSheet() {
         showDownloadActionSheet = false
         completedDownloadURL = nil
+        completedPhotosCompatibility = .checking
     }
 
     private func showTemporaryToast(_ message: String) {
@@ -631,8 +673,23 @@ struct ContentView: View {
                 }
                 completedDownloadURL = completedURL
                 notifyDownloadCompletionIfNeeded(fileURL: completedURL)
+
+                let needsPhotosCompatibilityCheck = askUserAfterDownloadAtStart || selectedPostDownloadActionAtStart == .saveToPhotos
+                if needsPhotosCompatibilityCheck {
+                    completedPhotosCompatibility = .checking
+                    completedPhotosCompatibility = await evaluatePhotosCompatibility(for: completedURL)
+                } else {
+                    completedPhotosCompatibility = .checking
+                }
+
                 if askUserAfterDownloadAtStart {
                     showDownloadActionSheet = true
+                } else if selectedPostDownloadActionAtStart == .saveToPhotos {
+                    if completedPhotosCompatibility.isCompatible {
+                        handlePostDownloadAction(selectedPostDownloadActionAtStart, for: completedURL)
+                    } else {
+                        showDownloadActionSheet = true
+                    }
                 } else {
                     handlePostDownloadAction(selectedPostDownloadActionAtStart, for: completedURL)
                 }
@@ -802,12 +859,17 @@ struct ContentView: View {
 
     private func saveDownloadedFileToPhotos(_ url: URL) {
         Task {
-            let codecDescription = detectedVideoCodecDescription(for: url)
-            let compatible = UIVideoAtPathIsCompatibleWithSavedPhotosAlbum(url.path)
-            guard compatible else {
+            let compatibility = await evaluatePhotosCompatibility(for: url)
+            guard case .compatible(let mediaType) = compatibility else {
+                let reason: String
+                if case .incompatible(let details) = compatibility {
+                    reason = details
+                } else {
+                    reason = "Could not verify media compatibility."
+                }
                 await MainActor.run {
                     reopenDownloadActionAfterAlert = true
-                    alertMessage = "iOS Photos cannot import this video format. Detected codec: \(codecDescription). Try remuxing to MP4/H.264 or HEVC."
+                    alertMessage = "iOS Photos cannot import this file: \(reason)"
                     showAlert = true
                 }
                 return
@@ -825,7 +887,12 @@ struct ContentView: View {
 
             do {
                 try await PHPhotoLibrary.shared().performChanges {
-                    PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: url)
+                    switch mediaType {
+                    case .video:
+                        PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: url)
+                    case .image:
+                        PHAssetChangeRequest.creationRequestForAssetFromImage(atFileURL: url)
+                    }
                 }
                 await MainActor.run {
                     reopenDownloadActionAfterAlert = false
@@ -839,6 +906,71 @@ struct ContentView: View {
                 }
             }
         }
+    }
+
+    private func evaluatePhotosCompatibility(for fileURL: URL) async -> PhotosCompatibilityState {
+        let ext = fileURL.pathExtension.lowercased()
+        let imageExtensions: Set<String> = ["jpg", "jpeg", "png", "gif", "heif", "heic"]
+        let videoExtensions: Set<String> = ["mp4", "mov", "m4v", "mkv", "webm", "avi", "flv", "ts", "mpeg", "mpg"]
+
+        if imageExtensions.contains(ext) {
+            return isImageIOSCompatible(fileURL) ? .compatible(.image) : .incompatible("Unsupported image format (\(ext)).")
+        }
+
+        if videoExtensions.contains(ext) {
+            return await videoCompatibilityState(for: fileURL)
+        }
+
+        if isImageIOSCompatible(fileURL) {
+            return .compatible(.image)
+        }
+
+        let fallbackVideo = await videoCompatibilityState(for: fileURL)
+        if fallbackVideo.isCompatible {
+            return fallbackVideo
+        }
+
+        return .incompatible("Unsupported format (\(ext.isEmpty ? "unknown" : ext)).")
+    }
+
+    private func videoCompatibilityState(for fileURL: URL) async -> PhotosCompatibilityState {
+        let ext = fileURL.pathExtension.lowercased()
+        let compatibleExtensions: Set<String> = ["mp4", "mov", "m4v"]
+        guard compatibleExtensions.contains(ext) else {
+            return .incompatible("Only MP4, MOV, or M4V can be saved.")
+        }
+
+        do {
+            let asset = AVAsset(url: fileURL)
+            let tracks = try await asset.loadTracks(withMediaType: .video)
+            guard !tracks.isEmpty else {
+                return .incompatible("No video track found.")
+            }
+
+            for track in tracks {
+                let formatDescriptions = try await track.load(.formatDescriptions) as? [CMFormatDescription] ?? []
+                for formatDescription in formatDescriptions {
+                    let codecType = CMFormatDescriptionGetMediaSubType(formatDescription)
+                    let codecString = fourCC(codecType)
+                    if codecString == "avc1" || codecString == "hvc1" || codecString == "hev1" {
+                        return .compatible(.video)
+                    }
+                }
+            }
+
+            return .incompatible("Video codec must be H.264 or H.265.")
+        } catch {
+            return .incompatible("Failed to inspect media codec.")
+        }
+    }
+
+    private func isImageIOSCompatible(_ fileURL: URL) -> Bool {
+        let ext = fileURL.pathExtension.lowercased()
+        let compatibleExtensions: Set<String> = ["jpg", "jpeg", "png", "gif", "heif", "heic"]
+        if compatibleExtensions.contains(ext) {
+            return true
+        }
+        return UIImage(contentsOfFile: fileURL.path) != nil
     }
 
     private func saveDownloadedFileToApplicationFolder(_ url: URL) {
@@ -873,18 +1005,6 @@ struct ContentView: View {
         case .saveToApplicationFolder:
             saveDownloadedFileToApplicationFolder(url)
         }
-    }
-
-    private func detectedVideoCodecDescription(for url: URL) -> String {
-        let asset = AVURLAsset(url: url)
-        guard let track = asset.tracks(withMediaType: .video).first,
-              let firstFormat = track.formatDescriptions.first else {
-            return "unknown"
-        }
-
-        let format = firstFormat as! CMFormatDescription
-        let subtype = CMFormatDescriptionGetMediaSubType(format)
-        return fourCC(subtype)
     }
 
     private func fourCC(_ code: FourCharCode) -> String {
