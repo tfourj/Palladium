@@ -8,10 +8,16 @@ PROJECT_NAME="Palladium"
 SCHEME_NAME="Palladium"
 BUILD_DIR="build"
 
-# Extract version from project.pbxproj
-VERSION=$(grep 'SHARED_VERSION_NUMBER' Palladium.xcodeproj/project.pbxproj | head -n 1 | sed -E 's/.*SHARED_VERSION_NUMBER = ([0-9\.]+[a-zA-Z0-9]*);.*/\1/')
-IPA_NAME="Palladium-${VERSION}-uBeta.ipa"
-echo "📦 Extracted version: ${VERSION}"
+LATEST_TAG=$(git tag --sort=-v:refname | head -n 1)
+if [ -n "$LATEST_TAG" ]; then
+  BUILD_REF="$LATEST_TAG"
+  echo "📦 Using latest git tag for IPA name: ${BUILD_REF}"
+else
+  BUILD_REF=$(git rev-parse --short HEAD)
+  echo "📦 No git tags found, using commit for IPA name: ${BUILD_REF}"
+fi
+
+IPA_NAME="Palladium-${BUILD_REF}.ipa"
 echo "📦 IPA will be named: ${IPA_NAME}"
 
 # -----------------------------
