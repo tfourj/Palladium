@@ -1,0 +1,106 @@
+name: Build Palladium .ipa (Unsigned)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    timeout-minutes: 60
+    env:
+      PYTHON_APPLE_SUPPORT_REPO: beeware/Python-Apple-support
+      PYTHON_APPLE_SUPPORT_TAG: latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download Python Apple Support
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        set -euo pipefail
+
+        if [ "$PYTHON_APPLE_SUPPORT_TAG" = "latest" ]; then
+          RELEASE_API="https://api.github.com/repos/$PYTHON_APPLE_SUPPORT_REPO/releases/latest"
+        else
+          RELEASE_API="https://api.github.com/repos/$PYTHON_APPLE_SUPPORT_REPO/releases/tags/$PYTHON_APPLE_SUPPORT_TAG"
+        fi
+
+        TMP_DIR=$(mktemp -d)
+        RELEASE_JSON_PATH="$TMP_DIR/release.json"
+        echo "Fetching release metadata from: $RELEASE_API"
+        curl -fsSL \
+          -H "Accept: application/vnd.github+json" \
+          -H "Authorization: Bearer $GH_TOKEN" \
+          "$RELEASE_API" \
+          -o "$RELEASE_JSON_PATH"
+
+        ASSET_URL=$(python3 -c 'import json,re,sys; payload=json.load(open(sys.argv[1], encoding="utf-8")); pattern=re.compile(r"iOS-support.*\.tar\.gz$"); print(next((asset.get("browser_download_url","") for asset in payload.get("assets", []) if pattern.search(str(asset.get("name","")))), ""))' "$RELEASE_JSON_PATH")
+
+        if [ -z "$ASSET_URL" ]; then
+          echo "❌ Could not find iOS support archive in release assets."
+          python3 -c 'import json,sys; payload=json.load(open(sys.argv[1], encoding="utf-8")); [print(asset.get("name","")) for asset in payload.get("assets", [])]' "$RELEASE_JSON_PATH"
+          exit 1
+        fi
+
+        echo "Downloading: $ASSET_URL"
+        ARCHIVE_PATH="$TMP_DIR/python-apple-support.tar.gz"
+        curl -fL "$ASSET_URL" -o "$ARCHIVE_PATH"
+
+        EXTRACT_DIR="$TMP_DIR/extracted"
+        mkdir -p "$EXTRACT_DIR"
+        tar -xzf "$ARCHIVE_PATH" -C "$EXTRACT_DIR"
+
+        XCFRAMEWORK_PATH=$(find "$EXTRACT_DIR" -type d -name "Python.xcframework" | head -n 1)
+        if [ -z "$XCFRAMEWORK_PATH" ]; then
+          echo "❌ Python.xcframework not found in extracted archive."
+          find "$EXTRACT_DIR" -maxdepth 3 -type d
+          exit 1
+        fi
+
+        rm -rf "$GITHUB_WORKSPACE/Python.xcframework"
+        cp -R "$XCFRAMEWORK_PATH" "$GITHUB_WORKSPACE/Python.xcframework"
+
+        echo "✅ Installed Python.xcframework:"
+        ls -la "$GITHUB_WORKSPACE/Python.xcframework"
+
+    - name: Clone SwiftFFmpeg-iOS
+      run: |
+        cd "$GITHUB_WORKSPACE/.."
+        git clone -b palladium https://github.com/tfourj/SwiftFFmpeg-iOS.git
+        echo "✅ SwiftFFmpeg-iOS cloned"
+
+    - name: Build SwiftFFmpeg-iOS
+      run: |
+        cd "$GITHUB_WORKSPACE/../SwiftFFmpeg-iOS"
+        chmod +x Scripts/build-ffmpeg-ios.sh
+        ./Scripts/build-ffmpeg-ios.sh --version 8.0.1
+        echo "✅ SwiftFFmpeg-iOS built"
+
+    - name: Set up Xcode 26.2
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: "26.2"
+
+    - name: Show Xcode Version
+      run: xcodebuild -version
+
+    - name: Show Swift Version
+      run: swift --version
+
+    - name: Make script executable
+      run: chmod +x build_ipa.sh
+
+    - name: Build IPA
+      env:
+        PALLADIUM_DISABLE_PYTHON_DYLIB_CODESIGN: "1"
+      run: ./build_ipa.sh
+
+    - name: Upload IPA artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Palladium
+        path: build/*.ipa

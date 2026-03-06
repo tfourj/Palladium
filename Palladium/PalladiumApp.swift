@@ -11,6 +11,7 @@ import Foundation
 @main
 struct PalladiumApp: App {
     init() {
+        retainFFmpegBridgeExports()
         PythonRuntimeBootstrap.configure()
     }
 

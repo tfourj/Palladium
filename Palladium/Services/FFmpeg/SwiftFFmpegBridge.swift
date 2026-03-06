@@ -67,6 +67,16 @@ public func palladium_ffmpeg_bridge_free(_ ptr: UnsafeMutablePointer<CChar>?) {
     free(ptr)
 }
 
+private var ffmpegBridgeRunAnchor: ((UnsafePointer<CChar>?) -> UnsafeMutablePointer<CChar>?)?
+private var ffmpegBridgeFreeAnchor: ((UnsafeMutablePointer<CChar>?) -> Void)?
+
+@inline(never)
+func retainFFmpegBridgeExports() {
+    // Keep explicit references so release builds preserve exported C bridge symbols.
+    ffmpegBridgeRunAnchor = palladium_ffmpeg_bridge_run
+    ffmpegBridgeFreeAnchor = palladium_ffmpeg_bridge_free
+}
+
 private func makeCString(_ response: FFmpegBridgeResponse) -> UnsafeMutablePointer<CChar>? {
     guard let data = try? JSONEncoder().encode(response),
           let string = String(data: data, encoding: .utf8) else {

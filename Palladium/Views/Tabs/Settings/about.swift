@@ -3,8 +3,15 @@ import SwiftUI
 struct SettingsAboutView: View {
     @Environment(\.colorScheme) private var colorScheme
 
+    private let githubURL = URL(string: "https://github.com/TfourJ")
     private let discordURL = URL(string: "https://getnickel.app/discord")
     private let licenseURL = URL(string: "https://github.com/TfourJ/Palladium/blob/main/LICENSE")
+    
+    private var appVersion: String {
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
+        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "Unknown"
+        return build == "1" ? "v\(version)" : "v\(version) (\(build))"
+    }
 
     var body: some View {
         Form {
@@ -17,17 +24,32 @@ struct SettingsAboutView: View {
 
                     Text("Palladium")
                         .font(.title2.bold())
+                    
+                    Text(appVersion)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                    
+                    Text("Powered by yt-dlp and ffmpeg")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 12)
             }
 
-            Section("Author") {
+            Section("Developer") {
                 HStack {
-                    Text("Author")
+                    Text("Developer")
                     Spacer()
                     Text("TfourJ")
                         .foregroundStyle(.secondary)
+                }
+                
+                if let githubURL {
+                    Link(destination: githubURL) {
+                        linkRow("GitHub")
+                    }
                 }
             }
 
