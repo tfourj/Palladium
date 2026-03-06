@@ -500,14 +500,41 @@ def fetch_package_index_versions(install_target=None, pip_main=None):
 
 class SwiftFFmpegBridge:
     def __init__(self):
-        lib = ctypes.CDLL(None)
-        self._run = lib.palladium_ffmpeg_bridge_run
-        self._run.argtypes = [ctypes.c_char_p]
-        self._run.restype = ctypes.c_void_p
+        self._run = None
+        self._free = None
+        self._load_bridge()
 
-        self._free = lib.palladium_ffmpeg_bridge_free
-        self._free.argtypes = [ctypes.c_void_p]
-        self._free.restype = None
+    def _candidate_library_specs(self):
+        specs = [(None, "main executable (RTLD_DEFAULT)")]
+        executable_path = os.environ.get("PALLADIUM_EXECUTABLE_PATH", "").strip()
+        if executable_path:
+            specs.append((executable_path, f"app executable at {executable_path}"))
+        return specs
+
+    def _load_bridge(self):
+        last_error = None
+        mode = getattr(ctypes, "RTLD_GLOBAL", 0)
+
+        for library_path, label in self._candidate_library_specs():
+            try:
+                lib = ctypes.CDLL(library_path, mode=mode)
+                run = lib.palladium_ffmpeg_bridge_run
+                run.argtypes = [ctypes.c_char_p]
+                run.restype = ctypes.c_void_p
+
+                free = lib.palladium_ffmpeg_bridge_free
+                free.argtypes = [ctypes.c_void_p]
+                free.restype = None
+
+                self._run = run
+                self._free = free
+                print(f"[palladium][ffmpeg-bridge] loaded symbols from {label}")
+                return
+            except Exception as error:
+                last_error = error
+                print(f"[palladium][ffmpeg-bridge] failed to load symbols from {label}: {error}")
+
+        raise RuntimeError(f"unable to load swift ffmpeg bridge symbols: {last_error}")
 
     def run(self, tool, args):
         payload = json.dumps({"tool": tool, "args": [str(a) for a in args]}).encode("utf-8")

@@ -55,6 +55,9 @@ private enum PythonRuntimeBootstrap {
             setenv("PALLADIUM_CACHE_DIR", writableCachePath, 1)
             setenv("XDG_CACHE_HOME", writableCachePath, 1)
         }
+        if let executablePath = bundle.executableURL?.path {
+            setenv("PALLADIUM_EXECUTABLE_PATH", executablePath, 1)
+        }
 
         setenv("PYTHONHOME", pythonRoot.path, 1)
         setenv("PYTHONPATH", pythonPathComponents.joined(separator: ":"), 1)

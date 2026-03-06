@@ -11,7 +11,7 @@
 		82BF06CE2F5762BC00133331 /* Python.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82BF06CD2F5762BC00133331 /* Python.xcframework */; };
 		82BF06CF2F5762BC00133331 /* Python.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 82BF06CD2F5762BC00133331 /* Python.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		82BF06D32F5762DD00133331 /* PythonKit in Frameworks */ = {isa = PBXBuildFile; productRef = 82BF06D22F5762DD00133331 /* PythonKit */; };
-		82BF06D62F5762EA00133331 /* SwiftFFmpeg in Frameworks */ = {isa = PBXBuildFile; productRef = 82BF06D52F5762EA00133331 /* SwiftFFmpeg */; };
+		82FD7E062F5B673000E69220 /* SwiftFFmpeg in Frameworks */ = {isa = PBXBuildFile; productRef = 82FD7E052F5B673000E69220 /* SwiftFFmpeg */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,6 +53,7 @@
 		8256E3AC2F57A8960067DF6E /* ShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		82BF06BE2F5761E800133331 /* Palladium.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Palladium.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		82BF06CD2F5762BC00133331 /* Python.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = Python.xcframework; sourceTree = "<group>"; };
+		82FD7E012F5B666000E69220 /* FFmpeg.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = FFmpeg.xcframework; path = "../SwiftFFmpeg-iOS/FFmpeg.xcframework"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -104,7 +105,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				82BF06CE2F5762BC00133331 /* Python.xcframework in Frameworks */,
-				82BF06D62F5762EA00133331 /* SwiftFFmpeg in Frameworks */,
+				82FD7E062F5B673000E69220 /* SwiftFFmpeg in Frameworks */,
 				82BF06D32F5762DD00133331 /* PythonKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -134,6 +135,7 @@
 		82BF06CC2F5762BC00133331 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				82FD7E012F5B666000E69220 /* FFmpeg.xcframework */,
 				82BF06CD2F5762BC00133331 /* Python.xcframework */,
 			);
 			name = Frameworks;
@@ -186,7 +188,7 @@
 			name = Palladium;
 			packageProductDependencies = (
 				82BF06D22F5762DD00133331 /* PythonKit */,
-				82BF06D52F5762EA00133331 /* SwiftFFmpeg */,
+				82FD7E052F5B673000E69220 /* SwiftFFmpeg */,
 			);
 			productName = Palladium;
 			productReference = 82BF06BE2F5761E800133331 /* Palladium.app */;
@@ -221,7 +223,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				82BF06D12F5762DD00133331 /* XCRemoteSwiftPackageReference "PythonKit" */,
-				82BF06D42F5762EA00133331 /* XCLocalSwiftPackageReference "../SwiftFFmpeg-iOS" */,
+				82FD7E042F5B673000E69220 /* XCLocalSwiftPackageReference "../SwiftFFmpeg-iOS" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 82BF06BF2F5761E800133331 /* Products */;
@@ -486,6 +488,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				STRIP_INSTALLED_PRODUCT = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -519,15 +522,16 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = "$(APP_VERSION)";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-Wl,-u,_palladium_ffmpeg_bridge_run",
 					"-Wl,-u,_palladium_ffmpeg_bridge_free",
 				);
-				MARKETING_VERSION = "$(APP_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.tfourj.Palladium;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				STRIP_INSTALLED_PRODUCT = NO;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -568,12 +572,12 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = "$(APP_VERSION)";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-Wl,-u,_palladium_ffmpeg_bridge_run",
 					"-Wl,-u,_palladium_ffmpeg_bridge_free",
 				);
-				MARKETING_VERSION = "$(APP_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.tfourj.Palladium;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -623,7 +627,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		82BF06D42F5762EA00133331 /* XCLocalSwiftPackageReference "../SwiftFFmpeg-iOS" */ = {
+		82FD7E042F5B673000E69220 /* XCLocalSwiftPackageReference "../SwiftFFmpeg-iOS" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = "../SwiftFFmpeg-iOS";
 		};
@@ -646,7 +650,7 @@
 			package = 82BF06D12F5762DD00133331 /* XCRemoteSwiftPackageReference "PythonKit" */;
 			productName = PythonKit;
 		};
-		82BF06D52F5762EA00133331 /* SwiftFFmpeg */ = {
+		82FD7E052F5B673000E69220 /* SwiftFFmpeg */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SwiftFFmpeg;
 		};
