@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct SettingsAboutView: View {
+    @Environment(\.colorScheme) private var colorScheme
+
     private let discordURL = URL(string: "https://getnickel.app/discord")
     private let licenseURL = URL(string: "https://github.com/TfourJ/Palladium/blob/main/LICENSE")
 
@@ -8,7 +10,7 @@ struct SettingsAboutView: View {
         Form {
             Section {
                 VStack(spacing: 12) {
-                    Image("palladium_dark")
+                    Image(colorScheme == .dark ? "palladium_dark" : "palladium_light")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 80, height: 80)

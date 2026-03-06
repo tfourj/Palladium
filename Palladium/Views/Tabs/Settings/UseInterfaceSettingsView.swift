@@ -8,6 +8,7 @@ struct UseInterfaceSettingsView: View {
     @Binding var autoDownloadOnPaste: Bool
     @Binding var shareSheetDownloadMode: ShareSheetDownloadMode
     @Binding var linkHistoryEnabled: Bool
+    @Binding var appAppearanceMode: AppAppearanceMode
 
     let isRunning: Bool
 
@@ -46,6 +47,20 @@ struct UseInterfaceSettingsView: View {
                 Text("Share Sheet")
             } footer: {
                 Text("Ask opens a picker. Other options start downloads directly with that mode.")
+            }
+
+            Section {
+                Picker("App theme", selection: $appAppearanceMode) {
+                    ForEach(AppAppearanceMode.allCases) { mode in
+                        Text(mode.title).tag(mode)
+                    }
+                }
+                .pickerStyle(.menu)
+                .disabled(isRunning)
+            } header: {
+                Text("Appearance")
+            } footer: {
+                Text("System uses the phone setting by default.")
             }
 
             Section {

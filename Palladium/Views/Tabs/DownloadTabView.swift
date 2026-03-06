@@ -2,6 +2,8 @@ import SwiftUI
 import UIKit
 
 struct DownloadTabView: View {
+    @Environment(\.colorScheme) private var colorScheme
+
     @Binding var statusText: String
     @Binding var urlText: String
     @Binding var selectedPreset: DownloadPreset
@@ -20,23 +22,19 @@ struct DownloadTabView: View {
 
     var body: some View {
         ZStack {
-            LinearGradient(
-                colors: [Color.black, Color(red: 0.08, green: 0.10, blue: 0.14)],
-                startPoint: .top,
-                endPoint: .bottom
-            )
+            backgroundGradient
             .ignoresSafeArea()
 
             VStack(spacing: 12) {
                 ZStack {
                     VStack(spacing: 4) {
-                        Image("palladium_dark")
+                        Image(logoImageName)
                             .resizable()
                             .scaledToFit()
                             .frame(width: 56, height: 56)
                         Text("Palladium")
                             .font(.title.bold())
-                            .foregroundStyle(.white)
+                            .foregroundStyle(primaryTextColor)
                     }
 
                     HStack {
@@ -48,9 +46,9 @@ struct DownloadTabView: View {
                                 ZStack(alignment: .topTrailing) {
                                     Image(systemName: "clock")
                                         .font(.system(size: 18, weight: .semibold))
-                                        .foregroundStyle(.white)
+                                        .foregroundStyle(primaryTextColor)
                                         .frame(width: 40, height: 40)
-                                        .background(Color.white.opacity(0.12))
+                                        .background(cardElementBackground)
                                         .clipShape(RoundedRectangle(cornerRadius: 8))
 
                                     if !historyEntries.isEmpty {
@@ -79,15 +77,15 @@ struct DownloadTabView: View {
                             ProgressView()
                             Text("Downloading...")
                                 .font(.footnote)
-                                .foregroundStyle(.white)
+                                .foregroundStyle(primaryTextColor)
                         }
 
                         Text(progressText)
                             .font(.system(.footnote, design: .monospaced))
-                            .foregroundStyle(.white)
+                            .foregroundStyle(primaryTextColor)
                             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                             .padding(12)
-                            .background(Color.white.opacity(0.10))
+                            .background(cardElementBackground)
                             .clipShape(RoundedRectangle(cornerRadius: 8))
                     }
                     .padding(.horizontal, 20)
@@ -109,24 +107,24 @@ struct DownloadTabView: View {
                         TextField("Enter video URL", text: $urlText)
                             .textInputAutocapitalization(.never)
                             .autocorrectionDisabled()
-                            .foregroundStyle(.white)
+                            .foregroundStyle(primaryTextColor)
                             .padding(.horizontal, 10)
                             .padding(.vertical, 10)
-                            .background(Color.white.opacity(0.10))
+                            .background(cardElementBackground)
                             .clipShape(RoundedRectangle(cornerRadius: 6))
 
                         Button(action: pasteOrClearURL) {
                             Image(systemName: urlText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "doc.on.clipboard" : "xmark.circle.fill")
                                 .font(.system(size: 18, weight: .semibold))
                                 .frame(width: 42, height: 42)
-                                .background(Color.white.opacity(0.12))
+                                .background(cardElementBackground)
                                 .clipShape(RoundedRectangle(cornerRadius: 6))
                         }
                         .buttonStyle(.plain)
                         .disabled(isRunning)
                     }
                     .padding(8)
-                    .background(Color.white.opacity(0.08))
+                    .background(cardBackground)
                     .clipShape(RoundedRectangle(cornerRadius: 8))
 
                     Button(action: onDownload) {
@@ -157,7 +155,7 @@ struct DownloadTabView: View {
                     }
                 }
                 .padding(12)
-                .background(Color.white.opacity(0.08))
+                .background(cardBackground)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
                 .padding(.horizontal, 20)
                 .padding(.bottom, 8)
@@ -186,7 +184,7 @@ struct DownloadTabView: View {
             if let title = entry.title, !title.isEmpty {
                 Text(title)
                     .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(primaryTextColor)
                     .lineLimit(2)
             }
 
@@ -202,7 +200,7 @@ struct DownloadTabView: View {
                     .padding(.horizontal, 7)
                     .padding(.vertical, 3)
                     .background(presetColor(entry.preset).opacity(0.25))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(primaryTextColor)
                     .clipShape(Capsule())
 
                 Text(entry.timestamp.formatted(date: .abbreviated, time: .shortened))
@@ -232,7 +230,7 @@ struct DownloadTabView: View {
                                 historyRow(entry)
                             }
                             .buttonStyle(.plain)
-                            .listRowBackground(Color.white.opacity(0.04))
+                            .listRowBackground(listRowBackground)
                             .swipeActions(edge: .leading, allowsFullSwipe: false) {
                                 Button {
                                     onCopyHistoryLink(entry.url)
@@ -265,6 +263,45 @@ struct DownloadTabView: View {
             }
         }
         .presentationDetents([.medium, .large])
+    }
+
+    private var isDarkMode: Bool {
+        colorScheme == .dark
+    }
+
+    private var logoImageName: String {
+        isDarkMode ? "palladium_dark" : "palladium_light"
+    }
+
+    private var backgroundGradient: LinearGradient {
+        if isDarkMode {
+            return LinearGradient(
+                colors: [Color.black, Color(red: 0.08, green: 0.10, blue: 0.14)],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+        }
+        return LinearGradient(
+            colors: [Color(red: 0.97, green: 0.98, blue: 1.0), Color(red: 0.91, green: 0.93, blue: 0.97)],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+    }
+
+    private var primaryTextColor: Color {
+        isDarkMode ? .white : .primary
+    }
+
+    private var cardBackground: Color {
+        isDarkMode ? Color.white.opacity(0.08) : Color.black.opacity(0.06)
+    }
+
+    private var cardElementBackground: Color {
+        isDarkMode ? Color.white.opacity(0.12) : Color.black.opacity(0.08)
+    }
+
+    private var listRowBackground: Color {
+        isDarkMode ? Color.white.opacity(0.04) : Color.black.opacity(0.03)
     }
 
     private func presetColor(_ preset: DownloadPreset) -> Color {

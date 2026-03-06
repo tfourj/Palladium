@@ -17,6 +17,7 @@ struct SettingsTabView: View {
     @Binding var autoDownloadOnPaste: Bool
     @Binding var shareSheetDownloadMode: ShareSheetDownloadMode
     @Binding var linkHistoryEnabled: Bool
+    @Binding var appAppearanceMode: AppAppearanceMode
 
     let packageStatusText: String
     let versionsText: String
@@ -84,6 +85,7 @@ struct SettingsTabView: View {
                         autoDownloadOnPaste: $autoDownloadOnPaste,
                         shareSheetDownloadMode: $shareSheetDownloadMode,
                         linkHistoryEnabled: $linkHistoryEnabled,
+                        appAppearanceMode: $appAppearanceMode,
                         isRunning: isRunning
                     )
                 case .downloadArguments:

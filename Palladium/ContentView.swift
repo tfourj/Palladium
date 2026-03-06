@@ -37,6 +37,7 @@ struct ContentView: View {
     private static let shareSheetDownloadModeDefaultsKey = "palladium.shareSheetDownloadMode"
     private static let linkHistoryEnabledDefaultsKey = "palladium.linkHistoryEnabled"
     private static let linkHistoryEntriesDefaultsKey = "palladium.linkHistoryEntries"
+    private static let appAppearanceModeDefaultsKey = "palladium.appAppearanceMode"
 
     @Environment(\.scenePhase) private var scenePhase
     @State private var isRunning = false
@@ -54,6 +55,7 @@ struct ContentView: View {
     @State private var shareSheetDownloadMode: ShareSheetDownloadMode
     @State private var linkHistoryEnabled: Bool
     @State private var linkHistoryEntries: [LinkHistoryEntry]
+    @State private var appAppearanceMode: AppAppearanceMode
     @State private var selectedTab: AppTab = .download
     @State private var packageStatusText = "idle"
     @State private var versionsText = "yt-dlp: unknown\nyt-dlp-apple-webkit-jsi: unknown"
@@ -87,6 +89,7 @@ struct ContentView: View {
         _shareSheetDownloadMode = State(initialValue: Self.loadShareSheetDownloadMode())
         _linkHistoryEnabled = State(initialValue: Self.loadLinkHistoryEnabled())
         _linkHistoryEntries = State(initialValue: Self.loadLinkHistoryEntries())
+        _appAppearanceMode = State(initialValue: Self.loadAppAppearanceMode())
         _consoleLogStore = StateObject(wrappedValue: ConsoleLogStore())
     }
 
@@ -122,6 +125,7 @@ struct ContentView: View {
                 autoDownloadOnPaste: $autoDownloadOnPaste,
                 shareSheetDownloadMode: $shareSheetDownloadMode,
                 linkHistoryEnabled: $linkHistoryEnabled,
+                appAppearanceMode: $appAppearanceMode,
                 packageStatusText: packageStatusText,
                 versionsText: versionsText,
                 updatesSummaryText: packageUpdatesSummaryText,
@@ -178,6 +182,9 @@ struct ContentView: View {
         .onChange(of: linkHistoryEnabled) { _ in
             persistPreferences()
         }
+        .onChange(of: appAppearanceMode) { _ in
+            persistPreferences()
+        }
         .sheet(item: $shareItem) { item in
             ShareSheet(activityItems: [item.url])
         }
@@ -217,6 +224,7 @@ struct ContentView: View {
         .onOpenURL { incomingURL in
             handleIncomingDownloadURL(incomingURL)
         }
+        .preferredColorScheme(appAppearanceMode.preferredColorScheme)
     }
 
     private var shareSheetDefaultPreset: DownloadPreset {
@@ -779,6 +787,7 @@ struct ContentView: View {
         defaults.set(autoDownloadOnPaste, forKey: Self.autoDownloadOnPasteDefaultsKey)
         defaults.set(shareSheetDownloadMode.rawValue, forKey: Self.shareSheetDownloadModeDefaultsKey)
         defaults.set(linkHistoryEnabled, forKey: Self.linkHistoryEnabledDefaultsKey)
+        defaults.set(appAppearanceMode.rawValue, forKey: Self.appAppearanceModeDefaultsKey)
     }
 
     private func persistLinkHistoryEntries() {
@@ -880,6 +889,14 @@ struct ContentView: View {
             return []
         }
         return Array(decoded.prefix(10))
+    }
+
+    private static func loadAppAppearanceMode() -> AppAppearanceMode {
+        guard let rawValue = UserDefaults.standard.string(forKey: appAppearanceModeDefaultsKey),
+              let mode = AppAppearanceMode(rawValue: rawValue) else {
+            return .system
+        }
+        return mode
     }
 
     private func requestNotificationAuthorizationIfNeeded() {
