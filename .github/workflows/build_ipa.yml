@@ -3,6 +3,9 @@ name: Build Palladium .ipa (Unsigned)
 on:
   push:
     branches: [main]
+    paths:
+      - "Palladium/**"
+      - "Palladium.xcodeproj/project.pbxproj"
   workflow_dispatch:
 
 jobs:
