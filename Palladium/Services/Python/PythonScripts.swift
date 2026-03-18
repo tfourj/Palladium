@@ -823,11 +823,44 @@ def build_preset_args(preset):
     ]
 
 
+CLI_DASHLIKE_PREFIX = "?\u2010\u2011\u2012\u2013\u2014\u2015\u2212\uFE58\uFE63\uFF0D"
+
+
+def normalize_cli_arg_token(token):
+    value = str(token)
+    if not value:
+        return value
+    if value.startswith("--"):
+        return value
+    if value.startswith("-") and (len(value) == 1 or value[1] not in CLI_DASHLIKE_PREFIX):
+        return value
+    if value.startswith(("http://", "https://", "file:/", "/")):
+        return value
+    if value[0] not in CLI_DASHLIKE_PREFIX:
+        return value
+
+    match = re.match(rf"^[{re.escape(CLI_DASHLIKE_PREFIX)}-]+([A-Za-z][A-Za-z0-9_-]*)(.*)$", value)
+    if not match:
+        return value
+
+    option_name = match.group(1)
+    suffix = match.group(2)
+    prefix = "-" if len(option_name) == 1 else "--"
+    normalized = f"{prefix}{option_name}{suffix}"
+    if normalized != value:
+        print(f"[palladium] normalized arg token: {value!r} -> {normalized!r}")
+    return normalized
+
+
+def normalize_cli_args(tokens):
+    return [normalize_cli_arg_token(token) for token in tokens]
+
+
 def parse_custom_args(custom_args_value):
     if not custom_args_value:
         return []
     try:
-        parsed = shlex.split(str(custom_args_value))
+        parsed = normalize_cli_args(shlex.split(str(custom_args_value)))
         print(f"[palladium] custom args parsed: {parsed}")
         return parsed
     except Exception:
@@ -865,7 +898,7 @@ def parse_extra_args(extra_args_value):
     if not extra_args_value:
         return []
     try:
-        parsed = shlex.split(str(extra_args_value))
+        parsed = normalize_cli_args(shlex.split(str(extra_args_value)))
         print(f"[palladium] extra args parsed: {parsed}")
         return parsed
     except Exception:
