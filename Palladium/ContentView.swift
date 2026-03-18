@@ -63,6 +63,7 @@ struct ContentView: View {
     @State private var statusText = "idle"
     @State private var urlText: String
     @State private var progressText = "Enter a URL and tap Download."
+    @State private var downloadErrorText: String?
     @State private var selectedPreset: DownloadPreset
     @State private var customArgsText: String
     @State private var extraArgsText: String
@@ -131,6 +132,7 @@ struct ContentView: View {
                     selectedPreset: $selectedPreset,
                     isRunning: isRunning,
                     progressText: progressText,
+                    downloadErrorText: downloadErrorText,
                     onDownload: { runDownloadFlow() },
                     onCancel: cancelDownloadFlow,
                     onPastedURL: handlePastedURL,
@@ -600,6 +602,7 @@ struct ContentView: View {
         guard !targetURL.isEmpty else { return }
 
         consoleLogStore.clearAll()
+        downloadErrorText = nil
 
         do {
             let removedCount = try clearDownloadsDirectoryContents()
@@ -670,6 +673,9 @@ struct ContentView: View {
             } else {
                 progressText = outcome.statusText == "success" ? "download complete" : "download failed"
             }
+            if outcome.statusText == "error" {
+                downloadErrorText = downloadErrorDetails(from: outcome)
+            }
             appendConsoleText("\n\(outcome.summaryText)\n")
             if !receivedPythonLiveOutput, !outcome.outputText.isEmpty {
                 appendConsoleText("\n\(outcome.outputText)\n")
@@ -689,6 +695,7 @@ struct ContentView: View {
                     )
                 }
                 completedDownloadURL = completedURL
+                downloadErrorText = nil
                 notifyDownloadCompletionIfNeeded(fileURL: completedURL)
 
                 let needsPhotosCompatibilityCheck = askUserAfterDownloadAtStart || selectedPostDownloadActionAtStart == .saveToPhotos
@@ -888,6 +895,30 @@ struct ContentView: View {
                 lastDownloadProgressPercent = nil
             }
         }
+    }
+
+    private func downloadErrorDetails(from outcome: PythonFlowOutcome) -> String? {
+        var lines: [String] = []
+
+        let errorLines = outcome.outputText
+            .components(separatedBy: .newlines)
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty && $0.hasPrefix("ERROR:") }
+        if let lastErrorLine = errorLines.last {
+            lines.append(lastErrorLine)
+        }
+
+        if let ytDlpExitCode = outcome.ytDlpExitCode {
+            lines.append("yt-dlp exit code: \(ytDlpExitCode)")
+        }
+        if let pipExitCode = outcome.pipExitCode, pipExitCode != 0 {
+            lines.append("pip exit code: \(pipExitCode)")
+        }
+
+        if lines.isEmpty {
+            return nil
+        }
+        return lines.joined(separator: "\n")
     }
 
     private func shouldAcceptDownloadProgressLine(_ line: String) -> Bool {

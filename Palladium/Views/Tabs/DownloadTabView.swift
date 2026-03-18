@@ -10,6 +10,7 @@ struct DownloadTabView: View {
 
     let isRunning: Bool
     let progressText: String
+    let downloadErrorText: String?
     let onDownload: () -> Void
     let onCancel: () -> Void
     let onPastedURL: (String) -> Void
@@ -92,6 +93,27 @@ struct DownloadTabView: View {
                     .frame(maxHeight: .infinity)
                 } else {
                     Spacer(minLength: 0)
+                }
+
+                if let downloadErrorText, !downloadErrorText.isEmpty {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Last Error")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.red)
+
+                        Text(downloadErrorText)
+                            .font(.system(.footnote, design: .monospaced))
+                            .foregroundStyle(primaryTextColor)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .padding(12)
+                    .background(cardElementBackground)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.red.opacity(0.45), lineWidth: 1)
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .padding(.horizontal, 20)
                 }
 
                 VStack(spacing: 10) {

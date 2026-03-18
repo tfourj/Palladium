@@ -44,6 +44,8 @@ enum PythonFlowRunner {
                 """,
                 versionsText: nil,
                 downloadedPath: nil,
+                pipExitCode: nil,
+                ytDlpExitCode: nil,
                 updatesAvailable: nil,
                 updatesSummary: nil,
                 availableVersions: nil
@@ -72,6 +74,8 @@ enum PythonFlowRunner {
             outputText: output,
             versionsText: nil,
             downloadedPath: downloadedPath,
+            pipExitCode: pipExitCode,
+            ytDlpExitCode: ytExitCode,
             updatesAvailable: nil,
             updatesSummary: nil,
             availableVersions: nil
@@ -92,6 +96,8 @@ enum PythonFlowRunner {
                 """,
                 versionsText: nil,
                 downloadedPath: nil,
+                pipExitCode: nil,
+                ytDlpExitCode: nil,
                 updatesAvailable: nil,
                 updatesSummary: nil,
                 availableVersions: nil
@@ -132,6 +138,8 @@ enum PythonFlowRunner {
             outputText: output,
             versionsText: versionsText,
             downloadedPath: nil,
+            pipExitCode: pipExitCode,
+            ytDlpExitCode: nil,
             updatesAvailable: updatesAvailable,
             updatesSummary: updatesSummary,
             availableVersions: availableVersions
@@ -178,6 +186,8 @@ struct PythonFlowOutcome: Sendable {
     let outputText: String
     let versionsText: String?
     let downloadedPath: String?
+    let pipExitCode: Int?
+    let ytDlpExitCode: Int?
     let updatesAvailable: Bool?
     let updatesSummary: String?
     let availableVersions: [String: [String]]?
