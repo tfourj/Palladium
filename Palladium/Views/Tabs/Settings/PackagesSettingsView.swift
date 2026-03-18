@@ -161,9 +161,9 @@ struct PackagesSettingsView: View {
     }
 
     private func prepareCustomVersionEditor() {
-        ytDlpSelectedVersion = installedVersion(for: "yt-dlp") ?? Self.latestSelectionToken
-        webkitJSISelectedVersion = installedVersion(for: "yt-dlp-apple-webkit-jsi") ?? Self.latestSelectionToken
-        pipSelectedVersion = installedVersion(for: "pip") ?? Self.latestSelectionToken
+        ytDlpSelectedVersion = Self.latestSelectionToken
+        webkitJSISelectedVersion = Self.latestSelectionToken
+        pipSelectedVersion = Self.latestSelectionToken
     }
 
     private func installedVersion(for packageName: String) -> String? {

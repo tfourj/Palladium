@@ -324,38 +324,73 @@ def collect_versions(install_target=None, allow_cache_fallback=True):
     return versions
 
 
+def normalized_version_text(value):
+    return str(value or "").strip()
+
+
+def latest_index_version(indexed_versions, package_name):
+    for candidate in indexed_versions.get(package_name) or []:
+        resolved = normalized_version_text(candidate)
+        if resolved:
+            return resolved
+    return ""
+
+
+def build_package_update_lines(installed_versions, indexed_versions):
+    lines = []
+    for package_name in TRACKED_PACKAGES:
+        current_version = normalized_version_text(installed_versions.get(package_name))
+        if not current_version or current_version in ("not installed", "unknown"):
+            continue
+
+        latest_version = latest_index_version(indexed_versions, package_name)
+        if latest_version and latest_version != current_version:
+            lines.append(f"{package_name}: {current_version} -> {latest_version}")
+    return lines
+
+
+def build_package_install_plan(installed_versions, indexed_versions, custom_versions=None):
+    custom_versions = custom_versions or {}
+    packages = []
+    cleanup_packages = []
+
+    if custom_versions:
+        for package_name in TRACKED_PACKAGES:
+            requested_version = normalized_version_text(custom_versions.get(package_name))
+            if not requested_version:
+                continue
+
+            current_version = normalized_version_text(installed_versions.get(package_name))
+            if requested_version == current_version:
+                print(f"[palladium] skipping {package_name}; already on requested version {requested_version}")
+                continue
+
+            packages.append(f"{package_name}=={requested_version}")
+            if package_name in CLEANUP_PACKAGES:
+                cleanup_packages.append(package_name)
+        return packages, cleanup_packages
+
+    for package_name in TRACKED_PACKAGES:
+        current_version = normalized_version_text(installed_versions.get(package_name))
+        if not current_version or current_version in ("not installed", "unknown"):
+            continue
+
+        latest_version = latest_index_version(indexed_versions, package_name)
+        if latest_version and latest_version != current_version:
+            packages.append(package_name)
+
+    return packages, cleanup_packages
+
+
 def check_package_updates(install_target=None):
     pip_main = ensure_pip_entrypoint(install_target)
     if pip_main is None:
         return False, "Unable to check updates (pip unavailable)."
 
-    def normalized_version(value):
-        return str(value or "").strip()
-
-    def build_update_lines(installed_versions, indexed_versions):
-        lines = []
-        for package_name in TRACKED_PACKAGES:
-            current_version = normalized_version(installed_versions.get(package_name))
-            if not current_version or current_version in ("not installed", "unknown"):
-                continue
-
-            indexed = indexed_versions.get(package_name) or []
-            latest_version = ""
-            for candidate in indexed:
-                latest_version = normalized_version(candidate)
-                if latest_version:
-                    break
-            if not latest_version:
-                continue
-
-            if latest_version != current_version:
-                lines.append(f"{package_name}: {current_version} -> {latest_version}")
-        return lines
-
     try:
         installed_versions = collect_versions(install_target=install_target, allow_cache_fallback=False)
         indexed_versions = fetch_package_index_versions(install_target=install_target, pip_main=pip_main)
-        update_lines = build_update_lines(installed_versions, indexed_versions)
+        update_lines = build_package_update_lines(installed_versions, indexed_versions)
         if update_lines:
             return True, "\\n".join(update_lines)
         if indexed_versions:
@@ -403,10 +438,10 @@ def check_package_updates(install_target=None):
         for item in relevant:
             name = str(item.get("name", "package"))
             package_key = name.lower()
-            old_ver = normalized_version(item.get("version", "?")) or "?"
-            new_ver = normalized_version(item.get("latest_version", "?")) or "?"
+            old_ver = normalized_version_text(item.get("version", "?")) or "?"
+            new_ver = normalized_version_text(item.get("latest_version", "?")) or "?"
 
-            installed_ver = normalized_version(installed_versions.get(package_key))
+            installed_ver = normalized_version_text(installed_versions.get(package_key))
             if installed_ver and installed_ver not in ("not installed", "unknown"):
                 old_ver = installed_ver
 
@@ -1546,6 +1581,7 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, p
                     pip_args = ["install", "--no-cache-dir", "--progress-bar", "off", "--no-color", *packages]
                     if install_target:
                         pip_args[1:1] = ["--target", install_target]
+                    pip_args[1:1] = ["--disable-pip-version-check"]
                     pip_result = pip_main(pip_args)
                     pip_exit_code = 0 if pip_result is None else int(pip_result)
                     print(f"[palladium] pip exit code: {pip_exit_code}")
@@ -1811,41 +1847,42 @@ def run_package_maintenance(action, custom_versions_json=None):
 
         if action == "update":
             if updates_available or bool(custom_versions):
-                pip_attempted = True
                 pip_main = ensure_pip_entrypoint(install_target)
                 if pip_main is not None:
                     try:
-                        if custom_versions:
+                        installed_versions = collect_versions(install_target=install_target, allow_cache_fallback=False)
+                        indexed_versions = fetch_package_index_versions(install_target=install_target, pip_main=pip_main)
+                        packages, cleanup_packages = build_package_install_plan(
+                            installed_versions,
+                            indexed_versions,
+                            custom_versions=custom_versions,
+                        )
+
+                        if not packages:
+                            print("[palladium] no package installs required")
+                            pip_exit_code = 0
+                        else:
+                            pip_attempted = True
                             if install_target:
                                 stale_removed = 0
-                                for package_name in CLEANUP_PACKAGES:
+                                for package_name in cleanup_packages:
                                     stale_removed += cleanup_target_package(install_target, package_name)
                                 print(f"[palladium] removed stale target package entries: {stale_removed}")
-                            packages = []
-                            for package_name in TRACKED_PACKAGES:
-                                version = custom_versions.get(package_name)
-                                if version:
-                                    packages.append(f"{package_name}=={version}")
-                                else:
-                                    packages.append(package_name)
                             pip_args = [
                                 "install",
                                 "--upgrade",
-                                "--force-reinstall",
+                                "--disable-pip-version-check",
                                 "--no-cache-dir",
                                 "--progress-bar",
                                 "off",
                                 "--no-color",
                                 *packages,
                             ]
-                        else:
-                            packages = list(TRACKED_PACKAGES)
-                            pip_args = ["install", "--upgrade", "--no-cache-dir", "--progress-bar", "off", "--no-color", *packages]
-                        if install_target:
-                            pip_args[1:1] = ["--target", install_target]
-                        pip_result = pip_main(pip_args)
-                        pip_exit_code = 0 if pip_result is None else int(pip_result)
-                        print(f"[palladium] pip exit code: {pip_exit_code}")
+                            if install_target:
+                                pip_args[1:1] = ["--target", install_target]
+                            pip_result = pip_main(pip_args)
+                            pip_exit_code = 0 if pip_result is None else int(pip_result)
+                            print(f"[palladium] pip exit code: {pip_exit_code}")
                     except Exception:
                         pip_exit_code = 1
                         print("[palladium] pip update failed")
