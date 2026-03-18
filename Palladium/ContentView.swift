@@ -98,6 +98,7 @@ struct ContentView: View {
     @State private var currentDownloadTask: Task<Void, Never>?
     @State private var cancelMarkerURL: URL?
     @State private var lastDownloadProgressPercent: Double?
+    @State private var pendingDownloadProgressLine = ""
     @State private var pendingConsoleChunks = ""
     @State private var isConsoleFlushScheduled = false
     @State private var keyboardDismissTapInstalled = false
@@ -611,6 +612,7 @@ struct ContentView: View {
         statusText = "running"
         progressText = "Downloading..."
         lastDownloadProgressPercent = nil
+        pendingDownloadProgressLine = ""
 
         let logPipe = Pipe()
         let readHandle = logPipe.fileHandleForReading
@@ -662,6 +664,7 @@ struct ContentView: View {
 
             isRunning = false
             lastDownloadProgressPercent = nil
+            pendingDownloadProgressLine = ""
             statusText = outcome.statusText
             if outcome.statusText == "cancelled" {
                 progressText = "download cancelled"
@@ -775,6 +778,7 @@ struct ContentView: View {
             try? "cancel".write(to: markerURL, atomically: true, encoding: .utf8)
         }
         currentDownloadTask?.cancel()
+        pendingDownloadProgressLine = ""
         progressText = "Cancelling..."
     }
 
@@ -869,27 +873,44 @@ struct ContentView: View {
     }
 
     private func updateProgress(from chunk: String) {
-        let normalized = chunk.replacingOccurrences(of: "\r", with: "\n")
-        let lines = normalized.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
+        let normalized = chunk
+            .replacingOccurrences(of: "\r\n", with: "\n")
+            .replacingOccurrences(of: "\r", with: "\n")
+        let combined = pendingDownloadProgressLine + normalized
+        guard !combined.isEmpty else { return }
+
+        var lines = combined.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
+        if combined.hasSuffix("\n") {
+            pendingDownloadProgressLine = ""
+        } else {
+            pendingDownloadProgressLine = lines.popLast() ?? ""
+        }
+
         for line in lines {
-            let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
-            if trimmed.contains("[download]") {
-                guard shouldAcceptDownloadProgressLine(trimmed) else { continue }
-                progressText = trimmed
-            } else if trimmed.contains("[Merger]") {
-                progressText = trimmed
-            } else if trimmed.contains("yt-dlp Popen running ffmpeg") {
-                progressText = "Merging audio and video..."
-            } else if trimmed.contains("yt-dlp Popen ffmpeg finished") {
-                progressText = "Merge finished"
-            } else if trimmed.contains("[palladium] downloaded file:") {
-                progressText = "download complete"
-            } else if trimmed.hasPrefix("[ExtractAudio]") {
-                progressText = trimmed
-            } else if trimmed.hasPrefix("[palladium] running yt-dlp") {
-                progressText = "Downloading..."
-                lastDownloadProgressPercent = nil
-            }
+            updateProgressLine(line)
+        }
+    }
+
+    private func updateProgressLine(_ line: String) {
+        let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+
+        if trimmed.contains("[download]") {
+            guard shouldAcceptDownloadProgressLine(trimmed) else { return }
+            progressText = trimmed
+        } else if trimmed.contains("[Merger]") {
+            progressText = trimmed
+        } else if trimmed.contains("yt-dlp Popen running ffmpeg") {
+            progressText = "Merging audio and video..."
+        } else if trimmed.contains("yt-dlp Popen ffmpeg finished") {
+            progressText = "Merge finished"
+        } else if trimmed.contains("[palladium] downloaded file:") {
+            progressText = "download complete"
+        } else if trimmed.hasPrefix("[ExtractAudio]") {
+            progressText = trimmed
+        } else if trimmed.hasPrefix("[palladium] running yt-dlp") {
+            progressText = "Downloading..."
+            lastDownloadProgressPercent = nil
         }
     }
 
