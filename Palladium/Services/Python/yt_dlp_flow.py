@@ -18,6 +18,7 @@ MAX_CAPTURED_OUTPUT_CHARS = 250000
 TRACKED_PACKAGES = ("yt-dlp", "yt-dlp-apple-webkit-jsi", "pip")
 DISPLAY_PACKAGES = TRACKED_PACKAGES
 CLEANUP_PACKAGES = ("yt-dlp", "yt-dlp-apple-webkit-jsi")
+DEFAULT_YOUTUBE_EXTRACTOR_ARGS = "youtube:webpage_client=web"
 
 
 class TailBuffer:
@@ -915,6 +916,35 @@ def has_custom_output_template(args):
     return False
 
 
+def has_youtube_webpage_client_override(args):
+    normalized = [str(arg) for arg in (args or [])]
+    for index, arg in enumerate(normalized):
+        value = None
+        if arg == "--extractor-args" and index + 1 < len(normalized):
+            value = normalized[index + 1]
+        elif arg.startswith("--extractor-args="):
+            value = arg.split("=", 1)[1]
+
+        if not value:
+            continue
+
+        lowered = value.lower()
+        if "youtube:" in lowered and "webpage_client=" in lowered:
+            return True
+
+    return False
+
+
+def build_default_extractor_args(*arg_sets):
+    for arg_set in arg_sets:
+        if has_youtube_webpage_client_override(arg_set):
+            print("[palladium] keeping user-provided youtube webpage_client extractor args")
+            return []
+
+    print(f"[palladium] using default extractor args: {DEFAULT_YOUTUBE_EXTRACTOR_ARGS}")
+    return ["--extractor-args", DEFAULT_YOUTUBE_EXTRACTOR_ARGS]
+
+
 def is_cancel_requested(cancel_file_path):
     return bool(cancel_file_path) and os.path.exists(cancel_file_path)
 
@@ -1584,6 +1614,7 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, p
                         else:
                             preset_args = build_preset_args(download_preset)
                         extra_args = parse_extra_args(extra_args_text)
+                        default_extractor_args = build_default_extractor_args(preset_args, extra_args)
                         output_args = []
                         if has_custom_output_template(preset_args) or has_custom_output_template(extra_args):
                             print("[palladium] custom output template detected")
@@ -1604,6 +1635,7 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, p
                             ffmpeg_bridge_dir if ffmpeg_bridge_dir else ".",
                             "-P",
                             downloads_dir if downloads_dir else ".",
+                            *default_extractor_args,
                             *output_args,
                             *preset_args,
                             *extra_args,
