@@ -2,21 +2,19 @@ import Foundation
 import PythonKit
 
 enum PythonFlowRunner {
+    private static var insertedScriptDirectories = Set<String>()
+
     static func executeDownloadFlow(url: String, preset: String, presetArgsJSON: String, extraArgs: String) async -> PythonFlowOutcome {
         await runOnPythonThread {
-            let builtins = Python.import("builtins")
-            let main = Python.import("__main__")
-            _ = builtins.exec(PythonScripts.ytDlpScript, main.__dict__)
-            let payload = String(main.run_yt_dlp_flow(url, preset, presetArgsJSON, extraArgs)) ?? ""
+            let module = loadYtDlpModule()
+            let payload = String(module.run_yt_dlp_flow(url, preset, presetArgsJSON, extraArgs)) ?? ""
             return decodeDownloadPayload(payload)
         }
     }
 
     static func executePackageFlow(action: String, customVersions: [String: String]? = nil) async -> PythonFlowOutcome {
         await runOnPythonThread {
-            let builtins = Python.import("builtins")
-            let main = Python.import("__main__")
-            _ = builtins.exec(PythonScripts.ytDlpScript, main.__dict__)
+            let module = loadYtDlpModule()
             let customVersionsJSON: String
             if let customVersions,
                let data = try? JSONSerialization.data(withJSONObject: customVersions),
@@ -25,9 +23,30 @@ enum PythonFlowRunner {
             } else {
                 customVersionsJSON = ""
             }
-            let payload = String(main.run_package_maintenance(action, customVersionsJSON)) ?? ""
+            let payload = String(module.run_package_maintenance(action, customVersionsJSON)) ?? ""
             return decodePackagePayload(payload)
         }
+    }
+
+    private static func loadYtDlpModule() -> PythonObject {
+        let scriptURL = PythonScripts.ytDlpScriptURL
+        let scriptPath = scriptURL.path
+        let scriptDirectoryPath = scriptURL.deletingLastPathComponent().path
+
+        let sys = Python.import("sys")
+        if !insertedScriptDirectories.contains(scriptDirectoryPath) {
+            sys.path.insert(0, scriptDirectoryPath)
+            insertedScriptDirectories.insert(scriptDirectoryPath)
+        }
+
+        let importlibUtil = Python.import("importlib.util")
+        let moduleName = "palladium_runtime_ytdlp"
+
+        let spec = importlibUtil.spec_from_file_location(moduleName, scriptPath)
+        let module = importlibUtil.module_from_spec(spec)
+        sys.modules[moduleName] = module
+        _ = spec.loader.exec_module(module)
+        return module
     }
 
     private static func decodeDownloadPayload(_ payload: String) -> PythonFlowOutcome {

@@ -1,24 +1,65 @@
 import Foundation
 
 enum PythonScripts {
-    static let ytDlpScript = loadScript(named: "yt_dlp_flow", extension: "py")
+    private static let stagedPythonFiles: [String] = [
+        "yt_dlp_flow.py",
+        "palladium_ytdlp/__init__.py",
+        "palladium_ytdlp/args.py",
+        "palladium_ytdlp/entrypoints.py",
+        "palladium_ytdlp/ffmpeg_bridge.py",
+        "palladium_ytdlp/files.py",
+        "palladium_ytdlp/packages.py",
+        "palladium_ytdlp/shared.py",
+        "palladium_ytdlp/webkit_jsi.py",
+    ]
 
-    private static func loadScript(named name: String, extension fileExtension: String) -> String {
-        let fileName = "\(name).\(fileExtension)"
+    static let ytDlpScriptURL = stagePythonScripts().appendingPathComponent("yt_dlp_flow.py")
 
-        for bundle in candidateBundles {
-            if let directURL = bundle.url(forResource: name, withExtension: fileExtension),
-               let script = try? String(contentsOf: directURL, encoding: .utf8) {
-                return script
+    private static func stagePythonScripts() -> URL {
+        let fileManager = FileManager.default
+        let rootURL = fileManager.temporaryDirectory.appendingPathComponent("PalladiumPythonScripts", isDirectory: true)
+
+        try? fileManager.removeItem(at: rootURL)
+        try? fileManager.createDirectory(at: rootURL, withIntermediateDirectories: true)
+
+        for relativePath in stagedPythonFiles {
+            let sourceURL = requiredBundledFileURL(for: relativePath)
+            let destinationURL = rootURL.appendingPathComponent(relativePath)
+            try? fileManager.createDirectory(
+                at: destinationURL.deletingLastPathComponent(),
+                withIntermediateDirectories: true
+            )
+
+            if fileManager.fileExists(atPath: destinationURL.path) {
+                try? fileManager.removeItem(at: destinationURL)
             }
 
-            if let scriptURL = bundledScriptURL(in: bundle, fileName: fileName),
-               let script = try? String(contentsOf: scriptURL, encoding: .utf8) {
-                return script
+            do {
+                try fileManager.copyItem(at: sourceURL, to: destinationURL)
+            } catch {
+                preconditionFailure("Unable to stage Python script \(relativePath): \(error.localizedDescription)")
             }
         }
 
-        preconditionFailure("Missing bundled Python script: \(fileName)")
+        return rootURL
+    }
+
+    private static func requiredBundledFileURL(for relativePath: String) -> URL {
+        let fileName = (relativePath as NSString).lastPathComponent
+        let name = (fileName as NSString).deletingPathExtension
+        let fileExtension = (fileName as NSString).pathExtension
+
+        for bundle in candidateBundles {
+            if let directURL = bundle.url(forResource: name, withExtension: fileExtension) {
+                return directURL
+            }
+
+            if let scriptURL = bundledScriptURL(in: bundle, fileName: fileName) {
+                return scriptURL
+            }
+        }
+
+        preconditionFailure("Missing bundled Python script: \(relativePath)")
     }
 
     private static var candidateBundles: [Bundle] {

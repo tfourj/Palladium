@@ -1,0 +1,433 @@
+import contextlib
+import json
+import os
+import runpy
+import sys
+import time
+import traceback
+import importlib.metadata as importlib_metadata
+
+from .args import (
+    build_preset_args,
+    has_custom_output_template,
+    parse_custom_args,
+    parse_extra_args,
+    parse_preset_args_map,
+)
+from .ffmpeg_bridge import (
+    SwiftFFmpegBridge,
+    is_cancel_requested,
+    patch_subprocess_for_swiftffmpeg,
+    patch_ytdlp_cancel,
+    patch_ytdlp_ffmpeg_detection,
+    patch_ytdlp_popen_for_swiftffmpeg,
+)
+from .files import cleanup_existing_downloads, cleanup_temp_download_files, detect_downloaded_file_path
+from .packages import (
+    build_package_install_plan,
+    check_package_updates,
+    cleanup_target_package,
+    collect_versions,
+    ensure_pip_entrypoint,
+    fetch_package_index_versions,
+)
+from .shared import TRACKED_PACKAGES, TailBuffer, Tee, open_live_log_stream
+from .webkit_jsi import ensure_safe_webkit_jsi_runtime
+
+
+def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, preset_args_json_override=None, extra_args_override=None):
+    output = TailBuffer()
+    console_stdout = sys.__stdout__ if sys.__stdout__ is not None else None
+    console_stderr = sys.__stderr__ if sys.__stderr__ is not None else None
+    pip_attempted = False
+    pip_exit_code = None
+    yt_exit_code = None
+    downloaded_path = None
+    cancelled = False
+    success = False
+    if download_url_override is None:
+        download_url = os.environ.get("PALLADIUM_DOWNLOAD_URL", "").strip()
+    else:
+        download_url = str(download_url_override).strip()
+
+    if download_preset_override is None:
+        download_preset = os.environ.get("PALLADIUM_DOWNLOAD_PRESET", "auto_video").strip()
+    else:
+        download_preset = str(download_preset_override).strip()
+    if preset_args_json_override is None:
+        preset_args_json = os.environ.get("PALLADIUM_PRESET_ARGS_JSON", "").strip()
+    else:
+        preset_args_json = str(preset_args_json_override).strip()
+    if extra_args_override is None:
+        extra_args_text = os.environ.get("PALLADIUM_EXTRA_ARGS", "").strip()
+    else:
+        extra_args_text = str(extra_args_override).strip()
+    downloads_dir = os.environ.get("PALLADIUM_DOWNLOADS", "").strip()
+    install_target = os.environ.get("PALLADIUM_PYTHON_PACKAGES")
+    cache_dir = os.environ.get("PALLADIUM_CACHE_DIR", "").strip()
+    cancel_file_path = os.environ.get("PALLADIUM_CANCEL_FILE", "").strip()
+    live_log_stream = open_live_log_stream(os.environ.get("PALLADIUM_LOG_FD"))
+
+    with contextlib.redirect_stdout(Tee(output, console_stdout, live_log_stream)), contextlib.redirect_stderr(Tee(output, console_stderr, live_log_stream)):
+        os.environ["PYTHONIOENCODING"] = "utf-8"
+        if install_target:
+            os.makedirs(install_target, exist_ok=True)
+            if install_target not in sys.path:
+                sys.path.insert(0, install_target)
+            print(f"[palladium] package install target: {install_target}")
+        if downloads_dir:
+            os.makedirs(downloads_dir, exist_ok=True)
+            print(f"[palladium] download target: {downloads_dir}")
+        if cache_dir:
+            os.makedirs(cache_dir, exist_ok=True)
+            print(f"[palladium] cache target: {cache_dir}")
+
+        ffmpeg_bridge_dir = ""
+        if downloads_dir:
+            ffmpeg_bridge_dir = os.path.join(downloads_dir, ".palladium-ffmpeg")
+            try:
+                os.makedirs(ffmpeg_bridge_dir, exist_ok=True)
+                ffmpeg_stub = os.path.join(ffmpeg_bridge_dir, "ffmpeg")
+                ffprobe_stub = os.path.join(ffmpeg_bridge_dir, "ffprobe")
+                for stub_path in (ffmpeg_stub, ffprobe_stub):
+                    if not os.path.exists(stub_path):
+                        with open(stub_path, "w", encoding="utf-8") as stub_file:
+                            stub_file.write("#!/bin/sh\\n")
+                            stub_file.write("echo 'palladium swiftffmpeg bridge stub'\\n")
+                    try:
+                        os.chmod(stub_path, 0o755)
+                    except Exception:
+                        pass
+                print(f"[palladium][ffmpeg-bridge] stub location: {ffmpeg_bridge_dir}")
+                os.environ["PATH"] = ffmpeg_bridge_dir + os.pathsep + os.environ.get("PATH", "")
+            except Exception:
+                ffmpeg_bridge_dir = ""
+                print("[palladium][ffmpeg-bridge] unable to prepare ffmpeg-location stubs")
+                traceback.print_exc()
+
+        needs_yt_dlp_install = False
+        needs_webkit_jsi_install = False
+
+        print("[palladium] checking yt_dlp import")
+        try:
+            import yt_dlp  # noqa: F401
+            print("[palladium] yt_dlp already installed")
+        except Exception:
+            needs_yt_dlp_install = True
+            print("[palladium] yt_dlp module missing")
+
+        print("[palladium] checking yt-dlp-apple-webkit-jsi package")
+        try:
+            importlib_metadata.version("yt-dlp-apple-webkit-jsi")
+            print("[palladium] yt-dlp-apple-webkit-jsi already installed")
+        except Exception:
+            needs_webkit_jsi_install = True
+            print("[palladium] yt-dlp-apple-webkit-jsi missing")
+
+        if needs_yt_dlp_install or needs_webkit_jsi_install:
+            pip_attempted = True
+            pip_main = ensure_pip_entrypoint(install_target)
+            if pip_main is not None:
+                packages = []
+                if needs_yt_dlp_install:
+                    packages.append("yt-dlp")
+                if needs_webkit_jsi_install:
+                    packages.append("yt-dlp-apple-webkit-jsi")
+
+                try:
+                    pip_args = ["install", "--no-cache-dir", "--progress-bar", "off", "--no-color", *packages]
+                    if install_target:
+                        pip_args[1:1] = ["--target", install_target]
+                    pip_args[1:1] = ["--disable-pip-version-check"]
+                    pip_result = pip_main(pip_args)
+                    pip_exit_code = 0 if pip_result is None else int(pip_result)
+                    print(f"[palladium] pip exit code: {pip_exit_code}")
+                except Exception:
+                    pip_exit_code = 1
+                    print("[palladium] pip install failed")
+                    traceback.print_exc()
+            else:
+                pip_exit_code = 1
+
+            try:
+                if install_target and install_target not in sys.path:
+                    sys.path.insert(0, install_target)
+                import yt_dlp  # noqa: F401
+                print("[palladium] yt_dlp import succeeded after install")
+            except Exception:
+                print("[palladium] yt_dlp still unavailable after install attempt")
+                traceback.print_exc()
+
+        ensure_safe_webkit_jsi_runtime(install_target)
+
+        if not download_url:
+            print("[palladium] no URL provided")
+            yt_exit_code = 1
+        elif is_cancel_requested(cancel_file_path):
+            print("[palladium] cancellation requested before run")
+            cancelled = True
+            yt_exit_code = 130
+        else:
+            print(f"[palladium] running yt-dlp -v {download_url}")
+
+        argv_backup = sys.argv[:]
+        cwd_backup = os.getcwd()
+        run_started_at = time.time()
+
+        try:
+            if download_url:
+                bridge = None
+                try:
+                    bridge = SwiftFFmpegBridge()
+                    print("[palladium][ffmpeg-bridge] bridge loaded")
+                    print("[palladium][ffmpeg-bridge] startup probes skipped")
+                except Exception as bridge_error:
+                    print(f"[palladium] swift ffmpeg bridge error: {bridge_error}")
+                    traceback.print_exc()
+                    yt_exit_code = 1
+
+                if yt_exit_code != 1:
+                    if downloads_dir:
+                        os.chdir(downloads_dir)
+                    cleanup_temp_download_files(downloads_dir)
+                    cleanup_existing_downloads(downloads_dir, download_url)
+
+                    if is_cancel_requested(cancel_file_path):
+                        print("[palladium] cancellation requested before yt-dlp start")
+                        cancelled = True
+                        yt_exit_code = 130
+
+                    if yt_exit_code is None:
+                        preset_args_map = parse_preset_args_map(preset_args_json)
+                        selected_args = preset_args_map.get(download_preset, "")
+                        if selected_args:
+                            preset_args = parse_custom_args(selected_args)
+                            print(f"[palladium] preset args override: {download_preset}")
+                        elif download_preset == "custom":
+                            preset_args = []
+                            print("[palladium] preset: custom (no args)")
+                        else:
+                            preset_args = build_preset_args(download_preset)
+                        extra_args = parse_extra_args(extra_args_text)
+                        output_args = []
+                        if has_custom_output_template(preset_args) or has_custom_output_template(extra_args):
+                            print("[palladium] custom output template detected")
+                        else:
+                            output_args = ["-o", "%(title)s.%(ext)s"]
+
+                        sys.argv = [
+                            "yt-dlp",
+                            "-v",
+                            "--no-check-certificate",
+                            "--remote-components",
+                            "ejs:github",
+                            "--cache-dir",
+                            cache_dir if cache_dir else os.path.join(downloads_dir if downloads_dir else ".", ".cache"),
+                            "--force-overwrites",
+                            "--no-continue",
+                            "--ffmpeg-location",
+                            ffmpeg_bridge_dir if ffmpeg_bridge_dir else ".",
+                            "-P",
+                            downloads_dir if downloads_dir else ".",
+                            *output_args,
+                            *preset_args,
+                            *extra_args,
+                            download_url,
+                        ]
+
+                        try:
+                            with (
+                                patch_subprocess_for_swiftffmpeg(bridge),
+                                patch_ytdlp_popen_for_swiftffmpeg(bridge),
+                                patch_ytdlp_ffmpeg_detection(),
+                                patch_ytdlp_cancel(cancel_file_path),
+                            ):
+                                runpy.run_module("yt_dlp", run_name="__main__", alter_sys=True)
+                            yt_exit_code = 0
+                        except KeyboardInterrupt:
+                            cancelled = True
+                            yt_exit_code = 130
+                            print("[palladium] yt-dlp cancelled by user")
+                        except SystemExit as exc:
+                            if exc.code is None:
+                                yt_exit_code = 0
+                            elif isinstance(exc.code, int):
+                                yt_exit_code = exc.code
+                            else:
+                                print(f"[palladium] unexpected SystemExit code: {exc.code}")
+                                yt_exit_code = 1
+                        except Exception:
+                            print("[palladium] yt-dlp execution failed")
+                            traceback.print_exc()
+                            yt_exit_code = 1
+
+                if not cancelled and yt_exit_code is not None:
+                    try:
+                        log_text = output.getvalue()
+                        scan_dir = downloads_dir if downloads_dir else os.getcwd()
+                        downloaded_path = detect_downloaded_file_path(log_text, scan_dir, run_started_at)
+                        if downloaded_path:
+                            print(f"[palladium] downloaded file: {downloaded_path}")
+                            if yt_exit_code != 0:
+                                print(f"[palladium] overriding yt-dlp exit code {yt_exit_code} because downloaded file exists")
+                                yt_exit_code = 0
+                        else:
+                            print("[palladium] downloaded file path not detected")
+                    except Exception:
+                        print("[palladium] unable to detect downloaded file path")
+                        traceback.print_exc()
+        except Exception:
+            print("[palladium] unable to execute yt_dlp as __main__")
+            traceback.print_exc()
+            yt_exit_code = 1
+        finally:
+            sys.argv = argv_backup
+            try:
+                os.chdir(cwd_backup)
+            except Exception:
+                pass
+            if live_log_stream is not None:
+                try:
+                    live_log_stream.flush()
+                except Exception:
+                    pass
+
+        success = (pip_exit_code in (None, 0)) and (yt_exit_code == 0) and not cancelled
+        print(f"[palladium] flow success: {success}")
+
+    return json.dumps({
+        "pip_attempted": pip_attempted,
+        "pip_exit_code": pip_exit_code,
+        "yt_exit_code": yt_exit_code,
+        "cancelled": cancelled,
+        "success": success,
+        "downloaded_path": downloaded_path,
+        "output": output.getvalue(),
+    })
+
+
+def run_package_maintenance(action, custom_versions_json=None):
+    output = TailBuffer()
+    console_stdout = sys.__stdout__ if sys.__stdout__ is not None else None
+    console_stderr = sys.__stderr__ if sys.__stderr__ is not None else None
+    pip_attempted = False
+    pip_exit_code = None
+    success = False
+    updates_available = False
+    updates_summary = "Not checked yet."
+    available_versions = {}
+    install_target = os.environ.get("PALLADIUM_PYTHON_PACKAGES")
+    live_log_stream = open_live_log_stream(os.environ.get("PALLADIUM_LOG_FD"))
+
+    with contextlib.redirect_stdout(Tee(output, console_stdout, live_log_stream)), contextlib.redirect_stderr(Tee(output, console_stderr, live_log_stream)):
+        os.environ["PYTHONIOENCODING"] = "utf-8"
+        if install_target:
+            os.makedirs(install_target, exist_ok=True)
+            if install_target not in sys.path:
+                sys.path.insert(0, install_target)
+            print(f"[palladium] package install target: {install_target}")
+
+        print(f"[palladium] package action: {action}")
+        if action == "versions":
+            updates_available = False
+            updates_summary = "Skipped update check."
+            print("[palladium] quick version refresh only")
+        elif action == "index_versions":
+            updates_available = False
+            updates_summary = "Skipped update check."
+            available_versions = fetch_package_index_versions(install_target)
+            print("[palladium] fetched package index versions")
+        else:
+            updates_available, updates_summary = check_package_updates(install_target)
+            print(f"[palladium] updates available: {updates_available}")
+            print(f"[palladium] updates summary: {updates_summary}")
+
+        custom_versions = {}
+        if custom_versions_json:
+            try:
+                parsed_versions = json.loads(custom_versions_json)
+                if isinstance(parsed_versions, dict):
+                    for package_name in TRACKED_PACKAGES:
+                        raw_value = parsed_versions.get(package_name)
+                        if raw_value is None:
+                            continue
+                        requested_version = str(raw_value).strip()
+                        if requested_version:
+                            custom_versions[package_name] = requested_version
+            except Exception:
+                print("[palladium] failed to parse custom version payload")
+                traceback.print_exc()
+        if custom_versions:
+            print(f"[palladium] custom package versions requested: {custom_versions}")
+
+        if action == "update":
+            if updates_available or bool(custom_versions):
+                pip_main = ensure_pip_entrypoint(install_target)
+                if pip_main is not None:
+                    try:
+                        installed_versions = collect_versions(install_target=install_target, allow_cache_fallback=False)
+                        indexed_versions = fetch_package_index_versions(install_target=install_target, pip_main=pip_main)
+                        packages, cleanup_packages = build_package_install_plan(
+                            installed_versions,
+                            indexed_versions,
+                            custom_versions=custom_versions,
+                        )
+
+                        if not packages:
+                            print("[palladium] no package installs required")
+                            pip_exit_code = 0
+                        else:
+                            pip_attempted = True
+                            if install_target:
+                                stale_removed = 0
+                                for package_name in cleanup_packages:
+                                    stale_removed += cleanup_target_package(install_target, package_name)
+                                print(f"[palladium] removed stale target package entries: {stale_removed}")
+                            pip_args = [
+                                "install",
+                                "--upgrade",
+                                "--disable-pip-version-check",
+                                "--no-cache-dir",
+                                "--progress-bar",
+                                "off",
+                                "--no-color",
+                                *packages,
+                            ]
+                            if install_target:
+                                pip_args[1:1] = ["--target", install_target]
+                            pip_result = pip_main(pip_args)
+                            pip_exit_code = 0 if pip_result is None else int(pip_result)
+                            print(f"[palladium] pip exit code: {pip_exit_code}")
+                    except Exception:
+                        pip_exit_code = 1
+                        print("[palladium] pip update failed")
+                        traceback.print_exc()
+                else:
+                    pip_exit_code = 1
+            else:
+                print("[palladium] no updates available; skipping update")
+
+            updates_available, updates_summary = check_package_updates(install_target)
+            print(f"[palladium] post-update updates available: {updates_available}")
+            print(f"[palladium] post-update updates summary: {updates_summary}")
+
+        ensure_safe_webkit_jsi_runtime(install_target)
+
+        versions = collect_versions(install_target=install_target)
+        print(f"[palladium] yt-dlp version: {versions.get('yt-dlp')}")
+        print(f"[palladium] yt-dlp-apple-webkit-jsi version: {versions.get('yt-dlp-apple-webkit-jsi')}")
+        print(f"[palladium] pip version: {versions.get('pip')}")
+
+        success = (pip_exit_code in (None, 0))
+        print(f"[palladium] package flow success: {success}")
+
+    return json.dumps({
+        "pip_attempted": pip_attempted,
+        "pip_exit_code": pip_exit_code,
+        "success": success,
+        "updates_available": updates_available,
+        "updates_summary": updates_summary,
+        "versions": versions,
+        "available_versions": available_versions,
+        "output": output.getvalue(),
+    })
