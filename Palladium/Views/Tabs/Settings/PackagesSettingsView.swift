@@ -11,6 +11,7 @@ struct PackagesSettingsView: View {
     let isLoadingPackageVersions: Bool
     let isRunning: Bool
     let onRefreshVersions: () -> Void
+    let onCancel: () -> Void
     let onUpdatePackages: () -> Void
     let onCustomUpdatePackages: (_ ytDlpVersion: String?, _ webkitJSIVersion: String?, _ pipVersion: String?) -> Void
     let onFetchPackageVersions: () -> Void
@@ -50,12 +51,20 @@ struct PackagesSettingsView: View {
             }
 
             Section("Actions") {
-                Button(action: onRefreshVersions) {
-                    Text(isRunning ? "Running..." : "Check for Updates")
-                        .frame(maxWidth: .infinity)
+                if isRunning {
+                    Button(action: onCancel) {
+                        Text("Cancel")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.red)
+                } else {
+                    Button(action: onRefreshVersions) {
+                        Text("Check for Updates")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
                 }
-                .buttonStyle(.borderedProminent)
-                .disabled(isRunning)
 
                 Button {
                     guard !isRunning, updatesAvailable else { return }

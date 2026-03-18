@@ -35,6 +35,12 @@ from .shared import TRACKED_PACKAGES, TailBuffer, Tee, open_live_log_stream
 from .webkit_jsi import ensure_safe_webkit_jsi_runtime
 
 
+def raise_if_cancel_requested(cancel_file_path, message):
+    if is_cancel_requested(cancel_file_path):
+        print(message)
+        raise KeyboardInterrupt("cancel requested")
+
+
 def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, preset_args_json_override=None, extra_args_override=None):
     output = TailBuffer()
     console_stdout = sys.__stdout__ if sys.__stdout__ is not None else None
@@ -69,22 +75,26 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, p
     live_log_stream = open_live_log_stream(os.environ.get("PALLADIUM_LOG_FD"))
 
     with contextlib.redirect_stdout(Tee(output, console_stdout, live_log_stream)), contextlib.redirect_stderr(Tee(output, console_stderr, live_log_stream)):
-        os.environ["PYTHONIOENCODING"] = "utf-8"
-        if install_target:
-            os.makedirs(install_target, exist_ok=True)
-            if install_target not in sys.path:
-                sys.path.insert(0, install_target)
-            print(f"[palladium] package install target: {install_target}")
-        if downloads_dir:
-            os.makedirs(downloads_dir, exist_ok=True)
-            print(f"[palladium] download target: {downloads_dir}")
-        if cache_dir:
-            os.makedirs(cache_dir, exist_ok=True)
-            print(f"[palladium] cache target: {cache_dir}")
-
         ffmpeg_bridge_dir = ""
-        if downloads_dir:
-            ffmpeg_bridge_dir = os.path.join(downloads_dir, ".palladium-ffmpeg")
+        argv_backup = sys.argv[:]
+        cwd_backup = os.getcwd()
+        run_started_at = time.time()
+        try:
+            os.environ["PYTHONIOENCODING"] = "utf-8"
+            if install_target:
+                os.makedirs(install_target, exist_ok=True)
+                if install_target not in sys.path:
+                    sys.path.insert(0, install_target)
+                print(f"[palladium] package install target: {install_target}")
+            if downloads_dir:
+                os.makedirs(downloads_dir, exist_ok=True)
+                print(f"[palladium] download target: {downloads_dir}")
+            if cache_dir:
+                os.makedirs(cache_dir, exist_ok=True)
+                print(f"[palladium] cache target: {cache_dir}")
+
+            if downloads_dir:
+                ffmpeg_bridge_dir = os.path.join(downloads_dir, ".palladium-ffmpeg")
             try:
                 os.makedirs(ffmpeg_bridge_dir, exist_ok=True)
                 ffmpeg_stub = os.path.join(ffmpeg_bridge_dir, "ffmpeg")
@@ -105,77 +115,76 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, p
                 print("[palladium][ffmpeg-bridge] unable to prepare ffmpeg-location stubs")
                 traceback.print_exc()
 
-        needs_yt_dlp_install = False
-        needs_webkit_jsi_install = False
+            needs_yt_dlp_install = False
+            needs_webkit_jsi_install = False
 
-        print("[palladium] checking yt_dlp import")
-        try:
-            import yt_dlp  # noqa: F401
-            print("[palladium] yt_dlp already installed")
-        except Exception:
-            needs_yt_dlp_install = True
-            print("[palladium] yt_dlp module missing")
+            print("[palladium] checking yt_dlp import")
+            try:
+                import yt_dlp  # noqa: F401
+                print("[palladium] yt_dlp already installed")
+            except Exception:
+                needs_yt_dlp_install = True
+                print("[palladium] yt_dlp module missing")
 
-        print("[palladium] checking yt-dlp-apple-webkit-jsi package")
-        try:
-            importlib_metadata.version("yt-dlp-apple-webkit-jsi")
-            print("[palladium] yt-dlp-apple-webkit-jsi already installed")
-        except Exception:
-            needs_webkit_jsi_install = True
-            print("[palladium] yt-dlp-apple-webkit-jsi missing")
+            print("[palladium] checking yt-dlp-apple-webkit-jsi package")
+            try:
+                importlib_metadata.version("yt-dlp-apple-webkit-jsi")
+                print("[palladium] yt-dlp-apple-webkit-jsi already installed")
+            except Exception:
+                needs_webkit_jsi_install = True
+                print("[palladium] yt-dlp-apple-webkit-jsi missing")
 
-        if needs_yt_dlp_install or needs_webkit_jsi_install:
-            pip_attempted = True
-            pip_main = ensure_pip_entrypoint(install_target)
-            if pip_main is not None:
-                packages = []
-                if needs_yt_dlp_install:
-                    packages.append("yt-dlp")
-                if needs_webkit_jsi_install:
-                    packages.append("yt-dlp-apple-webkit-jsi")
+            if needs_yt_dlp_install or needs_webkit_jsi_install:
+                raise_if_cancel_requested(cancel_file_path, "[palladium] cancellation requested before pip install")
+                pip_attempted = True
+                pip_main = ensure_pip_entrypoint(install_target)
+                if pip_main is not None:
+                    packages = []
+                    if needs_yt_dlp_install:
+                        packages.append("yt-dlp")
+                    if needs_webkit_jsi_install:
+                        packages.append("yt-dlp-apple-webkit-jsi")
+
+                    try:
+                        raise_if_cancel_requested(cancel_file_path, "[palladium] cancellation requested before pip install")
+                        pip_args = ["install", "--no-cache-dir", "--progress-bar", "off", "--no-color", *packages]
+                        if install_target:
+                            pip_args[1:1] = ["--target", install_target]
+                        pip_args[1:1] = ["--disable-pip-version-check"]
+                        pip_result = pip_main(pip_args)
+                        pip_exit_code = 0 if pip_result is None else int(pip_result)
+                        print(f"[palladium] pip exit code: {pip_exit_code}")
+                    except Exception:
+                        pip_exit_code = 1
+                        print("[palladium] pip install failed")
+                        traceback.print_exc()
+                else:
+                    pip_exit_code = 1
 
                 try:
-                    pip_args = ["install", "--no-cache-dir", "--progress-bar", "off", "--no-color", *packages]
-                    if install_target:
-                        pip_args[1:1] = ["--target", install_target]
-                    pip_args[1:1] = ["--disable-pip-version-check"]
-                    pip_result = pip_main(pip_args)
-                    pip_exit_code = 0 if pip_result is None else int(pip_result)
-                    print(f"[palladium] pip exit code: {pip_exit_code}")
+                    if install_target and install_target not in sys.path:
+                        sys.path.insert(0, install_target)
+                    import yt_dlp  # noqa: F401
+                    print("[palladium] yt_dlp import succeeded after install")
                 except Exception:
-                    pip_exit_code = 1
-                    print("[palladium] pip install failed")
+                    print("[palladium] yt_dlp still unavailable after install attempt")
                     traceback.print_exc()
+
+            raise_if_cancel_requested(cancel_file_path, "[palladium] cancellation requested before webkit patch")
+            ensure_safe_webkit_jsi_runtime(install_target)
+
+            if not download_url:
+                print("[palladium] no URL provided")
+                yt_exit_code = 1
+            elif is_cancel_requested(cancel_file_path):
+                print("[palladium] cancellation requested before run")
+                cancelled = True
+                yt_exit_code = 130
             else:
-                pip_exit_code = 1
+                print(f"[palladium] running yt-dlp -v {download_url}")
 
-            try:
-                if install_target and install_target not in sys.path:
-                    sys.path.insert(0, install_target)
-                import yt_dlp  # noqa: F401
-                print("[palladium] yt_dlp import succeeded after install")
-            except Exception:
-                print("[palladium] yt_dlp still unavailable after install attempt")
-                traceback.print_exc()
-
-        ensure_safe_webkit_jsi_runtime(install_target)
-
-        if not download_url:
-            print("[palladium] no URL provided")
-            yt_exit_code = 1
-        elif is_cancel_requested(cancel_file_path):
-            print("[palladium] cancellation requested before run")
-            cancelled = True
-            yt_exit_code = 130
-        else:
-            print(f"[palladium] running yt-dlp -v {download_url}")
-
-        argv_backup = sys.argv[:]
-        cwd_backup = os.getcwd()
-        run_started_at = time.time()
-
-        try:
             if download_url:
+                raise_if_cancel_requested(cancel_file_path, "[palladium] cancellation requested before bridge startup")
                 bridge = None
                 try:
                     bridge = SwiftFFmpegBridge()
@@ -189,6 +198,7 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, p
                 if yt_exit_code != 1:
                     if downloads_dir:
                         os.chdir(downloads_dir)
+                    raise_if_cancel_requested(cancel_file_path, "[palladium] cancellation requested before download cleanup")
                     cleanup_temp_download_files(downloads_dir)
                     cleanup_existing_downloads(downloads_dir, download_url)
 
@@ -209,6 +219,7 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, p
                         else:
                             preset_args = build_preset_args(download_preset)
                         extra_args = parse_extra_args(extra_args_text)
+                        raise_if_cancel_requested(cancel_file_path, "[palladium] cancellation requested before yt-dlp invocation")
                         output_args = []
                         if has_custom_output_template(preset_args) or has_custom_output_template(extra_args):
                             print("[palladium] custom output template detected")
@@ -261,22 +272,27 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, p
                             traceback.print_exc()
                             yt_exit_code = 1
 
-                if not cancelled and yt_exit_code is not None:
-                    try:
-                        log_text = output.getvalue()
-                        scan_dir = downloads_dir if downloads_dir else os.getcwd()
-                        downloaded_path = detect_downloaded_file_path(log_text, scan_dir, run_started_at)
-                        if downloaded_path:
-                            print(f"[palladium] downloaded file: {downloaded_path}")
-                            if yt_exit_code != 0:
-                                print(f"[palladium] overriding yt-dlp exit code {yt_exit_code} because downloaded file exists")
-                                yt_exit_code = 0
-                        else:
-                            print("[palladium] downloaded file path not detected")
-                    except Exception:
-                        print("[palladium] unable to detect downloaded file path")
-                        traceback.print_exc()
-        except Exception:
+            if not cancelled and yt_exit_code is not None:
+                try:
+                    log_text = output.getvalue()
+                    scan_dir = downloads_dir if downloads_dir else os.getcwd()
+                    downloaded_path = detect_downloaded_file_path(log_text, scan_dir, run_started_at)
+                    if downloaded_path:
+                        print(f"[palladium] downloaded file: {downloaded_path}")
+                        if yt_exit_code != 0:
+                            print(f"[palladium] overriding yt-dlp exit code {yt_exit_code} because downloaded file exists")
+                            yt_exit_code = 0
+                    else:
+                        print("[palladium] downloaded file path not detected")
+                except Exception:
+                    print("[palladium] unable to detect downloaded file path")
+                    traceback.print_exc()
+        except KeyboardInterrupt:
+            cancelled = True
+            if yt_exit_code is None:
+                yt_exit_code = 130
+            print("[palladium] download flow cancelled by user")
+        except BaseException:
             print("[palladium] unable to execute yt_dlp as __main__")
             traceback.print_exc()
             yt_exit_code = 1
@@ -316,7 +332,10 @@ def run_package_maintenance(action, custom_versions_json=None):
     updates_available = False
     updates_summary = "Not checked yet."
     available_versions = {}
+    versions = {}
+    cancelled = False
     install_target = os.environ.get("PALLADIUM_PYTHON_PACKAGES")
+    cancel_file_path = os.environ.get("PALLADIUM_CANCEL_FILE", "").strip()
     live_log_stream = open_live_log_stream(os.environ.get("PALLADIUM_LOG_FD"))
 
     with contextlib.redirect_stdout(Tee(output, console_stdout, live_log_stream)), contextlib.redirect_stderr(Tee(output, console_stderr, live_log_stream)):
@@ -327,104 +346,117 @@ def run_package_maintenance(action, custom_versions_json=None):
                 sys.path.insert(0, install_target)
             print(f"[palladium] package install target: {install_target}")
 
-        print(f"[palladium] package action: {action}")
-        if action == "versions":
-            updates_available = False
-            updates_summary = "Skipped update check."
-            print("[palladium] quick version refresh only")
-        elif action == "index_versions":
-            updates_available = False
-            updates_summary = "Skipped update check."
-            available_versions = fetch_package_index_versions(install_target)
-            print("[palladium] fetched package index versions")
-        else:
-            updates_available, updates_summary = check_package_updates(install_target)
-            print(f"[palladium] updates available: {updates_available}")
-            print(f"[palladium] updates summary: {updates_summary}")
-
-        custom_versions = {}
-        if custom_versions_json:
-            try:
-                parsed_versions = json.loads(custom_versions_json)
-                if isinstance(parsed_versions, dict):
-                    for package_name in TRACKED_PACKAGES:
-                        raw_value = parsed_versions.get(package_name)
-                        if raw_value is None:
-                            continue
-                        requested_version = str(raw_value).strip()
-                        if requested_version:
-                            custom_versions[package_name] = requested_version
-            except Exception:
-                print("[palladium] failed to parse custom version payload")
-                traceback.print_exc()
-        if custom_versions:
-            print(f"[palladium] custom package versions requested: {custom_versions}")
-
-        if action == "update":
-            if updates_available or bool(custom_versions):
-                pip_main = ensure_pip_entrypoint(install_target)
-                if pip_main is not None:
-                    try:
-                        installed_versions = collect_versions(install_target=install_target, allow_cache_fallback=False)
-                        indexed_versions = fetch_package_index_versions(install_target=install_target, pip_main=pip_main)
-                        packages, cleanup_packages = build_package_install_plan(
-                            installed_versions,
-                            indexed_versions,
-                            custom_versions=custom_versions,
-                        )
-
-                        if not packages:
-                            print("[palladium] no package installs required")
-                            pip_exit_code = 0
-                        else:
-                            pip_attempted = True
-                            if install_target:
-                                stale_removed = 0
-                                for package_name in cleanup_packages:
-                                    stale_removed += cleanup_target_package(install_target, package_name)
-                                print(f"[palladium] removed stale target package entries: {stale_removed}")
-                            pip_args = [
-                                "install",
-                                "--upgrade",
-                                "--disable-pip-version-check",
-                                "--no-cache-dir",
-                                "--progress-bar",
-                                "off",
-                                "--no-color",
-                                *packages,
-                            ]
-                            if install_target:
-                                pip_args[1:1] = ["--target", install_target]
-                            pip_result = pip_main(pip_args)
-                            pip_exit_code = 0 if pip_result is None else int(pip_result)
-                            print(f"[palladium] pip exit code: {pip_exit_code}")
-                    except Exception:
-                        pip_exit_code = 1
-                        print("[palladium] pip update failed")
-                        traceback.print_exc()
-                else:
-                    pip_exit_code = 1
+        try:
+            raise_if_cancel_requested(cancel_file_path, "[palladium] package action cancelled before start")
+            print(f"[palladium] package action: {action}")
+            if action == "versions":
+                updates_available = False
+                updates_summary = "Skipped update check."
+                print("[palladium] quick version refresh only")
+            elif action == "index_versions":
+                updates_available = False
+                updates_summary = "Skipped update check."
+                available_versions = fetch_package_index_versions(install_target)
+                print("[palladium] fetched package index versions")
             else:
-                print("[palladium] no updates available; skipping update")
+                updates_available, updates_summary = check_package_updates(install_target)
+                print(f"[palladium] updates available: {updates_available}")
+                print(f"[palladium] updates summary: {updates_summary}")
 
-            updates_available, updates_summary = check_package_updates(install_target)
-            print(f"[palladium] post-update updates available: {updates_available}")
-            print(f"[palladium] post-update updates summary: {updates_summary}")
+            custom_versions = {}
+            if custom_versions_json:
+                try:
+                    parsed_versions = json.loads(custom_versions_json)
+                    if isinstance(parsed_versions, dict):
+                        for package_name in TRACKED_PACKAGES:
+                            raw_value = parsed_versions.get(package_name)
+                            if raw_value is None:
+                                continue
+                            requested_version = str(raw_value).strip()
+                            if requested_version:
+                                custom_versions[package_name] = requested_version
+                except Exception:
+                    print("[palladium] failed to parse custom version payload")
+                    traceback.print_exc()
+            if custom_versions:
+                print(f"[palladium] custom package versions requested: {custom_versions}")
 
-        ensure_safe_webkit_jsi_runtime(install_target)
+            if action == "update":
+                if updates_available or bool(custom_versions):
+                    raise_if_cancel_requested(cancel_file_path, "[palladium] package action cancelled before pip startup")
+                    pip_main = ensure_pip_entrypoint(install_target)
+                    if pip_main is not None:
+                        try:
+                            installed_versions = collect_versions(install_target=install_target, allow_cache_fallback=False)
+                            indexed_versions = fetch_package_index_versions(install_target=install_target, pip_main=pip_main)
+                            packages, cleanup_packages = build_package_install_plan(
+                                installed_versions,
+                                indexed_versions,
+                                custom_versions=custom_versions,
+                            )
 
-        versions = collect_versions(install_target=install_target)
-        print(f"[palladium] yt-dlp version: {versions.get('yt-dlp')}")
-        print(f"[palladium] yt-dlp-apple-webkit-jsi version: {versions.get('yt-dlp-apple-webkit-jsi')}")
-        print(f"[palladium] pip version: {versions.get('pip')}")
+                            if not packages:
+                                print("[palladium] no package installs required")
+                                pip_exit_code = 0
+                            else:
+                                pip_attempted = True
+                                if install_target:
+                                    stale_removed = 0
+                                    for package_name in cleanup_packages:
+                                        raise_if_cancel_requested(cancel_file_path, "[palladium] package action cancelled during cleanup")
+                                        stale_removed += cleanup_target_package(install_target, package_name)
+                                    print(f"[palladium] removed stale target package entries: {stale_removed}")
+                                raise_if_cancel_requested(cancel_file_path, "[palladium] package action cancelled before pip install")
+                                pip_args = [
+                                    "install",
+                                    "--upgrade",
+                                    "--disable-pip-version-check",
+                                    "--no-cache-dir",
+                                    "--progress-bar",
+                                    "off",
+                                    "--no-color",
+                                    *packages,
+                                ]
+                                if install_target:
+                                    pip_args[1:1] = ["--target", install_target]
+                                pip_result = pip_main(pip_args)
+                                pip_exit_code = 0 if pip_result is None else int(pip_result)
+                                print(f"[palladium] pip exit code: {pip_exit_code}")
+                        except Exception:
+                            pip_exit_code = 1
+                            print("[palladium] pip update failed")
+                            traceback.print_exc()
+                    else:
+                        pip_exit_code = 1
+                else:
+                    print("[palladium] no updates available; skipping update")
 
-        success = (pip_exit_code in (None, 0))
-        print(f"[palladium] package flow success: {success}")
+                raise_if_cancel_requested(cancel_file_path, "[palladium] package action cancelled before post-update check")
+                updates_available, updates_summary = check_package_updates(install_target)
+                print(f"[palladium] post-update updates available: {updates_available}")
+                print(f"[palladium] post-update updates summary: {updates_summary}")
+
+            raise_if_cancel_requested(cancel_file_path, "[palladium] package action cancelled before webkit patch")
+            ensure_safe_webkit_jsi_runtime(install_target)
+
+            raise_if_cancel_requested(cancel_file_path, "[palladium] package action cancelled before version collection")
+            versions = collect_versions(install_target=install_target)
+            print(f"[palladium] yt-dlp version: {versions.get('yt-dlp')}")
+            print(f"[palladium] yt-dlp-apple-webkit-jsi version: {versions.get('yt-dlp-apple-webkit-jsi')}")
+            print(f"[palladium] pip version: {versions.get('pip')}")
+
+            success = (pip_exit_code in (None, 0))
+            print(f"[palladium] package flow success: {success}")
+        except KeyboardInterrupt:
+            cancelled = True
+            success = False
+            print("[palladium] package action cancelled by user")
 
     return json.dumps({
         "pip_attempted": pip_attempted,
         "pip_exit_code": pip_exit_code,
         "success": success,
+        "cancelled": cancelled,
         "updates_available": updates_available,
         "updates_summary": updates_summary,
         "versions": versions,

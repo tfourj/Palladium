@@ -28,6 +28,7 @@ struct SettingsTabView: View {
     let isRunning: Bool
     let isPackageRunning: Bool
     let onRefreshVersions: () -> Void
+    let onCancelPackages: () -> Void
     let onUpdatePackages: () -> Void
     let onCustomUpdatePackages: (_ ytDlpVersion: String?, _ webkitJSIVersion: String?, _ pipVersion: String?) -> Void
     let onFetchPackageVersions: () -> Void
@@ -110,6 +111,7 @@ struct SettingsTabView: View {
                         isLoadingPackageVersions: isLoadingPackageVersions,
                         isRunning: isPackageRunning,
                         onRefreshVersions: onRefreshVersions,
+                        onCancel: onCancelPackages,
                         onUpdatePackages: onUpdatePackages,
                         onCustomUpdatePackages: onCustomUpdatePackages,
                         onFetchPackageVersions: onFetchPackageVersions,

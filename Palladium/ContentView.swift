@@ -96,6 +96,7 @@ struct ContentView: View {
     @State private var showToastMessage = false
     @State private var shareItem: ShareItem?
     @State private var currentDownloadTask: Task<Void, Never>?
+    @State private var currentPackageTask: Task<Void, Never>?
     @State private var cancelMarkerURL: URL?
     @State private var lastDownloadProgressPercent: Double?
     @State private var pendingDownloadProgressLine = ""
@@ -167,6 +168,7 @@ struct ContentView: View {
                     isRunning: isRunning,
                     isPackageRunning: isPackageRunning,
                     onRefreshVersions: refreshPackageVersions,
+                    onCancelPackages: cancelPackageFlow,
                     onUpdatePackages: updatePackages,
                     onCustomUpdatePackages: updatePackagesWithCustomVersions,
                     onFetchPackageVersions: fetchPackageIndexVersions,
@@ -774,12 +776,16 @@ struct ContentView: View {
 
     private func cancelDownloadFlow() {
         guard isRunning else { return }
-        if let markerURL = cancelMarkerURL {
-            try? "cancel".write(to: markerURL, atomically: true, encoding: .utf8)
-        }
+        requestActiveOperationCancellation()
         currentDownloadTask?.cancel()
         pendingDownloadProgressLine = ""
         progressText = "Cancelling..."
+    }
+
+    private func cancelPackageFlow() {
+        guard isPackageRunning else { return }
+        requestActiveOperationCancellation()
+        currentPackageTask?.cancel()
     }
 
     private func runPackageFlow(action: String, customVersions: [String: String]? = nil) {
@@ -799,7 +805,15 @@ struct ContentView: View {
         let logPipe = Pipe()
         let readHandle = logPipe.fileHandleForReading
         let writeFD = logPipe.fileHandleForWriting.fileDescriptor
+        let cancelMarker = makeCancelMarkerURL()
+        cancelMarkerURL = cancelMarker
         setenv("PALLADIUM_LOG_FD", "\(writeFD)", 1)
+        if let cancelMarker {
+            setenv("PALLADIUM_CANCEL_FILE", cancelMarker.path, 1)
+            try? FileManager.default.removeItem(at: cancelMarker)
+        } else {
+            unsetenv("PALLADIUM_CANCEL_FILE")
+        }
 
         readHandle.readabilityHandler = { handle in
             let data = handle.availableData
@@ -809,14 +823,20 @@ struct ContentView: View {
             }
         }
 
-        Task {
+        let task = Task {
             let outcome = await PythonFlowRunner.executePackageFlow(action: action, customVersions: customVersions)
 
             unsetenv("PALLADIUM_LOG_FD")
+            unsetenv("PALLADIUM_CANCEL_FILE")
             readHandle.readabilityHandler = nil
             try? readHandle.close()
             try? logPipe.fileHandleForWriting.close()
             await MainActor.run { flushConsoleChunks() }
+            if let cancelMarkerURL {
+                try? FileManager.default.removeItem(at: cancelMarkerURL)
+            }
+            self.cancelMarkerURL = nil
+            self.currentPackageTask = nil
 
             isPackageRunning = false
             isLoadingPackageVersions = false
@@ -838,6 +858,7 @@ struct ContentView: View {
             self.hasLoadedPackageStatus = true
             Self.logger.info("package flow finished with status: \(outcome.statusText, privacy: .public)")
         }
+        currentPackageTask = task
     }
 
     private func refreshPackageVersions() {
@@ -1418,6 +1439,13 @@ struct ContentView: View {
             return URL(fileURLWithPath: downloadsPath).appendingPathComponent(".palladium-cancel-\(UUID().uuidString)")
         }
         return FileManager.default.temporaryDirectory.appendingPathComponent(".palladium-cancel-\(UUID().uuidString)")
+    }
+
+    private func requestActiveOperationCancellation() {
+        if let markerURL = cancelMarkerURL {
+            try? "cancel".write(to: markerURL, atomically: true, encoding: .utf8)
+        }
+        PythonFlowRunner.interruptActiveFlow()
     }
 
     private func clearDownloadsDirectoryContents() throws -> Int {

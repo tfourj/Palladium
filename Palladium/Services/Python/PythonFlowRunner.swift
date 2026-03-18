@@ -1,20 +1,29 @@
 import Foundation
 import PythonKit
+import Darwin
 
 enum PythonFlowRunner {
     private static var insertedScriptDirectories = Set<String>()
 
     static func executeDownloadFlow(url: String, preset: String, presetArgsJSON: String, extraArgs: String) async -> PythonFlowOutcome {
         await runOnPythonThread {
-            let module = loadYtDlpModule()
-            let payload = String(module.run_yt_dlp_flow(url, preset, presetArgsJSON, extraArgs)) ?? ""
+            let payload: String
+            do {
+                let module = try loadYtDlpModule()
+                let function = try pythonMember(module, named: "run_yt_dlp_flow")
+                payload = callPythonFunction(
+                    function,
+                    arguments: [url, preset, presetArgsJSON, extraArgs]
+                )
+            } catch {
+                payload = fallbackPythonErrorPayload(error)
+            }
             return decodeDownloadPayload(payload)
         }
     }
 
     static func executePackageFlow(action: String, customVersions: [String: String]? = nil) async -> PythonFlowOutcome {
         await runOnPythonThread {
-            let module = loadYtDlpModule()
             let customVersionsJSON: String
             if let customVersions,
                let data = try? JSONSerialization.data(withJSONObject: customVersions),
@@ -23,30 +32,99 @@ enum PythonFlowRunner {
             } else {
                 customVersionsJSON = ""
             }
-            let payload = String(module.run_package_maintenance(action, customVersionsJSON)) ?? ""
+
+            let payload: String
+            do {
+                let module = try loadYtDlpModule()
+                let function = try pythonMember(module, named: "run_package_maintenance")
+                payload = callPythonFunction(
+                    function,
+                    arguments: [action, customVersionsJSON]
+                )
+            } catch {
+                payload = fallbackPythonErrorPayload(error)
+            }
             return decodePackagePayload(payload)
         }
     }
 
-    private static func loadYtDlpModule() -> PythonObject {
+    static func interruptActiveFlow() {
+        PythonExecutor.shared.interruptActiveWork()
+    }
+
+    private static func loadYtDlpModule() throws -> PythonObject {
         let scriptURL = PythonScripts.ytDlpScriptURL
         let scriptPath = scriptURL.path
         let scriptDirectoryPath = scriptURL.deletingLastPathComponent().path
 
-        let sys = Python.import("sys")
+        let sys = try Python.attemptImport("sys")
         if !insertedScriptDirectories.contains(scriptDirectoryPath) {
-            sys.path.insert(0, scriptDirectoryPath)
+            let sysPath = try pythonMember(sys, named: "path")
+            let insert = try pythonMember(sysPath, named: "insert")
+            _ = try insert.throwing.dynamicallyCall(withArguments: [0, scriptDirectoryPath])
             insertedScriptDirectories.insert(scriptDirectoryPath)
         }
 
-        let importlibUtil = Python.import("importlib.util")
+        let importlibUtil = try Python.attemptImport("importlib.util")
         let moduleName = "palladium_runtime_ytdlp"
 
-        let spec = importlibUtil.spec_from_file_location(moduleName, scriptPath)
-        let module = importlibUtil.module_from_spec(spec)
-        sys.modules[moduleName] = module
-        _ = spec.loader.exec_module(module)
+        let specFromFileLocation = try pythonMember(importlibUtil, named: "spec_from_file_location")
+        let spec = try specFromFileLocation.throwing.dynamicallyCall(withArguments: [moduleName, scriptPath])
+
+        let moduleFromSpec = try pythonMember(importlibUtil, named: "module_from_spec")
+        let module = try moduleFromSpec.throwing.dynamicallyCall(withArguments: [spec])
+
+        let modules = try pythonMember(sys, named: "modules")
+        let operatorModule = try Python.attemptImport("operator")
+        let setItem = try pythonMember(operatorModule, named: "setitem")
+        _ = try setItem.throwing.dynamicallyCall(withArguments: [modules, moduleName, module])
+
+        let loader = try pythonMember(spec, named: "loader")
+        let execModule = try pythonMember(loader, named: "exec_module")
+        _ = try execModule.throwing.dynamicallyCall(withArguments: [module])
         return module
+    }
+
+    private static func pythonMember(_ object: PythonObject, named name: String) throws -> PythonObject {
+        guard let member = object.checking[dynamicMember: name] else {
+            throw PythonModuleLoadError.missingAttribute(name)
+        }
+        return member
+    }
+
+    private static func callPythonFunction(
+        _ function: PythonObject,
+        arguments: [PythonConvertible]
+    ) -> String {
+        do {
+            let result = try function.throwing.dynamicallyCall(withArguments: arguments)
+            return String(result) ?? ""
+        } catch {
+            return fallbackPythonErrorPayload(error)
+        }
+    }
+
+    private static func fallbackPythonErrorPayload(_ error: Error) -> String {
+        let message = String(describing: error)
+        let isCancelled = message.contains("KeyboardInterrupt") || message.localizedCaseInsensitiveContains("cancel requested")
+        let payload: [String: Any] = [
+            "pip_attempted": false,
+            "pip_exit_code": NSNull(),
+            "yt_exit_code": isCancelled ? 130 : NSNull(),
+            "cancelled": isCancelled,
+            "success": false,
+            "downloaded_path": NSNull(),
+            "output": message,
+            "updates_available": false,
+            "updates_summary": isCancelled ? "Cancelled." : "Not checked yet.",
+            "versions": [:],
+            "available_versions": [:],
+        ]
+        guard let data = try? JSONSerialization.data(withJSONObject: payload),
+              let text = String(data: data, encoding: .utf8) else {
+            return "{\"success\":false,\"cancelled\":\(isCancelled ? "true" : "false"),\"output\":\"\(message.replacingOccurrences(of: "\"", with: "\\\""))\"}"
+        }
+        return text
     }
 
     private static func decodeDownloadPayload(_ payload: String) -> PythonFlowOutcome {
@@ -126,6 +204,7 @@ enum PythonFlowRunner {
         let pipAttempted = result["pip_attempted"] as? Bool ?? false
         let pipExitCode = result["pip_exit_code"] as? Int
         let success = result["success"] as? Bool ?? false
+        let cancelled = result["cancelled"] as? Bool ?? false
         let updatesAvailable = result["updates_available"] as? Bool ?? false
         let updatesSummary = result["updates_summary"] as? String ?? "Not checked yet."
         let output = result["output"] as? String ?? ""
@@ -135,6 +214,7 @@ enum PythonFlowRunner {
         let summary = """
         pip attempted: \(pipAttempted)
         pip exit code: \(pipExitCode.map(String.init) ?? "none")
+        cancelled: \(cancelled)
         updates available: \(updatesAvailable)
         updates summary: \(updatesSummary)
         success: \(success)
@@ -152,7 +232,7 @@ enum PythonFlowRunner {
         let versionsText = versionLines.joined(separator: "\n")
 
         return PythonFlowOutcome(
-            statusText: success ? "success" : "error",
+            statusText: cancelled ? "cancelled" : (success ? "success" : "error"),
             summaryText: summary,
             outputText: output,
             versionsText: versionsText,
@@ -199,6 +279,17 @@ enum PythonFlowRunner {
     }
 }
 
+private enum PythonModuleLoadError: Error, CustomStringConvertible {
+    case missingAttribute(String)
+
+    var description: String {
+        switch self {
+        case .missingAttribute(let name):
+            return "Missing Python attribute: \(name)"
+        }
+    }
+}
+
 struct PythonFlowOutcome: Sendable {
     let statusText: String
     let summaryText: String
@@ -216,7 +307,9 @@ private final class PythonExecutor: NSObject {
     static let shared = PythonExecutor()
 
     private let threadReady = DispatchSemaphore(value: 0)
+    private let stateLock = NSLock()
     private var pythonThread: Thread!
+    private var activePythonThreadID: UInt = 0
 
     private override init() {
         super.init()
@@ -245,10 +338,33 @@ private final class PythonExecutor: NSObject {
 
     func run<T: Sendable>(_ work: @escaping @Sendable () -> T) async -> T {
         await withCheckedContinuation { continuation in
-            let task = PythonWorkItem {
+            let task = PythonWorkItem { [self] in
+                setActivePythonThreadID(PythonCAPI.threadIdent())
+                defer { setActivePythonThreadID(0) }
                 continuation.resume(returning: work())
             }
             perform(#selector(executeWorkItem(_:)), on: pythonThread, with: task, waitUntilDone: false)
+        }
+    }
+
+    func interruptActiveWork() {
+        let threadID: UInt = stateLock.withLock {
+            activePythonThreadID
+        }
+        guard threadID != 0 else { return }
+
+        let gilState = PythonCAPI.gilEnsure()
+        defer { PythonCAPI.gilRelease(gilState) }
+
+        let result = PythonCAPI.setAsyncException(threadID, PythonCAPI.keyboardInterruptException)
+        if result > 1 {
+            _ = PythonCAPI.setAsyncException(threadID, nil)
+        }
+    }
+
+    private func setActivePythonThreadID(_ threadID: UInt) {
+        stateLock.withLock {
+            activePythonThreadID = threadID
         }
     }
 }
@@ -262,5 +378,61 @@ private final class PythonWorkItem: NSObject {
 
     @objc func execute() {
         block()
+    }
+}
+
+private enum PythonCAPI {
+    private typealias PyGILStateEnsureFn = @convention(c) () -> Int32
+    private typealias PyGILStateReleaseFn = @convention(c) (Int32) -> Void
+    private typealias PyThreadGetIdentFn = @convention(c) () -> UInt
+    private typealias PyThreadStateSetAsyncExcFn = @convention(c) (UInt, UnsafeMutableRawPointer?) -> Int32
+
+    private static let handle: UnsafeMutableRawPointer? = {
+        dlopen(nil, RTLD_NOW)
+    }()
+
+    private static let gilEnsureFn: PyGILStateEnsureFn? = loadFunction(named: "PyGILState_Ensure")
+    private static let gilReleaseFn: PyGILStateReleaseFn? = loadFunction(named: "PyGILState_Release")
+    private static let threadIdentFn: PyThreadGetIdentFn? = loadFunction(named: "PyThread_get_thread_ident")
+    private static let asyncExcFn: PyThreadStateSetAsyncExcFn? = loadFunction(named: "PyThreadState_SetAsyncExc")
+    private static let keyboardInterruptSymbol: UnsafeMutableRawPointer? = {
+        guard let handle else { return nil }
+        return dlsym(handle, "PyExc_KeyboardInterrupt")
+    }()
+
+    static func gilEnsure() -> Int32 {
+        gilEnsureFn?() ?? 0
+    }
+
+    static func gilRelease(_ state: Int32) {
+        gilReleaseFn?(state)
+    }
+
+    static func threadIdent() -> UInt {
+        threadIdentFn?() ?? 0
+    }
+
+    static var keyboardInterruptException: UnsafeMutableRawPointer? {
+        guard let keyboardInterruptSymbol else { return nil }
+        return keyboardInterruptSymbol
+            .assumingMemoryBound(to: UnsafeMutableRawPointer?.self)
+            .pointee
+    }
+
+    static func setAsyncException(_ threadID: UInt, _ exception: UnsafeMutableRawPointer?) -> Int32 {
+        asyncExcFn?(threadID, exception) ?? 0
+    }
+
+    private static func loadFunction<T>(named name: String) -> T? {
+        guard let handle, let symbol = dlsym(handle, name) else { return nil }
+        return unsafeBitCast(symbol, to: T.self)
+    }
+}
+
+private extension NSLock {
+    func withLock<T>(_ body: () -> T) -> T {
+        lock()
+        defer { unlock() }
+        return body()
     }
 }
