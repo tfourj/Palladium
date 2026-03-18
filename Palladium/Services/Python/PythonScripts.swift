@@ -874,6 +874,18 @@ def parse_extra_args(extra_args_value):
         return []
 
 
+def has_custom_output_template(args):
+    normalized = [str(arg) for arg in (args or [])]
+    for index, arg in enumerate(normalized):
+        if arg == "-o":
+            return index + 1 < len(normalized)
+        if arg == "--output":
+            return index + 1 < len(normalized)
+        if arg.startswith("--output="):
+            return True
+    return False
+
+
 def is_cancel_requested(cancel_file_path):
     return bool(cancel_file_path) and os.path.exists(cancel_file_path)
 
@@ -1543,6 +1555,11 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, p
                         else:
                             preset_args = build_preset_args(download_preset)
                         extra_args = parse_extra_args(extra_args_text)
+                        output_args = []
+                        if has_custom_output_template(preset_args) or has_custom_output_template(extra_args):
+                            print("[palladium] custom output template detected")
+                        else:
+                            output_args = ["-o", "%(title)s.%(ext)s"]
 
                         sys.argv = [
                             "yt-dlp",
@@ -1558,8 +1575,7 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, p
                             ffmpeg_bridge_dir if ffmpeg_bridge_dir else ".",
                             "-P",
                             downloads_dir if downloads_dir else ".",
-                            "-o",
-                            "%(title)s [%(id)s].%(ext)s",
+                            *output_args,
                             *preset_args,
                             *extra_args,
                             download_url,
