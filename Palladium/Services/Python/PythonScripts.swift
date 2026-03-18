@@ -574,6 +574,14 @@ def normalize_ffmpeg_args(args):
     return normalized
 
 
+def bridge_ffmpeg_output_path(args):
+    for arg in reversed(args):
+        if arg in ("-nostats", "-nostdin"):
+            continue
+        return arg
+    return None
+
+
 def prepare_bridge_ffmpeg_args(tool, args):
     prepared = normalize_ffmpeg_args(args)
     if tool == "ffmpeg":
@@ -589,7 +597,7 @@ def prepare_bridge_ffmpeg_args(tool, args):
         if "-loglevel" not in prepared:
             prepared = ["-loglevel", "error", *prepared]
         if "-nostats" not in prepared:
-            prepared = [*prepared, "-nostats"]
+            prepared = ["-nostats", *prepared]
         if "-nostdin" not in prepared:
             prepared = ["-nostdin", *prepared]
     return prepared
@@ -723,16 +731,7 @@ def cleanup_temp_download_files(downloads_dir):
             if not os.path.isfile(full_path):
                 continue
 
-            lower = name.lower()
-            is_temp = (
-                lower.endswith(".part")
-                or lower.endswith(".ytdl")
-                or lower.endswith(".tmp")
-                or ".temp." in lower
-                or re.search(r"\.f\d+\.[a-z0-9]+\.part$", lower) is not None
-                or ".frag" in lower
-            )
-            if not is_temp:
+            if not is_temp_download_artifact(name):
                 continue
 
             try:
@@ -744,6 +743,62 @@ def cleanup_temp_download_files(downloads_dir):
     except Exception:
         print("[palladium] temp cleanup failed")
         traceback.print_exc()
+
+
+def is_temp_download_artifact(name):
+    lower = str(name).lower()
+    return (
+        lower.endswith(".part")
+        or lower.endswith(".ytdl")
+        or lower.endswith(".tmp")
+        or ".temp." in lower
+        or re.search(r"\.f\d+\.[a-z0-9]+\.part$", lower) is not None
+        or ".frag" in lower
+        or ".fhls-" in lower
+    )
+
+
+def detect_downloaded_file_path(log_text, scan_dir, run_started_at):
+    downloaded_path = None
+    destination_matches = re.findall(r"^\[download\] Destination: (.+)$", log_text, flags=re.MULTILINE)
+    already_downloaded_matches = []
+    for line in log_text.splitlines():
+        if line.startswith("[download]") and "has already been downloaded" in line:
+            candidate_line = line[len("[download]"):].strip()
+            candidate_line = candidate_line.split(" has already been downloaded", 1)[0].strip()
+            if candidate_line:
+                already_downloaded_matches.append(candidate_line)
+
+    if destination_matches:
+        candidate = destination_matches[-1].strip()
+        if candidate:
+            downloaded_path = candidate
+    elif already_downloaded_matches:
+        candidate = already_downloaded_matches[-1].strip()
+        if candidate:
+            downloaded_path = candidate
+
+    if downloaded_path:
+        if not os.path.isabs(downloaded_path):
+            downloaded_path = os.path.join(scan_dir, downloaded_path)
+        if not os.path.isfile(downloaded_path):
+            downloaded_path = None
+
+    if downloaded_path is None:
+        candidates = []
+        for filename in os.listdir(scan_dir):
+            full_path = os.path.join(scan_dir, filename)
+            if not os.path.isfile(full_path) or is_temp_download_artifact(filename):
+                continue
+            mtime = os.path.getmtime(full_path)
+            if mtime >= (run_started_at - 3600):
+                candidates.append((mtime, full_path))
+        if candidates:
+            downloaded_path = max(candidates, key=lambda item: item[0])[1]
+
+    if downloaded_path and os.path.getsize(downloaded_path) <= 0:
+        return None
+    return downloaded_path
 
 
 def build_preset_args(preset):
@@ -923,15 +978,15 @@ def patch_subprocess_for_swiftffmpeg(bridge):
                 elapsed = time.time() - started_at
                 print(f"[palladium][ffmpeg-bridge] {tool} finished in {elapsed:.2f}s")
                 if tool == "ffmpeg" and bridged_args:
-                    target_path = bridged_args[-1]
-                    if os.path.isfile(target_path):
+                    target_path = bridge_ffmpeg_output_path(bridged_args)
+                    if target_path and os.path.isfile(target_path):
                         try:
                             target_size = os.path.getsize(target_path)
                             print(f"[palladium][ffmpeg-bridge] output file ready: {target_path} ({target_size} bytes)")
                         except Exception:
                             print(f"[palladium][ffmpeg-bridge] output file ready: {target_path}")
                     else:
-                        print(f"[palladium][ffmpeg-bridge] output file missing after run: {target_path}")
+                        print(f"[palladium][ffmpeg-bridge] output file missing after run: {target_path or '<unknown>'}")
             except Exception as bridge_error:
                 raise RuntimeError(f"swift ffmpeg bridge error: {bridge_error}") from bridge_error
 
@@ -1115,15 +1170,15 @@ def patch_ytdlp_popen_for_swiftffmpeg(bridge):
             elapsed = time.time() - started_at
             print(f"[palladium][ffmpeg-bridge] yt-dlp Popen {tool} finished in {elapsed:.2f}s")
             if tool == "ffmpeg" and bridged_args:
-                target_path = bridged_args[-1]
-                if os.path.isfile(target_path):
+                target_path = bridge_ffmpeg_output_path(bridged_args)
+                if target_path and os.path.isfile(target_path):
                     try:
                         target_size = os.path.getsize(target_path)
                         print(f"[palladium][ffmpeg-bridge] yt-dlp Popen output file ready: {target_path} ({target_size} bytes)")
                     except Exception:
                         print(f"[palladium][ffmpeg-bridge] yt-dlp Popen output file ready: {target_path}")
                 else:
-                    print(f"[palladium][ffmpeg-bridge] yt-dlp Popen output file missing after run: {target_path}")
+                    print(f"[palladium][ffmpeg-bridge] yt-dlp Popen output file missing after run: {target_path or '<unknown>'}")
             if text_mode:
                 self._stdout_value = stdout_output
                 self._stderr_value = stderr_output
@@ -1536,46 +1591,16 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, p
                             traceback.print_exc()
                             yt_exit_code = 1
 
-                if yt_exit_code == 0:
+                if not cancelled and yt_exit_code is not None:
                     try:
                         log_text = output.getvalue()
-                        destination_matches = re.findall(r"^\\[download\\] Destination: (.+)$", log_text, flags=re.MULTILINE)
-                        already_downloaded_matches = []
-                        for line in log_text.splitlines():
-                            if line.startswith("[download]") and "has already been downloaded" in line:
-                                candidate_line = line[len("[download]"):].strip()
-                                candidate_line = candidate_line.split(" has already been downloaded", 1)[0].strip()
-                                if candidate_line:
-                                    already_downloaded_matches.append(candidate_line)
-                        if destination_matches:
-                            candidate = destination_matches[-1].strip()
-                            if candidate:
-                                downloaded_path = candidate
-                        elif already_downloaded_matches:
-                            candidate = already_downloaded_matches[-1].strip()
-                            if candidate:
-                                downloaded_path = candidate
-
                         scan_dir = downloads_dir if downloads_dir else os.getcwd()
-                        if downloaded_path:
-                            if not os.path.isabs(downloaded_path):
-                                downloaded_path = os.path.join(scan_dir, downloaded_path)
-                            if not os.path.isfile(downloaded_path):
-                                downloaded_path = None
-
-                        if downloaded_path is None:
-                            candidates = []
-                            for filename in os.listdir(scan_dir):
-                                full_path = os.path.join(scan_dir, filename)
-                                if os.path.isfile(full_path) and not filename.endswith(".part"):
-                                    mtime = os.path.getmtime(full_path)
-                                    if mtime >= (run_started_at - 3600):
-                                        candidates.append((mtime, full_path))
-                            if candidates:
-                                downloaded_path = max(candidates, key=lambda item: item[0])[1]
-
+                        downloaded_path = detect_downloaded_file_path(log_text, scan_dir, run_started_at)
                         if downloaded_path:
                             print(f"[palladium] downloaded file: {downloaded_path}")
+                            if yt_exit_code != 0:
+                                print(f"[palladium] overriding yt-dlp exit code {yt_exit_code} because downloaded file exists")
+                                yt_exit_code = 0
                         else:
                             print("[palladium] downloaded file path not detected")
                     except Exception:
