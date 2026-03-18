@@ -56,6 +56,46 @@ enum PostDownloadAction: String, Codable, CaseIterable, Identifiable {
     }
 }
 
+enum AfterDownloadBehavior: String, Codable, CaseIterable, Identifiable {
+    case ask
+    case openShareSheet
+    case saveToPhotos
+    case saveToApplicationFolder
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .ask: return "Ask"
+        case .openShareSheet: return "Open Share Sheet"
+        case .saveToPhotos: return "Save to Photos"
+        case .saveToApplicationFolder: return "Save to App Folder"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .ask: return "questionmark.circle"
+        case .openShareSheet: return "square.and.arrow.up"
+        case .saveToPhotos: return "photo.on.rectangle"
+        case .saveToApplicationFolder: return "folder"
+        }
+    }
+
+    var postDownloadAction: PostDownloadAction? {
+        switch self {
+        case .ask:
+            return nil
+        case .openShareSheet:
+            return .openShareSheet
+        case .saveToPhotos:
+            return .saveToPhotos
+        case .saveToApplicationFolder:
+            return .saveToApplicationFolder
+        }
+    }
+}
+
 enum ShareSheetDownloadMode: String, Codable, CaseIterable, Identifiable {
     case ask
     case autoVideo = "auto_video"

@@ -1,8 +1,8 @@
 import SwiftUI
 
 struct UseInterfaceSettingsView: View {
-    @Binding var askUserAfterDownload: Bool
-    @Binding var selectedPostDownloadAction: PostDownloadAction
+    @Binding var selectedPreset: DownloadPreset
+    @Binding var afterDownloadBehavior: AfterDownloadBehavior
     @Binding var notificationsEnabled: Bool
     @Binding var rememberSelectedPreset: Bool
     @Binding var autoDownloadOnPaste: Bool
@@ -15,38 +15,42 @@ struct UseInterfaceSettingsView: View {
     var body: some View {
         Form {
             Section {
-                Toggle("Remember selected mode", isOn: $rememberSelectedPreset)
-                    .disabled(isRunning)
-
-                Toggle("Ask what to do after download", isOn: $askUserAfterDownload)
-                    .disabled(isRunning)
-
-                Picker("Default action when ask is off", selection: $selectedPostDownloadAction) {
-                    ForEach(PostDownloadAction.allCases) { action in
-                        Label(action.title, systemImage: action.icon).tag(action)
+                Picker("Normal download mode", selection: $selectedPreset) {
+                    ForEach(DownloadPreset.allCases) { preset in
+                        Text(preset.title).tag(preset)
                     }
                 }
-                .disabled(isRunning || askUserAfterDownload)
-            } header: {
-                Text("Download Behavior")
-            } footer: {
-                Text(askUserAfterDownload
-                     ? "Default action is disabled while ask mode is enabled. If mode memory is off, the app starts with Auto every launch."
-                     : "Selected action runs automatically after each successful download. If mode memory is off, the app starts with Auto every launch.")
-            }
+                .pickerStyle(.menu)
+                .disabled(isRunning)
 
-            Section {
-                Picker("Selected mode for share sheet", selection: $shareSheetDownloadMode) {
+                Picker("Share sheet mode", selection: $shareSheetDownloadMode) {
                     ForEach(ShareSheetDownloadMode.allCases) { mode in
                         Text(mode.title).tag(mode)
                     }
                 }
                 .pickerStyle(.menu)
+                .disabled(isRunning)
+
+                Toggle("Remember picker options", isOn: $rememberSelectedPreset)
                     .disabled(isRunning)
             } header: {
-                Text("Share Sheet")
+                Text("Download Modes")
             } footer: {
-                Text("Ask opens a picker. Other options start downloads directly with that mode.")
+                Text("Normal download mode matches the main picker on the Download tab. If memory is off, it resets to Auto when the app launches.")
+            }
+
+            Section {
+                Picker("After download", selection: $afterDownloadBehavior) {
+                    ForEach(AfterDownloadBehavior.allCases) { behavior in
+                        Label(behavior.title, systemImage: behavior.icon).tag(behavior)
+                    }
+                }
+                .pickerStyle(.menu)
+                .disabled(isRunning)
+            } header: {
+                Text("After Download")
+            } footer: {
+                Text("Ask shows the same action picker after each successful download. Other options run automatically.")
             }
 
             Section {
@@ -86,7 +90,7 @@ struct UseInterfaceSettingsView: View {
                     .disabled(isRunning)
             }
         }
-        .navigationTitle("User interface")
+        .navigationTitle("User Interface")
         .navigationBarTitleDisplayMode(.inline)
     }
 }

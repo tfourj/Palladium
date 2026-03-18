@@ -47,6 +47,7 @@ struct ContentView: View {
     private static let presetDefaultsKey = "palladium.selectedPreset"
     private static let customArgsDefaultsKey = "palladium.customArgs"
     private static let extraArgsDefaultsKey = "palladium.extraArgs"
+    private static let afterDownloadBehaviorDefaultsKey = "palladium.afterDownloadBehavior"
     private static let askUserAfterDownloadDefaultsKey = "palladium.askUserAfterDownload"
     private static let selectedPostDownloadActionDefaultsKey = "palladium.selectedPostDownloadAction"
     private static let notificationsEnabledDefaultsKey = "palladium.notificationsEnabled"
@@ -67,8 +68,7 @@ struct ContentView: View {
     @State private var selectedPreset: DownloadPreset
     @State private var customArgsText: String
     @State private var extraArgsText: String
-    @State private var askUserAfterDownload: Bool
-    @State private var selectedPostDownloadAction: PostDownloadAction
+    @State private var afterDownloadBehavior: AfterDownloadBehavior
     @State private var notificationsEnabled: Bool
     @State private var rememberSelectedPreset: Bool
     @State private var autoDownloadOnPaste: Bool
@@ -110,8 +110,7 @@ struct ContentView: View {
         _selectedPreset = State(initialValue: Self.loadSelectedPreset(rememberSelection: rememberPreset))
         _customArgsText = State(initialValue: Self.loadCustomArgs())
         _extraArgsText = State(initialValue: Self.loadExtraArgs())
-        _askUserAfterDownload = State(initialValue: Self.loadAskUserAfterDownload())
-        _selectedPostDownloadAction = State(initialValue: Self.loadSelectedPostDownloadAction())
+        _afterDownloadBehavior = State(initialValue: Self.loadAfterDownloadBehavior())
         _notificationsEnabled = State(initialValue: Self.loadNotificationsEnabled())
         _rememberSelectedPreset = State(initialValue: rememberPreset)
         _autoDownloadOnPaste = State(initialValue: Self.loadAutoDownloadOnPaste())
@@ -150,8 +149,8 @@ struct ContentView: View {
                 SettingsTabView(
                     customArgsText: $customArgsText,
                     extraArgsText: $extraArgsText,
-                    askUserAfterDownload: $askUserAfterDownload,
-                    selectedPostDownloadAction: $selectedPostDownloadAction,
+                    selectedPreset: $selectedPreset,
+                    afterDownloadBehavior: $afterDownloadBehavior,
                     notificationsEnabled: $notificationsEnabled,
                     rememberSelectedPreset: $rememberSelectedPreset,
                     autoDownloadOnPaste: $autoDownloadOnPaste,
@@ -210,10 +209,7 @@ struct ContentView: View {
         .onChange(of: extraArgsText, initial: false) {
             persistPreferences()
         }
-        .onChange(of: askUserAfterDownload, initial: false) {
-            persistPreferences()
-        }
-        .onChange(of: selectedPostDownloadAction, initial: false) {
+        .onChange(of: afterDownloadBehavior, initial: false) {
             persistPreferences()
         }
         .onChange(of: notificationsEnabled, initial: false) {
@@ -622,8 +618,7 @@ struct ContentView: View {
         let presetAtStart = (presetOverride ?? selectedPreset).pythonValue
         let extraArgsAtStart = extraArgsText.trimmingCharacters(in: .whitespacesAndNewlines)
         let presetArgsJSONAtStart = buildPresetArgumentsJSON()
-        let askUserAfterDownloadAtStart = askUserAfterDownload
-        let selectedPostDownloadActionAtStart = selectedPostDownloadAction
+        let afterDownloadBehaviorAtStart = afterDownloadBehavior
         let linkHistoryEnabledAtStart = linkHistoryEnabled
         var receivedPythonLiveOutput = false
         let cancelMarker = makeCancelMarkerURL()
@@ -698,7 +693,8 @@ struct ContentView: View {
                 downloadErrorText = nil
                 notifyDownloadCompletionIfNeeded(fileURL: completedURL)
 
-                let needsPhotosCompatibilityCheck = askUserAfterDownloadAtStart || selectedPostDownloadActionAtStart == .saveToPhotos
+                let needsPhotosCompatibilityCheck = afterDownloadBehaviorAtStart == .ask
+                    || afterDownloadBehaviorAtStart.postDownloadAction == .saveToPhotos
                 if needsPhotosCompatibilityCheck {
                     completedPhotosCompatibility = .checking
                     completedPhotosCompatibility = await evaluatePhotosCompatibility(for: completedURL)
@@ -706,16 +702,16 @@ struct ContentView: View {
                     completedPhotosCompatibility = .checking
                 }
 
-                if askUserAfterDownloadAtStart {
+                if afterDownloadBehaviorAtStart == .ask {
                     showDownloadActionSheet = true
-                } else if selectedPostDownloadActionAtStart == .saveToPhotos {
+                } else if afterDownloadBehaviorAtStart.postDownloadAction == .saveToPhotos {
                     if completedPhotosCompatibility.isCompatible {
-                        handlePostDownloadAction(selectedPostDownloadActionAtStart, for: completedURL)
+                        handlePostDownloadAction(.saveToPhotos, for: completedURL)
                     } else {
                         showDownloadActionSheet = true
                     }
-                } else {
-                    handlePostDownloadAction(selectedPostDownloadActionAtStart, for: completedURL)
+                } else if let action = afterDownloadBehaviorAtStart.postDownloadAction {
+                    handlePostDownloadAction(action, for: completedURL)
                 }
             }
         }
@@ -1160,8 +1156,9 @@ struct ContentView: View {
         }
         defaults.set(customArgsText, forKey: Self.customArgsDefaultsKey)
         defaults.set(extraArgsText, forKey: Self.extraArgsDefaultsKey)
-        defaults.set(askUserAfterDownload, forKey: Self.askUserAfterDownloadDefaultsKey)
-        defaults.set(selectedPostDownloadAction.rawValue, forKey: Self.selectedPostDownloadActionDefaultsKey)
+        defaults.set(afterDownloadBehavior.rawValue, forKey: Self.afterDownloadBehaviorDefaultsKey)
+        defaults.removeObject(forKey: Self.askUserAfterDownloadDefaultsKey)
+        defaults.removeObject(forKey: Self.selectedPostDownloadActionDefaultsKey)
         defaults.set(notificationsEnabled, forKey: Self.notificationsEnabledDefaultsKey)
         defaults.set(autoDownloadOnPaste, forKey: Self.autoDownloadOnPasteDefaultsKey)
         defaults.set(shareSheetDownloadMode.rawValue, forKey: Self.shareSheetDownloadModeDefaultsKey)
@@ -1215,14 +1212,32 @@ struct ContentView: View {
         UserDefaults.standard.string(forKey: extraArgsDefaultsKey) ?? ""
     }
 
-    private static func loadAskUserAfterDownload() -> Bool {
+    private static func loadAfterDownloadBehavior() -> AfterDownloadBehavior {
+        if let rawValue = UserDefaults.standard.string(forKey: afterDownloadBehaviorDefaultsKey),
+           let behavior = AfterDownloadBehavior(rawValue: rawValue) {
+            return behavior
+        }
+        if loadAskUserAfterDownloadLegacy() {
+            return .ask
+        }
+        switch loadSelectedPostDownloadActionLegacy() {
+        case .saveToPhotos:
+            return .saveToPhotos
+        case .openShareSheet:
+            return .openShareSheet
+        case .saveToApplicationFolder:
+            return .saveToApplicationFolder
+        }
+    }
+
+    private static func loadAskUserAfterDownloadLegacy() -> Bool {
         if UserDefaults.standard.object(forKey: askUserAfterDownloadDefaultsKey) == nil {
             return true
         }
         return UserDefaults.standard.bool(forKey: askUserAfterDownloadDefaultsKey)
     }
 
-    private static func loadSelectedPostDownloadAction() -> PostDownloadAction {
+    private static func loadSelectedPostDownloadActionLegacy() -> PostDownloadAction {
         guard let raw = UserDefaults.standard.string(forKey: selectedPostDownloadActionDefaultsKey),
               let action = PostDownloadAction(rawValue: raw) else {
             return .openShareSheet

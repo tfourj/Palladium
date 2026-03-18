@@ -10,8 +10,8 @@ struct SettingsTabView: View {
 
     @Binding var customArgsText: String
     @Binding var extraArgsText: String
-    @Binding var askUserAfterDownload: Bool
-    @Binding var selectedPostDownloadAction: PostDownloadAction
+    @Binding var selectedPreset: DownloadPreset
+    @Binding var afterDownloadBehavior: AfterDownloadBehavior
     @Binding var notificationsEnabled: Bool
     @Binding var rememberSelectedPreset: Bool
     @Binding var autoDownloadOnPaste: Bool
@@ -39,7 +39,7 @@ struct SettingsTabView: View {
                 Section(header: Text("General")) {
                     NavigationLink(value: SettingsRoute.useInterface) {
                         settingsRow(
-                            title: "User interface",
+                            title: "User Interface",
                             subtitle: "Download behavior and share sheet flow",
                             icon: "slider.horizontal.3",
                             color: .green
@@ -84,8 +84,8 @@ struct SettingsTabView: View {
                 switch route {
                 case .useInterface:
                     UseInterfaceSettingsView(
-                        askUserAfterDownload: $askUserAfterDownload,
-                        selectedPostDownloadAction: $selectedPostDownloadAction,
+                        selectedPreset: $selectedPreset,
+                        afterDownloadBehavior: $afterDownloadBehavior,
                         notificationsEnabled: $notificationsEnabled,
                         rememberSelectedPreset: $rememberSelectedPreset,
                         autoDownloadOnPaste: $autoDownloadOnPaste,
