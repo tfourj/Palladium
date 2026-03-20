@@ -52,6 +52,7 @@ def run_yt_dlp_flow(
     embed_thumbnail_override=None,
     subtitle_language_pattern_override=None,
     run_output_dir_override=None,
+    cookies_file_path_override=None,
 ):
     output = TailBuffer()
     console_stdout = sys.__stdout__ if sys.__stdout__ is not None else None
@@ -103,6 +104,10 @@ def run_yt_dlp_flow(
         run_output_dir = os.environ.get("PALLADIUM_RUN_OUTPUT_DIR", "").strip() or downloads_dir
     else:
         run_output_dir = str(run_output_dir_override).strip() or downloads_dir
+    if cookies_file_path_override is None:
+        cookies_file_path = os.environ.get("PALLADIUM_COOKIES_FILE", "").strip()
+    else:
+        cookies_file_path = str(cookies_file_path_override).strip()
     install_target = os.environ.get("PALLADIUM_PYTHON_PACKAGES")
     cache_dir = os.environ.get("PALLADIUM_CACHE_DIR", "").strip()
     cancel_file_path = os.environ.get("PALLADIUM_CANCEL_FILE", "").strip()
@@ -280,6 +285,10 @@ def run_yt_dlp_flow(
 
                         if embed_thumbnail:
                             download_behavior_args.append("--embed-thumbnail")
+                        cookie_args = []
+                        if cookies_file_path:
+                            cookie_args = ["--cookies", cookies_file_path]
+                            print(f"[palladium] cookies file: {cookies_file_path}")
 
                         sys.argv = [
                             "yt-dlp",
@@ -298,6 +307,7 @@ def run_yt_dlp_flow(
                             *output_args,
                             *download_behavior_args,
                             *preset_args,
+                            *cookie_args,
                             *extra_args,
                             download_url,
                         ]

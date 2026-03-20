@@ -12,6 +12,9 @@ struct DownloadTabView: View {
     @Binding var embedThumbnail: Bool
     @Binding var subtitleLanguagePattern: String
     @Binding var customSubtitleLanguagePattern: String
+    @Binding var useCookiesForNextDownload: Bool
+    @Binding var selectedCookieFileName: String?
+    let availableCookieFiles: [CookieLibraryItem]
 
     let isRunning: Bool
     let progressText: String
@@ -182,6 +185,8 @@ struct DownloadTabView: View {
                                     subtitle: "Attach artwork to supported media files",
                                     isOn: $embedThumbnail
                                 )
+
+                                cookieDownloadOptionRow
                             }
                             .transition(
                                 .asymmetric(
@@ -360,6 +365,71 @@ struct DownloadTabView: View {
         }
     }
 
+    private var cookieDownloadOptionRow: some View {
+        VStack(spacing: 8) {
+            downloadOptionToggle(
+                title: "Use cookies",
+                subtitle: "Use an imported Netscape cookie file for this run",
+                isOn: $useCookiesForNextDownload
+            )
+
+            if useCookiesForNextDownload {
+                HStack(spacing: 10) {
+                    Image(systemName: "lock.doc")
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundStyle(.blue)
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Cookie file")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(primaryTextColor)
+                        Text(cookiePickerSubtitle)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.leading)
+                    }
+
+                    Spacer()
+
+                    Menu {
+                        if availableCookieFiles.isEmpty {
+                            Button("No imported cookie files") {}
+                                .disabled(true)
+                        } else {
+                            ForEach(availableCookieFiles) { item in
+                                Button {
+                                    selectedCookieFileName = item.fileName
+                                } label: {
+                                    if item.fileName == selectedCookieFileName {
+                                        Label(item.fileName, systemImage: "checkmark")
+                                    } else {
+                                        Text(item.fileName)
+                                    }
+                                }
+                            }
+                        }
+                    } label: {
+                        Text(cookiePickerLabel)
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(availableCookieFiles.isEmpty ? Color.secondary : Color.blue)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 8)
+                            .background(cardBackground)
+                            .clipShape(RoundedRectangle(cornerRadius: 6))
+                    }
+                    .disabled(isRunning || availableCookieFiles.isEmpty)
+                }
+
+                if let cookieSelectionMessage {
+                    Text(cookieSelectionMessage)
+                        .font(.caption)
+                        .foregroundStyle(cookieSelectionMessageColor)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+            }
+        }
+    }
+
     private var selectedSubtitleOption: SubtitleLanguageOption? {
         SubtitleLanguageOption.allCases.first(where: { $0.subtitlePattern == subtitleLanguagePattern })
     }
@@ -400,7 +470,61 @@ struct DownloadTabView: View {
         if embedThumbnail {
             parts.append("Embed thumbnail")
         }
+        if useCookiesForNextDownload {
+            parts.append("Cookies: \(cookieSummaryText)")
+        }
         return parts.isEmpty ? "Playlist, subtitles, and thumbnail settings" : parts.joined(separator: " • ")
+    }
+
+    private var cookiePickerLabel: String {
+        if let selectedCookieFileName,
+           !selectedCookieFileName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return selectedCookieFileName
+        }
+        return "Select file"
+    }
+
+    private var cookiePickerSubtitle: String {
+        if availableCookieFiles.isEmpty {
+            return "Import files in Settings > Cookie Files"
+        }
+        return "\(availableCookieFiles.count) imported file\(availableCookieFiles.count == 1 ? "" : "s")"
+    }
+
+    private var cookieSelectionMessage: String? {
+        if availableCookieFiles.isEmpty {
+            return "Import Netscape cookie files in Settings > Cookie Files."
+        }
+        guard let selectedCookieFileName,
+              !selectedCookieFileName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            return "Select an imported cookie file before downloading."
+        }
+        guard availableCookieFiles.contains(where: { $0.fileName == selectedCookieFileName }) else {
+            return "The selected cookie file is missing. Choose another one."
+        }
+        return nil
+    }
+
+    private var cookieSelectionMessageColor: Color {
+        if availableCookieFiles.isEmpty {
+            return .secondary
+        }
+        return .red
+    }
+
+    private var cookieSummaryText: String {
+        if let selectedCookieFileName,
+           availableCookieFiles.contains(where: { $0.fileName == selectedCookieFileName }) {
+            return selectedCookieFileName
+        }
+        if let selectedCookieFileName,
+           !selectedCookieFileName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return "Missing file"
+        }
+        if availableCookieFiles.isEmpty {
+            return "No file"
+        }
+        return "Select file"
     }
 
     @ViewBuilder

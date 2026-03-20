@@ -4,6 +4,7 @@ struct SettingsTabView: View {
     private enum SettingsRoute: Hashable {
         case useInterface
         case downloadArguments
+        case cookieFiles
         case storage
         case packages
         case about
@@ -11,6 +12,7 @@ struct SettingsTabView: View {
 
     @Binding var customArgsText: String
     @Binding var extraArgsText: String
+    @Binding var selectedCookieFileName: String?
     @Binding var selectedPreset: DownloadPreset
     @Binding var afterDownloadBehavior: AfterDownloadBehavior
     @Binding var notificationsEnabled: Bool
@@ -20,6 +22,7 @@ struct SettingsTabView: View {
     @Binding var linkHistoryEnabled: Bool
     @Binding var appAppearanceMode: AppAppearanceMode
 
+    let availableCookieFiles: [CookieLibraryItem]
     let storageSummary: StorageManagementSummary
     let packageStatusText: String
     let versionsText: String
@@ -43,6 +46,9 @@ struct SettingsTabView: View {
     let onPruneSavedStorage: (_ window: StoragePruneWindow) -> Void
     let onPruneCacheStorage: (_ window: StoragePruneWindow) -> Void
     let onOpenStorageManager: () -> Void
+    let onRefreshCookieFiles: () -> Void
+    let onImportCookieFile: (URL) -> Void
+    let onDeleteCookieFile: (CookieLibraryItem) -> Void
 
     var body: some View {
         NavigationStack {
@@ -63,6 +69,15 @@ struct SettingsTabView: View {
                             subtitle: "Custom and global yt-dlp args",
                             icon: "terminal",
                             color: .blue
+                        )
+                    }
+
+                    NavigationLink(value: SettingsRoute.cookieFiles) {
+                        settingsRow(
+                            title: "Cookie Files",
+                            subtitle: cookieFilesSubtitle,
+                            icon: "lock.doc.fill",
+                            color: .cyan
                         )
                     }
 
@@ -134,6 +149,15 @@ struct SettingsTabView: View {
                         onPruneCache: onPruneCacheStorage,
                         onAppear: onOpenStorageManager
                     )
+                case .cookieFiles:
+                    CookieFilesSettingsView(
+                        items: availableCookieFiles,
+                        selectedCookieFileName: selectedCookieFileName,
+                        isBusy: isRunning || isPackageRunning,
+                        onImport: onImportCookieFile,
+                        onDelete: onDeleteCookieFile,
+                        onAppear: onRefreshCookieFiles
+                    )
                 case .packages:
                     PackagesSettingsView(
                         packageStatusText: packageStatusText,
@@ -155,6 +179,13 @@ struct SettingsTabView: View {
                 }
             }
         }
+    }
+
+    private var cookieFilesSubtitle: String {
+        if availableCookieFiles.isEmpty {
+            return "Import Netscape cookie files"
+        }
+        return "\(availableCookieFiles.count) imported - \(selectedCookieFileName ?? "no default selected")"
     }
 
     private func settingsRow(

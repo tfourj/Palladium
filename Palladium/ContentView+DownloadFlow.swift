@@ -118,7 +118,7 @@ extension ContentView {
         selectedTab = .download
         urlText = sharedLink
         appendConsoleText("[palladium] starting shared-link download preset=\(preset.rawValue)\n")
-        runDownloadFlow(urlOverride: sharedLink, presetOverride: preset)
+        runDownloadFlow(urlOverride: sharedLink, presetOverride: preset, useCookiesOverride: false)
     }
 
     func handlePastedURL(_ pastedURL: String) {
@@ -131,7 +131,11 @@ extension ContentView {
         runDownloadFlow(urlOverride: pastedURL, presetOverride: selectedPreset)
     }
 
-    func runDownloadFlow(urlOverride: String? = nil, presetOverride: DownloadPreset? = nil) {
+    func runDownloadFlow(
+        urlOverride: String? = nil,
+        presetOverride: DownloadPreset? = nil,
+        useCookiesOverride: Bool? = nil
+    ) {
         guard !isRunning, !isPackageRunning else { return }
         let targetURL = (urlOverride ?? urlText).trimmingCharacters(in: .whitespacesAndNewlines)
         guard !targetURL.isEmpty else { return }
@@ -139,6 +143,16 @@ extension ContentView {
         consoleLogStore.clearAll()
         downloadErrorText = nil
         completedDownloadResult = nil
+        let useCookiesAtStart = useCookiesOverride ?? useCookiesForNextDownload
+        let cookiesFilePath: String?
+        do {
+            cookiesFilePath = try selectedCookiesFilePathForNextDownload(useCookies: useCookiesAtStart)
+        } catch {
+            appendConsoleText("[palladium] cookie preflight failed: \(error.localizedDescription)\n", source: .app)
+            downloadErrorText = error.localizedDescription
+            progressText = "download failed"
+            return
+        }
 
         do {
             let removedCount = try clearDownloadsDirectoryContents()
@@ -209,7 +223,8 @@ extension ContentView {
                 downloadSubtitles: downloadSubtitlesAtStart,
                 embedThumbnail: embedThumbnailAtStart,
                 subtitleLanguagePattern: subtitleLanguagePatternAtStart,
-                runOutputDir: runOutputURL.path
+                runOutputDir: runOutputURL.path,
+                cookiesFilePath: cookiesFilePath
             )
 
             unsetenv("PALLADIUM_LOG_FD")

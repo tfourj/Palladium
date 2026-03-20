@@ -14,7 +14,8 @@ enum PythonFlowRunner {
         downloadSubtitles: Bool,
         embedThumbnail: Bool,
         subtitleLanguagePattern: String,
-        runOutputDir: String
+        runOutputDir: String,
+        cookiesFilePath: String?
     ) async -> PythonFlowOutcome {
         await runOnPythonThread {
             let payload: String
@@ -32,7 +33,8 @@ enum PythonFlowRunner {
                         downloadSubtitles,
                         embedThumbnail,
                         subtitleLanguagePattern,
-                        runOutputDir
+                        runOutputDir,
+                        cookiesFilePath ?? ""
                     ]
                 )
             } catch {

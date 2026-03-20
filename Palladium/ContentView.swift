@@ -58,6 +58,7 @@ struct ContentView: View {
     static let linkHistoryEntriesDefaultsKey = "palladium.linkHistoryEntries"
     static let appAppearanceModeDefaultsKey = "palladium.appAppearanceMode"
     static let packageVersionsTextDefaultsKey = "palladium.packageVersionsText"
+    static let selectedCookieFileNameDefaultsKey = "palladium.selectedCookieFileName"
 
     @Environment(\.scenePhase) var scenePhase
     @State var isRunning = false
@@ -78,6 +79,9 @@ struct ContentView: View {
     @State var embedThumbnail: Bool
     @State var subtitleLanguagePattern: String
     @State var customSubtitleLanguagePattern: String
+    @State var useCookiesForNextDownload = false
+    @State var selectedCookieFileName: String?
+    @State var availableCookieFiles: [CookieLibraryItem] = []
     @State var linkHistoryEnabled: Bool
     @State var linkHistoryEntries: [LinkHistoryEntry]
     @State var appAppearanceMode: AppAppearanceMode
@@ -128,6 +132,7 @@ struct ContentView: View {
         _embedThumbnail = State(initialValue: Self.loadEmbedThumbnail())
         _subtitleLanguagePattern = State(initialValue: Self.loadSubtitleLanguagePattern())
         _customSubtitleLanguagePattern = State(initialValue: Self.loadCustomSubtitleLanguagePattern())
+        _selectedCookieFileName = State(initialValue: Self.loadSelectedCookieFileName())
         _linkHistoryEnabled = State(initialValue: Self.loadLinkHistoryEnabled())
         _linkHistoryEntries = State(initialValue: Self.loadLinkHistoryEntries())
         _appAppearanceMode = State(initialValue: Self.loadAppAppearanceMode())
@@ -147,6 +152,9 @@ struct ContentView: View {
                     embedThumbnail: $embedThumbnail,
                     subtitleLanguagePattern: $subtitleLanguagePattern,
                     customSubtitleLanguagePattern: $customSubtitleLanguagePattern,
+                    useCookiesForNextDownload: $useCookiesForNextDownload,
+                    selectedCookieFileName: $selectedCookieFileName,
+                    availableCookieFiles: availableCookieFiles,
                     isRunning: isRunning,
                     progressText: progressText,
                     downloadErrorText: downloadErrorText,
@@ -167,6 +175,7 @@ struct ContentView: View {
                 SettingsTabView(
                     customArgsText: $customArgsText,
                     extraArgsText: $extraArgsText,
+                    selectedCookieFileName: $selectedCookieFileName,
                     selectedPreset: $selectedPreset,
                     afterDownloadBehavior: $afterDownloadBehavior,
                     notificationsEnabled: $notificationsEnabled,
@@ -175,6 +184,7 @@ struct ContentView: View {
                     shareSheetDownloadMode: $shareSheetDownloadMode,
                     linkHistoryEnabled: $linkHistoryEnabled,
                     appAppearanceMode: $appAppearanceMode,
+                    availableCookieFiles: availableCookieFiles,
                     storageSummary: storageSummary,
                     packageStatusText: packageStatusText,
                     versionsText: versionsText,
@@ -197,7 +207,10 @@ struct ContentView: View {
                     onPruneDownloadsStorage: pruneTemporaryDownloadsStorage,
                     onPruneSavedStorage: pruneSavedDownloadsStorage,
                     onPruneCacheStorage: pruneYtDlpCacheStorage,
-                    onOpenStorageManager: refreshStorageSummary
+                    onOpenStorageManager: refreshStorageSummary,
+                    onRefreshCookieFiles: refreshCookieLibrary,
+                    onImportCookieFile: importCookieFile,
+                    onDeleteCookieFile: deleteCookieFile
                 )
                 .tabItem {
                     Label("Settings", systemImage: "slider.horizontal.3")
@@ -268,6 +281,9 @@ struct ContentView: View {
         .onChange(of: customSubtitleLanguagePattern, initial: false) {
             persistPreferences()
         }
+        .onChange(of: selectedCookieFileName, initial: false) {
+            persistPreferences()
+        }
         .onChange(of: linkHistoryEnabled, initial: false) {
             persistPreferences()
         }
@@ -298,6 +314,7 @@ struct ContentView: View {
         }
         .onAppear {
             installKeyboardDismissTapIfNeeded()
+            refreshCookieLibrary()
         }
         .onOpenURL { incomingURL in
             handleIncomingDownloadURL(incomingURL)
