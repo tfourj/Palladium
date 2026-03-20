@@ -78,8 +78,11 @@ def normalize_ffmpeg_args(args):
     for arg in args:
         value = str(arg)
         if value.startswith("file:/"):
-            parsed = urllib.parse.urlparse(value)
-            decoded_path = urllib.parse.unquote(parsed.path)
+            # yt-dlp sometimes passes local file inputs as `file:/...` without
+            # percent-encoding reserved characters like `#`. Parsing those as a
+            # URL truncates the real filename at the fragment delimiter, so keep
+            # the raw file payload and only strip the scheme before decoding.
+            decoded_path = urllib.parse.unquote(value[5:])
             if decoded_path:
                 value = decoded_path
         normalized.append(value)
