@@ -510,6 +510,7 @@
 				INFOPLIST_FILE = Palladium/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Palladium;
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Palladium does not use the camera directly. This message is included because bundled system APIs may reference camera access.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Save downloaded videos to your photo library.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -560,6 +561,7 @@
 				INFOPLIST_FILE = Palladium/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Palladium;
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Palladium does not use the camera directly. This message is included because bundled system APIs may reference camera access.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Save downloaded videos to your photo library.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
