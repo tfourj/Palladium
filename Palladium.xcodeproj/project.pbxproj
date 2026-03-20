@@ -271,7 +271,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -e\n\n# Unsigned/CI builds can disable extension framework signing explicitly.\nif [ \"${PALLADIUM_DISABLE_PYTHON_DYLIB_CODESIGN:-}\" = \"1\" ]; then\n  export CODE_SIGNING_ALLOWED=NO\n  export EXPANDED_CODE_SIGN_IDENTITY=\"\"\n  export EXPANDED_CODE_SIGN_IDENTITY_NAME=\"\"\nfi\n\n# If Xcode provides an empty/whitespace identity, force-signing should be skipped.\nSIGN_IDENTITY_TRIMMED=$(echo \"${EXPANDED_CODE_SIGN_IDENTITY:-}\" | tr -d '[:space:]')\nif [ -z \"$SIGN_IDENTITY_TRIMMED\" ]; then\n  export CODE_SIGNING_ALLOWED=NO\nfi\n\nsource \"$PROJECT_DIR/Python.xcframework/build/utils.sh\"\ninstall_python Python.xcframework\n";
+			shellScript = "sh \"$PROJECT_DIR/scripts/install_python_runtime.sh\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
