@@ -100,6 +100,7 @@ struct SettingsTabView: View {
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
+            .onAppear(perform: onRefreshStorage)
             .navigationDestination(for: SettingsRoute.self) { route in
                 switch route {
                 case .useInterface:
