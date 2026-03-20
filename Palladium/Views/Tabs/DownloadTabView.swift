@@ -174,28 +174,13 @@ struct DownloadTabView: View {
                                     isOn: $downloadPlaylist
                                 )
 
-                                downloadOptionToggle(
-                                    title: "Download subtitles",
-                                    subtitle: "Save subtitle sidecars with the media",
-                                    isOn: $downloadSubtitles
-                                )
+                                subtitleDownloadOptionRow
 
                                 downloadOptionToggle(
                                     title: "Embed thumbnail",
                                     subtitle: "Attach artwork to supported media files",
                                     isOn: $embedThumbnail
                                 )
-
-                                if downloadSubtitles {
-                                    Picker("Subtitle language", selection: $subtitleLanguagePattern) {
-                                        ForEach(SubtitleLanguageOption.allCases) { option in
-                                            Text(option.title).tag(option.subtitlePattern)
-                                        }
-                                    }
-                                    .pickerStyle(.menu)
-                                    .disabled(isRunning)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                }
                             }
                             .transition(
                                 .asymmetric(
@@ -306,6 +291,47 @@ struct DownloadTabView: View {
         }
         .buttonStyle(.plain)
         .disabled(isRunning)
+    }
+
+    private var subtitleDownloadOptionRow: some View {
+        HStack(spacing: 10) {
+            Button {
+                guard !isRunning else { return }
+                downloadSubtitles.toggle()
+            } label: {
+                HStack(spacing: 10) {
+                    Image(systemName: downloadSubtitles ? "checkmark.square.fill" : "square")
+                        .font(.system(size: 19, weight: .semibold))
+                        .foregroundStyle(downloadSubtitles ? .blue : primaryTextColor)
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Download subtitles")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(primaryTextColor)
+                        Text("Save subtitle sidecars with the media")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.leading)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .disabled(isRunning)
+
+            if downloadSubtitles {
+                Picker("Subtitle language", selection: $subtitleLanguagePattern) {
+                    ForEach(SubtitleLanguageOption.allCases) { option in
+                        Text(option.title).tag(option.subtitlePattern)
+                    }
+                }
+                .pickerStyle(.menu)
+                .labelsHidden()
+                .disabled(isRunning)
+                .tint(.blue)
+            }
+        }
     }
 
     private var downloadOptionsSummary: String {

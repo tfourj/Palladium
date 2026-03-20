@@ -133,6 +133,16 @@ enum ShareSheetDownloadMode: String, Codable, CaseIterable, Identifiable {
 
 enum SubtitleLanguageOption: String, Codable, CaseIterable, Identifiable {
     case english = "en"
+    case spanish = "es.*"
+    case french = "fr.*"
+    case german = "de.*"
+    case italian = "it.*"
+    case portuguese = "pt.*"
+    case japanese = "ja"
+    case korean = "ko"
+    case chinese = "zh.*"
+    case arabic = "ar.*"
+    case russian = "ru.*"
     case allAvailable = "all"
 
     var id: String { rawValue }
@@ -141,6 +151,26 @@ enum SubtitleLanguageOption: String, Codable, CaseIterable, Identifiable {
         switch self {
         case .english:
             return "English"
+        case .spanish:
+            return "Spanish"
+        case .french:
+            return "French"
+        case .german:
+            return "German"
+        case .italian:
+            return "Italian"
+        case .portuguese:
+            return "Portuguese"
+        case .japanese:
+            return "Japanese"
+        case .korean:
+            return "Korean"
+        case .chinese:
+            return "Chinese"
+        case .arabic:
+            return "Arabic"
+        case .russian:
+            return "Russian"
         case .allAvailable:
             return "All Available"
         }
