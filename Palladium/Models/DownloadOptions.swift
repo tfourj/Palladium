@@ -143,6 +143,7 @@ enum SubtitleLanguageOption: String, Codable, CaseIterable, Identifiable {
     case chinese = "zh.*"
     case arabic = "ar.*"
     case russian = "ru.*"
+    case custom = "__custom__"
     case allAvailable = "all"
 
     var id: String { rawValue }
@@ -171,6 +172,8 @@ enum SubtitleLanguageOption: String, Codable, CaseIterable, Identifiable {
             return "Arabic"
         case .russian:
             return "Russian"
+        case .custom:
+            return "Custom"
         case .allAvailable:
             return "All Available"
         }

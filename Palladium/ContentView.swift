@@ -58,6 +58,7 @@ struct ContentView: View {
     private static let downloadSubtitlesDefaultsKey = "palladium.downloadSubtitles"
     private static let embedThumbnailDefaultsKey = "palladium.embedThumbnail"
     private static let subtitleLanguagePatternDefaultsKey = "palladium.subtitleLanguagePattern"
+    private static let customSubtitleLanguagePatternDefaultsKey = "palladium.customSubtitleLanguagePattern"
     private static let linkHistoryEnabledDefaultsKey = "palladium.linkHistoryEnabled"
     private static let linkHistoryEntriesDefaultsKey = "palladium.linkHistoryEntries"
     private static let appAppearanceModeDefaultsKey = "palladium.appAppearanceMode"
@@ -81,6 +82,7 @@ struct ContentView: View {
     @State private var downloadSubtitles: Bool
     @State private var embedThumbnail: Bool
     @State private var subtitleLanguagePattern: String
+    @State private var customSubtitleLanguagePattern: String
     @State private var linkHistoryEnabled: Bool
     @State private var linkHistoryEntries: [LinkHistoryEntry]
     @State private var appAppearanceMode: AppAppearanceMode
@@ -129,6 +131,7 @@ struct ContentView: View {
         _downloadSubtitles = State(initialValue: Self.loadDownloadSubtitles())
         _embedThumbnail = State(initialValue: Self.loadEmbedThumbnail())
         _subtitleLanguagePattern = State(initialValue: Self.loadSubtitleLanguagePattern())
+        _customSubtitleLanguagePattern = State(initialValue: Self.loadCustomSubtitleLanguagePattern())
         _linkHistoryEnabled = State(initialValue: Self.loadLinkHistoryEnabled())
         _linkHistoryEntries = State(initialValue: Self.loadLinkHistoryEntries())
         _appAppearanceMode = State(initialValue: Self.loadAppAppearanceMode())
@@ -147,6 +150,7 @@ struct ContentView: View {
                     downloadSubtitles: $downloadSubtitles,
                     embedThumbnail: $embedThumbnail,
                     subtitleLanguagePattern: $subtitleLanguagePattern,
+                    customSubtitleLanguagePattern: $customSubtitleLanguagePattern,
                     isRunning: isRunning,
                     progressText: progressText,
                     downloadErrorText: downloadErrorText,
@@ -254,6 +258,9 @@ struct ContentView: View {
             persistPreferences()
         }
         .onChange(of: subtitleLanguagePattern, initial: false) {
+            persistPreferences()
+        }
+        .onChange(of: customSubtitleLanguagePattern, initial: false) {
             persistPreferences()
         }
         .onChange(of: linkHistoryEnabled, initial: false) {
@@ -741,7 +748,7 @@ struct ContentView: View {
         let downloadPlaylistAtStart = downloadPlaylist
         let downloadSubtitlesAtStart = downloadSubtitles
         let embedThumbnailAtStart = embedThumbnail
-        let subtitleLanguagePatternAtStart = subtitleLanguagePattern
+        let subtitleLanguagePatternAtStart = resolvedSubtitleLanguagePattern
         var receivedPythonLiveOutput = false
         let liveLogDecoder = StreamingUTF8Decoder()
         let cancelMarker = makeCancelMarkerURL()
@@ -1395,6 +1402,7 @@ struct ContentView: View {
         defaults.set(downloadSubtitles, forKey: Self.downloadSubtitlesDefaultsKey)
         defaults.set(embedThumbnail, forKey: Self.embedThumbnailDefaultsKey)
         defaults.set(subtitleLanguagePattern, forKey: Self.subtitleLanguagePatternDefaultsKey)
+        defaults.set(customSubtitleLanguagePattern, forKey: Self.customSubtitleLanguagePatternDefaultsKey)
         defaults.set(linkHistoryEnabled, forKey: Self.linkHistoryEnabledDefaultsKey)
         defaults.set(appAppearanceMode.rawValue, forKey: Self.appAppearanceModeDefaultsKey)
     }
@@ -1535,8 +1543,21 @@ struct ContentView: View {
         if rawValue == "en.*" {
             return SubtitleLanguageOption.english.subtitlePattern
         }
-        guard SubtitleLanguageOption.allCases.contains(where: { $0.subtitlePattern == rawValue }) else {
-            return SubtitleLanguageOption.english.subtitlePattern
+        if SubtitleLanguageOption.allCases.contains(where: { $0.subtitlePattern == rawValue }) {
+            return rawValue
+        }
+        return SubtitleLanguageOption.custom.subtitlePattern
+    }
+
+    private static func loadCustomSubtitleLanguagePattern() -> String {
+        if let explicitValue = UserDefaults.standard.string(forKey: customSubtitleLanguagePatternDefaultsKey) {
+            return explicitValue
+        }
+        guard let rawValue = UserDefaults.standard.string(forKey: subtitleLanguagePatternDefaultsKey) else {
+            return ""
+        }
+        if rawValue == "en.*" || SubtitleLanguageOption.allCases.contains(where: { $0.subtitlePattern == rawValue }) {
+            return ""
         }
         return rawValue
     }
@@ -1719,6 +1740,16 @@ struct ContentView: View {
             removed += 1
         }
         return removed
+    }
+}
+
+private extension ContentView {
+    var resolvedSubtitleLanguagePattern: String {
+        if subtitleLanguagePattern == SubtitleLanguageOption.custom.subtitlePattern {
+            let trimmed = customSubtitleLanguagePattern.trimmingCharacters(in: .whitespacesAndNewlines)
+            return trimmed.isEmpty ? SubtitleLanguageOption.english.subtitlePattern : trimmed
+        }
+        return subtitleLanguagePattern
     }
 }
 

@@ -11,6 +11,7 @@ struct DownloadTabView: View {
     @Binding var downloadSubtitles: Bool
     @Binding var embedThumbnail: Bool
     @Binding var subtitleLanguagePattern: String
+    @Binding var customSubtitleLanguagePattern: String
 
     let isRunning: Bool
     let progressText: String
@@ -294,44 +295,87 @@ struct DownloadTabView: View {
     }
 
     private var subtitleDownloadOptionRow: some View {
-        HStack(spacing: 10) {
-            Button {
-                guard !isRunning else { return }
-                downloadSubtitles.toggle()
-            } label: {
-                HStack(spacing: 10) {
-                    Image(systemName: downloadSubtitles ? "checkmark.square.fill" : "square")
-                        .font(.system(size: 19, weight: .semibold))
-                        .foregroundStyle(downloadSubtitles ? .blue : primaryTextColor)
+        VStack(spacing: 8) {
+            HStack(spacing: 10) {
+                Button {
+                    guard !isRunning else { return }
+                    downloadSubtitles.toggle()
+                } label: {
+                    HStack(spacing: 10) {
+                        Image(systemName: downloadSubtitles ? "checkmark.square.fill" : "square")
+                            .font(.system(size: 19, weight: .semibold))
+                            .foregroundStyle(downloadSubtitles ? .blue : primaryTextColor)
 
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Download subtitles")
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(primaryTextColor)
-                        Text("Save subtitle sidecars with the media")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .multilineTextAlignment(.leading)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Download subtitles")
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(primaryTextColor)
+                            Text("Save subtitle sidecars with the media")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .multilineTextAlignment(.leading)
+                        }
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .contentShape(Rectangle())
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .disabled(isRunning)
-
-            if downloadSubtitles {
-                Picker("Subtitle language", selection: $subtitleLanguagePattern) {
-                    ForEach(SubtitleLanguageOption.allCases) { option in
-                        Text(option.title).tag(option.subtitlePattern)
-                    }
-                }
-                .pickerStyle(.menu)
-                .labelsHidden()
+                .buttonStyle(.plain)
                 .disabled(isRunning)
-                .tint(.blue)
+
+                if downloadSubtitles {
+                    Picker("Subtitle language", selection: $subtitleLanguagePattern) {
+                        ForEach(SubtitleLanguageOption.allCases) { option in
+                            Text(option.title).tag(option.subtitlePattern)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .labelsHidden()
+                    .disabled(isRunning)
+                    .tint(.blue)
+                }
+            }
+
+            if downloadSubtitles, subtitleLanguagePattern == SubtitleLanguageOption.custom.subtitlePattern {
+                TextField("Subtitle pattern, e.g. en.*, es.*, zh-Hans", text: normalizedCustomSubtitlePattern)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                    .foregroundStyle(primaryTextColor)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 10)
+                    .background(cardBackground)
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                    .disabled(isRunning)
             }
         }
+    }
+
+    private var selectedSubtitleOption: SubtitleLanguageOption? {
+        SubtitleLanguageOption.allCases.first(where: { $0.subtitlePattern == subtitleLanguagePattern })
+    }
+
+    private var subtitleSummaryText: String {
+        if subtitleLanguagePattern == SubtitleLanguageOption.custom.subtitlePattern {
+            let trimmed = customSubtitleLanguagePattern.trimmingCharacters(in: .whitespacesAndNewlines)
+            return trimmed.isEmpty ? "Custom" : "Custom: \(trimmed)"
+        }
+        if let option = selectedSubtitleOption {
+            return option.title
+        }
+        let trimmed = subtitleLanguagePattern.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? "Custom" : "Custom: \(trimmed)"
+    }
+
+    private var normalizedCustomSubtitlePattern: Binding<String> {
+        Binding(
+            get: { customSubtitleLanguagePattern },
+            set: { newValue in
+                customSubtitleLanguagePattern = newValue
+                if subtitleLanguagePattern != SubtitleLanguageOption.custom.subtitlePattern,
+                   !newValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    subtitleLanguagePattern = SubtitleLanguageOption.custom.subtitlePattern
+                }
+            }
+        )
     }
 
     private var downloadOptionsSummary: String {
@@ -340,11 +384,7 @@ struct DownloadTabView: View {
             parts.append("Playlist")
         }
         if downloadSubtitles {
-            if let option = SubtitleLanguageOption.allCases.first(where: { $0.subtitlePattern == subtitleLanguagePattern }) {
-                parts.append("Subtitles: \(option.title)")
-            } else {
-                parts.append("Subtitles")
-            }
+            parts.append("Subtitles: \(subtitleSummaryText)")
         }
         if embedThumbnail {
             parts.append("Embed thumbnail")
