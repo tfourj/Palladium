@@ -3,7 +3,6 @@ import json
 import os
 import runpy
 import sys
-import time
 import traceback
 import importlib.metadata as importlib_metadata
 
@@ -13,6 +12,7 @@ from .args import (
     parse_custom_args,
     parse_extra_args,
     parse_preset_args_map,
+    strip_checkbox_owned_download_args,
 )
 from .ffmpeg_bridge import (
     SwiftFFmpegBridge,
@@ -22,7 +22,7 @@ from .ffmpeg_bridge import (
     patch_ytdlp_ffmpeg_detection,
     patch_ytdlp_popen_for_swiftffmpeg,
 )
-from .files import cleanup_existing_downloads, cleanup_temp_download_files, detect_downloaded_file_path
+from .files import cleanup_temp_download_files, detect_downloaded_files
 from .packages import (
     build_package_install_plan,
     check_package_updates,
@@ -41,14 +41,24 @@ def raise_if_cancel_requested(cancel_file_path, message):
         raise KeyboardInterrupt("cancel requested")
 
 
-def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, preset_args_json_override=None, extra_args_override=None):
+def run_yt_dlp_flow(
+    download_url_override=None,
+    download_preset_override=None,
+    preset_args_json_override=None,
+    extra_args_override=None,
+    download_playlist_override=None,
+    download_subtitles_override=None,
+    subtitle_language_pattern_override=None,
+    run_output_dir_override=None,
+):
     output = TailBuffer()
     console_stdout = sys.__stdout__ if sys.__stdout__ is not None else None
     console_stderr = sys.__stderr__ if sys.__stderr__ is not None else None
     pip_attempted = False
     pip_exit_code = None
     yt_exit_code = None
-    downloaded_path = None
+    downloaded_paths = []
+    primary_downloaded_path = None
     cancelled = False
     success = False
     if download_url_override is None:
@@ -68,7 +78,23 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, p
         extra_args_text = os.environ.get("PALLADIUM_EXTRA_ARGS", "").strip()
     else:
         extra_args_text = str(extra_args_override).strip()
+    if download_playlist_override is None:
+        download_playlist = os.environ.get("PALLADIUM_DOWNLOAD_PLAYLIST", "").strip().lower() in ("1", "true", "yes", "on")
+    else:
+        download_playlist = bool(download_playlist_override)
+    if download_subtitles_override is None:
+        download_subtitles = os.environ.get("PALLADIUM_DOWNLOAD_SUBTITLES", "").strip().lower() in ("1", "true", "yes", "on")
+    else:
+        download_subtitles = bool(download_subtitles_override)
+    if subtitle_language_pattern_override is None:
+        subtitle_language_pattern = os.environ.get("PALLADIUM_SUBTITLE_LANGUAGE_PATTERN", "en.*").strip() or "en.*"
+    else:
+        subtitle_language_pattern = str(subtitle_language_pattern_override).strip() or "en.*"
     downloads_dir = os.environ.get("PALLADIUM_DOWNLOADS", "").strip()
+    if run_output_dir_override is None:
+        run_output_dir = os.environ.get("PALLADIUM_RUN_OUTPUT_DIR", "").strip() or downloads_dir
+    else:
+        run_output_dir = str(run_output_dir_override).strip() or downloads_dir
     install_target = os.environ.get("PALLADIUM_PYTHON_PACKAGES")
     cache_dir = os.environ.get("PALLADIUM_CACHE_DIR", "").strip()
     cancel_file_path = os.environ.get("PALLADIUM_CANCEL_FILE", "").strip()
@@ -78,7 +104,6 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, p
         ffmpeg_bridge_dir = ""
         argv_backup = sys.argv[:]
         cwd_backup = os.getcwd()
-        run_started_at = time.time()
         try:
             os.environ["PYTHONIOENCODING"] = "utf-8"
             if install_target:
@@ -89,12 +114,17 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, p
             if downloads_dir:
                 os.makedirs(downloads_dir, exist_ok=True)
                 print(f"[palladium] download target: {downloads_dir}")
+            if run_output_dir:
+                os.makedirs(run_output_dir, exist_ok=True)
+                print(f"[palladium] run output target: {run_output_dir}")
             if cache_dir:
                 os.makedirs(cache_dir, exist_ok=True)
                 print(f"[palladium] cache target: {cache_dir}")
 
             if downloads_dir:
                 ffmpeg_bridge_dir = os.path.join(downloads_dir, ".palladium-ffmpeg")
+            elif run_output_dir:
+                ffmpeg_bridge_dir = os.path.join(run_output_dir, ".palladium-ffmpeg")
             try:
                 os.makedirs(ffmpeg_bridge_dir, exist_ok=True)
                 ffmpeg_stub = os.path.join(ffmpeg_bridge_dir, "ffmpeg")
@@ -196,11 +226,10 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, p
                     yt_exit_code = 1
 
                 if yt_exit_code != 1:
-                    if downloads_dir:
-                        os.chdir(downloads_dir)
+                    if run_output_dir:
+                        os.chdir(run_output_dir)
                     raise_if_cancel_requested(cancel_file_path, "[palladium] cancellation requested before download cleanup")
-                    cleanup_temp_download_files(downloads_dir)
-                    cleanup_existing_downloads(downloads_dir, download_url)
+                    cleanup_temp_download_files(run_output_dir)
 
                     if is_cancel_requested(cancel_file_path):
                         print("[palladium] cancellation requested before yt-dlp start")
@@ -218,13 +247,28 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, p
                             print("[palladium] preset: custom (no args)")
                         else:
                             preset_args = build_preset_args(download_preset)
-                        extra_args = parse_extra_args(extra_args_text)
+                        preset_args = strip_checkbox_owned_download_args(preset_args)
+                        extra_args = strip_checkbox_owned_download_args(parse_extra_args(extra_args_text))
                         raise_if_cancel_requested(cancel_file_path, "[palladium] cancellation requested before yt-dlp invocation")
                         output_args = []
+                        download_behavior_args = []
                         if has_custom_output_template(preset_args) or has_custom_output_template(extra_args):
                             print("[palladium] custom output template detected")
                         else:
-                            output_args = ["-o", "%(title)s.%(ext)s"]
+                            if download_playlist:
+                                output_args = ["-o", "%(playlist_index)03d - %(title)s.%(ext)s"]
+                            else:
+                                output_args = ["-o", "%(title)s.%(ext)s"]
+
+                        if not download_playlist:
+                            download_behavior_args.append("--no-playlist")
+
+                        if download_subtitles:
+                            download_behavior_args.extend(["--write-subs", "--write-auto-subs"])
+                            if subtitle_language_pattern == "all":
+                                download_behavior_args.append("--all-subs")
+                            else:
+                                download_behavior_args.extend(["--sub-langs", subtitle_language_pattern])
 
                         sys.argv = [
                             "yt-dlp",
@@ -239,8 +283,9 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, p
                             "--ffmpeg-location",
                             ffmpeg_bridge_dir if ffmpeg_bridge_dir else ".",
                             "-P",
-                            downloads_dir if downloads_dir else ".",
+                            run_output_dir if run_output_dir else ".",
                             *output_args,
+                            *download_behavior_args,
                             *preset_args,
                             *extra_args,
                             download_url,
@@ -274,18 +319,19 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, p
 
             if not cancelled and yt_exit_code is not None:
                 try:
-                    log_text = output.getvalue()
-                    scan_dir = downloads_dir if downloads_dir else os.getcwd()
-                    downloaded_path = detect_downloaded_file_path(log_text, scan_dir, run_started_at)
-                    if downloaded_path:
-                        print(f"[palladium] downloaded file: {downloaded_path}")
+                    scan_dir = run_output_dir if run_output_dir else downloads_dir if downloads_dir else os.getcwd()
+                    downloaded_paths, primary_downloaded_path = detect_downloaded_files(scan_dir)
+                    if downloaded_paths:
+                        print(f"[palladium] downloaded files detected: {len(downloaded_paths)}")
+                        if primary_downloaded_path:
+                            print(f"[palladium] primary downloaded file: {primary_downloaded_path}")
                         if yt_exit_code != 0:
-                            print(f"[palladium] overriding yt-dlp exit code {yt_exit_code} because downloaded file exists")
+                            print(f"[palladium] overriding yt-dlp exit code {yt_exit_code} because downloaded files exist")
                             yt_exit_code = 0
                     else:
-                        print("[palladium] downloaded file path not detected")
+                        print("[palladium] downloaded files not detected")
                 except Exception:
-                    print("[palladium] unable to detect downloaded file path")
+                    print("[palladium] unable to detect downloaded files")
                     traceback.print_exc()
         except KeyboardInterrupt:
             cancelled = True
@@ -317,7 +363,9 @@ def run_yt_dlp_flow(download_url_override=None, download_preset_override=None, p
         "yt_exit_code": yt_exit_code,
         "cancelled": cancelled,
         "success": success,
-        "downloaded_path": downloaded_path,
+        "downloaded_paths": downloaded_paths,
+        "primary_downloaded_path": primary_downloaded_path,
+        "downloaded_path": primary_downloaded_path,
         "output": output.getvalue(),
     })
 

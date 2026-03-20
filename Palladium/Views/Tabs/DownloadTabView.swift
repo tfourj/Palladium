@@ -7,6 +7,9 @@ struct DownloadTabView: View {
     @Binding var statusText: String
     @Binding var urlText: String
     @Binding var selectedPreset: DownloadPreset
+    @Binding var downloadPlaylist: Bool
+    @Binding var downloadSubtitles: Bool
+    @Binding var subtitleLanguagePattern: String
 
     let isRunning: Bool
     let progressText: String
@@ -125,6 +128,34 @@ struct DownloadTabView: View {
                     .pickerStyle(.segmented)
                     .disabled(isRunning)
 
+                    VStack(spacing: 8) {
+                        downloadOptionToggle(
+                            title: "Download playlist",
+                            subtitle: "Allow yt-dlp to fetch multiple items",
+                            isOn: $downloadPlaylist
+                        )
+
+                        downloadOptionToggle(
+                            title: "Download subtitles",
+                            subtitle: "Save subtitle sidecars with the media",
+                            isOn: $downloadSubtitles
+                        )
+
+                        if downloadSubtitles {
+                            Picker("Subtitle language", selection: $subtitleLanguagePattern) {
+                                ForEach(SubtitleLanguageOption.allCases) { option in
+                                    Text(option.title).tag(option.subtitlePattern)
+                                }
+                            }
+                            .pickerStyle(.menu)
+                            .disabled(isRunning)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                    }
+                    .padding(10)
+                    .background(cardElementBackground)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+
                     HStack(spacing: 8) {
                         TextField("Enter video URL", text: $urlText)
                             .textInputAutocapitalization(.never)
@@ -190,6 +221,39 @@ struct DownloadTabView: View {
             return
         }
         urlText = ""
+    }
+
+    private func downloadOptionToggle(
+        title: String,
+        subtitle: String,
+        isOn: Binding<Bool>
+    ) -> some View {
+        Button {
+            guard !isRunning else { return }
+            isOn.wrappedValue.toggle()
+        } label: {
+            HStack(spacing: 10) {
+                Image(systemName: isOn.wrappedValue ? "checkmark.square.fill" : "square")
+                    .font(.system(size: 19, weight: .semibold))
+                    .foregroundStyle(isOn.wrappedValue ? .blue : primaryTextColor)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(primaryTextColor)
+                    Text(subtitle)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.leading)
+                }
+
+                Spacer()
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .disabled(isRunning)
     }
 
     @ViewBuilder

@@ -36,7 +36,7 @@ struct UseInterfaceSettingsView: View {
             } header: {
                 Text("Download Modes")
             } footer: {
-                Text("Normal download mode matches the main picker on the Download tab. If memory is off, it resets to Auto when the app launches.")
+                Text("Normal download mode matches the main picker on the Download tab. If memory is off, it resets to Video when the app launches.")
             }
 
             Section {

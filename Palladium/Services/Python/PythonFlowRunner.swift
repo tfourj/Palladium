@@ -5,7 +5,16 @@ import Darwin
 enum PythonFlowRunner {
     private static var insertedScriptDirectories = Set<String>()
 
-    static func executeDownloadFlow(url: String, preset: String, presetArgsJSON: String, extraArgs: String) async -> PythonFlowOutcome {
+    static func executeDownloadFlow(
+        url: String,
+        preset: String,
+        presetArgsJSON: String,
+        extraArgs: String,
+        downloadPlaylist: Bool,
+        downloadSubtitles: Bool,
+        subtitleLanguagePattern: String,
+        runOutputDir: String
+    ) async -> PythonFlowOutcome {
         await runOnPythonThread {
             let payload: String
             do {
@@ -13,7 +22,16 @@ enum PythonFlowRunner {
                 let function = try pythonMember(module, named: "run_yt_dlp_flow")
                 payload = callPythonFunction(
                     function,
-                    arguments: [url, preset, presetArgsJSON, extraArgs]
+                    arguments: [
+                        url,
+                        preset,
+                        presetArgsJSON,
+                        extraArgs,
+                        downloadPlaylist,
+                        downloadSubtitles,
+                        subtitleLanguagePattern,
+                        runOutputDir
+                    ]
                 )
             } catch {
                 payload = fallbackPythonErrorPayload(error)
@@ -113,6 +131,8 @@ enum PythonFlowRunner {
             "yt_exit_code": isCancelled ? 130 : NSNull(),
             "cancelled": isCancelled,
             "success": false,
+            "downloaded_paths": [],
+            "primary_downloaded_path": NSNull(),
             "downloaded_path": NSNull(),
             "output": message,
             "updates_available": false,
@@ -140,7 +160,8 @@ enum PythonFlowRunner {
                 \(payload)
                 """,
                 versionsText: nil,
-                downloadedPath: nil,
+                downloadedPaths: [],
+                primaryDownloadedPath: nil,
                 pipExitCode: nil,
                 ytDlpExitCode: nil,
                 updatesAvailable: nil,
@@ -155,7 +176,8 @@ enum PythonFlowRunner {
         let success = result["success"] as? Bool ?? false
         let cancelled = result["cancelled"] as? Bool ?? false
         let output = result["output"] as? String ?? ""
-        let downloadedPath = result["downloaded_path"] as? String
+        let downloadedPaths = (result["downloaded_paths"] as? [String]) ?? []
+        let primaryDownloadedPath = result["primary_downloaded_path"] as? String
 
         let summary = """
         pip attempted: \(pipAttempted)
@@ -170,7 +192,8 @@ enum PythonFlowRunner {
             summaryText: summary,
             outputText: output,
             versionsText: nil,
-            downloadedPath: downloadedPath,
+            downloadedPaths: downloadedPaths,
+            primaryDownloadedPath: primaryDownloadedPath,
             pipExitCode: pipExitCode,
             ytDlpExitCode: ytExitCode,
             updatesAvailable: nil,
@@ -192,7 +215,8 @@ enum PythonFlowRunner {
                 \(payload)
                 """,
                 versionsText: nil,
-                downloadedPath: nil,
+                downloadedPaths: [],
+                primaryDownloadedPath: nil,
                 pipExitCode: nil,
                 ytDlpExitCode: nil,
                 updatesAvailable: nil,
@@ -236,7 +260,8 @@ enum PythonFlowRunner {
             summaryText: summary,
             outputText: output,
             versionsText: versionsText,
-            downloadedPath: nil,
+            downloadedPaths: [],
+            primaryDownloadedPath: nil,
             pipExitCode: pipExitCode,
             ytDlpExitCode: nil,
             updatesAvailable: updatesAvailable,
@@ -295,7 +320,8 @@ struct PythonFlowOutcome: Sendable {
     let summaryText: String
     let outputText: String
     let versionsText: String?
-    let downloadedPath: String?
+    let downloadedPaths: [String]
+    let primaryDownloadedPath: String?
     let pipExitCode: Int?
     let ytDlpExitCode: Int?
     let updatesAvailable: Bool?

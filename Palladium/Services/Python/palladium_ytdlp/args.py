@@ -4,6 +4,27 @@ import shlex
 import traceback
 
 CLI_DASHLIKE_PREFIX = "?\u2010\u2011\u2012\u2013\u2014\u2015\u2212\uFE58\uFE63\uFF0D"
+FLAGS_WITH_VALUES = {
+    "-o",
+    "--output",
+    "--sub-lang",
+    "--sub-langs",
+}
+PLAYLIST_CONTROL_FLAGS = {
+    "--no-playlist",
+    "--yes-playlist",
+}
+SUBTITLE_CONTROL_FLAGS = {
+    "--all-subs",
+    "--embed-subs",
+    "--skip-download",
+    "--sub-lang",
+    "--sub-langs",
+    "--write-auto-sub",
+    "--write-auto-subs",
+    "--write-sub",
+    "--write-subs",
+}
 
 
 def build_preset_args(preset):
@@ -119,3 +140,25 @@ def has_custom_output_template(args):
         if arg.startswith("--output="):
             return True
     return False
+
+
+def strip_checkbox_owned_download_args(args):
+    normalized = [str(arg) for arg in (args or [])]
+    stripped = []
+    index = 0
+
+    while index < len(normalized):
+        arg = normalized[index]
+        option_name = arg.split("=", 1)[0]
+
+        if option_name in PLAYLIST_CONTROL_FLAGS or option_name in SUBTITLE_CONTROL_FLAGS:
+            if option_name in FLAGS_WITH_VALUES and "=" not in arg and index + 1 < len(normalized):
+                index += 2
+            else:
+                index += 1
+            continue
+
+        stripped.append(arg)
+        index += 1
+
+    return stripped

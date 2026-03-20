@@ -54,6 +54,9 @@ struct ContentView: View {
     private static let rememberSelectedPresetDefaultsKey = "palladium.rememberSelectedPreset"
     private static let autoDownloadOnPasteDefaultsKey = "palladium.autoDownloadOnPaste"
     private static let shareSheetDownloadModeDefaultsKey = "palladium.shareSheetDownloadMode"
+    private static let downloadPlaylistDefaultsKey = "palladium.downloadPlaylist"
+    private static let downloadSubtitlesDefaultsKey = "palladium.downloadSubtitles"
+    private static let subtitleLanguagePatternDefaultsKey = "palladium.subtitleLanguagePattern"
     private static let linkHistoryEnabledDefaultsKey = "palladium.linkHistoryEnabled"
     private static let linkHistoryEntriesDefaultsKey = "palladium.linkHistoryEntries"
     private static let appAppearanceModeDefaultsKey = "palladium.appAppearanceMode"
@@ -73,6 +76,9 @@ struct ContentView: View {
     @State private var rememberSelectedPreset: Bool
     @State private var autoDownloadOnPaste: Bool
     @State private var shareSheetDownloadMode: ShareSheetDownloadMode
+    @State private var downloadPlaylist: Bool
+    @State private var downloadSubtitles: Bool
+    @State private var subtitleLanguagePattern: String
     @State private var linkHistoryEnabled: Bool
     @State private var linkHistoryEntries: [LinkHistoryEntry]
     @State private var appAppearanceMode: AppAppearanceMode
@@ -86,7 +92,7 @@ struct ContentView: View {
     @State private var isPackageRunning = false
     @State private var hasLoadedPackageStatus = false
     @StateObject private var consoleLogStore: ConsoleLogStore
-    @State private var completedDownloadURL: URL?
+    @State private var completedDownloadResult: CompletedDownloadResult?
     @State private var completedPhotosCompatibility: PhotosCompatibilityState = .checking
     @State private var showDownloadActionSheet = false
     @State private var alertMessage: String?
@@ -94,7 +100,7 @@ struct ContentView: View {
     @State private var reopenDownloadActionAfterAlert = false
     @State private var toastMessage: String?
     @State private var showToastMessage = false
-    @State private var shareItem: ShareItem?
+    @State private var sharePayload: SharePayload?
     @State private var currentDownloadTask: Task<Void, Never>?
     @State private var currentPackageTask: Task<Void, Never>?
     @State private var cancelMarkerURL: URL?
@@ -117,6 +123,9 @@ struct ContentView: View {
         _rememberSelectedPreset = State(initialValue: rememberPreset)
         _autoDownloadOnPaste = State(initialValue: Self.loadAutoDownloadOnPaste())
         _shareSheetDownloadMode = State(initialValue: Self.loadShareSheetDownloadMode())
+        _downloadPlaylist = State(initialValue: Self.loadDownloadPlaylist())
+        _downloadSubtitles = State(initialValue: Self.loadDownloadSubtitles())
+        _subtitleLanguagePattern = State(initialValue: Self.loadSubtitleLanguagePattern())
         _linkHistoryEnabled = State(initialValue: Self.loadLinkHistoryEnabled())
         _linkHistoryEntries = State(initialValue: Self.loadLinkHistoryEntries())
         _appAppearanceMode = State(initialValue: Self.loadAppAppearanceMode())
@@ -131,6 +140,9 @@ struct ContentView: View {
                     statusText: $statusText,
                     urlText: $urlText,
                     selectedPreset: $selectedPreset,
+                    downloadPlaylist: $downloadPlaylist,
+                    downloadSubtitles: $downloadSubtitles,
+                    subtitleLanguagePattern: $subtitleLanguagePattern,
                     isRunning: isRunning,
                     progressText: progressText,
                     downloadErrorText: downloadErrorText,
@@ -228,14 +240,23 @@ struct ContentView: View {
         .onChange(of: shareSheetDownloadMode, initial: false) {
             persistPreferences()
         }
+        .onChange(of: downloadPlaylist, initial: false) {
+            persistPreferences()
+        }
+        .onChange(of: downloadSubtitles, initial: false) {
+            persistPreferences()
+        }
+        .onChange(of: subtitleLanguagePattern, initial: false) {
+            persistPreferences()
+        }
         .onChange(of: linkHistoryEnabled, initial: false) {
             persistPreferences()
         }
         .onChange(of: appAppearanceMode, initial: false) {
             persistPreferences()
         }
-        .sheet(item: $shareItem) { item in
-            ShareSheet(activityItems: [item.url])
+        .sheet(item: $sharePayload) { payload in
+            ShareSheet(activityItems: payload.activityItems)
         }
         .sheet(isPresented: $showShareSheetDownloadPicker) {
             shareSheetModePickerSheet
@@ -246,7 +267,7 @@ struct ContentView: View {
         }
         .alert("Result", isPresented: $showAlert) {
             Button("OK", role: .cancel) {
-                if reopenDownloadActionAfterAlert, completedDownloadURL != nil {
+                if reopenDownloadActionAfterAlert, completedDownloadResult != nil {
                     reopenDownloadActionAfterAlert = false
                     showDownloadActionSheet = true
                 } else {
@@ -284,7 +305,7 @@ struct ContentView: View {
 
             VStack(spacing: 14) {
                 shareSheetModeButton(
-                    title: "Auto",
+                    title: "Video",
                     subtitle: "Best quality available",
                     icon: "wand.and.stars",
                     color: .blue,
@@ -370,8 +391,8 @@ struct ContentView: View {
                 .fontWeight(.bold)
                 .padding(.top)
 
-            if let fileName = completedDownloadURL?.lastPathComponent {
-                Text(fileName)
+            if let summaryTitle = completedResultDisplayTitle {
+                Text(summaryTitle)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -379,7 +400,7 @@ struct ContentView: View {
                     .padding(.horizontal)
             }
 
-            Text("Choose what to do with the downloaded file.")
+            Text(downloadCompleteSummaryText)
                 .font(.body)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
@@ -387,27 +408,31 @@ struct ContentView: View {
 
             VStack(spacing: 14) {
                 downloadCompleteActionButton(
-                    title: "Open Share Sheet",
-                    subtitle: "Share or save with other apps",
+                    title: completedResultIsCollection ? "Share All" : "Open Share Sheet",
+                    subtitle: completedResultIsCollection ? "Share every downloaded file" : "Share or save with other apps",
                     icon: "square.and.arrow.up",
                     color: .blue
                 ) {
                     performPromptedPostDownloadAction(.openShareSheet)
                 }
 
-                downloadCompleteActionButton(
-                    title: "Save to Photos",
-                    subtitle: saveToPhotosButtonSubtitle,
-                    icon: "photo.on.rectangle",
-                    color: .green,
-                    isEnabled: completedPhotosCompatibility.isCompatible
-                ) {
-                    performPromptedPostDownloadAction(.saveToPhotos)
+                if shouldOfferPhotosAction {
+                    downloadCompleteActionButton(
+                        title: "Save to Photos",
+                        subtitle: saveToPhotosButtonSubtitle,
+                        icon: "photo.on.rectangle",
+                        color: .green,
+                        isEnabled: completedPhotosCompatibility.isCompatible
+                    ) {
+                        performPromptedPostDownloadAction(.saveToPhotos)
+                    }
                 }
 
                 downloadCompleteActionButton(
                     title: "Save to App Folder",
-                    subtitle: "Keep a copy in Palladium/Saved",
+                    subtitle: completedResultIsCollection
+                        ? "Keep the whole download folder in Palladium/Saved"
+                        : "Keep a copy in Palladium/Saved",
                     icon: "folder.badge.plus",
                     color: .orange
                 ) {
@@ -464,12 +489,42 @@ struct ContentView: View {
     }
 
     private func performPromptedPostDownloadAction(_ action: PostDownloadAction) {
-        guard let url = completedDownloadURL else {
+        guard let result = completedDownloadResult else {
             showDownloadActionSheet = false
             return
         }
         showDownloadActionSheet = false
-        handlePostDownloadAction(action, for: url)
+        handlePostDownloadAction(action, for: result)
+    }
+
+    private var completedResultDisplayTitle: String? {
+        guard let result = completedDownloadResult else { return nil }
+        if !result.isCollection {
+            return result.primaryMediaURL?.lastPathComponent ?? result.items.first?.lastPathComponent
+        }
+        if let primaryMediaURL = result.primaryMediaURL {
+            return primaryMediaURL.deletingPathExtension().lastPathComponent
+        }
+        return result.folderURL?.lastPathComponent
+    }
+
+    private var completedResultIsCollection: Bool {
+        completedDownloadResult?.isCollection ?? false
+    }
+
+    private var shouldOfferPhotosAction: Bool {
+        guard let result = completedDownloadResult else { return false }
+        return !result.isCollection
+    }
+
+    private var downloadCompleteSummaryText: String {
+        guard let result = completedDownloadResult else {
+            return "Choose what to do with the downloaded files."
+        }
+        if result.isCollection {
+            return "This download produced \(result.items.count) files. Photos import is disabled for collections and subtitle sidecars."
+        }
+        return "Choose what to do with the downloaded file."
     }
 
     private var saveToPhotosButtonSubtitle: String {
@@ -490,7 +545,7 @@ struct ContentView: View {
 
     private func dismissDownloadActionSheet() {
         showDownloadActionSheet = false
-        completedDownloadURL = nil
+        completedDownloadResult = nil
         completedPhotosCompatibility = .checking
     }
 
@@ -552,10 +607,20 @@ struct ContentView: View {
         appendConsoleText("[palladium] copied history link\n")
     }
 
-    private func addLinkHistoryEntry(url: String, presetRawValue: String, downloadedPath: String, outputText: String) {
+    private func addLinkHistoryEntry(
+        url: String,
+        presetRawValue: String,
+        downloadedPaths: [String],
+        primaryDownloadedPath: String?,
+        outputText: String
+    ) {
         let trimmedURL = url.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedURL.isEmpty else { return }
-        let title = extractHistoryTitle(downloadedPath: downloadedPath, outputText: outputText)
+        let title = extractHistoryTitle(
+            downloadedPaths: downloadedPaths,
+            primaryDownloadedPath: primaryDownloadedPath,
+            outputText: outputText
+        )
         let entry = LinkHistoryEntry(
             id: UUID(),
             url: trimmedURL,
@@ -572,7 +637,28 @@ struct ContentView: View {
         persistLinkHistoryEntries()
     }
 
-    private func extractHistoryTitle(downloadedPath: String, outputText: String) -> String? {
+    private func extractHistoryTitle(
+        downloadedPaths: [String],
+        primaryDownloadedPath: String?,
+        outputText: String
+    ) -> String? {
+        if let playlistTitle = outputText.components(separatedBy: .newlines)
+            .compactMap({ line -> String? in
+                let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+                if trimmed.hasPrefix("[download] Downloading playlist: ") {
+                    return trimmed.replacingOccurrences(of: "[download] Downloading playlist: ", with: "")
+                }
+                if trimmed.hasPrefix("[youtube:tab] Downloading playlist ") {
+                    return trimmed.replacingOccurrences(of: "[youtube:tab] Downloading playlist ", with: "")
+                }
+                return nil
+            })
+            .last?
+            .trimmingCharacters(in: .whitespacesAndNewlines),
+           !playlistTitle.isEmpty {
+            return playlistTitle
+        }
+
         if let destinationMatch = outputText.components(separatedBy: .newlines)
             .reversed()
             .first(where: { $0.hasPrefix("[download] Destination: ") }) {
@@ -581,7 +667,13 @@ struct ContentView: View {
                 return parsed
             }
         }
-        return normalizedHistoryTitle(fromPath: downloadedPath)
+
+        if let primaryDownloadedPath,
+           let title = normalizedHistoryTitle(fromPath: primaryDownloadedPath) {
+            return title
+        }
+
+        return downloadedPaths.lazy.compactMap(normalizedHistoryTitle(fromPath:)).first
     }
 
     private func normalizedHistoryTitle(fromPath path: String) -> String? {
@@ -602,12 +694,24 @@ struct ContentView: View {
 
         consoleLogStore.clearAll()
         downloadErrorText = nil
+        completedDownloadResult = nil
 
         do {
             let removedCount = try clearDownloadsDirectoryContents()
             appendConsoleText("[palladium] cleared downloads folder entries: \(removedCount)\n")
         } catch {
             appendConsoleText("[palladium] failed to clear downloads folder: \(error.localizedDescription)\n")
+        }
+
+        let runOutputURL: URL
+        do {
+            runOutputURL = try makeDownloadRunDirectory()
+            appendConsoleText("[palladium] run output folder: \(runOutputURL.lastPathComponent)\n")
+        } catch {
+            appendConsoleText("[palladium] failed to create run output folder: \(error.localizedDescription)\n")
+            downloadErrorText = "Failed to prepare download folder."
+            progressText = "download failed"
+            return
         }
 
         isRunning = true
@@ -624,6 +728,9 @@ struct ContentView: View {
         let presetArgsJSONAtStart = buildPresetArgumentsJSON()
         let afterDownloadBehaviorAtStart = afterDownloadBehavior
         let linkHistoryEnabledAtStart = linkHistoryEnabled
+        let downloadPlaylistAtStart = downloadPlaylist
+        let downloadSubtitlesAtStart = downloadSubtitles
+        let subtitleLanguagePatternAtStart = subtitleLanguagePattern
         var receivedPythonLiveOutput = false
         let liveLogDecoder = StreamingUTF8Decoder()
         let cancelMarker = makeCancelMarkerURL()
@@ -652,7 +759,11 @@ struct ContentView: View {
                 url: targetURL,
                 preset: presetAtStart,
                 presetArgsJSON: presetArgsJSONAtStart,
-                extraArgs: extraArgsAtStart
+                extraArgs: extraArgsAtStart,
+                downloadPlaylist: downloadPlaylistAtStart,
+                downloadSubtitles: downloadSubtitlesAtStart,
+                subtitleLanguagePattern: subtitleLanguagePatternAtStart,
+                runOutputDir: runOutputURL.path
             )
 
             unsetenv("PALLADIUM_LOG_FD")
@@ -698,42 +809,49 @@ struct ContentView: View {
             }
             Self.logger.info("yt-dlp flow finished with status: \(outcome.statusText, privacy: .public)")
 
-            if outcome.statusText == "success",
-               let downloadedPath = outcome.downloadedPath,
-               FileManager.default.fileExists(atPath: downloadedPath) {
-                let completedURL = URL(fileURLWithPath: downloadedPath)
+            if outcome.statusText == "success", !outcome.downloadedPaths.isEmpty {
+                let result = CompletedDownloadResult(
+                    items: outcome.downloadedPaths.map { URL(fileURLWithPath: $0) },
+                    primaryMediaURL: outcome.primaryDownloadedPath.map { URL(fileURLWithPath: $0) },
+                    folderURL: runOutputURL
+                )
                 if linkHistoryEnabledAtStart {
                     addLinkHistoryEntry(
                         url: targetURL,
                         presetRawValue: presetAtStart,
-                        downloadedPath: downloadedPath,
+                        downloadedPaths: outcome.downloadedPaths,
+                        primaryDownloadedPath: outcome.primaryDownloadedPath,
                         outputText: outcome.outputText
                     )
                 }
-                completedDownloadURL = completedURL
+                completedDownloadResult = result
                 downloadErrorText = nil
-                notifyDownloadCompletionIfNeeded(fileURL: completedURL)
+                if let notificationTarget = result.notificationTargetURL {
+                    notifyDownloadCompletionIfNeeded(fileURL: notificationTarget)
+                }
 
                 let needsPhotosCompatibilityCheck = afterDownloadBehaviorAtStart == .ask
                     || afterDownloadBehaviorAtStart.postDownloadAction == .saveToPhotos
-                if needsPhotosCompatibilityCheck {
+                if needsPhotosCompatibilityCheck, let photosCandidateURL = result.photosCandidateURL {
                     completedPhotosCompatibility = .checking
-                    completedPhotosCompatibility = await evaluatePhotosCompatibility(for: completedURL)
+                    completedPhotosCompatibility = await evaluatePhotosCompatibility(for: photosCandidateURL)
                 } else {
-                    completedPhotosCompatibility = .checking
+                    completedPhotosCompatibility = .incompatible("Photos is only available for a single media file.")
                 }
 
                 if afterDownloadBehaviorAtStart == .ask {
                     showDownloadActionSheet = true
                 } else if afterDownloadBehaviorAtStart.postDownloadAction == .saveToPhotos {
                     if completedPhotosCompatibility.isCompatible {
-                        handlePostDownloadAction(.saveToPhotos, for: completedURL)
+                        handlePostDownloadAction(.saveToPhotos, for: result)
                     } else {
                         showDownloadActionSheet = true
                     }
                 } else if let action = afterDownloadBehaviorAtStart.postDownloadAction {
-                    handlePostDownloadAction(action, for: completedURL)
+                    handlePostDownloadAction(action, for: result)
                 }
+            } else if outcome.statusText == "success" {
+                downloadErrorText = "Download finished but no files were found."
             }
         }
         currentDownloadTask = task
@@ -1162,7 +1280,7 @@ struct ContentView: View {
         return UIImage(contentsOfFile: fileURL.path) != nil
     }
 
-    private func saveDownloadedFileToApplicationFolder(_ url: URL) {
+    private func saveDownloadedFileToApplicationFolder(_ result: CompletedDownloadResult) {
         do {
             let documents = try FileManager.default.url(
                 for: .documentDirectory,
@@ -1172,12 +1290,32 @@ struct ContentView: View {
             )
             let appFolder = documents.appendingPathComponent("Saved", isDirectory: true)
             try FileManager.default.createDirectory(at: appFolder, withIntermediateDirectories: true)
-            let destination = appFolder.appendingPathComponent(url.lastPathComponent)
+
+            let sourceURL: URL
+            let destination: URL
+            if result.isCollection, let folderURL = result.folderURL {
+                sourceURL = folderURL
+                destination = appFolder.appendingPathComponent(folderURL.lastPathComponent, isDirectory: true)
+            } else if let itemURL = result.primaryMediaURL ?? result.items.first {
+                sourceURL = itemURL
+                destination = appFolder.appendingPathComponent(itemURL.lastPathComponent)
+            } else {
+                throw NSError(
+                    domain: "Palladium",
+                    code: 1,
+                    userInfo: [NSLocalizedDescriptionKey: "No downloaded files were available."]
+                )
+            }
+
             if FileManager.default.fileExists(atPath: destination.path) {
                 try FileManager.default.removeItem(at: destination)
             }
-            try FileManager.default.copyItem(at: url, to: destination)
-            alertMessage = "Saved to app folder: \(destination.lastPathComponent)"
+            try FileManager.default.copyItem(at: sourceURL, to: destination)
+            if result.isCollection {
+                alertMessage = "Saved download folder: \(destination.lastPathComponent)"
+            } else {
+                alertMessage = "Saved to app folder: \(destination.lastPathComponent)"
+            }
             showAlert = true
         } catch {
             alertMessage = "Failed to save to app folder: \(error.localizedDescription)"
@@ -1185,14 +1323,20 @@ struct ContentView: View {
         }
     }
 
-    private func handlePostDownloadAction(_ action: PostDownloadAction, for url: URL) {
+    private func handlePostDownloadAction(_ action: PostDownloadAction, for result: CompletedDownloadResult) {
         switch action {
         case .saveToPhotos:
-            saveDownloadedFileToPhotos(url)
+            guard let fileURL = result.photosCandidateURL else {
+                reopenDownloadActionAfterAlert = true
+                alertMessage = "Photos is only available for a single media file."
+                showAlert = true
+                return
+            }
+            saveDownloadedFileToPhotos(fileURL)
         case .openShareSheet:
-            shareItem = ShareItem(url: url)
+            sharePayload = SharePayload(activityItems: result.shareActivityItems)
         case .saveToApplicationFolder:
-            saveDownloadedFileToApplicationFolder(url)
+            saveDownloadedFileToApplicationFolder(result)
         }
     }
 
@@ -1229,6 +1373,9 @@ struct ContentView: View {
         defaults.set(notificationsEnabled, forKey: Self.notificationsEnabledDefaultsKey)
         defaults.set(autoDownloadOnPaste, forKey: Self.autoDownloadOnPasteDefaultsKey)
         defaults.set(shareSheetDownloadMode.rawValue, forKey: Self.shareSheetDownloadModeDefaultsKey)
+        defaults.set(downloadPlaylist, forKey: Self.downloadPlaylistDefaultsKey)
+        defaults.set(downloadSubtitles, forKey: Self.downloadSubtitlesDefaultsKey)
+        defaults.set(subtitleLanguagePattern, forKey: Self.subtitleLanguagePatternDefaultsKey)
         defaults.set(linkHistoryEnabled, forKey: Self.linkHistoryEnabledDefaultsKey)
         defaults.set(appAppearanceMode.rawValue, forKey: Self.appAppearanceModeDefaultsKey)
     }
@@ -1339,6 +1486,28 @@ struct ContentView: View {
             return .ask
         }
         return mode
+    }
+
+    private static func loadDownloadPlaylist() -> Bool {
+        if UserDefaults.standard.object(forKey: downloadPlaylistDefaultsKey) == nil {
+            return false
+        }
+        return UserDefaults.standard.bool(forKey: downloadPlaylistDefaultsKey)
+    }
+
+    private static func loadDownloadSubtitles() -> Bool {
+        if UserDefaults.standard.object(forKey: downloadSubtitlesDefaultsKey) == nil {
+            return false
+        }
+        return UserDefaults.standard.bool(forKey: downloadSubtitlesDefaultsKey)
+    }
+
+    private static func loadSubtitleLanguagePattern() -> String {
+        guard let rawValue = UserDefaults.standard.string(forKey: subtitleLanguagePatternDefaultsKey),
+              SubtitleLanguageOption.allCases.contains(where: { $0.subtitlePattern == rawValue }) else {
+            return SubtitleLanguageOption.english.subtitlePattern
+        }
+        return rawValue
     }
 
     private static func loadLinkHistoryEnabled() -> Bool {
@@ -1466,6 +1635,26 @@ struct ContentView: View {
         return FileManager.default.temporaryDirectory.appendingPathComponent(".palladium-cancel-\(UUID().uuidString)")
     }
 
+    private func makeDownloadRunDirectory() throws -> URL {
+        let downloadsURL: URL
+        if let downloadsPath = ProcessInfo.processInfo.environment["PALLADIUM_DOWNLOADS"], !downloadsPath.isEmpty {
+            downloadsURL = URL(fileURLWithPath: downloadsPath, isDirectory: true)
+        } else {
+            let documents = try FileManager.default.url(
+                for: .documentDirectory,
+                in: .userDomainMask,
+                appropriateFor: nil,
+                create: true
+            )
+            downloadsURL = documents.appendingPathComponent("Temp", isDirectory: true)
+        }
+
+        try FileManager.default.createDirectory(at: downloadsURL, withIntermediateDirectories: true)
+        let runDirectory = downloadsURL.appendingPathComponent("run-\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: runDirectory, withIntermediateDirectories: true)
+        return runDirectory
+    }
+
     private func requestActiveOperationCancellation() {
         if let markerURL = cancelMarkerURL {
             try? "cancel".write(to: markerURL, atomically: true, encoding: .utf8)
@@ -1576,9 +1765,32 @@ private final class KeyboardDismissTapHandler: NSObject, UIGestureRecognizerDele
     }
 }
 
-private struct ShareItem: Identifiable {
+private struct CompletedDownloadResult {
+    let items: [URL]
+    let primaryMediaURL: URL?
+    let folderURL: URL?
+
+    var isCollection: Bool {
+        items.count > 1
+    }
+
+    var photosCandidateURL: URL? {
+        guard !isCollection else { return nil }
+        return primaryMediaURL ?? items.first
+    }
+
+    var notificationTargetURL: URL? {
+        primaryMediaURL ?? items.first
+    }
+
+    var shareActivityItems: [Any] {
+        items.map { $0 as Any }
+    }
+}
+
+private struct SharePayload: Identifiable {
     let id = UUID()
-    let url: URL
+    let activityItems: [Any]
 }
 
 private struct ShareSheet: UIViewControllerRepresentable {

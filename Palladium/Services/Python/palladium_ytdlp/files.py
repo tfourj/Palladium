@@ -3,6 +3,17 @@ import re
 import traceback
 import urllib.parse
 
+PRIMARY_MEDIA_EXTENSIONS = {
+    "3gp", "aac", "aiff", "avi", "flac", "m4a", "m4v", "mkv", "mov", "mp3",
+    "mp4", "mpeg", "mpg", "ogg", "opus", "ts", "wav", "webm",
+}
+IMAGE_MEDIA_EXTENSIONS = {
+    "gif", "heic", "heif", "jpeg", "jpg", "png", "webp",
+}
+SECONDARY_SIDE_CAR_EXTENSIONS = {
+    "ass", "description", "json", "lrc", "srt", "srv1", "srv2", "srv3", "ttml", "vtt",
+}
+
 
 def extract_probable_youtube_id(url):
     try:
@@ -92,44 +103,59 @@ def is_temp_download_artifact(name):
     )
 
 
-def detect_downloaded_file_path(log_text, scan_dir, run_started_at):
-    downloaded_path = None
-    destination_matches = re.findall(r"^\[download\] Destination: (.+)$", log_text, flags=re.MULTILINE)
-    already_downloaded_matches = []
-    for line in log_text.splitlines():
-        if line.startswith("[download]") and "has already been downloaded" in line:
-            candidate_line = line[len("[download]"):].strip()
-            candidate_line = candidate_line.split(" has already been downloaded", 1)[0].strip()
-            if candidate_line:
-                already_downloaded_matches.append(candidate_line)
+def collect_downloaded_file_paths(scan_dir):
+    if not scan_dir or not os.path.isdir(scan_dir):
+        return []
 
-    if destination_matches:
-        candidate = destination_matches[-1].strip()
-        if candidate:
-            downloaded_path = candidate
-    elif already_downloaded_matches:
-        candidate = already_downloaded_matches[-1].strip()
-        if candidate:
-            downloaded_path = candidate
+    collected = []
+    try:
+        for root, dirnames, filenames in os.walk(scan_dir):
+            dirnames[:] = [
+                name for name in dirnames
+                if not name.startswith(".") and name not in {".palladium-ffmpeg", ".cache"}
+            ]
 
-    if downloaded_path:
-        if not os.path.isabs(downloaded_path):
-            downloaded_path = os.path.join(scan_dir, downloaded_path)
-        if not os.path.isfile(downloaded_path):
-            downloaded_path = None
+            for filename in filenames:
+                if filename.startswith(".") or is_temp_download_artifact(filename):
+                    continue
 
-    if downloaded_path is None:
-        candidates = []
-        for filename in os.listdir(scan_dir):
-            full_path = os.path.join(scan_dir, filename)
-            if not os.path.isfile(full_path) or is_temp_download_artifact(filename):
-                continue
-            mtime = os.path.getmtime(full_path)
-            if mtime >= (run_started_at - 3600):
-                candidates.append((mtime, full_path))
-        if candidates:
-            downloaded_path = max(candidates, key=lambda item: item[0])[1]
+                full_path = os.path.join(root, filename)
+                if not os.path.isfile(full_path):
+                    continue
 
-    if downloaded_path and os.path.getsize(downloaded_path) <= 0:
+                try:
+                    if os.path.getsize(full_path) <= 0:
+                        continue
+                except Exception:
+                    continue
+
+                collected.append(os.path.abspath(full_path))
+    except Exception:
+        print("[palladium] failed to collect downloaded files")
+        traceback.print_exc()
+        return []
+
+    return sorted(collected, key=lambda path: os.path.relpath(path, scan_dir).lower())
+
+
+def choose_primary_downloaded_path(paths):
+    if not paths:
         return None
-    return downloaded_path
+
+    def path_priority(path):
+        filename = os.path.basename(path).lower()
+        extension = os.path.splitext(filename)[1].lstrip(".")
+        if extension in PRIMARY_MEDIA_EXTENSIONS:
+            return (0, path.lower())
+        if extension in IMAGE_MEDIA_EXTENSIONS:
+            return (1, path.lower())
+        if extension in SECONDARY_SIDE_CAR_EXTENSIONS:
+            return (3, path.lower())
+        return (2, path.lower())
+
+    return min(paths, key=path_priority)
+
+
+def detect_downloaded_files(scan_dir):
+    downloaded_paths = collect_downloaded_file_paths(scan_dir)
+    return downloaded_paths, choose_primary_downloaded_path(downloaded_paths)
