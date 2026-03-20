@@ -15,6 +15,8 @@ jobs:
     env:
       PYTHON_APPLE_SUPPORT_REPO: beeware/Python-Apple-support
       PYTHON_APPLE_SUPPORT_TAG: latest
+      SWIFTFFMPEG_IOS_REPO: tfourj/SwiftFFmpeg-iOS
+      SWIFTFFMPEG_IOS_ASSET: SwiftFFmpeg-iOS.zip
 
     steps:
     - name: Checkout code
@@ -73,18 +75,58 @@ jobs:
         echo "✅ Installed Python.xcframework:"
         ls -la "$GITHUB_WORKSPACE/Python.xcframework"
 
-    - name: Clone SwiftFFmpeg-iOS
+    - name: Download SwiftFFmpeg-iOS
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        cd "$GITHUB_WORKSPACE/.."
-        git clone -b palladium https://github.com/tfourj/SwiftFFmpeg-iOS.git
-        echo "✅ SwiftFFmpeg-iOS cloned"
+        set -euo pipefail
 
-    - name: Build SwiftFFmpeg-iOS
-      run: |
-        cd "$GITHUB_WORKSPACE/../SwiftFFmpeg-iOS"
-        chmod +x Scripts/build-ffmpeg-ios.sh
-        ./Scripts/build-ffmpeg-ios.sh --version 8.0.1
-        echo "✅ SwiftFFmpeg-iOS built"
+        RELEASE_API="https://api.github.com/repos/$SWIFTFFMPEG_IOS_REPO/releases/latest"
+        TMP_DIR=$(mktemp -d)
+        RELEASE_JSON_PATH="$TMP_DIR/release.json"
+        EXTRACT_DIR="$TMP_DIR/extracted"
+        TARGET_DIR="$GITHUB_WORKSPACE/../SwiftFFmpeg-iOS"
+
+        echo "Fetching release metadata from: $RELEASE_API"
+        curl -fsSL \
+          -H "Accept: application/vnd.github+json" \
+          -H "Authorization: Bearer $GH_TOKEN" \
+          "$RELEASE_API" \
+          -o "$RELEASE_JSON_PATH"
+
+        ASSET_URL=$(python3 -c 'import json,sys; payload=json.load(open(sys.argv[1], encoding="utf-8")); asset_name=sys.argv[2]; print(next((asset.get("browser_download_url","") for asset in payload.get("assets", []) if asset.get("name","") == asset_name), ""))' "$RELEASE_JSON_PATH" "$SWIFTFFMPEG_IOS_ASSET")
+
+        if [ -z "$ASSET_URL" ]; then
+          echo "❌ Could not find $SWIFTFFMPEG_IOS_ASSET in the latest SwiftFFmpeg-iOS release."
+          python3 -c 'import json,sys; payload=json.load(open(sys.argv[1], encoding="utf-8")); [print(asset.get("name","")) for asset in payload.get("assets", [])]' "$RELEASE_JSON_PATH"
+          exit 1
+        fi
+
+        echo "Downloading: $ASSET_URL"
+        ARCHIVE_PATH="$TMP_DIR/$SWIFTFFMPEG_IOS_ASSET"
+        curl -fL "$ASSET_URL" -o "$ARCHIVE_PATH"
+
+        mkdir -p "$EXTRACT_DIR"
+        unzip -q "$ARCHIVE_PATH" -d "$EXTRACT_DIR"
+
+        SOURCE_DIR=""
+        if [ -d "$EXTRACT_DIR/SwiftFFmpeg-iOS" ]; then
+          SOURCE_DIR="$EXTRACT_DIR/SwiftFFmpeg-iOS"
+        else
+          SOURCE_DIR=$(find "$EXTRACT_DIR" -maxdepth 2 -type f -name "Package.swift" -exec dirname {} \; | head -n 1)
+        fi
+
+        if [ -z "$SOURCE_DIR" ] || [ ! -d "$SOURCE_DIR" ]; then
+          echo "❌ Could not locate extracted SwiftFFmpeg-iOS folder."
+          find "$EXTRACT_DIR" -maxdepth 3 -print
+          exit 1
+        fi
+
+        rm -rf "$TARGET_DIR"
+        cp -R "$SOURCE_DIR" "$TARGET_DIR"
+
+        echo "✅ Installed SwiftFFmpeg-iOS:"
+        ls -la "$TARGET_DIR"
 
     - name: Set up Xcode 26.2
       uses: maxim-lobanov/setup-xcode@v1
