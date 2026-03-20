@@ -179,6 +179,34 @@ def split_bridge_output(tool, output):
     return stdout_text, stderr_text
 
 
+@contextlib.contextmanager
+def patch_ytdlp_ffprobe_metadata_fallback():
+    try:
+        from yt_dlp.postprocessor.ffmpeg import FFmpegPostProcessor
+    except Exception:
+        yield
+        return
+
+    original_get_metadata_object = getattr(FFmpegPostProcessor, "get_metadata_object", None)
+    if original_get_metadata_object is None:
+        yield
+        return
+
+    def patched_get_metadata_object(self, *args, **kwargs):
+        try:
+            return original_get_metadata_object(self, *args, **kwargs)
+        except json.JSONDecodeError:
+            target_path = args[0] if args else kwargs.get("path", "<unknown>")
+            print(f"[palladium][ffmpeg-bridge] ffprobe metadata parse failed for {target_path}; using empty metadata fallback")
+            return {"streams": [], "format": {}}
+
+    FFmpegPostProcessor.get_metadata_object = patched_get_metadata_object
+    try:
+        yield
+    finally:
+        FFmpegPostProcessor.get_metadata_object = original_get_metadata_object
+
+
 def is_cancel_requested(cancel_file_path):
     return bool(cancel_file_path) and os.path.exists(cancel_file_path)
 

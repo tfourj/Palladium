@@ -10,8 +10,11 @@ PRIMARY_MEDIA_EXTENSIONS = {
 IMAGE_MEDIA_EXTENSIONS = {
     "gif", "heic", "heif", "jpeg", "jpg", "png", "webp",
 }
-SECONDARY_SIDE_CAR_EXTENSIONS = {
-    "ass", "description", "json", "lrc", "srt", "srv1", "srv2", "srv3", "ttml", "vtt",
+SUBTITLE_SIDE_CAR_EXTENSIONS = {
+    "ass", "lrc", "srt", "srv1", "srv2", "srv3", "ttml", "vtt",
+}
+AUXILIARY_SIDE_CAR_EXTENSIONS = {
+    "description", "json", "nfo",
 }
 
 
@@ -149,13 +152,35 @@ def choose_primary_downloaded_path(paths):
             return (0, path.lower())
         if extension in IMAGE_MEDIA_EXTENSIONS:
             return (1, path.lower())
-        if extension in SECONDARY_SIDE_CAR_EXTENSIONS:
+        if extension in SUBTITLE_SIDE_CAR_EXTENSIONS or extension in AUXILIARY_SIDE_CAR_EXTENSIONS:
             return (3, path.lower())
         return (2, path.lower())
 
     return min(paths, key=path_priority)
 
 
+def filter_user_visible_downloaded_paths(paths, primary_path):
+    if not paths:
+        return []
+
+    primary_extension = os.path.splitext(os.path.basename(primary_path).lower())[1].lstrip(".") if primary_path else ""
+    visible_paths = []
+
+    for path in paths:
+        extension = os.path.splitext(os.path.basename(path).lower())[1].lstrip(".")
+
+        if extension in AUXILIARY_SIDE_CAR_EXTENSIONS:
+            continue
+        if primary_extension in PRIMARY_MEDIA_EXTENSIONS and extension in IMAGE_MEDIA_EXTENSIONS:
+            continue
+
+        visible_paths.append(path)
+
+    return visible_paths or paths
+
+
 def detect_downloaded_files(scan_dir):
-    downloaded_paths = collect_downloaded_file_paths(scan_dir)
-    return downloaded_paths, choose_primary_downloaded_path(downloaded_paths)
+    all_downloaded_paths = collect_downloaded_file_paths(scan_dir)
+    primary_path = choose_primary_downloaded_path(all_downloaded_paths)
+    visible_paths = filter_user_visible_downloaded_paths(all_downloaded_paths, primary_path)
+    return visible_paths, choose_primary_downloaded_path(visible_paths)
