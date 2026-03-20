@@ -11,7 +11,7 @@ enum DownloadPreset: String, Codable, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .autoVideo: return "Auto"
+        case .autoVideo: return "Video"
         case .mute: return "Mute"
         case .audio: return "Audio"
         case .custom: return "Custom"
@@ -108,7 +108,7 @@ enum ShareSheetDownloadMode: String, Codable, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .ask: return "Ask"
-        case .autoVideo: return "Auto"
+        case .autoVideo: return "Video"
         case .audio: return "Audio"
         case .mute: return "Mute"
         case .custom: return "Custom"
