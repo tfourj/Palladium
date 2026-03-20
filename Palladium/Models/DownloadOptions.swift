@@ -132,7 +132,7 @@ enum ShareSheetDownloadMode: String, Codable, CaseIterable, Identifiable {
 }
 
 enum SubtitleLanguageOption: String, Codable, CaseIterable, Identifiable {
-    case english = "en.*"
+    case english = "en"
     case allAvailable = "all"
 
     var id: String { rawValue }

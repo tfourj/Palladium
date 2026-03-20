@@ -159,6 +159,14 @@ def choose_primary_downloaded_path(paths):
     return min(paths, key=path_priority)
 
 
+def has_primary_media_file(paths):
+    for path in paths or []:
+        extension = os.path.splitext(os.path.basename(path).lower())[1].lstrip(".")
+        if extension in PRIMARY_MEDIA_EXTENSIONS:
+            return True
+    return False
+
+
 def filter_user_visible_downloaded_paths(paths, primary_path):
     if not paths:
         return []

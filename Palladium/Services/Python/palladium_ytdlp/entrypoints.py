@@ -23,7 +23,7 @@ from .ffmpeg_bridge import (
     patch_ytdlp_ffmpeg_detection,
     patch_ytdlp_popen_for_swiftffmpeg,
 )
-from .files import cleanup_temp_download_files, detect_downloaded_files
+from .files import cleanup_temp_download_files, detect_downloaded_files, has_primary_media_file
 from .packages import (
     build_package_install_plan,
     check_package_updates,
@@ -93,9 +93,11 @@ def run_yt_dlp_flow(
     else:
         embed_thumbnail = bool(embed_thumbnail_override)
     if subtitle_language_pattern_override is None:
-        subtitle_language_pattern = os.environ.get("PALLADIUM_SUBTITLE_LANGUAGE_PATTERN", "en.*").strip() or "en.*"
+        subtitle_language_pattern = os.environ.get("PALLADIUM_SUBTITLE_LANGUAGE_PATTERN", "en").strip() or "en"
     else:
-        subtitle_language_pattern = str(subtitle_language_pattern_override).strip() or "en.*"
+        subtitle_language_pattern = str(subtitle_language_pattern_override).strip() or "en"
+    if subtitle_language_pattern == "en.*":
+        subtitle_language_pattern = "en"
     downloads_dir = os.environ.get("PALLADIUM_DOWNLOADS", "").strip()
     if run_output_dir_override is None:
         run_output_dir = os.environ.get("PALLADIUM_RUN_OUTPUT_DIR", "").strip() or downloads_dir
@@ -336,8 +338,11 @@ def run_yt_dlp_flow(
                         if primary_downloaded_path:
                             print(f"[palladium] primary downloaded file: {primary_downloaded_path}")
                         if yt_exit_code != 0:
-                            print(f"[palladium] overriding yt-dlp exit code {yt_exit_code} because downloaded files exist")
-                            yt_exit_code = 0
+                            if has_primary_media_file(downloaded_paths):
+                                print(f"[palladium] overriding yt-dlp exit code {yt_exit_code} because a media file exists")
+                                yt_exit_code = 0
+                            else:
+                                print(f"[palladium] keeping yt-dlp exit code {yt_exit_code} because only sidecar files were downloaded")
                     else:
                         print("[palladium] downloaded files not detected")
                 except Exception:

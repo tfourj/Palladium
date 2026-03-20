@@ -1529,8 +1529,13 @@ struct ContentView: View {
     }
 
     private static func loadSubtitleLanguagePattern() -> String {
-        guard let rawValue = UserDefaults.standard.string(forKey: subtitleLanguagePatternDefaultsKey),
-              SubtitleLanguageOption.allCases.contains(where: { $0.subtitlePattern == rawValue }) else {
+        guard let rawValue = UserDefaults.standard.string(forKey: subtitleLanguagePatternDefaultsKey) else {
+            return SubtitleLanguageOption.english.subtitlePattern
+        }
+        if rawValue == "en.*" {
+            return SubtitleLanguageOption.english.subtitlePattern
+        }
+        guard SubtitleLanguageOption.allCases.contains(where: { $0.subtitlePattern == rawValue }) else {
             return SubtitleLanguageOption.english.subtitlePattern
         }
         return rawValue
