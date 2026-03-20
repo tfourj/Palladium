@@ -8,13 +8,13 @@ PROJECT_NAME="Palladium"
 SCHEME_NAME="Palladium"
 BUILD_DIR="build"
 
-LATEST_TAG=$(git tag --sort=-v:refname | head -n 1)
-if [ -n "$LATEST_TAG" ]; then
-  BUILD_REF="$LATEST_TAG"
-  echo "📦 Using latest git tag for IPA name: ${BUILD_REF}"
+HEAD_TAG=$(git tag --points-at HEAD --sort=-v:refname | head -n 1)
+if [ -n "$HEAD_TAG" ]; then
+  BUILD_REF="$HEAD_TAG"
+  echo "📦 Using tag on current commit for IPA name: ${BUILD_REF}"
 else
   BUILD_REF=$(git rev-parse --short HEAD)
-  echo "📦 No git tags found, using commit for IPA name: ${BUILD_REF}"
+  echo "📦 Current commit has no tag, using commit for IPA name: ${BUILD_REF}"
 fi
 
 IPA_NAME="Palladium-${BUILD_REF}.ipa"
