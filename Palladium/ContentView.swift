@@ -625,6 +625,7 @@ struct ContentView: View {
         let afterDownloadBehaviorAtStart = afterDownloadBehavior
         let linkHistoryEnabledAtStart = linkHistoryEnabled
         var receivedPythonLiveOutput = false
+        let liveLogDecoder = StreamingUTF8Decoder()
         let cancelMarker = makeCancelMarkerURL()
         cancelMarkerURL = cancelMarker
         setenv("PALLADIUM_LOG_FD", "\(writeFD)", 1)
@@ -637,7 +638,9 @@ struct ContentView: View {
 
         readHandle.readabilityHandler = { handle in
             let data = handle.availableData
-            guard !data.isEmpty, let chunk = String(data: data, encoding: .utf8) else { return }
+            guard !data.isEmpty else { return }
+            let chunk = liveLogDecoder.append(data)
+            guard !chunk.isEmpty else { return }
             receivedPythonLiveOutput = true
             Task { @MainActor in
                 enqueueConsoleChunk(chunk, trackProgress: true)
@@ -657,7 +660,14 @@ struct ContentView: View {
             readHandle.readabilityHandler = nil
             try? readHandle.close()
             try? logPipe.fileHandleForWriting.close()
-            await MainActor.run { flushConsoleChunks() }
+            let trailingChunk = liveLogDecoder.finish()
+            await MainActor.run {
+                if !trailingChunk.isEmpty {
+                    receivedPythonLiveOutput = true
+                    enqueueConsoleChunk(trailingChunk, trackProgress: true)
+                }
+                flushConsoleChunks()
+            }
             if let cancelMarkerURL {
                 try? FileManager.default.removeItem(at: cancelMarkerURL)
             }
@@ -677,6 +687,12 @@ struct ContentView: View {
                 downloadErrorText = downloadErrorDetails(from: outcome)
             }
             appendConsoleText("\n\(outcome.summaryText)\n")
+            if !receivedPythonLiveOutput {
+                appendConsoleText(
+                    "[palladium] live python log stream produced no decodable chunks; using buffered output fallback\n",
+                    source: .app
+                )
+            }
             if !receivedPythonLiveOutput, !outcome.outputText.isEmpty {
                 appendConsoleText("\n\(outcome.outputText)\n")
             }
@@ -805,6 +821,7 @@ struct ContentView: View {
         let logPipe = Pipe()
         let readHandle = logPipe.fileHandleForReading
         let writeFD = logPipe.fileHandleForWriting.fileDescriptor
+        let liveLogDecoder = StreamingUTF8Decoder()
         let cancelMarker = makeCancelMarkerURL()
         cancelMarkerURL = cancelMarker
         setenv("PALLADIUM_LOG_FD", "\(writeFD)", 1)
@@ -817,7 +834,9 @@ struct ContentView: View {
 
         readHandle.readabilityHandler = { handle in
             let data = handle.availableData
-            guard !data.isEmpty, let chunk = String(data: data, encoding: .utf8) else { return }
+            guard !data.isEmpty else { return }
+            let chunk = liveLogDecoder.append(data)
+            guard !chunk.isEmpty else { return }
             Task { @MainActor in
                 enqueueConsoleChunk(chunk, trackProgress: false)
             }
@@ -831,7 +850,13 @@ struct ContentView: View {
             readHandle.readabilityHandler = nil
             try? readHandle.close()
             try? logPipe.fileHandleForWriting.close()
-            await MainActor.run { flushConsoleChunks() }
+            let trailingChunk = liveLogDecoder.finish()
+            await MainActor.run {
+                if !trailingChunk.isEmpty {
+                    enqueueConsoleChunk(trailingChunk, trackProgress: false)
+                }
+                flushConsoleChunks()
+            }
             if let cancelMarkerURL {
                 try? FileManager.default.removeItem(at: cancelMarkerURL)
             }
@@ -1474,6 +1499,44 @@ struct ContentView: View {
             removed += 1
         }
         return removed
+    }
+}
+
+private final class StreamingUTF8Decoder {
+    private var pendingData = Data()
+
+    func append(_ data: Data) -> String {
+        guard !data.isEmpty else { return "" }
+        pendingData.append(data)
+
+        if let decoded = String(data: pendingData, encoding: .utf8) {
+            pendingData.removeAll(keepingCapacity: true)
+            return decoded
+        }
+
+        let maxTrailingBytes = min(3, pendingData.count)
+        if maxTrailingBytes > 0 {
+            for trailingBytes in 1...maxTrailingBytes {
+                let prefixCount = pendingData.count - trailingBytes
+                let prefix = pendingData.prefix(prefixCount)
+                if let decoded = String(data: prefix, encoding: .utf8) {
+                    pendingData = Data(pendingData.suffix(trailingBytes))
+                    return decoded
+                }
+            }
+        }
+
+        guard pendingData.count > 3 else { return "" }
+        let decoded = String(decoding: pendingData, as: UTF8.self)
+        pendingData.removeAll(keepingCapacity: true)
+        return decoded
+    }
+
+    func finish() -> String {
+        guard !pendingData.isEmpty else { return "" }
+        let decoded = String(decoding: pendingData, as: UTF8.self)
+        pendingData.removeAll(keepingCapacity: true)
+        return decoded
     }
 }
 
