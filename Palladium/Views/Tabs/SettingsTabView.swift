@@ -4,6 +4,7 @@ struct SettingsTabView: View {
     private enum SettingsRoute: Hashable {
         case useInterface
         case downloadArguments
+        case storage
         case packages
         case about
     }
@@ -19,6 +20,7 @@ struct SettingsTabView: View {
     @Binding var linkHistoryEnabled: Bool
     @Binding var appAppearanceMode: AppAppearanceMode
 
+    let storageSummary: StorageManagementSummary
     let packageStatusText: String
     let versionsText: String
     let updatesSummaryText: String
@@ -33,6 +35,14 @@ struct SettingsTabView: View {
     let onCustomUpdatePackages: (_ ytDlpVersion: String?, _ webkitJSIVersion: String?, _ pipVersion: String?) -> Void
     let onFetchPackageVersions: () -> Void
     let onOpenPackageManager: () -> Void
+    let onRefreshStorage: () -> Void
+    let onClearDownloadsStorage: () -> Void
+    let onClearSavedStorage: () -> Void
+    let onClearCacheStorage: () -> Void
+    let onPruneDownloadsStorage: (_ window: StoragePruneWindow) -> Void
+    let onPruneSavedStorage: (_ window: StoragePruneWindow) -> Void
+    let onPruneCacheStorage: (_ window: StoragePruneWindow) -> Void
+    let onOpenStorageManager: () -> Void
 
     var body: some View {
         NavigationStack {
@@ -53,6 +63,15 @@ struct SettingsTabView: View {
                             subtitle: "Custom and global yt-dlp args",
                             icon: "terminal",
                             color: .blue
+                        )
+                    }
+
+                    NavigationLink(value: SettingsRoute.storage) {
+                        settingsRow(
+                            title: "Download Storage",
+                            subtitle: "\(storageSummary.formattedTotalSize) across temp, saved, and cache",
+                            icon: "internaldrive.fill",
+                            color: .teal
                         )
                     }
                 }
@@ -100,6 +119,19 @@ struct SettingsTabView: View {
                         customArgsText: $customArgsText,
                         extraArgsText: $extraArgsText,
                         isRunning: isRunning
+                    )
+                case .storage:
+                    StorageSettingsView(
+                        summary: storageSummary,
+                        isBusy: isRunning || isPackageRunning,
+                        onRefresh: onRefreshStorage,
+                        onClearDownloads: onClearDownloadsStorage,
+                        onClearSaved: onClearSavedStorage,
+                        onClearCache: onClearCacheStorage,
+                        onPruneDownloads: onPruneDownloadsStorage,
+                        onPruneSaved: onPruneSavedStorage,
+                        onPruneCache: onPruneCacheStorage,
+                        onAppear: onOpenStorageManager
                     )
                 case .packages:
                     PackagesSettingsView(

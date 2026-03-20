@@ -95,6 +95,7 @@ struct ContentView: View {
     @State private var isLoadingPackageVersions = false
     @State private var isPackageRunning = false
     @State private var hasLoadedPackageStatus = false
+    @State private var storageSummary: StorageManagementSummary = .empty
     @StateObject private var consoleLogStore: ConsoleLogStore
     @State private var completedDownloadResult: CompletedDownloadResult?
     @State private var completedPhotosCompatibility: PhotosCompatibilityState = .checking
@@ -179,6 +180,7 @@ struct ContentView: View {
                     shareSheetDownloadMode: $shareSheetDownloadMode,
                     linkHistoryEnabled: $linkHistoryEnabled,
                     appAppearanceMode: $appAppearanceMode,
+                    storageSummary: storageSummary,
                     packageStatusText: packageStatusText,
                     versionsText: versionsText,
                     updatesSummaryText: packageUpdatesSummaryText,
@@ -192,7 +194,15 @@ struct ContentView: View {
                     onUpdatePackages: updatePackages,
                     onCustomUpdatePackages: updatePackagesWithCustomVersions,
                     onFetchPackageVersions: fetchPackageIndexVersions,
-                    onOpenPackageManager: loadPackageStatusIfNeeded
+                    onOpenPackageManager: loadPackageStatusIfNeeded,
+                    onRefreshStorage: refreshStorageSummary,
+                    onClearDownloadsStorage: clearTemporaryDownloadsStorage,
+                    onClearSavedStorage: clearSavedDownloadsStorage,
+                    onClearCacheStorage: clearYtDlpCacheStorage,
+                    onPruneDownloadsStorage: pruneTemporaryDownloadsStorage,
+                    onPruneSavedStorage: pruneSavedDownloadsStorage,
+                    onPruneCacheStorage: pruneYtDlpCacheStorage,
+                    onOpenStorageManager: refreshStorageSummary
                 )
                 .tabItem {
                     Label("Settings", systemImage: "slider.horizontal.3")
@@ -1715,22 +1725,149 @@ struct ContentView: View {
     }
 
     private func clearDownloadsDirectoryContents() throws -> Int {
-        let downloadsURL: URL
-        if let downloadsPath = ProcessInfo.processInfo.environment["PALLADIUM_DOWNLOADS"], !downloadsPath.isEmpty {
-            downloadsURL = URL(fileURLWithPath: downloadsPath, isDirectory: true)
-        } else {
-            let documents = try FileManager.default.url(
-                for: .documentDirectory,
-                in: .userDomainMask,
-                appropriateFor: nil,
-                create: true
-            )
-            downloadsURL = documents.appendingPathComponent("Temp", isDirectory: true)
+        let downloadsURL = try downloadsDirectoryURL()
+        return try clearDirectoryContents(at: downloadsURL)
+    }
+
+    private func refreshStorageSummary() {
+        do {
+            storageSummary = try buildStorageManagementSummary()
+        } catch {
+            appendConsoleText("[palladium] failed to refresh storage summary: \(error.localizedDescription)\n", source: .app)
+            alertMessage = "Failed to refresh storage summary: \(error.localizedDescription)"
+            showAlert = true
+        }
+    }
+
+    private func clearTemporaryDownloadsStorage() {
+        guard !isRunning, !isPackageRunning else { return }
+        do {
+            let removed = try clearDirectoryContents(at: try downloadsDirectoryURL())
+            refreshStorageSummary()
+            appendConsoleText("[palladium] cleared temporary download entries: \(removed)\n", source: .app)
+            showTemporaryToast(removed == 0 ? "Download folder already empty" : "Cleared download folder")
+        } catch {
+            appendConsoleText("[palladium] failed to clear temporary downloads: \(error.localizedDescription)\n", source: .app)
+            alertMessage = "Failed to clear download folder: \(error.localizedDescription)"
+            showAlert = true
+        }
+    }
+
+    private func clearYtDlpCacheStorage() {
+        guard !isRunning, !isPackageRunning else { return }
+        do {
+            let removed = try clearDirectoryContents(at: try cacheDirectoryURL())
+            refreshStorageSummary()
+            appendConsoleText("[palladium] cleared yt-dlp cache entries: \(removed)\n", source: .app)
+            showTemporaryToast(removed == 0 ? "Cache already empty" : "Cleared cache")
+        } catch {
+            appendConsoleText("[palladium] failed to clear yt-dlp cache: \(error.localizedDescription)\n", source: .app)
+            alertMessage = "Failed to clear cache: \(error.localizedDescription)"
+            showAlert = true
+        }
+    }
+
+    private func clearSavedDownloadsStorage() {
+        guard !isRunning, !isPackageRunning else { return }
+        do {
+            let removed = try clearDirectoryContents(at: try savedDirectoryURL())
+            refreshStorageSummary()
+            appendConsoleText("[palladium] cleared saved download entries: \(removed)\n", source: .app)
+            showTemporaryToast(removed == 0 ? "Saved folder already empty" : "Cleared saved folder")
+        } catch {
+            appendConsoleText("[palladium] failed to clear saved downloads: \(error.localizedDescription)\n", source: .app)
+            alertMessage = "Failed to clear saved folder: \(error.localizedDescription)"
+            showAlert = true
+        }
+    }
+
+    private func pruneTemporaryDownloadsStorage(_ window: StoragePruneWindow) {
+        guard !isRunning, !isPackageRunning else { return }
+        do {
+            let removed = try removeDirectoryItems(olderThan: window.cutoffDate, at: try downloadsDirectoryURL())
+            refreshStorageSummary()
+            appendConsoleText("[palladium] pruned temporary download entries older than \(window.title): \(removed)\n", source: .app)
+            showTemporaryToast(removed == 0 ? "Nothing to remove" : "Removed \(removed) old item\(removed == 1 ? "" : "s")")
+        } catch {
+            appendConsoleText("[palladium] failed to prune temporary downloads: \(error.localizedDescription)\n", source: .app)
+            alertMessage = "Failed to remove old downloads: \(error.localizedDescription)"
+            showAlert = true
+        }
+    }
+
+    private func pruneYtDlpCacheStorage(_ window: StoragePruneWindow) {
+        guard !isRunning, !isPackageRunning else { return }
+        do {
+            let removed = try removeDirectoryItems(olderThan: window.cutoffDate, at: try cacheDirectoryURL())
+            refreshStorageSummary()
+            appendConsoleText("[palladium] pruned cache entries older than \(window.title): \(removed)\n", source: .app)
+            showTemporaryToast(removed == 0 ? "Nothing to remove" : "Removed \(removed) old item\(removed == 1 ? "" : "s")")
+        } catch {
+            appendConsoleText("[palladium] failed to prune yt-dlp cache: \(error.localizedDescription)\n", source: .app)
+            alertMessage = "Failed to remove old cache files: \(error.localizedDescription)"
+            showAlert = true
+        }
+    }
+
+    private func pruneSavedDownloadsStorage(_ window: StoragePruneWindow) {
+        guard !isRunning, !isPackageRunning else { return }
+        do {
+            let removed = try removeDirectoryItems(olderThan: window.cutoffDate, at: try savedDirectoryURL())
+            refreshStorageSummary()
+            appendConsoleText("[palladium] pruned saved download entries older than \(window.title): \(removed)\n", source: .app)
+            showTemporaryToast(removed == 0 ? "Nothing to remove" : "Removed \(removed) old item\(removed == 1 ? "" : "s")")
+        } catch {
+            appendConsoleText("[palladium] failed to prune saved downloads: \(error.localizedDescription)\n", source: .app)
+            alertMessage = "Failed to remove old saved files: \(error.localizedDescription)"
+            showAlert = true
+        }
+    }
+
+    private func buildStorageManagementSummary() throws -> StorageManagementSummary {
+        StorageManagementSummary(
+            downloads: try summarizeDirectory(at: try downloadsDirectoryURL(), locationLabel: "Documents/Temp"),
+            saved: try summarizeDirectory(at: try savedDirectoryURL(), locationLabel: "Documents/Saved"),
+            cache: try summarizeDirectory(at: try cacheDirectoryURL(), locationLabel: "Library/Caches/yt-dlp")
+        )
+    }
+
+    private func summarizeDirectory(at directoryURL: URL, locationLabel: String) throws -> StorageLocationSummary {
+        try FileManager.default.createDirectory(at: directoryURL, withIntermediateDirectories: true)
+        let contents = try FileManager.default.contentsOfDirectory(
+            at: directoryURL,
+            includingPropertiesForKeys: nil
+        )
+        return StorageLocationSummary(
+            locationLabel: locationLabel,
+            itemCount: contents.count,
+            totalBytes: directoryAllocatedSize(at: directoryURL)
+        )
+    }
+
+    private func directoryAllocatedSize(at directoryURL: URL) -> Int64 {
+        guard let enumerator = FileManager.default.enumerator(
+            at: directoryURL,
+            includingPropertiesForKeys: [.isRegularFileKey, .fileSizeKey],
+            options: [.skipsHiddenFiles]
+        ) else {
+            return 0
         }
 
-        try FileManager.default.createDirectory(at: downloadsURL, withIntermediateDirectories: true)
+        var total: Int64 = 0
+        for case let fileURL as URL in enumerator {
+            guard let resourceValues = try? fileURL.resourceValues(forKeys: [.isRegularFileKey, .fileSizeKey]),
+                  resourceValues.isRegularFile == true else {
+                continue
+            }
+            total += Int64(resourceValues.fileSize ?? 0)
+        }
+        return total
+    }
+
+    private func clearDirectoryContents(at directoryURL: URL) throws -> Int {
+        try FileManager.default.createDirectory(at: directoryURL, withIntermediateDirectories: true)
         let contents = try FileManager.default.contentsOfDirectory(
-            at: downloadsURL,
+            at: directoryURL,
             includingPropertiesForKeys: nil
         )
 
@@ -1740,6 +1877,56 @@ struct ContentView: View {
             removed += 1
         }
         return removed
+    }
+
+    private func removeDirectoryItems(olderThan cutoffDate: Date, at directoryURL: URL) throws -> Int {
+        try FileManager.default.createDirectory(at: directoryURL, withIntermediateDirectories: true)
+        let contents = try FileManager.default.contentsOfDirectory(
+            at: directoryURL,
+            includingPropertiesForKeys: [.contentModificationDateKey, .creationDateKey],
+            options: [.skipsHiddenFiles]
+        )
+
+        var removed = 0
+        for item in contents {
+            let resourceValues = try? item.resourceValues(forKeys: [.contentModificationDateKey, .creationDateKey])
+            let referenceDate = resourceValues?.contentModificationDate ?? resourceValues?.creationDate ?? .distantFuture
+            if referenceDate < cutoffDate {
+                try FileManager.default.removeItem(at: item)
+                removed += 1
+            }
+        }
+        return removed
+    }
+
+    private func downloadsDirectoryURL() throws -> URL {
+        if let downloadsPath = ProcessInfo.processInfo.environment["PALLADIUM_DOWNLOADS"], !downloadsPath.isEmpty {
+            return URL(fileURLWithPath: downloadsPath, isDirectory: true)
+        }
+        return try documentsDirectoryURL().appendingPathComponent("Temp", isDirectory: true)
+    }
+
+    private func savedDirectoryURL() throws -> URL {
+        try documentsDirectoryURL().appendingPathComponent("Saved", isDirectory: true)
+    }
+
+    private func cacheDirectoryURL() throws -> URL {
+        let caches = try FileManager.default.url(
+            for: .cachesDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: true
+        )
+        return caches.appendingPathComponent("yt-dlp", isDirectory: true)
+    }
+
+    private func documentsDirectoryURL() throws -> URL {
+        try FileManager.default.url(
+            for: .documentDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: true
+        )
     }
 }
 

@@ -256,6 +256,7 @@
 /* Begin PBXShellScriptBuildPhase section */
 		82BF06D72F57630001333331 /* Install Python Runtime */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
