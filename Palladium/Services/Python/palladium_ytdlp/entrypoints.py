@@ -49,6 +49,7 @@ def run_yt_dlp_flow(
     extra_args_override=None,
     download_playlist_override=None,
     download_subtitles_override=None,
+    embed_thumbnail_override=None,
     subtitle_language_pattern_override=None,
     run_output_dir_override=None,
 ):
@@ -87,6 +88,10 @@ def run_yt_dlp_flow(
         download_subtitles = os.environ.get("PALLADIUM_DOWNLOAD_SUBTITLES", "").strip().lower() in ("1", "true", "yes", "on")
     else:
         download_subtitles = bool(download_subtitles_override)
+    if embed_thumbnail_override is None:
+        embed_thumbnail = os.environ.get("PALLADIUM_EMBED_THUMBNAIL", "").strip().lower() in ("1", "true", "yes", "on")
+    else:
+        embed_thumbnail = bool(embed_thumbnail_override)
     if subtitle_language_pattern_override is None:
         subtitle_language_pattern = os.environ.get("PALLADIUM_SUBTITLE_LANGUAGE_PATTERN", "en.*").strip() or "en.*"
     else:
@@ -270,6 +275,9 @@ def run_yt_dlp_flow(
                                 download_behavior_args.append("--all-subs")
                             else:
                                 download_behavior_args.extend(["--sub-langs", subtitle_language_pattern])
+
+                        if embed_thumbnail:
+                            download_behavior_args.append("--embed-thumbnail")
 
                         sys.argv = [
                             "yt-dlp",

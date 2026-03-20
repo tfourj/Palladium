@@ -56,6 +56,7 @@ struct ContentView: View {
     private static let shareSheetDownloadModeDefaultsKey = "palladium.shareSheetDownloadMode"
     private static let downloadPlaylistDefaultsKey = "palladium.downloadPlaylist"
     private static let downloadSubtitlesDefaultsKey = "palladium.downloadSubtitles"
+    private static let embedThumbnailDefaultsKey = "palladium.embedThumbnail"
     private static let subtitleLanguagePatternDefaultsKey = "palladium.subtitleLanguagePattern"
     private static let linkHistoryEnabledDefaultsKey = "palladium.linkHistoryEnabled"
     private static let linkHistoryEntriesDefaultsKey = "palladium.linkHistoryEntries"
@@ -78,6 +79,7 @@ struct ContentView: View {
     @State private var shareSheetDownloadMode: ShareSheetDownloadMode
     @State private var downloadPlaylist: Bool
     @State private var downloadSubtitles: Bool
+    @State private var embedThumbnail: Bool
     @State private var subtitleLanguagePattern: String
     @State private var linkHistoryEnabled: Bool
     @State private var linkHistoryEntries: [LinkHistoryEntry]
@@ -125,6 +127,7 @@ struct ContentView: View {
         _shareSheetDownloadMode = State(initialValue: Self.loadShareSheetDownloadMode())
         _downloadPlaylist = State(initialValue: Self.loadDownloadPlaylist())
         _downloadSubtitles = State(initialValue: Self.loadDownloadSubtitles())
+        _embedThumbnail = State(initialValue: Self.loadEmbedThumbnail())
         _subtitleLanguagePattern = State(initialValue: Self.loadSubtitleLanguagePattern())
         _linkHistoryEnabled = State(initialValue: Self.loadLinkHistoryEnabled())
         _linkHistoryEntries = State(initialValue: Self.loadLinkHistoryEntries())
@@ -142,6 +145,7 @@ struct ContentView: View {
                     selectedPreset: $selectedPreset,
                     downloadPlaylist: $downloadPlaylist,
                     downloadSubtitles: $downloadSubtitles,
+                    embedThumbnail: $embedThumbnail,
                     subtitleLanguagePattern: $subtitleLanguagePattern,
                     isRunning: isRunning,
                     progressText: progressText,
@@ -244,6 +248,9 @@ struct ContentView: View {
             persistPreferences()
         }
         .onChange(of: downloadSubtitles, initial: false) {
+            persistPreferences()
+        }
+        .onChange(of: embedThumbnail, initial: false) {
             persistPreferences()
         }
         .onChange(of: subtitleLanguagePattern, initial: false) {
@@ -499,6 +506,9 @@ struct ContentView: View {
 
     private var completedResultDisplayTitle: String? {
         guard let result = completedDownloadResult else { return nil }
+        if let titleHint = result.titleHint, !titleHint.isEmpty {
+            return titleHint
+        }
         if !result.isCollection {
             return result.primaryMediaURL?.lastPathComponent ?? result.items.first?.lastPathComponent
         }
@@ -730,6 +740,7 @@ struct ContentView: View {
         let linkHistoryEnabledAtStart = linkHistoryEnabled
         let downloadPlaylistAtStart = downloadPlaylist
         let downloadSubtitlesAtStart = downloadSubtitles
+        let embedThumbnailAtStart = embedThumbnail
         let subtitleLanguagePatternAtStart = subtitleLanguagePattern
         var receivedPythonLiveOutput = false
         let liveLogDecoder = StreamingUTF8Decoder()
@@ -762,6 +773,7 @@ struct ContentView: View {
                 extraArgs: extraArgsAtStart,
                 downloadPlaylist: downloadPlaylistAtStart,
                 downloadSubtitles: downloadSubtitlesAtStart,
+                embedThumbnail: embedThumbnailAtStart,
                 subtitleLanguagePattern: subtitleLanguagePatternAtStart,
                 runOutputDir: runOutputURL.path
             )
@@ -810,10 +822,16 @@ struct ContentView: View {
             Self.logger.info("yt-dlp flow finished with status: \(outcome.statusText, privacy: .public)")
 
             if outcome.statusText == "success", !outcome.downloadedPaths.isEmpty {
+                let resultTitle = extractHistoryTitle(
+                    downloadedPaths: outcome.downloadedPaths,
+                    primaryDownloadedPath: outcome.primaryDownloadedPath,
+                    outputText: outcome.outputText
+                )
                 let result = CompletedDownloadResult(
                     items: outcome.downloadedPaths.map { URL(fileURLWithPath: $0) },
                     primaryMediaURL: outcome.primaryDownloadedPath.map { URL(fileURLWithPath: $0) },
-                    folderURL: runOutputURL
+                    folderURL: runOutputURL,
+                    titleHint: resultTitle
                 )
                 if linkHistoryEnabledAtStart {
                     addLinkHistoryEntry(
@@ -1295,7 +1313,7 @@ struct ContentView: View {
             let destination: URL
             if result.isCollection, let folderURL = result.folderURL {
                 sourceURL = folderURL
-                destination = appFolder.appendingPathComponent(folderURL.lastPathComponent, isDirectory: true)
+                destination = appFolder.appendingPathComponent(result.savedFolderName, isDirectory: true)
             } else if let itemURL = result.primaryMediaURL ?? result.items.first {
                 sourceURL = itemURL
                 destination = appFolder.appendingPathComponent(itemURL.lastPathComponent)
@@ -1375,6 +1393,7 @@ struct ContentView: View {
         defaults.set(shareSheetDownloadMode.rawValue, forKey: Self.shareSheetDownloadModeDefaultsKey)
         defaults.set(downloadPlaylist, forKey: Self.downloadPlaylistDefaultsKey)
         defaults.set(downloadSubtitles, forKey: Self.downloadSubtitlesDefaultsKey)
+        defaults.set(embedThumbnail, forKey: Self.embedThumbnailDefaultsKey)
         defaults.set(subtitleLanguagePattern, forKey: Self.subtitleLanguagePatternDefaultsKey)
         defaults.set(linkHistoryEnabled, forKey: Self.linkHistoryEnabledDefaultsKey)
         defaults.set(appAppearanceMode.rawValue, forKey: Self.appAppearanceModeDefaultsKey)
@@ -1500,6 +1519,13 @@ struct ContentView: View {
             return false
         }
         return UserDefaults.standard.bool(forKey: downloadSubtitlesDefaultsKey)
+    }
+
+    private static func loadEmbedThumbnail() -> Bool {
+        if UserDefaults.standard.object(forKey: embedThumbnailDefaultsKey) == nil {
+            return false
+        }
+        return UserDefaults.standard.bool(forKey: embedThumbnailDefaultsKey)
     }
 
     private static func loadSubtitleLanguagePattern() -> String {
@@ -1769,6 +1795,7 @@ private struct CompletedDownloadResult {
     let items: [URL]
     let primaryMediaURL: URL?
     let folderURL: URL?
+    let titleHint: String?
 
     var isCollection: Bool {
         items.count > 1
@@ -1785,6 +1812,40 @@ private struct CompletedDownloadResult {
 
     var shareActivityItems: [Any] {
         items.map { $0 as Any }
+    }
+
+    var savedFolderName: String {
+        if let titleHint = sanitizedFolderName(titleHint) {
+            return titleHint
+        }
+        if let primaryMediaURL {
+            let baseName = primaryMediaURL.deletingPathExtension().lastPathComponent
+            if let sanitized = sanitizedFolderName(baseName) {
+                return sanitized
+            }
+        }
+        if let folderURL,
+           let sanitized = sanitizedFolderName(folderURL.lastPathComponent) {
+            return sanitized
+        }
+        return "download"
+    }
+
+    private func sanitizedFolderName(_ rawValue: String?) -> String? {
+        guard let rawValue else { return nil }
+        let trimmed = rawValue.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return nil }
+
+        let invalidCharacters = CharacterSet(charactersIn: "/:\\?%*|\"<>")
+        let components = trimmed.components(separatedBy: invalidCharacters)
+        let joined = components.joined(separator: " ")
+        let collapsed = joined.replacingOccurrences(
+            of: #"\s+"#,
+            with: " ",
+            options: .regularExpression
+        ).trimmingCharacters(in: CharacterSet.whitespacesAndNewlines.union(.init(charactersIn: ".")))
+
+        return collapsed.isEmpty ? nil : collapsed
     }
 }
 

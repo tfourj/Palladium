@@ -7,6 +7,7 @@ CLI_DASHLIKE_PREFIX = "?\u2010\u2011\u2012\u2013\u2014\u2015\u2212\uFE58\uFE63\u
 FLAGS_WITH_VALUES = {
     "-o",
     "--output",
+    "--convert-thumbnails",
     "--sub-lang",
     "--sub-langs",
 }
@@ -24,6 +25,13 @@ SUBTITLE_CONTROL_FLAGS = {
     "--write-auto-subs",
     "--write-sub",
     "--write-subs",
+}
+THUMBNAIL_CONTROL_FLAGS = {
+    "--convert-thumbnails",
+    "--embed-thumbnail",
+    "--no-embed-thumbnail",
+    "--write-all-thumbnails",
+    "--write-thumbnail",
 }
 
 
@@ -151,7 +159,7 @@ def strip_checkbox_owned_download_args(args):
         arg = normalized[index]
         option_name = arg.split("=", 1)[0]
 
-        if option_name in PLAYLIST_CONTROL_FLAGS or option_name in SUBTITLE_CONTROL_FLAGS:
+        if option_name in PLAYLIST_CONTROL_FLAGS or option_name in SUBTITLE_CONTROL_FLAGS or option_name in THUMBNAIL_CONTROL_FLAGS:
             if option_name in FLAGS_WITH_VALUES and "=" not in arg and index + 1 < len(normalized):
                 index += 2
             else:

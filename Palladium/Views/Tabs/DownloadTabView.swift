@@ -9,6 +9,7 @@ struct DownloadTabView: View {
     @Binding var selectedPreset: DownloadPreset
     @Binding var downloadPlaylist: Bool
     @Binding var downloadSubtitles: Bool
+    @Binding var embedThumbnail: Bool
     @Binding var subtitleLanguagePattern: String
 
     let isRunning: Bool
@@ -23,6 +24,7 @@ struct DownloadTabView: View {
     let onDeleteHistoryEntry: (LinkHistoryEntry) -> Void
     let onCopyHistoryLink: (String) -> Void
     @State private var showHistorySheet = false
+    @State private var showDownloadOptions = false
 
     var body: some View {
         ZStack {
@@ -129,27 +131,78 @@ struct DownloadTabView: View {
                     .disabled(isRunning)
 
                     VStack(spacing: 8) {
-                        downloadOptionToggle(
-                            title: "Download playlist",
-                            subtitle: "Allow yt-dlp to fetch multiple items",
-                            isOn: $downloadPlaylist
-                        )
+                        Button {
+                            guard !isRunning else { return }
+                            withAnimation(.easeInOut(duration: 0.16)) {
+                                showDownloadOptions.toggle()
+                            }
+                        } label: {
+                            HStack(spacing: 10) {
+                                Image(systemName: "slider.horizontal.3")
+                                    .font(.system(size: 18, weight: .semibold))
+                                    .foregroundStyle(.blue)
 
-                        downloadOptionToggle(
-                            title: "Download subtitles",
-                            subtitle: "Save subtitle sidecars with the media",
-                            isOn: $downloadSubtitles
-                        )
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("More options")
+                                        .font(.subheadline.weight(.semibold))
+                                        .foregroundStyle(primaryTextColor)
+                                    Text(downloadOptionsSummary)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                        .multilineTextAlignment(.leading)
+                                }
 
-                        if downloadSubtitles {
-                            Picker("Subtitle language", selection: $subtitleLanguagePattern) {
-                                ForEach(SubtitleLanguageOption.allCases) { option in
-                                    Text(option.title).tag(option.subtitlePattern)
+                                Spacer()
+
+                                Image(systemName: "chevron.down")
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundStyle(.secondary)
+                                    .rotationEffect(.degrees(showDownloadOptions ? 180 : 0))
+                                    .animation(.easeInOut(duration: 0.16), value: showDownloadOptions)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(isRunning)
+
+                        if showDownloadOptions {
+                            VStack(spacing: 8) {
+                                downloadOptionToggle(
+                                    title: "Download playlist",
+                                    subtitle: "Allow yt-dlp to fetch multiple items",
+                                    isOn: $downloadPlaylist
+                                )
+
+                                downloadOptionToggle(
+                                    title: "Download subtitles",
+                                    subtitle: "Save subtitle sidecars with the media",
+                                    isOn: $downloadSubtitles
+                                )
+
+                                downloadOptionToggle(
+                                    title: "Embed thumbnail",
+                                    subtitle: "Attach artwork to supported media files",
+                                    isOn: $embedThumbnail
+                                )
+
+                                if downloadSubtitles {
+                                    Picker("Subtitle language", selection: $subtitleLanguagePattern) {
+                                        ForEach(SubtitleLanguageOption.allCases) { option in
+                                            Text(option.title).tag(option.subtitlePattern)
+                                        }
+                                    }
+                                    .pickerStyle(.menu)
+                                    .disabled(isRunning)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
                                 }
                             }
-                            .pickerStyle(.menu)
-                            .disabled(isRunning)
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .transition(
+                                .asymmetric(
+                                    insertion: .opacity.combined(with: .scale(scale: 0.98, anchor: .top)),
+                                    removal: .opacity
+                                )
+                            )
                         }
                     }
                     .padding(10)
@@ -246,7 +299,6 @@ struct DownloadTabView: View {
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.leading)
                 }
-
                 Spacer()
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -254,6 +306,24 @@ struct DownloadTabView: View {
         }
         .buttonStyle(.plain)
         .disabled(isRunning)
+    }
+
+    private var downloadOptionsSummary: String {
+        var parts: [String] = []
+        if downloadPlaylist {
+            parts.append("Playlist")
+        }
+        if downloadSubtitles {
+            if let option = SubtitleLanguageOption.allCases.first(where: { $0.subtitlePattern == subtitleLanguagePattern }) {
+                parts.append("Subtitles: \(option.title)")
+            } else {
+                parts.append("Subtitles")
+            }
+        }
+        if embedThumbnail {
+            parts.append("Embed thumbnail")
+        }
+        return parts.isEmpty ? "Playlist, subtitles, and thumbnail settings" : parts.joined(separator: " • ")
     }
 
     @ViewBuilder

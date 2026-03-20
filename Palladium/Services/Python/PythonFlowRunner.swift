@@ -12,6 +12,7 @@ enum PythonFlowRunner {
         extraArgs: String,
         downloadPlaylist: Bool,
         downloadSubtitles: Bool,
+        embedThumbnail: Bool,
         subtitleLanguagePattern: String,
         runOutputDir: String
     ) async -> PythonFlowOutcome {
@@ -29,6 +30,7 @@ enum PythonFlowRunner {
                         extraArgs,
                         downloadPlaylist,
                         downloadSubtitles,
+                        embedThumbnail,
                         subtitleLanguagePattern,
                         runOutputDir
                     ]
