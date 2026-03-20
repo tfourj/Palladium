@@ -223,6 +223,11 @@ struct DownloadTabView: View {
                         if isRunning {
                             onCancel()
                         } else {
+                            if showDownloadOptions {
+                                withAnimation(.easeInOut(duration: 0.16)) {
+                                    showDownloadOptions = false
+                                }
+                            }
                             onDownload()
                         }
                     }) {
@@ -248,6 +253,12 @@ struct DownloadTabView: View {
         }
         .sheet(isPresented: $showHistorySheet) {
             historySheet
+        }
+        .onChange(of: isRunning) { _, running in
+            guard running, showDownloadOptions else { return }
+            withAnimation(.easeInOut(duration: 0.16)) {
+                showDownloadOptions = false
+            }
         }
     }
 

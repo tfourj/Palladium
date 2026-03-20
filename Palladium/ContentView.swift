@@ -1232,6 +1232,8 @@ struct ContentView: View {
                 }
                 await MainActor.run {
                     reopenDownloadActionAfterAlert = false
+                    alertMessage = nil
+                    showAlert = false
                     showTemporaryToast("Saved to Photos")
                 }
             } catch {
@@ -1346,12 +1348,13 @@ struct ContentView: View {
                 try FileManager.default.removeItem(at: destination)
             }
             try FileManager.default.copyItem(at: sourceURL, to: destination)
+            alertMessage = nil
+            showAlert = false
             if result.isCollection {
-                alertMessage = "Saved download folder: \(destination.lastPathComponent)"
+                showTemporaryToast("Saved folder: \(destination.lastPathComponent)")
             } else {
-                alertMessage = "Saved to app folder: \(destination.lastPathComponent)"
+                showTemporaryToast("Saved to app folder: \(destination.lastPathComponent)")
             }
-            showAlert = true
         } catch {
             alertMessage = "Failed to save to app folder: \(error.localizedDescription)"
             showAlert = true
