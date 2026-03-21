@@ -307,7 +307,7 @@ def run_yt_dlp_flow(
                                 patch_subprocess_for_swiftffmpeg(bridge),
                                 patch_ytdlp_popen_for_swiftffmpeg(bridge),
                                 patch_ytdlp_ffmpeg_detection(bridge),
-                                patch_ytdlp_ffprobe_metadata_fallback(),
+                                patch_ytdlp_ffprobe_metadata_fallback(bridge),
                                 patch_ytdlp_cancel(cancel_file_path),
                             ):
                                 runpy.run_module("yt_dlp", run_name="__main__", alter_sys=True)

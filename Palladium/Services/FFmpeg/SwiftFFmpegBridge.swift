@@ -11,6 +11,7 @@ private struct FFmpegBridgeResponse: Encodable {
     let ok: Bool
     let exit_code: Int
     let output: String
+    let stderr: String
     let error: String?
 }
 
@@ -112,7 +113,7 @@ public func palladium_ffmpeg_bridge_run(_ jsonPtr: UnsafePointer<CChar>?) -> Uns
 
     do {
         guard let jsonPtr else {
-            response = FFmpegBridgeResponse(ok: false, exit_code: 1, output: "", error: "missing request payload")
+            response = FFmpegBridgeResponse(ok: false, exit_code: 1, output: "", stderr: "", error: "missing request payload")
             return makeCString(response)
         }
 
@@ -126,7 +127,7 @@ public func palladium_ffmpeg_bridge_run(_ jsonPtr: UnsafePointer<CChar>?) -> Uns
         case "ffprobe":
             tool = .ffprobe
         default:
-            response = FFmpegBridgeResponse(ok: false, exit_code: 1, output: "", error: "unsupported tool: \(request.tool)")
+            response = FFmpegBridgeResponse(ok: false, exit_code: 1, output: "", stderr: "", error: "unsupported tool: \(request.tool)")
             return makeCString(response)
         }
 
@@ -135,29 +136,38 @@ public func palladium_ffmpeg_bridge_run(_ jsonPtr: UnsafePointer<CChar>?) -> Uns
             SwiftFFmpeg.setLogHandler { _, message in
                 liveLogForwarder?.ingest(message)
             }
-            let (exitCode, output) = try SwiftFFmpeg.execute(request.args, tool: tool)
+            let result = try SwiftFFmpeg.executeDetailed(request.args, tool: tool)
             liveLogForwarder?.finish()
             SwiftFFmpeg.setLogHandler(nil)
-            response = FFmpegBridgeResponse(ok: true, exit_code: Int(exitCode), output: output, error: nil)
+            response = FFmpegBridgeResponse(
+                ok: true,
+                exit_code: Int(result.exitCode),
+                output: result.stdout,
+                stderr: result.stderr,
+                error: nil
+            )
         } catch {
             liveLogForwarder?.finish()
             SwiftFFmpeg.setLogHandler(nil)
             var code = 1
             var output = ""
+            var stderr = ""
             if let swiftError = error as? SwiftFFmpegError,
-               case let .executionFailed(exitCode, capturedOutput) = swiftError {
+               case let .executionFailed(exitCode, capturedStdout, capturedStderr) = swiftError {
                 code = Int(exitCode)
-                output = capturedOutput
+                output = capturedStdout
+                stderr = capturedStderr
             }
             response = FFmpegBridgeResponse(
                 ok: false,
                 exit_code: code,
                 output: output,
+                stderr: stderr,
                 error: String(describing: error)
             )
         }
     } catch {
-        response = FFmpegBridgeResponse(ok: false, exit_code: 1, output: "", error: "invalid request: \(error)")
+        response = FFmpegBridgeResponse(ok: false, exit_code: 1, output: "", stderr: "", error: "invalid request: \(error)")
     }
 
     return makeCString(response)
@@ -182,7 +192,7 @@ func retainFFmpegBridgeExports() {
 private func makeCString(_ response: FFmpegBridgeResponse) -> UnsafeMutablePointer<CChar>? {
     guard let data = try? JSONEncoder().encode(response),
           let string = String(data: data, encoding: .utf8) else {
-        return strdup("{\"ok\":false,\"exit_code\":1,\"output\":\"\",\"error\":\"encoding failed\"}")
+        return strdup("{\"ok\":false,\"exit_code\":1,\"output\":\"\",\"stderr\":\"\",\"error\":\"encoding failed\"}")
     }
     return strdup(string)
 }

@@ -64,14 +64,16 @@ class SwiftFFmpegBridge:
         ok = bool(response.get("ok", False))
         exit_code = int(response.get("exit_code", 1))
         output = response.get("output", "")
+        stderr = response.get("stderr", "")
         error = response.get("error")
 
         if not ok:
-            if output:
-                raise RuntimeError((error or f"swift ffmpeg bridge failed with exit code {exit_code}") + "\\n" + output)
+            details = "\n".join(part for part in (str(stderr or "").strip(), str(output or "").strip()) if part)
+            if details:
+                raise RuntimeError((error or f"swift ffmpeg bridge failed with exit code {exit_code}") + "\\n" + details)
             raise RuntimeError(error or f"swift ffmpeg bridge failed with exit code {exit_code}")
 
-        return exit_code, output
+        return exit_code, output, stderr
 
 
 def normalize_ffmpeg_args(args):
@@ -116,13 +118,11 @@ def prepare_bridge_ffmpeg_args(tool, args):
     return prepared
 
 
-def log_bridge_output(output):
-    if not output:
+def log_bridge_output(stdout_text, stderr_text=""):
+    combined = "\n".join(part for part in (str(stderr_text or "").strip(), str(stdout_text or "").strip()) if part)
+    if not combined:
         return
-    text = str(output).strip()
-    if not text:
-        return
-    for line in text.splitlines():
+    for line in combined.splitlines():
         print(f"[palladium][ffmpeg-bridge][log] {line}")
 
 
@@ -171,15 +171,23 @@ def extract_ffprobe_json_payload(output_text):
     return None, stripped
 
 
-def split_bridge_output(tool, output):
+def split_bridge_output(tool, output, stderr_output=""):
     text = str(output or "")
+    stderr_text = str(stderr_output or "")
     if tool != "ffprobe":
-        return text, text
+        return text, stderr_text
 
-    stdout_text, stderr_text = extract_ffprobe_json_payload(text)
+    if text.strip():
+        stdout_text, extracted_stderr = extract_ffprobe_json_payload(text)
+        if stdout_text is not None:
+            merged_stderr = "\n".join(part for part in (stderr_text.strip(), extracted_stderr.strip()) if part)
+            return stdout_text, merged_stderr
+
+    combined = "\n".join(part for part in (text.strip(), stderr_text.strip()) if part)
+    stdout_text, extracted_stderr = extract_ffprobe_json_payload(combined)
     if stdout_text is None:
-        return text, text
-    return stdout_text, stderr_text
+        return text, stderr_text
+    return stdout_text, extracted_stderr
 
 
 def clean_bridge_version(raw_version):
@@ -213,27 +221,16 @@ def parse_bridge_executable_version(output_text, tool):
     return None
 
 
-def parse_bridge_libavformat_version(output_text):
-    text = str(output_text or "")
-    match = re.search(r"(?m)^\s*libavformat\s+(?:[0-9. ]+)\s+/\s+([0-9. ]+)", text)
-    if not match:
-        return None
-    return match.group(1).replace(" ", "")
-
-
-def is_outdated_bridge_version(version_text, minimum_version_text):
-    def to_parts(value):
-        return [int(piece) for piece in re.findall(r"\d+", str(value or ""))]
-
-    current = to_parts(version_text)
-    minimum = to_parts(minimum_version_text)
-    if not current or not minimum:
+def bridge_lists_bsf(output_text, bsf_name):
+    target = str(bsf_name or "").strip()
+    if not target:
         return False
 
-    size = max(len(current), len(minimum))
-    current += [0] * (size - len(current))
-    minimum += [0] * (size - len(minimum))
-    return current < minimum
+    for line in str(output_text or "").splitlines():
+        stripped = line.strip()
+        if stripped == target:
+            return True
+    return False
 
 
 def probe_bridge_ffmpeg_capabilities(bridge):
@@ -247,21 +244,24 @@ def probe_bridge_ffmpeg_capabilities(bridge):
     }
 
     try:
-        _, ffmpeg_output = bridge.run("ffmpeg", ["-bsfs"])
-        ffmpeg_version = parse_bridge_executable_version(ffmpeg_output, "ffmpeg")
-        libavformat_version = parse_bridge_libavformat_version(ffmpeg_output)
+        _, ffmpeg_output, ffmpeg_stderr = bridge.run("ffmpeg", ["-bsfs"])
+        ffmpeg_text = "\n".join(part for part in (ffmpeg_output.strip(), ffmpeg_stderr.strip()) if part)
+        ffmpeg_version = parse_bridge_executable_version(ffmpeg_text, "ffmpeg")
         result["versions"]["ffmpeg"] = ffmpeg_version
         result["features"] = {
-            "fdk": "--enable-libfdk-aac" in ffmpeg_output,
-            "setts": "setts" in ffmpeg_output.splitlines(),
-            "needs_adtstoasc": is_outdated_bridge_version(libavformat_version, "57.56.100"),
+            "fdk": "--enable-libfdk-aac" in ffmpeg_text,
+            "setts": "setts" in ffmpeg_text.splitlines(),
+            # The in-process bridge still needs explicit AAC ADTS to ASC
+            # remuxing for yt-dlp's MP4 post-processing flows.
+            "needs_adtstoasc": bridge_lists_bsf(ffmpeg_text, "aac_adtstoasc"),
         }
     except Exception as error:
         print(f"[palladium][ffmpeg-bridge] ffmpeg capability probe failed: {error}")
 
     try:
-        _, ffprobe_output = bridge.run("ffprobe", ["-version"])
-        result["versions"]["ffprobe"] = parse_bridge_executable_version(ffprobe_output, "ffprobe")
+        _, ffprobe_output, ffprobe_stderr = bridge.run("ffprobe", ["-version"])
+        ffprobe_text = "\n".join(part for part in (ffprobe_output.strip(), ffprobe_stderr.strip()) if part)
+        result["versions"]["ffprobe"] = parse_bridge_executable_version(ffprobe_text, "ffprobe")
     except Exception as error:
         print(f"[palladium][ffmpeg-bridge] ffprobe version probe failed: {error}")
 
@@ -277,8 +277,41 @@ def probe_bridge_ffmpeg_capabilities(bridge):
     return result
 
 
+def probe_bridge_ffprobe_metadata(bridge, path):
+    target_path = str(path or "").strip()
+    if not target_path:
+        return None
+
+    try:
+        _, output, stderr_output = bridge.run(
+            "ffprobe",
+            [
+                "-hide_banner",
+                "-show_format",
+                "-show_streams",
+                "-of",
+                "json",
+                target_path,
+            ],
+        )
+    except Exception as error:
+        print(f"[palladium][ffmpeg-bridge] bridge metadata probe failed for {target_path}: {error}")
+        return None
+
+    stdout_text, _ = split_bridge_output("ffprobe", output, stderr_output)
+    try:
+        parsed = json.loads(stdout_text)
+    except Exception as error:
+        print(f"[palladium][ffmpeg-bridge] bridge metadata json parse failed for {target_path}: {error}")
+        return None
+
+    if isinstance(parsed, dict):
+        return parsed
+    return None
+
+
 @contextlib.contextmanager
-def patch_ytdlp_ffprobe_metadata_fallback():
+def patch_ytdlp_ffprobe_metadata_fallback(bridge):
     try:
         from yt_dlp.postprocessor.ffmpeg import FFmpegPostProcessor
     except Exception:
@@ -295,6 +328,10 @@ def patch_ytdlp_ffprobe_metadata_fallback():
             return original_get_metadata_object(self, *args, **kwargs)
         except json.JSONDecodeError:
             target_path = args[0] if args else kwargs.get("path", "<unknown>")
+            recovered_metadata = probe_bridge_ffprobe_metadata(bridge, target_path)
+            if recovered_metadata is not None:
+                print(f"[palladium][ffmpeg-bridge] ffprobe metadata parse failed for {target_path}; using bridge metadata fallback")
+                return recovered_metadata
             print(f"[palladium][ffmpeg-bridge] ffprobe metadata parse failed for {target_path}; using empty metadata fallback")
             return {"streams": [], "format": {}}
 
@@ -402,10 +439,10 @@ def patch_subprocess_for_swiftffmpeg(bridge):
                 bridged_args = prepare_bridge_ffmpeg_args(tool, cmd[1:])
                 started_at = time.time()
                 print(f"[palladium][ffmpeg-bridge] running {tool} with {len(bridged_args)} arg(s)")
-                code, output = bridge.run(tool, bridged_args)
+                code, output, stderr_output = bridge.run(tool, bridged_args)
                 self.returncode = int(code)
-                log_bridge_output(output)
-                stdout_output, stderr_output = split_bridge_output(tool, output)
+                log_bridge_output(output, stderr_output)
+                stdout_output, stderr_output = split_bridge_output(tool, output, stderr_output)
                 elapsed = time.time() - started_at
                 print(f"[palladium][ffmpeg-bridge] {tool} finished in {elapsed:.2f}s")
                 if tool == "ffmpeg" and bridged_args:
@@ -599,10 +636,10 @@ def patch_ytdlp_popen_for_swiftffmpeg(bridge):
             bridged_args = prepare_bridge_ffmpeg_args(tool, cmd[1:])
             started_at = time.time()
             print(f"[palladium][ffmpeg-bridge] yt-dlp Popen running {tool} with {len(bridged_args)} arg(s)")
-            code, output = bridge.run(tool, bridged_args)
+            code, output, stderr_output = bridge.run(tool, bridged_args)
             self.returncode = int(code)
-            log_bridge_output(output)
-            stdout_output, stderr_output = split_bridge_output(tool, output)
+            log_bridge_output(output, stderr_output)
+            stdout_output, stderr_output = split_bridge_output(tool, output, stderr_output)
             elapsed = time.time() - started_at
             print(f"[palladium][ffmpeg-bridge] yt-dlp Popen {tool} finished in {elapsed:.2f}s")
             if tool == "ffmpeg" and bridged_args:
