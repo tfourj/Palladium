@@ -36,6 +36,7 @@ Pull requests are welcome! For major changes, please open an issue first to disc
 
 
 - [`yt-dlp`](https://github.com/yt-dlp/yt-dlp)
+- [`yt-dlp-apple-webkit-jsi`](https://github.com/grqz/yt-dlp-apple-webkit-jsi)
 - [`ffmpeg`](https://ffmpeg.org/)
 - [`PythonKit`](https://github.com/pvieito/PythonKit)
 - [`python-apple-support`](https://github.com/beeware/Python-Apple-support)
