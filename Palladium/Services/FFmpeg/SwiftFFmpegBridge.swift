@@ -14,6 +14,12 @@ private struct FFmpegBridgeResponse: Encodable {
     let error: String?
 }
 
+enum FFmpegBridgeControl {
+    static func requestCancellation() {
+        SwiftFFmpeg.requestCancel()
+    }
+}
+
 private final class FFmpegLiveLogForwarder {
     private let liveLogFD: Int32?
     private let lock = NSLock()
