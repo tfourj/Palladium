@@ -43,7 +43,7 @@ def build_preset_args(preset):
     if preset == "mute":
         print("[palladium] preset: mute (mp4 no-audio)")
         return [
-            "-f", "bv*/bestvideo",
+            "-f", "bv/bestvideo",
             "--merge-output-format", "mp4",
             "--remux-video", "mp4",
             "-S", "vcodec:h264,lang,quality,res,fps,hdr:12",

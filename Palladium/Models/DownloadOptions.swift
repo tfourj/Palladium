@@ -23,7 +23,7 @@ enum DownloadPreset: String, Codable, CaseIterable, Identifiable {
         case .autoVideo:
             return "--merge-output-format mp4 --remux-video mp4 -S vcodec:h264,lang,quality,res,fps,hdr:12,acodec:aac"
         case .mute:
-            return "-f bv*/bestvideo --merge-output-format mp4 --remux-video mp4 -S vcodec:h264,lang,quality,res,fps,hdr:12"
+            return "-f bv/bestvideo --merge-output-format mp4 --remux-video mp4 -S vcodec:h264,lang,quality,res,fps,hdr:12"
         case .audio:
             return "-f ba[acodec^=mp3]/ba/b -x --audio-format mp3"
         case .custom:
