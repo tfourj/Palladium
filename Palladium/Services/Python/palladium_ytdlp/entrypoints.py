@@ -16,12 +16,9 @@ from .args import (
 )
 from .ffmpeg_bridge import (
     SwiftFFmpegBridge,
+    YTDLPFFmpegBridgeAdapter,
     is_cancel_requested,
-    patch_ytdlp_ffprobe_metadata_fallback,
-    patch_subprocess_for_swiftffmpeg,
-    patch_ytdlp_cancel,
-    patch_ytdlp_ffmpeg_detection,
-    patch_ytdlp_popen_for_swiftffmpeg,
+    patch_ytdlp_for_swiftffmpeg,
 )
 from .files import cleanup_temp_download_files, detect_downloaded_files, has_primary_media_file
 from .packages import (
@@ -109,7 +106,6 @@ def run_yt_dlp_flow(
     live_log_stream = open_live_log_stream(os.environ.get("PALLADIUM_LOG_FD"))
 
     with contextlib.redirect_stdout(Tee(output, console_stdout, live_log_stream)), contextlib.redirect_stderr(Tee(output, console_stderr, live_log_stream)):
-        ffmpeg_bridge_dir = ""
         argv_backup = sys.argv[:]
         cwd_backup = os.getcwd()
         try:
@@ -128,30 +124,6 @@ def run_yt_dlp_flow(
             if cache_dir:
                 os.makedirs(cache_dir, exist_ok=True)
                 print(f"[palladium] cache target: {cache_dir}")
-
-            if downloads_dir:
-                ffmpeg_bridge_dir = os.path.join(downloads_dir, ".palladium-ffmpeg")
-            elif run_output_dir:
-                ffmpeg_bridge_dir = os.path.join(run_output_dir, ".palladium-ffmpeg")
-            try:
-                os.makedirs(ffmpeg_bridge_dir, exist_ok=True)
-                ffmpeg_stub = os.path.join(ffmpeg_bridge_dir, "ffmpeg")
-                ffprobe_stub = os.path.join(ffmpeg_bridge_dir, "ffprobe")
-                for stub_path in (ffmpeg_stub, ffprobe_stub):
-                    if not os.path.exists(stub_path):
-                        with open(stub_path, "w", encoding="utf-8") as stub_file:
-                            stub_file.write("#!/bin/sh\\n")
-                            stub_file.write("echo 'palladium swiftffmpeg bridge stub'\\n")
-                    try:
-                        os.chmod(stub_path, 0o755)
-                    except Exception:
-                        pass
-                print(f"[palladium][ffmpeg-bridge] stub location: {ffmpeg_bridge_dir}")
-                os.environ["PATH"] = ffmpeg_bridge_dir + os.pathsep + os.environ.get("PATH", "")
-            except Exception:
-                ffmpeg_bridge_dir = ""
-                print("[palladium][ffmpeg-bridge] unable to prepare ffmpeg-location stubs")
-                traceback.print_exc()
 
             needs_yt_dlp_install = False
             needs_webkit_jsi_install = False
@@ -224,8 +196,10 @@ def run_yt_dlp_flow(
             if download_url:
                 raise_if_cancel_requested(cancel_file_path, "[palladium] cancellation requested before bridge startup")
                 bridge = None
+                bridge_adapter = None
                 try:
                     bridge = SwiftFFmpegBridge()
+                    bridge_adapter = YTDLPFFmpegBridgeAdapter(bridge, cancel_file_path=cancel_file_path)
                     print("[palladium][ffmpeg-bridge] bridge loaded")
                     print("[palladium][ffmpeg-bridge] startup probes skipped")
                 except Exception as bridge_error:
@@ -291,8 +265,6 @@ def run_yt_dlp_flow(
                             cache_dir if cache_dir else os.path.join(downloads_dir if downloads_dir else ".", ".cache"),
                             "--force-overwrites",
                             "--no-continue",
-                            "--ffmpeg-location",
-                            ffmpeg_bridge_dir if ffmpeg_bridge_dir else ".",
                             "-P",
                             run_output_dir if run_output_dir else ".",
                             *output_args,
@@ -303,13 +275,7 @@ def run_yt_dlp_flow(
                         ]
 
                         try:
-                            with (
-                                patch_subprocess_for_swiftffmpeg(bridge),
-                                patch_ytdlp_popen_for_swiftffmpeg(bridge),
-                                patch_ytdlp_ffmpeg_detection(bridge),
-                                patch_ytdlp_ffprobe_metadata_fallback(bridge),
-                                patch_ytdlp_cancel(cancel_file_path),
-                            ):
+                            with patch_ytdlp_for_swiftffmpeg(bridge_adapter):
                                 runpy.run_module("yt_dlp", run_name="__main__", alter_sys=True)
                             yt_exit_code = 0
                         except KeyboardInterrupt:
