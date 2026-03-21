@@ -602,7 +602,15 @@ def patch_ytdlp_ffmpeg_detection():
     original_get_versions_and_features = None
     original_basename = None
     original_probe_basename = None
+    missing = object()
+    original_features = missing
     ffmpeg_pp = None
+    bridge_features = {
+        "fdk": False,
+        # Encrypted HLS downloads check this flag before adding the AAC bitstream filter.
+        "needs_adtstoasc": False,
+        "setts": True,
+    }
 
     try:
         from yt_dlp.postprocessor.ffmpeg import FFmpegPostProcessor
@@ -610,6 +618,8 @@ def patch_ytdlp_ffmpeg_detection():
     except Exception:
         yield
         return
+
+    original_features = getattr(ffmpeg_pp, "_features", missing)
 
     if hasattr(ffmpeg_pp, "_determine_executables"):
         original_determine = ffmpeg_pp._determine_executables
@@ -636,8 +646,8 @@ def patch_ytdlp_ffmpeg_detection():
         original_get_versions_and_features = ffmpeg_pp.get_versions_and_features
 
         @classmethod
-        def patched_get_versions_and_features(cls, ydl):
-            return {"ffmpeg": "bridge", "ffprobe": "bridge"}, {}
+        def patched_get_versions_and_features(cls, ydl=None):
+            return {"ffmpeg": "bridge", "ffprobe": "bridge"}, dict(bridge_features)
 
         ffmpeg_pp.get_versions_and_features = patched_get_versions_and_features
 
@@ -663,6 +673,8 @@ def patch_ytdlp_ffmpeg_detection():
 
         ffmpeg_pp.probe_basename = property(get_probe_basename, set_probe_basename)
 
+    ffmpeg_pp._features = dict(bridge_features)
+
     try:
         print("[palladium][ffmpeg-bridge] yt-dlp ffmpeg detection patch enabled")
         yield
@@ -677,3 +689,10 @@ def patch_ytdlp_ffmpeg_detection():
             ffmpeg_pp.basename = original_basename
         if original_probe_basename is not None:
             ffmpeg_pp.probe_basename = original_probe_basename
+        if original_features is missing:
+            try:
+                delattr(ffmpeg_pp, "_features")
+            except AttributeError:
+                pass
+        else:
+            ffmpeg_pp._features = original_features
