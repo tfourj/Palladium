@@ -106,6 +106,7 @@ struct ContentView: View {
     @State var currentDownloadTask: Task<Void, Never>?
     @State var currentPackageTask: Task<Void, Never>?
     @State var cancelMarkerURL: URL?
+    @State var downloadCancelRequested = false
     @State var lastDownloadProgressPercent: Double?
     @State var ffmpegProgressDurationSeconds: Double?
     @State var pendingDownloadProgressLine = ""

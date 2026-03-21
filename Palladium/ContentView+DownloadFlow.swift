@@ -161,6 +161,7 @@ extension ContentView {
         isRunning = true
         statusText = "running"
         progressText = "Downloading..."
+        downloadCancelRequested = false
         lastDownloadProgressPercent = nil
         ffmpegProgressDurationSeconds = nil
         pendingDownloadProgressLine = ""
@@ -233,6 +234,7 @@ extension ContentView {
             self.currentDownloadTask = nil
 
             isRunning = false
+            downloadCancelRequested = false
             lastDownloadProgressPercent = nil
             ffmpegProgressDurationSeconds = nil
             pendingDownloadProgressLine = ""
@@ -347,6 +349,7 @@ extension ContentView {
 
     func cancelDownloadFlow() {
         guard isRunning else { return }
+        downloadCancelRequested = true
         requestActiveOperationCancellation()
         currentDownloadTask?.cancel()
         pendingDownloadProgressLine = ""
@@ -376,6 +379,7 @@ extension ContentView {
     func updateProgressLine(_ line: String) {
         let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
+        guard !downloadCancelRequested else { return }
 
         if trimmed.hasPrefix("[palladium][ffmpeg-progress] duration=") {
             ffmpegProgressDurationSeconds = parseFFmpegDuration(from: trimmed)
