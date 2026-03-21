@@ -553,13 +553,17 @@ def patch_subprocess_for_swiftffmpeg(bridge):
 @contextlib.contextmanager
 def patch_ytdlp_popen_for_swiftffmpeg(bridge):
     try:
+        import yt_dlp.downloader.external as ydl_external
+        import yt_dlp.utils as ydl_utils_public
         import yt_dlp.utils._utils as ydl_utils
         import yt_dlp.postprocessor.ffmpeg as ydl_ffmpeg_pp
     except Exception:
         yield
         return
 
+    original_public_utils_popen = getattr(ydl_utils_public, "Popen", None)
     original_utils_popen = ydl_utils.Popen
+    original_external_popen = getattr(ydl_external, "Popen", None)
     original_ffmpeg_popen = getattr(ydl_ffmpeg_pp, "Popen", None)
 
     def normalize_cmd(args):
@@ -679,14 +683,22 @@ def patch_ytdlp_popen_for_swiftffmpeg(bridge):
                 return getattr(self._delegate, name)
             raise AttributeError(name)
 
+    if original_public_utils_popen is not None:
+        ydl_utils_public.Popen = BridgePopen
     ydl_utils.Popen = BridgePopen
+    if original_external_popen is not None:
+        ydl_external.Popen = BridgePopen
     if original_ffmpeg_popen is not None:
         ydl_ffmpeg_pp.Popen = BridgePopen
     try:
         print("[palladium][ffmpeg-bridge] yt-dlp internal Popen patch enabled")
         yield
     finally:
+        if original_public_utils_popen is not None:
+            ydl_utils_public.Popen = original_public_utils_popen
         ydl_utils.Popen = original_utils_popen
+        if original_external_popen is not None:
+            ydl_external.Popen = original_external_popen
         if original_ffmpeg_popen is not None:
             ydl_ffmpeg_pp.Popen = original_ffmpeg_popen
 
