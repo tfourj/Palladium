@@ -16,6 +16,7 @@ struct SettingsTabView: View {
     @Binding var notificationsEnabled: Bool
     @Binding var rememberSelectedPreset: Bool
     @Binding var autoDownloadOnPaste: Bool
+    @Binding var detailedProgressEnabled: Bool
     @Binding var shareSheetDownloadMode: ShareSheetDownloadMode
     @Binding var linkHistoryEnabled: Bool
     @Binding var appAppearanceMode: AppAppearanceMode
@@ -110,6 +111,7 @@ struct SettingsTabView: View {
                         notificationsEnabled: $notificationsEnabled,
                         rememberSelectedPreset: $rememberSelectedPreset,
                         autoDownloadOnPaste: $autoDownloadOnPaste,
+                        detailedProgressEnabled: $detailedProgressEnabled,
                         shareSheetDownloadMode: $shareSheetDownloadMode,
                         linkHistoryEnabled: $linkHistoryEnabled,
                         appAppearanceMode: $appAppearanceMode,

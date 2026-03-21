@@ -6,6 +6,7 @@ struct UseInterfaceSettingsView: View {
     @Binding var notificationsEnabled: Bool
     @Binding var rememberSelectedPreset: Bool
     @Binding var autoDownloadOnPaste: Bool
+    @Binding var detailedProgressEnabled: Bool
     @Binding var shareSheetDownloadMode: ShareSheetDownloadMode
     @Binding var linkHistoryEnabled: Bool
     @Binding var appAppearanceMode: AppAppearanceMode
@@ -74,6 +75,15 @@ struct UseInterfaceSettingsView: View {
                 Text("Paste")
             } footer: {
                 Text("Starts download immediately after pasting a URL from the Download tab.")
+            }
+
+            Section {
+                Toggle("Show verbose progress lines", isOn: $detailedProgressEnabled)
+                    .disabled(isRunning)
+            } header: {
+                Text("Progress")
+            } footer: {
+                Text("Shows most live yt-dlp, Palladium, and downloader log lines in the main progress label while a download is running.")
             }
 
             Section {

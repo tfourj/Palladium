@@ -41,6 +41,7 @@ extension ContentView {
         defaults.removeObject(forKey: Self.selectedPostDownloadActionDefaultsKey)
         defaults.set(notificationsEnabled, forKey: Self.notificationsEnabledDefaultsKey)
         defaults.set(autoDownloadOnPaste, forKey: Self.autoDownloadOnPasteDefaultsKey)
+        defaults.set(detailedProgressEnabled, forKey: Self.detailedProgressEnabledDefaultsKey)
         defaults.set(shareSheetDownloadMode.rawValue, forKey: Self.shareSheetDownloadModeDefaultsKey)
         defaults.set(downloadPlaylist, forKey: Self.downloadPlaylistDefaultsKey)
         defaults.set(downloadSubtitles, forKey: Self.downloadSubtitlesDefaultsKey)
@@ -147,6 +148,13 @@ extension ContentView {
             return .ask
         }
         return mode
+    }
+
+    static func loadDetailedProgressEnabled() -> Bool {
+        if UserDefaults.standard.object(forKey: detailedProgressEnabledDefaultsKey) == nil {
+            return false
+        }
+        return UserDefaults.standard.bool(forKey: detailedProgressEnabledDefaultsKey)
     }
 
     static func loadDownloadPlaylist() -> Bool {

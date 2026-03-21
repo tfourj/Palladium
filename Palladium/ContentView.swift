@@ -52,6 +52,7 @@ struct ContentView: View {
     static let downloadPlaylistDefaultsKey = "palladium.downloadPlaylist"
     static let downloadSubtitlesDefaultsKey = "palladium.downloadSubtitles"
     static let embedThumbnailDefaultsKey = "palladium.embedThumbnail"
+    static let detailedProgressEnabledDefaultsKey = "palladium.detailedProgressEnabled"
     static let subtitleLanguagePatternDefaultsKey = "palladium.subtitleLanguagePattern"
     static let customSubtitleLanguagePatternDefaultsKey = "palladium.customSubtitleLanguagePattern"
     static let linkHistoryEnabledDefaultsKey = "palladium.linkHistoryEnabled"
@@ -76,6 +77,7 @@ struct ContentView: View {
     @State var downloadPlaylist: Bool
     @State var downloadSubtitles: Bool
     @State var embedThumbnail: Bool
+    @State var detailedProgressEnabled: Bool
     @State var subtitleLanguagePattern: String
     @State var customSubtitleLanguagePattern: String
     @State var linkHistoryEnabled: Bool
@@ -127,6 +129,7 @@ struct ContentView: View {
         _downloadPlaylist = State(initialValue: Self.loadDownloadPlaylist())
         _downloadSubtitles = State(initialValue: Self.loadDownloadSubtitles())
         _embedThumbnail = State(initialValue: Self.loadEmbedThumbnail())
+        _detailedProgressEnabled = State(initialValue: Self.loadDetailedProgressEnabled())
         _subtitleLanguagePattern = State(initialValue: Self.loadSubtitleLanguagePattern())
         _customSubtitleLanguagePattern = State(initialValue: Self.loadCustomSubtitleLanguagePattern())
         _linkHistoryEnabled = State(initialValue: Self.loadLinkHistoryEnabled())
@@ -173,6 +176,7 @@ struct ContentView: View {
                     notificationsEnabled: $notificationsEnabled,
                     rememberSelectedPreset: $rememberSelectedPreset,
                     autoDownloadOnPaste: $autoDownloadOnPaste,
+                    detailedProgressEnabled: $detailedProgressEnabled,
                     shareSheetDownloadMode: $shareSheetDownloadMode,
                     linkHistoryEnabled: $linkHistoryEnabled,
                     appAppearanceMode: $appAppearanceMode,
@@ -249,6 +253,9 @@ struct ContentView: View {
             }
         }
         .onChange(of: autoDownloadOnPaste, initial: false) {
+            persistPreferences()
+        }
+        .onChange(of: detailedProgressEnabled, initial: false) {
             persistPreferences()
         }
         .onChange(of: shareSheetDownloadMode, initial: false) {

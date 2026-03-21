@@ -377,12 +377,7 @@ extension ContentView {
         let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
 
-        if trimmed.contains("[download]") {
-            guard shouldAcceptDownloadProgressLine(trimmed) else { return }
-            progressText = trimmed
-        } else if trimmed.contains("[Merger]") {
-            progressText = trimmed
-        } else if trimmed.hasPrefix("[palladium][ffmpeg-progress] duration=") {
+        if trimmed.hasPrefix("[palladium][ffmpeg-progress] duration=") {
             ffmpegProgressDurationSeconds = parseFFmpegDuration(from: trimmed)
         } else if trimmed.hasPrefix("[palladium][ffmpeg-progress] time=") {
             if let update = parseFFmpegProgressUpdate(from: trimmed) {
@@ -398,6 +393,13 @@ extension ContentView {
                     progressText = "Processing with ffmpeg..."
                 }
             }
+        } else if detailedProgressEnabled, shouldShowDetailedProgressLine(trimmed) {
+            progressText = trimmed
+        } else if trimmed.contains("[download]") {
+            guard shouldAcceptDownloadProgressLine(trimmed) else { return }
+            progressText = trimmed
+        } else if trimmed.contains("[Merger]") {
+            progressText = trimmed
         } else if trimmed.contains("yt-dlp Popen running ffmpeg") {
             progressText = "Merging audio and video..."
         } else if trimmed.contains("yt-dlp Popen ffmpeg finished") {
@@ -410,6 +412,13 @@ extension ContentView {
             progressText = "Downloading..."
             lastDownloadProgressPercent = nil
         }
+    }
+
+    private func shouldShowDetailedProgressLine(_ line: String) -> Bool {
+        if line.hasPrefix("[palladium][ffmpeg-progress]") {
+            return false
+        }
+        return true
     }
 
     func downloadErrorDetails(from outcome: PythonFlowOutcome) -> String? {
