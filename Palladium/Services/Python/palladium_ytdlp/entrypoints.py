@@ -306,7 +306,7 @@ def run_yt_dlp_flow(
                             with (
                                 patch_subprocess_for_swiftffmpeg(bridge),
                                 patch_ytdlp_popen_for_swiftffmpeg(bridge),
-                                patch_ytdlp_ffmpeg_detection(),
+                                patch_ytdlp_ffmpeg_detection(bridge),
                                 patch_ytdlp_ffprobe_metadata_fallback(),
                                 patch_ytdlp_cancel(cancel_file_path),
                             ):

@@ -3,6 +3,7 @@ import ctypes
 import io
 import json
 import os
+import re
 import shlex
 import shutil
 import subprocess
@@ -180,6 +181,101 @@ def split_bridge_output(tool, output):
     if stdout_text is None:
         return text, text
     return stdout_text, stderr_text
+
+
+def clean_bridge_version(raw_version):
+    text = str(raw_version or "").strip()
+    if not text:
+        return None
+
+    for pattern in (
+        r"(?:\d+:)?([0-9.]+)-[0-9]+ubuntu[0-9.]+$",
+        r"n([0-9.]+)$",
+    ):
+        match = re.match(pattern, text)
+        if match:
+            return match.group(1)
+
+    numeric_match = re.search(r"([0-9]+(?:\.[0-9]+)+)", text)
+    if numeric_match:
+        return numeric_match.group(1)
+
+    return text
+
+
+def parse_bridge_executable_version(output_text, tool):
+    text = str(output_text or "")
+    for line in text.splitlines():
+        stripped = line.strip()
+        prefix = f"{tool} version "
+        if stripped.lower().startswith(prefix):
+            version_text = stripped[len(prefix):].split(None, 1)[0]
+            return clean_bridge_version(version_text)
+    return None
+
+
+def parse_bridge_libavformat_version(output_text):
+    text = str(output_text or "")
+    match = re.search(r"(?m)^\s*libavformat\s+(?:[0-9. ]+)\s+/\s+([0-9. ]+)", text)
+    if not match:
+        return None
+    return match.group(1).replace(" ", "")
+
+
+def is_outdated_bridge_version(version_text, minimum_version_text):
+    def to_parts(value):
+        return [int(piece) for piece in re.findall(r"\d+", str(value or ""))]
+
+    current = to_parts(version_text)
+    minimum = to_parts(minimum_version_text)
+    if not current or not minimum:
+        return False
+
+    size = max(len(current), len(minimum))
+    current += [0] * (size - len(current))
+    minimum += [0] * (size - len(minimum))
+    return current < minimum
+
+
+def probe_bridge_ffmpeg_capabilities(bridge):
+    cached = getattr(bridge, "_palladium_ffmpeg_capabilities", None)
+    if cached is not None:
+        return cached
+
+    result = {
+        "versions": {"ffmpeg": None, "ffprobe": None},
+        "features": {},
+    }
+
+    try:
+        _, ffmpeg_output = bridge.run("ffmpeg", ["-bsfs"])
+        ffmpeg_version = parse_bridge_executable_version(ffmpeg_output, "ffmpeg")
+        libavformat_version = parse_bridge_libavformat_version(ffmpeg_output)
+        result["versions"]["ffmpeg"] = ffmpeg_version
+        result["features"] = {
+            "fdk": "--enable-libfdk-aac" in ffmpeg_output,
+            "setts": "setts" in ffmpeg_output.splitlines(),
+            "needs_adtstoasc": is_outdated_bridge_version(libavformat_version, "57.56.100"),
+        }
+    except Exception as error:
+        print(f"[palladium][ffmpeg-bridge] ffmpeg capability probe failed: {error}")
+
+    try:
+        _, ffprobe_output = bridge.run("ffprobe", ["-version"])
+        result["versions"]["ffprobe"] = parse_bridge_executable_version(ffprobe_output, "ffprobe")
+    except Exception as error:
+        print(f"[palladium][ffmpeg-bridge] ffprobe version probe failed: {error}")
+
+    bridge._palladium_ffmpeg_capabilities = result
+    if result["versions"]["ffmpeg"] or result["versions"]["ffprobe"]:
+        print(
+            "[palladium][ffmpeg-bridge] probed versions:"
+            f" ffmpeg={result['versions']['ffmpeg'] or 'unknown'}"
+            f" ffprobe={result['versions']['ffprobe'] or 'unknown'}"
+        )
+    if result["features"]:
+        print(f"[palladium][ffmpeg-bridge] probed features: {result['features']}")
+    return result
 
 
 @contextlib.contextmanager
@@ -596,21 +692,9 @@ def patch_ytdlp_popen_for_swiftffmpeg(bridge):
 
 
 @contextlib.contextmanager
-def patch_ytdlp_ffmpeg_detection():
-    original_determine = None
-    original_check_version = None
-    original_get_versions_and_features = None
-    original_basename = None
-    original_probe_basename = None
-    missing = object()
-    original_features = missing
+def patch_ytdlp_ffmpeg_detection(bridge):
+    original_get_ffmpeg_version = None
     ffmpeg_pp = None
-    bridge_features = {
-        "fdk": False,
-        # Encrypted HLS downloads check this flag before adding the AAC bitstream filter.
-        "needs_adtstoasc": False,
-        "setts": True,
-    }
 
     try:
         from yt_dlp.postprocessor.ffmpeg import FFmpegPostProcessor
@@ -619,80 +703,36 @@ def patch_ytdlp_ffmpeg_detection():
         yield
         return
 
-    original_features = getattr(ffmpeg_pp, "_features", missing)
+    if hasattr(ffmpeg_pp, "_get_ffmpeg_version"):
+        original_get_ffmpeg_version = ffmpeg_pp._get_ffmpeg_version
 
-    if hasattr(ffmpeg_pp, "_determine_executables"):
-        original_determine = ffmpeg_pp._determine_executables
+        def patched_get_ffmpeg_version(self, prog):
+            version = None
+            features = {}
+            try:
+                version, features = original_get_ffmpeg_version(self, prog)
+            except Exception as error:
+                print(f"[palladium][ffmpeg-bridge] yt-dlp {prog} probe failed; using bridge fallback: {error}")
 
-        def patched_determine(self):
-            return {
-                "ffmpeg": "ffmpeg",
-                "ffprobe": "ffprobe",
-                "avconv": "avconv",
-                "avprobe": "avprobe",
-            }
+            if version and (prog != "ffmpeg" or features):
+                return version, features
 
-        ffmpeg_pp._determine_executables = patched_determine
+            fallback = probe_bridge_ffmpeg_capabilities(bridge)
+            fallback_version = fallback["versions"].get(prog)
+            fallback_features = dict(fallback["features"]) if prog == "ffmpeg" else {}
 
-    if hasattr(ffmpeg_pp, "check_version"):
-        original_check_version = ffmpeg_pp.check_version
+            if version and prog == "ffmpeg" and fallback_features:
+                return version, fallback_features
+            if fallback_version or fallback_features:
+                print(f"[palladium][ffmpeg-bridge] using bridge-derived {prog} metadata")
+                return fallback_version or version, fallback_features or features
+            return version, features
 
-        def patched_check_version(self):
-            return True
-
-        ffmpeg_pp.check_version = patched_check_version
-
-    if hasattr(ffmpeg_pp, "get_versions_and_features"):
-        original_get_versions_and_features = ffmpeg_pp.get_versions_and_features
-
-        @classmethod
-        def patched_get_versions_and_features(cls, ydl=None):
-            return {"ffmpeg": "bridge", "ffprobe": "bridge"}, dict(bridge_features)
-
-        ffmpeg_pp.get_versions_and_features = patched_get_versions_and_features
-
-    if hasattr(ffmpeg_pp, "basename"):
-        original_basename = ffmpeg_pp.basename
-
-        def get_basename(self):
-            return "ffmpeg"
-
-        def set_basename(self, value):
-            self.__dict__["_palladium_basename"] = value
-
-        ffmpeg_pp.basename = property(get_basename, set_basename)
-
-    if hasattr(ffmpeg_pp, "probe_basename"):
-        original_probe_basename = ffmpeg_pp.probe_basename
-
-        def get_probe_basename(self):
-            return "ffprobe"
-
-        def set_probe_basename(self, value):
-            self.__dict__["_palladium_probe_basename"] = value
-
-        ffmpeg_pp.probe_basename = property(get_probe_basename, set_probe_basename)
-
-    ffmpeg_pp._features = dict(bridge_features)
+        ffmpeg_pp._get_ffmpeg_version = patched_get_ffmpeg_version
 
     try:
-        print("[palladium][ffmpeg-bridge] yt-dlp ffmpeg detection patch enabled")
+        print("[palladium][ffmpeg-bridge] yt-dlp ffmpeg detection fallback enabled")
         yield
     finally:
-        if original_determine is not None:
-            ffmpeg_pp._determine_executables = original_determine
-        if original_check_version is not None:
-            ffmpeg_pp.check_version = original_check_version
-        if original_get_versions_and_features is not None:
-            ffmpeg_pp.get_versions_and_features = original_get_versions_and_features
-        if original_basename is not None:
-            ffmpeg_pp.basename = original_basename
-        if original_probe_basename is not None:
-            ffmpeg_pp.probe_basename = original_probe_basename
-        if original_features is missing:
-            try:
-                delattr(ffmpeg_pp, "_features")
-            except AttributeError:
-                pass
-        else:
-            ffmpeg_pp._features = original_features
+        if original_get_ffmpeg_version is not None:
+            ffmpeg_pp._get_ffmpeg_version = original_get_ffmpeg_version
