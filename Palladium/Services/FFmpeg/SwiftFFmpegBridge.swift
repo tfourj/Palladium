@@ -14,6 +14,92 @@ private struct FFmpegBridgeResponse: Encodable {
     let error: String?
 }
 
+private final class FFmpegLiveLogForwarder {
+    private let liveLogFD: Int32?
+    private let lock = NSLock()
+    private var pendingMessage = ""
+
+    init() {
+        if let rawValue = ProcessInfo.processInfo.environment["PALLADIUM_LOG_FD"],
+           let fdValue = Int32(rawValue) {
+            liveLogFD = fdValue
+        } else {
+            liveLogFD = nil
+        }
+    }
+
+    func ingest(_ message: String) {
+        guard liveLogFD != nil else { return }
+        var linesToEmit: [String] = []
+        lock.lock()
+        pendingMessage.append(message)
+
+        while let newlineIndex = pendingMessage.firstIndex(where: \.isNewline) {
+            let line = String(pendingMessage[..<newlineIndex])
+            let nextIndex = pendingMessage.index(after: newlineIndex)
+            pendingMessage.removeSubrange(pendingMessage.startIndex..<nextIndex)
+            linesToEmit.append(line)
+        }
+        lock.unlock()
+
+        for line in linesToEmit {
+            emitIfRelevant(line)
+        }
+    }
+
+    func finish() {
+        let trailingLine: String?
+        lock.lock()
+        trailingLine = pendingMessage.isEmpty ? nil : pendingMessage
+        pendingMessage.removeAll(keepingCapacity: false)
+        lock.unlock()
+
+        if let trailingLine {
+            emitIfRelevant(trailingLine)
+        }
+    }
+
+    private func emitIfRelevant(_ line: String) {
+        let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+
+        if let duration = extractMatch(#"Duration:\s*([0-9:.]+)"#, from: trimmed) {
+            writeLine("[palladium][ffmpeg-progress] duration=\(duration)")
+            return
+        }
+
+        if let currentTime = extractMatch(#"time=([0-9:.]+)"#, from: trimmed) {
+            let speed = extractMatch(#"speed=\s*([0-9.]+x)"#, from: trimmed) ?? ""
+            let suffix = speed.isEmpty ? "" : " speed=\(speed)"
+            writeLine("[palladium][ffmpeg-progress] time=\(currentTime)\(suffix)")
+        }
+    }
+
+    private func extractMatch(_ pattern: String, from text: String) -> String? {
+        guard let regex = try? NSRegularExpression(pattern: pattern) else {
+            return nil
+        }
+        let range = NSRange(text.startIndex..<text.endIndex, in: text)
+        guard let match = regex.firstMatch(in: text, range: range),
+              match.numberOfRanges > 1,
+              let valueRange = Range(match.range(at: 1), in: text) else {
+            return nil
+        }
+        return String(text[valueRange])
+    }
+
+    private func writeLine(_ line: String) {
+        guard let liveLogFD,
+              let data = "\(line)\n".data(using: .utf8) else {
+            return
+        }
+        data.withUnsafeBytes { buffer in
+            guard let baseAddress = buffer.baseAddress else { return }
+            _ = Darwin.write(liveLogFD, baseAddress, buffer.count)
+        }
+    }
+}
+
 @_cdecl("palladium_ffmpeg_bridge_run")
 public func palladium_ffmpeg_bridge_run(_ jsonPtr: UnsafePointer<CChar>?) -> UnsafeMutablePointer<CChar>? {
     let response: FFmpegBridgeResponse
@@ -38,10 +124,18 @@ public func palladium_ffmpeg_bridge_run(_ jsonPtr: UnsafePointer<CChar>?) -> Uns
             return makeCString(response)
         }
 
+        let liveLogForwarder = tool == .ffmpeg ? FFmpegLiveLogForwarder() : nil
         do {
+            SwiftFFmpeg.setLogHandler { _, message in
+                liveLogForwarder?.ingest(message)
+            }
             let (exitCode, output) = try SwiftFFmpeg.execute(request.args, tool: tool)
+            liveLogForwarder?.finish()
+            SwiftFFmpeg.setLogHandler(nil)
             response = FFmpegBridgeResponse(ok: true, exit_code: Int(exitCode), output: output, error: nil)
         } catch {
+            liveLogForwarder?.finish()
+            SwiftFFmpeg.setLogHandler(nil)
             var code = 1
             if let swiftError = error as? SwiftFFmpegError,
                case let .executionFailed(exitCode) = swiftError {

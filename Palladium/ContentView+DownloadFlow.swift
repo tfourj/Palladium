@@ -162,6 +162,7 @@ extension ContentView {
         statusText = "running"
         progressText = "Downloading..."
         lastDownloadProgressPercent = nil
+        ffmpegProgressDurationSeconds = nil
         pendingDownloadProgressLine = ""
 
         let logPipe = Pipe()
@@ -233,6 +234,7 @@ extension ContentView {
 
             isRunning = false
             lastDownloadProgressPercent = nil
+            ffmpegProgressDurationSeconds = nil
             pendingDownloadProgressLine = ""
             statusText = outcome.statusText
             if outcome.statusText == "cancelled" {
@@ -348,6 +350,7 @@ extension ContentView {
         requestActiveOperationCancellation()
         currentDownloadTask?.cancel()
         pendingDownloadProgressLine = ""
+        ffmpegProgressDurationSeconds = nil
         progressText = "Cancelling..."
     }
 
@@ -379,6 +382,22 @@ extension ContentView {
             progressText = trimmed
         } else if trimmed.contains("[Merger]") {
             progressText = trimmed
+        } else if trimmed.hasPrefix("[palladium][ffmpeg-progress] duration=") {
+            ffmpegProgressDurationSeconds = parseFFmpegDuration(from: trimmed)
+        } else if trimmed.hasPrefix("[palladium][ffmpeg-progress] time=") {
+            if let update = parseFFmpegProgressUpdate(from: trimmed) {
+                if let progressPercent = update.percent {
+                    lastDownloadProgressPercent = progressPercent
+                    let clampedPercent = min(max(progressPercent, 0), 100)
+                    if let speedText = update.speedText {
+                        progressText = String(format: "Processing with ffmpeg... %.1f%% (%@)", clampedPercent, speedText)
+                    } else {
+                        progressText = String(format: "Processing with ffmpeg... %.1f%%", clampedPercent)
+                    }
+                } else {
+                    progressText = "Processing with ffmpeg..."
+                }
+            }
         } else if trimmed.contains("yt-dlp Popen running ffmpeg") {
             progressText = "Merging audio and video..."
         } else if trimmed.contains("yt-dlp Popen ffmpeg finished") {
@@ -458,6 +477,55 @@ extension ContentView {
         }
 
         return false
+    }
+
+    private func parseFFmpegDuration(from line: String) -> Double? {
+        guard let value = line.split(separator: "=", maxSplits: 1).last else {
+            return nil
+        }
+        return parseFFmpegTimestamp(String(value))
+    }
+
+    private func parseFFmpegProgressUpdate(from line: String) -> (percent: Double?, speedText: String?)? {
+        let payload = line.replacingOccurrences(of: "[palladium][ffmpeg-progress] ", with: "")
+        let fields = payload.split(separator: " ").map(String.init)
+        var currentTimeText: String?
+        var speedText: String?
+
+        for field in fields {
+            if field.hasPrefix("time=") {
+                currentTimeText = String(field.dropFirst(5))
+            } else if field.hasPrefix("speed=") {
+                speedText = String(field.dropFirst(6))
+            }
+        }
+
+        guard let currentTimeText else {
+            return nil
+        }
+
+        let currentTimeSeconds = parseFFmpegTimestamp(currentTimeText)
+        let percent: Double?
+        if let currentTimeSeconds,
+           let durationSeconds = ffmpegProgressDurationSeconds,
+           durationSeconds > 0 {
+            percent = (currentTimeSeconds / durationSeconds) * 100
+        } else {
+            percent = nil
+        }
+
+        return (percent, speedText)
+    }
+
+    private func parseFFmpegTimestamp(_ text: String) -> Double? {
+        let parts = text.split(separator: ":")
+        guard parts.count == 3,
+              let hours = Double(parts[0]),
+              let minutes = Double(parts[1]),
+              let seconds = Double(parts[2]) else {
+            return nil
+        }
+        return (hours * 3600) + (minutes * 60) + seconds
     }
 
     private func extractDownloadPercent(from line: String) -> Double? {

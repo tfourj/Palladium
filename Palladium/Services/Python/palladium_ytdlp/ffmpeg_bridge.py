@@ -104,14 +104,13 @@ def prepare_bridge_ffmpeg_args(tool, args):
         i = 0
         while i < len(prepared):
             if prepared[i] == "-loglevel" and i + 1 < len(prepared):
-                prepared[i + 1] = "error"
                 i += 2
                 continue
             i += 1
         if "-loglevel" not in prepared:
-            prepared = ["-loglevel", "error", *prepared]
-        if "-nostats" not in prepared:
-            prepared = ["-nostats", *prepared]
+            prepared = ["-loglevel", "info", *prepared]
+        if "-stats" not in prepared and "-nostats" not in prepared:
+            prepared = ["-stats", *prepared]
         if "-nostdin" not in prepared:
             prepared = ["-nostdin", *prepared]
     return prepared
