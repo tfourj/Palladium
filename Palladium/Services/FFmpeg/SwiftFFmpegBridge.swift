@@ -143,14 +143,16 @@ public func palladium_ffmpeg_bridge_run(_ jsonPtr: UnsafePointer<CChar>?) -> Uns
             liveLogForwarder?.finish()
             SwiftFFmpeg.setLogHandler(nil)
             var code = 1
+            var output = ""
             if let swiftError = error as? SwiftFFmpegError,
-               case let .executionFailed(exitCode) = swiftError {
+               case let .executionFailed(exitCode, capturedOutput) = swiftError {
                 code = Int(exitCode)
+                output = capturedOutput
             }
             response = FFmpegBridgeResponse(
                 ok: false,
                 exit_code: code,
-                output: "",
+                output: output,
                 error: String(describing: error)
             )
         }

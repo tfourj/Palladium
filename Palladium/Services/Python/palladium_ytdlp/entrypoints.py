@@ -279,7 +279,7 @@ def run_yt_dlp_flow(
                                 download_behavior_args.extend(["--sub-langs", subtitle_language_pattern])
 
                         if embed_thumbnail:
-                            download_behavior_args.append("--embed-thumbnail")
+                            download_behavior_args.extend(["--convert-thumbnails", "png", "--embed-thumbnail"])
 
                         sys.argv = [
                             "yt-dlp",
