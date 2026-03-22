@@ -8,7 +8,12 @@ import sys
 import traceback
 import importlib.metadata as importlib_metadata
 
-from .shared import CLEANUP_PACKAGES, DISPLAY_PACKAGES, TRACKED_PACKAGES
+from .shared import (
+    CLEANUP_PACKAGES,
+    DISPLAY_PACKAGES,
+    TRACKED_PACKAGES,
+    WEBKIT_JSI_API_PACKAGE_RELATIVE_PATH,
+)
 
 
 def has_pip_in_target(install_target):
@@ -150,6 +155,29 @@ def canonical_package_name(name):
     return re.sub(r"[-_.]+", "-", str(name or "").strip().lower())
 
 
+def package_marker_paths(package_name):
+    normalized_name = canonical_package_name(package_name)
+    import_name = str(package_name or "").replace("-", "_").strip().lower()
+    candidates = [import_name, f"{import_name}.py"]
+    if normalized_name == "yt-dlp-apple-webkit-jsi":
+        candidates.append(WEBKIT_JSI_API_PACKAGE_RELATIVE_PATH)
+    return tuple(candidates)
+
+
+def has_target_package_marker(package_name, install_target):
+    if not install_target or not os.path.isdir(install_target):
+        return False
+
+    for relative_path in package_marker_paths(package_name):
+        if not relative_path:
+            continue
+        candidate_path = os.path.join(install_target, relative_path)
+        if os.path.exists(candidate_path):
+            return True
+
+    return False
+
+
 def version_from_install_target(package_name, install_target):
     if not install_target or not os.path.isdir(install_target):
         return None
@@ -185,8 +213,38 @@ def version_from_install_target(package_name, install_target):
     if not candidates:
         return None
 
+    if not has_target_package_marker(package_name, install_target):
+        return None
+
     candidates.sort(key=lambda item: item[0], reverse=True)
     return candidates[0][1]
+
+
+def installed_version(package_name, install_target=None):
+    target_version = version_from_install_target(package_name, install_target)
+    if target_version:
+        return target_version
+
+    try:
+        resolved_version = importlib_metadata.version(package_name)
+    except Exception:
+        resolved_version = None
+
+    version_text = str(resolved_version or "").strip()
+    return version_text or None
+
+
+def is_package_installed(package_name, install_target=None, allow_cache_fallback=True):
+    resolved_version = installed_version(package_name, install_target)
+    if resolved_version:
+        return True, resolved_version, "metadata"
+
+    if allow_cache_fallback and install_target and has_target_package_marker(package_name, install_target):
+        cached_version = load_cached_versions(install_target).get(package_name, "").strip()
+        if cached_version:
+            return True, cached_version, "cache"
+
+    return False, "", "missing"
 
 
 def cleanup_target_package(install_target, package_name):
@@ -240,17 +298,7 @@ def collect_versions(install_target=None, allow_cache_fallback=True):
     cached_versions = load_cached_versions(install_target) if allow_cache_fallback else {}
     versions = {}
     for package_name in DISPLAY_PACKAGES:
-        target_version = version_from_install_target(package_name, install_target)
-        if target_version:
-            versions[package_name] = target_version
-            continue
-
-        resolved_version = None
-        try:
-            resolved_version = importlib_metadata.version(package_name)
-        except Exception:
-            resolved_version = None
-
+        resolved_version = installed_version(package_name, install_target)
         if resolved_version:
             versions[package_name] = resolved_version
             continue

@@ -4,7 +4,6 @@ import os
 import runpy
 import sys
 import traceback
-import importlib.metadata as importlib_metadata
 
 from .args import (
     build_preset_args,
@@ -28,6 +27,7 @@ from .packages import (
     collect_versions,
     ensure_pip_entrypoint,
     fetch_package_index_versions,
+    is_package_installed,
 )
 from .shared import TRACKED_PACKAGES, TailBuffer, Tee, open_live_log_stream
 from .webkit_jsi import ensure_safe_webkit_jsi_runtime
@@ -128,19 +128,25 @@ def run_yt_dlp_flow(
             needs_yt_dlp_install = False
             needs_webkit_jsi_install = False
 
-            print("[palladium] checking yt_dlp import")
-            try:
-                import yt_dlp  # noqa: F401
-                print("[palladium] yt_dlp already installed")
-            except Exception:
+            print("[palladium] checking yt-dlp package metadata")
+            yt_dlp_installed, yt_dlp_version, yt_dlp_source = is_package_installed(
+                "yt-dlp",
+                install_target=install_target,
+            )
+            if yt_dlp_installed:
+                print(f"[palladium] yt-dlp already installed ({yt_dlp_version} via {yt_dlp_source})")
+            else:
                 needs_yt_dlp_install = True
-                print("[palladium] yt_dlp module missing")
+                print("[palladium] yt-dlp package missing")
 
-            print("[palladium] checking yt-dlp-apple-webkit-jsi package")
-            try:
-                importlib_metadata.version("yt-dlp-apple-webkit-jsi")
-                print("[palladium] yt-dlp-apple-webkit-jsi already installed")
-            except Exception:
+            print("[palladium] checking yt-dlp-apple-webkit-jsi package metadata")
+            webkit_jsi_installed, webkit_jsi_version, webkit_jsi_source = is_package_installed(
+                "yt-dlp-apple-webkit-jsi",
+                install_target=install_target,
+            )
+            if webkit_jsi_installed:
+                print(f"[palladium] yt-dlp-apple-webkit-jsi already installed ({webkit_jsi_version} via {webkit_jsi_source})")
+            else:
                 needs_webkit_jsi_install = True
                 print("[palladium] yt-dlp-apple-webkit-jsi missing")
 
@@ -171,14 +177,12 @@ def run_yt_dlp_flow(
                 else:
                     pip_exit_code = 1
 
-                try:
-                    if install_target and install_target not in sys.path:
-                        sys.path.insert(0, install_target)
-                    import yt_dlp  # noqa: F401
-                    print("[palladium] yt_dlp import succeeded after install")
-                except Exception:
-                    print("[palladium] yt_dlp still unavailable after install attempt")
-                    traceback.print_exc()
+                installed_versions = collect_versions(install_target=install_target, allow_cache_fallback=False)
+                print(f"[palladium] yt-dlp after install: {installed_versions.get('yt-dlp', 'not installed')}")
+                print(
+                    "[palladium] yt-dlp-apple-webkit-jsi after install: "
+                    f"{installed_versions.get('yt-dlp-apple-webkit-jsi', 'not installed')}"
+                )
 
             raise_if_cancel_requested(cancel_file_path, "[palladium] cancellation requested before webkit patch")
             ensure_safe_webkit_jsi_runtime(install_target)
