@@ -155,6 +155,10 @@ def canonical_package_name(name):
     return re.sub(r"[-_.]+", "-", str(name or "").strip().lower())
 
 
+def wheel_safe_package_name(name):
+    return re.sub(r"[-_.]+", "_", str(name or "").strip().lower())
+
+
 def package_marker_paths(package_name):
     normalized_name = canonical_package_name(package_name)
     import_name = str(package_name or "").replace("-", "_").strip().lower()
@@ -247,11 +251,22 @@ def is_package_installed(package_name, install_target=None, allow_cache_fallback
     return False, "", "missing"
 
 
+def matches_distribution_entry(entry_stem, package_name):
+    normalized_stem = canonical_package_name(entry_stem)
+    safe_stem = wheel_safe_package_name(entry_stem)
+    normalized_name = canonical_package_name(package_name)
+    safe_name = wheel_safe_package_name(package_name)
+    return (
+        normalized_stem == normalized_name
+        or safe_stem == safe_name
+        or safe_stem.startswith(f"{safe_name}-")
+    )
+
+
 def cleanup_target_package(install_target, package_name):
     if not install_target or not os.path.isdir(install_target):
         return 0
 
-    normalized_name = canonical_package_name(package_name)
     import_name = str(package_name).replace("-", "_").strip().lower()
     removed = 0
 
@@ -268,12 +283,10 @@ def cleanup_target_package(install_target, package_name):
                 should_remove = True
             elif lower_entry.endswith(".dist-info"):
                 stem = lower_entry[:-10]
-                normalized_stem = canonical_package_name(stem)
-                should_remove = normalized_stem == normalized_name or normalized_stem.startswith(f"{normalized_name}-")
+                should_remove = matches_distribution_entry(stem, package_name)
             elif lower_entry.endswith(".egg-info"):
                 stem = lower_entry[:-9]
-                normalized_stem = canonical_package_name(stem)
-                should_remove = normalized_stem == normalized_name or normalized_stem.startswith(f"{normalized_name}-")
+                should_remove = matches_distribution_entry(stem, package_name)
 
             if not should_remove:
                 continue
