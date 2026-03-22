@@ -10,7 +10,12 @@ struct SettingsAboutView: View {
     private var appVersion: String {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
         let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "Unknown"
-        return build == "1" ? "v\(version)" : "v\(version) (\(build))"
+        let rawFinalValue = Bundle.main.object(forInfoDictionaryKey: "APP_FINAL")
+        let normalizedFinalValue = String(describing: rawFinalValue ?? "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .lowercased()
+        let isFinal = normalizedFinalValue == "true"
+        return isFinal ? "v\(version)" : "v\(version)-b\(build)"
     }
 
     var body: some View {
