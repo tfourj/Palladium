@@ -37,6 +37,7 @@ final class ConsoleLogStore: ObservableObject {
     @Published var selectedFilter: ConsoleLogFilter = .app
 
     let activeLogFileURL: URL
+    let logsDirectoryURL: URL
 
     private let maxEntries: Int
     private let writer: ConsoleLogFileWriter
@@ -47,12 +48,13 @@ final class ConsoleLogStore: ObservableObject {
         self.maxEntries = maxEntries
 
         let logsDirectoryURL = Self.defaultLogsDirectoryURL()
-        self.activeLogFileURL = logsDirectoryURL.appendingPathComponent("console.log")
+        self.logsDirectoryURL = logsDirectoryURL
+        self.activeLogFileURL = logsDirectoryURL.appendingPathComponent("latest.log")
         self.writer = ConsoleLogFileWriter(
             directoryURL: logsDirectoryURL,
-            baseFilename: "console.log",
+            activeFilename: "latest.log",
             maxBytesPerFile: 5 * 1024 * 1024,
-            maxArchives: 3
+            archiveFilenames: ["log1.log", "log2.log"]
         )
 
         Task {
@@ -174,18 +176,14 @@ final class ConsoleLogStore: ObservableObject {
 actor ConsoleLogFileWriter {
     private let directoryURL: URL
     private let activeLogFileURL: URL
-    private let baseName: String
-    private let fileExtension: String
+    private let archiveFileURLs: [URL]
     private let maxBytesPerFile: Int
-    private let maxArchives: Int
 
-    init(directoryURL: URL, baseFilename: String, maxBytesPerFile: Int, maxArchives: Int) {
+    init(directoryURL: URL, activeFilename: String, maxBytesPerFile: Int, archiveFilenames: [String]) {
         self.directoryURL = directoryURL
-        self.activeLogFileURL = directoryURL.appendingPathComponent(baseFilename)
-        self.baseName = (baseFilename as NSString).deletingPathExtension
-        self.fileExtension = (baseFilename as NSString).pathExtension
+        self.activeLogFileURL = directoryURL.appendingPathComponent(activeFilename)
+        self.archiveFileURLs = archiveFilenames.map { directoryURL.appendingPathComponent($0) }
         self.maxBytesPerFile = maxBytesPerFile
-        self.maxArchives = max(0, maxArchives)
     }
 
     func prepare() {
@@ -213,15 +211,9 @@ actor ConsoleLogFileWriter {
             try? FileManager.default.removeItem(at: activeLogFileURL)
         }
 
-        guard maxArchives > 0 else {
-            ensureActiveFileExists()
-            return
-        }
-
-        for index in 1...maxArchives {
-            let archive = archiveURL(index: index)
-            if FileManager.default.fileExists(atPath: archive.path) {
-                try? FileManager.default.removeItem(at: archive)
+        for archiveURL in archiveFileURLs {
+            if FileManager.default.fileExists(atPath: archiveURL.path) {
+                try? FileManager.default.removeItem(at: archiveURL)
             }
         }
 
@@ -232,33 +224,37 @@ actor ConsoleLogFileWriter {
         let currentSize = currentFileSizeBytes()
         guard currentSize + additionalBytes > maxBytesPerFile else { return }
 
-        if maxArchives > 0 {
-            let oldestArchive = archiveURL(index: maxArchives)
-            if FileManager.default.fileExists(atPath: oldestArchive.path) {
-                try? FileManager.default.removeItem(at: oldestArchive)
-            }
-
-            if maxArchives > 1 {
-                for index in stride(from: maxArchives - 1, through: 1, by: -1) {
-                    let source = archiveURL(index: index)
-                    let destination = archiveURL(index: index + 1)
-                    guard FileManager.default.fileExists(atPath: source.path) else { continue }
-                    if FileManager.default.fileExists(atPath: destination.path) {
-                        try? FileManager.default.removeItem(at: destination)
-                    }
-                    try? FileManager.default.moveItem(at: source, to: destination)
-                }
-            }
-
-            let firstArchive = archiveURL(index: 1)
-            if FileManager.default.fileExists(atPath: firstArchive.path) {
-                try? FileManager.default.removeItem(at: firstArchive)
-            }
+        guard !archiveFileURLs.isEmpty else {
             if FileManager.default.fileExists(atPath: activeLogFileURL.path) {
-                try? FileManager.default.moveItem(at: activeLogFileURL, to: firstArchive)
+                try? FileManager.default.removeItem(at: activeLogFileURL)
             }
-        } else if FileManager.default.fileExists(atPath: activeLogFileURL.path) {
-            try? FileManager.default.removeItem(at: activeLogFileURL)
+            ensureActiveFileExists()
+            return
+        }
+
+        if let oldestArchiveURL = archiveFileURLs.last,
+           FileManager.default.fileExists(atPath: oldestArchiveURL.path) {
+            try? FileManager.default.removeItem(at: oldestArchiveURL)
+        }
+
+        if archiveFileURLs.count > 1 {
+            for index in stride(from: archiveFileURLs.count - 2, through: 0, by: -1) {
+                let sourceURL = archiveFileURLs[index]
+                let destinationURL = archiveFileURLs[index + 1]
+                guard FileManager.default.fileExists(atPath: sourceURL.path) else { continue }
+                if FileManager.default.fileExists(atPath: destinationURL.path) {
+                    try? FileManager.default.removeItem(at: destinationURL)
+                }
+                try? FileManager.default.moveItem(at: sourceURL, to: destinationURL)
+            }
+        }
+
+        let firstArchiveURL = archiveFileURLs[0]
+        if FileManager.default.fileExists(atPath: firstArchiveURL.path) {
+            try? FileManager.default.removeItem(at: firstArchiveURL)
+        }
+        if FileManager.default.fileExists(atPath: activeLogFileURL.path) {
+            try? FileManager.default.moveItem(at: activeLogFileURL, to: firstArchiveURL)
         }
 
         ensureActiveFileExists()
@@ -282,15 +278,5 @@ actor ConsoleLogFileWriter {
     private func ensureActiveFileExists() {
         guard !FileManager.default.fileExists(atPath: activeLogFileURL.path) else { return }
         _ = FileManager.default.createFile(atPath: activeLogFileURL.path, contents: nil)
-    }
-
-    private func archiveURL(index: Int) -> URL {
-        let name: String
-        if fileExtension.isEmpty {
-            name = "\(baseName).\(index)"
-        } else {
-            name = "\(baseName).\(index).\(fileExtension)"
-        }
-        return directoryURL.appendingPathComponent(name)
     }
 }

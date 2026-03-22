@@ -205,7 +205,34 @@
       }
     },
     "console.lines.visible" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Showing %lld of %lld lines"
+          }
+        }
+      }
+    },
+    "console.search.empty" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No matching log lines."
+          }
+        }
+      }
+    },
+    "console.search.placeholder" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search console"
+          }
+        }
+      }
     },
     "console.source.app" : {
       "localizations" : {
