@@ -12,11 +12,6 @@ jobs:
   build:
     runs-on: macos-latest
     timeout-minutes: 60
-    env:
-      PYTHON_APPLE_SUPPORT_REPO: beeware/Python-Apple-support
-      PYTHON_APPLE_SUPPORT_TAG: latest
-      SWIFTFFMPEG_IOS_REPO: tfourj/SwiftFFmpeg-iOS
-      SWIFTFFMPEG_IOS_ASSET: SwiftFFmpeg-iOS.zip
 
     steps:
     - name: Checkout code
@@ -26,37 +21,26 @@ jobs:
         fetch-tags: true
 
     - name: Download Python Apple Support
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: robinraju/release-downloader@v1
+      with:
+        repository: beeware/Python-Apple-support
+        latest: true
+        fileName: "*iOS-support*.tar.gz"
+        out-file-path: python-download
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Install Python Apple Support
       run: |
         set -euo pipefail
 
-        if [ "$PYTHON_APPLE_SUPPORT_TAG" = "latest" ]; then
-          RELEASE_API="https://api.github.com/repos/$PYTHON_APPLE_SUPPORT_REPO/releases/latest"
-        else
-          RELEASE_API="https://api.github.com/repos/$PYTHON_APPLE_SUPPORT_REPO/releases/tags/$PYTHON_APPLE_SUPPORT_TAG"
-        fi
-
         TMP_DIR=$(mktemp -d)
-        RELEASE_JSON_PATH="$TMP_DIR/release.json"
-        echo "Fetching release metadata from: $RELEASE_API"
-        curl -fsSL \
-          -H "Accept: application/vnd.github+json" \
-          -H "Authorization: Bearer $GH_TOKEN" \
-          "$RELEASE_API" \
-          -o "$RELEASE_JSON_PATH"
+        ARCHIVE_PATH=$(find "$GITHUB_WORKSPACE/python-download" -maxdepth 1 -type f -name "*iOS-support*.tar.gz" | head -n 1)
 
-        ASSET_URL=$(python3 -c 'import json,re,sys; payload=json.load(open(sys.argv[1], encoding="utf-8")); pattern=re.compile(r"iOS-support.*\.tar\.gz$"); print(next((asset.get("browser_download_url","") for asset in payload.get("assets", []) if pattern.search(str(asset.get("name","")))), ""))' "$RELEASE_JSON_PATH")
-
-        if [ -z "$ASSET_URL" ]; then
-          echo "❌ Could not find iOS support archive in release assets."
-          python3 -c 'import json,sys; payload=json.load(open(sys.argv[1], encoding="utf-8")); [print(asset.get("name","")) for asset in payload.get("assets", [])]' "$RELEASE_JSON_PATH"
+        if [ -z "$ARCHIVE_PATH" ]; then
+          echo "❌ Could not find downloaded iOS support archive."
+          find "$GITHUB_WORKSPACE/python-download" -maxdepth 2 -print
           exit 1
         fi
-
-        echo "Downloading: $ASSET_URL"
-        ARCHIVE_PATH="$TMP_DIR/python-apple-support.tar.gz"
-        curl -fL "$ASSET_URL" -o "$ARCHIVE_PATH"
 
         EXTRACT_DIR="$TMP_DIR/extracted"
         mkdir -p "$EXTRACT_DIR"
@@ -76,38 +60,24 @@ jobs:
         ls -la "$GITHUB_WORKSPACE/Python.xcframework"
 
     - name: Download SwiftFFmpeg-iOS
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: robinraju/release-downloader@v1
+      with:
+        repository: tfourj/SwiftFFmpeg-iOS
+        latest: true
+        fileName: SwiftFFmpeg-iOS.zip
+        out-file-path: swiftffmpeg-download
+        extract: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Install SwiftFFmpeg-iOS
       run: |
         set -euo pipefail
 
-        RELEASE_API="https://api.github.com/repos/$SWIFTFFMPEG_IOS_REPO/releases/latest"
         TMP_DIR=$(mktemp -d)
-        RELEASE_JSON_PATH="$TMP_DIR/release.json"
-        EXTRACT_DIR="$TMP_DIR/extracted"
         TARGET_DIR="$GITHUB_WORKSPACE/../SwiftFFmpeg-iOS"
-
-        echo "Fetching release metadata from: $RELEASE_API"
-        curl -fsSL \
-          -H "Accept: application/vnd.github+json" \
-          -H "Authorization: Bearer $GH_TOKEN" \
-          "$RELEASE_API" \
-          -o "$RELEASE_JSON_PATH"
-
-        ASSET_URL=$(python3 -c 'import json,sys; payload=json.load(open(sys.argv[1], encoding="utf-8")); asset_name=sys.argv[2]; print(next((asset.get("browser_download_url","") for asset in payload.get("assets", []) if asset.get("name","") == asset_name), ""))' "$RELEASE_JSON_PATH" "$SWIFTFFMPEG_IOS_ASSET")
-
-        if [ -z "$ASSET_URL" ]; then
-          echo "❌ Could not find $SWIFTFFMPEG_IOS_ASSET in the latest SwiftFFmpeg-iOS release."
-          python3 -c 'import json,sys; payload=json.load(open(sys.argv[1], encoding="utf-8")); [print(asset.get("name","")) for asset in payload.get("assets", [])]' "$RELEASE_JSON_PATH"
-          exit 1
-        fi
-
-        echo "Downloading: $ASSET_URL"
-        ARCHIVE_PATH="$TMP_DIR/$SWIFTFFMPEG_IOS_ASSET"
-        curl -fL "$ASSET_URL" -o "$ARCHIVE_PATH"
-
+        EXTRACT_DIR="$TMP_DIR/extracted"
         mkdir -p "$EXTRACT_DIR"
-        unzip -q "$ARCHIVE_PATH" -d "$EXTRACT_DIR"
+        cp -R "$GITHUB_WORKSPACE/swiftffmpeg-download/." "$EXTRACT_DIR"
 
         SOURCE_DIR=""
         if [ -d "$EXTRACT_DIR/SwiftFFmpeg-iOS" ]; then
