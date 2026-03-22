@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="Palladium/Assets.xcassets/palladium_dark.imageset/palladium_dark.png" alt="Palladium Logo" width="200">
+<img src="Palladium/Resources/Assets.xcassets/palladium_dark.imageset/palladium_dark.png" alt="Palladium Logo" width="200">
 
 # Palladium
 
@@ -22,7 +22,7 @@ On-device iOS media downloader powered by `yt-dlp`, `ffmpeg`, and `PythonKit`.
 
 ## Download
 
-- TestFlight: coming soon
+- TestFlight: [Join here!](https://testflight.apple.com/join/y3nRxfpn)
 - AltStore PAL: coming soon
 - IPA
   - Stable: [GitHub Releases](https://github.com/tfourj/Palladium/releases)
