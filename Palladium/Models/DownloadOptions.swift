@@ -11,10 +11,10 @@ enum DownloadPreset: String, Codable, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .autoVideo: return "Video"
-        case .mute: return "Mute"
-        case .audio: return "Audio"
-        case .custom: return "Custom"
+        case .autoVideo: return String(localized: "download.preset.video")
+        case .mute: return String(localized: "download.preset.mute")
+        case .audio: return String(localized: "download.preset.audio")
+        case .custom: return String(localized: "common.custom")
         }
     }
 
@@ -41,9 +41,9 @@ enum PostDownloadAction: String, Codable, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .saveToPhotos: return "Save to Photos"
-        case .openShareSheet: return "Open Share Sheet"
-        case .saveToApplicationFolder: return "Save to App Folder"
+        case .saveToPhotos: return String(localized: "photos.action.save")
+        case .openShareSheet: return String(localized: "post_download.action.share.title")
+        case .saveToApplicationFolder: return String(localized: "post_download.action.save_folder.title")
         }
     }
 
@@ -66,10 +66,10 @@ enum AfterDownloadBehavior: String, Codable, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .ask: return "Ask"
-        case .openShareSheet: return "Open Share Sheet"
-        case .saveToPhotos: return "Save to Photos"
-        case .saveToApplicationFolder: return "Save to App Folder"
+        case .ask: return String(localized: "common.ask")
+        case .openShareSheet: return String(localized: "post_download.action.share.title")
+        case .saveToPhotos: return String(localized: "photos.action.save")
+        case .saveToApplicationFolder: return String(localized: "post_download.action.save_folder.title")
         }
     }
 
@@ -107,11 +107,11 @@ enum ShareSheetDownloadMode: String, Codable, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .ask: return "Ask"
-        case .autoVideo: return "Video"
-        case .audio: return "Audio"
-        case .mute: return "Mute"
-        case .custom: return "Custom"
+        case .ask: return String(localized: "common.ask")
+        case .autoVideo: return String(localized: "download.preset.video")
+        case .audio: return String(localized: "download.preset.audio")
+        case .mute: return String(localized: "download.preset.mute")
+        case .custom: return String(localized: "common.custom")
         }
     }
 
@@ -151,31 +151,31 @@ enum SubtitleLanguageOption: String, Codable, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .english:
-            return "English"
+            return String(localized: "subtitle.language.english")
         case .spanish:
-            return "Spanish"
+            return String(localized: "subtitle.language.spanish")
         case .french:
-            return "French"
+            return String(localized: "subtitle.language.french")
         case .german:
-            return "German"
+            return String(localized: "subtitle.language.german")
         case .italian:
-            return "Italian"
+            return String(localized: "subtitle.language.italian")
         case .portuguese:
-            return "Portuguese"
+            return String(localized: "subtitle.language.portuguese")
         case .japanese:
-            return "Japanese"
+            return String(localized: "subtitle.language.japanese")
         case .korean:
-            return "Korean"
+            return String(localized: "subtitle.language.korean")
         case .chinese:
-            return "Chinese"
+            return String(localized: "subtitle.language.chinese")
         case .arabic:
-            return "Arabic"
+            return String(localized: "subtitle.language.arabic")
         case .russian:
-            return "Russian"
+            return String(localized: "subtitle.language.russian")
         case .custom:
-            return "Custom"
+            return String(localized: "common.custom")
         case .allAvailable:
-            return "All Available"
+            return String(localized: "subtitle.language.all")
         }
     }
 

@@ -16,7 +16,7 @@ extension ContentView {
             storageSummary = try buildStorageManagementSummary()
         } catch {
             appendConsoleText("[palladium] failed to refresh storage summary: \(error.localizedDescription)\n", source: .app)
-            alertMessage = "Failed to refresh storage summary: \(error.localizedDescription)"
+            alertMessage = String(format: String(localized: "storage.error.refresh_summary"), error.localizedDescription)
             showAlert = true
         }
     }
@@ -27,10 +27,10 @@ extension ContentView {
             let removed = try clearDirectoryContents(at: try downloadsDirectoryURL())
             refreshStorageSummary()
             appendConsoleText("[palladium] cleared temporary download entries: \(removed)\n", source: .app)
-            showTemporaryToast(removed == 0 ? "Download folder already empty" : "Cleared download folder")
+            showTemporaryToast(removed == 0 ? String(localized: "storage.toast.downloads_empty") : String(localized: "storage.toast.downloads_cleared"))
         } catch {
             appendConsoleText("[palladium] failed to clear temporary downloads: \(error.localizedDescription)\n", source: .app)
-            alertMessage = "Failed to clear download folder: \(error.localizedDescription)"
+            alertMessage = String(format: String(localized: "storage.error.clear_downloads"), error.localizedDescription)
             showAlert = true
         }
     }
@@ -41,10 +41,10 @@ extension ContentView {
             let removed = try clearDirectoryContents(at: try cacheDirectoryURL())
             refreshStorageSummary()
             appendConsoleText("[palladium] cleared yt-dlp cache entries: \(removed)\n", source: .app)
-            showTemporaryToast(removed == 0 ? "Cache already empty" : "Cleared cache")
+            showTemporaryToast(removed == 0 ? String(localized: "storage.toast.cache_empty") : String(localized: "storage.toast.cache_cleared"))
         } catch {
             appendConsoleText("[palladium] failed to clear yt-dlp cache: \(error.localizedDescription)\n", source: .app)
-            alertMessage = "Failed to clear cache: \(error.localizedDescription)"
+            alertMessage = String(format: String(localized: "storage.error.clear_cache"), error.localizedDescription)
             showAlert = true
         }
     }
@@ -55,10 +55,10 @@ extension ContentView {
             let removed = try clearDirectoryContents(at: try savedDirectoryURL())
             refreshStorageSummary()
             appendConsoleText("[palladium] cleared saved download entries: \(removed)\n", source: .app)
-            showTemporaryToast(removed == 0 ? "Saved folder already empty" : "Cleared saved folder")
+            showTemporaryToast(removed == 0 ? String(localized: "storage.toast.saved_empty") : String(localized: "storage.toast.saved_cleared"))
         } catch {
             appendConsoleText("[palladium] failed to clear saved downloads: \(error.localizedDescription)\n", source: .app)
-            alertMessage = "Failed to clear saved folder: \(error.localizedDescription)"
+            alertMessage = String(format: String(localized: "storage.error.clear_saved"), error.localizedDescription)
             showAlert = true
         }
     }
@@ -69,10 +69,14 @@ extension ContentView {
             let removed = try removeDirectoryItems(olderThan: window.cutoffDate, at: try downloadsDirectoryURL())
             refreshStorageSummary()
             appendConsoleText("[palladium] pruned temporary download entries older than \(window.title): \(removed)\n", source: .app)
-            showTemporaryToast(removed == 0 ? "Nothing to remove" : "Removed \(removed) old item\(removed == 1 ? "" : "s")")
+            showTemporaryToast(
+                removed == 0
+                    ? String(localized: "storage.toast.nothing")
+                    : String(format: String(localized: "storage.toast.removed_old_items"), removed)
+            )
         } catch {
             appendConsoleText("[palladium] failed to prune temporary downloads: \(error.localizedDescription)\n", source: .app)
-            alertMessage = "Failed to remove old downloads: \(error.localizedDescription)"
+            alertMessage = String(format: String(localized: "storage.error.prune_downloads"), error.localizedDescription)
             showAlert = true
         }
     }
@@ -83,10 +87,14 @@ extension ContentView {
             let removed = try removeDirectoryItems(olderThan: window.cutoffDate, at: try cacheDirectoryURL())
             refreshStorageSummary()
             appendConsoleText("[palladium] pruned cache entries older than \(window.title): \(removed)\n", source: .app)
-            showTemporaryToast(removed == 0 ? "Nothing to remove" : "Removed \(removed) old item\(removed == 1 ? "" : "s")")
+            showTemporaryToast(
+                removed == 0
+                    ? String(localized: "storage.toast.nothing")
+                    : String(format: String(localized: "storage.toast.removed_old_items"), removed)
+            )
         } catch {
             appendConsoleText("[palladium] failed to prune yt-dlp cache: \(error.localizedDescription)\n", source: .app)
-            alertMessage = "Failed to remove old cache files: \(error.localizedDescription)"
+            alertMessage = String(format: String(localized: "storage.error.prune_cache"), error.localizedDescription)
             showAlert = true
         }
     }
@@ -97,19 +105,23 @@ extension ContentView {
             let removed = try removeDirectoryItems(olderThan: window.cutoffDate, at: try savedDirectoryURL())
             refreshStorageSummary()
             appendConsoleText("[palladium] pruned saved download entries older than \(window.title): \(removed)\n", source: .app)
-            showTemporaryToast(removed == 0 ? "Nothing to remove" : "Removed \(removed) old item\(removed == 1 ? "" : "s")")
+            showTemporaryToast(
+                removed == 0
+                    ? String(localized: "storage.toast.nothing")
+                    : String(format: String(localized: "storage.toast.removed_old_items"), removed)
+            )
         } catch {
             appendConsoleText("[palladium] failed to prune saved downloads: \(error.localizedDescription)\n", source: .app)
-            alertMessage = "Failed to remove old saved files: \(error.localizedDescription)"
+            alertMessage = String(format: String(localized: "storage.error.prune_saved"), error.localizedDescription)
             showAlert = true
         }
     }
 
     func buildStorageManagementSummary() throws -> StorageManagementSummary {
         StorageManagementSummary(
-            downloads: try summarizeDirectory(at: try downloadsDirectoryURL(), locationLabel: "Documents/Temp"),
-            saved: try summarizeDirectory(at: try savedDirectoryURL(), locationLabel: "Documents/Saved"),
-            cache: try summarizeDirectory(at: try cacheDirectoryURL(), locationLabel: "Library/Caches/yt-dlp")
+            downloads: try summarizeDirectory(at: try downloadsDirectoryURL(), locationLabel: String(localized: "storage.path.temp")),
+            saved: try summarizeDirectory(at: try savedDirectoryURL(), locationLabel: String(localized: "storage.path.saved")),
+            cache: try summarizeDirectory(at: try cacheDirectoryURL(), locationLabel: String(localized: "storage.path.cache"))
         )
     }
 

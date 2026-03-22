@@ -39,7 +39,7 @@ struct DownloadTabView: View {
                             .resizable()
                             .scaledToFit()
                             .frame(width: 56, height: 56)
-                        Text("Palladium")
+                        Text("app.name")
                             .font(.title.bold())
                             .foregroundStyle(primaryTextColor)
                     }
@@ -71,7 +71,7 @@ struct DownloadTabView: View {
                                 }
                             }
                             .buttonStyle(.plain)
-                            .accessibilityLabel("Open link history")
+                            .accessibilityLabel("history.open")
                         }
                     }
                 }
@@ -82,7 +82,7 @@ struct DownloadTabView: View {
                     VStack(alignment: .leading, spacing: 8) {
                         HStack(spacing: 8) {
                             ProgressView()
-                            Text("Downloading...")
+                            Text("download.status.running")
                                 .font(.footnote)
                                 .foregroundStyle(primaryTextColor)
                         }
@@ -103,7 +103,7 @@ struct DownloadTabView: View {
 
                 if let downloadErrorText, !downloadErrorText.isEmpty {
                     VStack(alignment: .leading, spacing: 6) {
-                        Text("Last Error")
+                        Text("download.error.last_title")
                             .font(.caption.weight(.semibold))
                             .foregroundStyle(.red)
 
@@ -123,7 +123,7 @@ struct DownloadTabView: View {
                 }
 
                 VStack(spacing: 10) {
-                    Picker("Preset", selection: $selectedPreset) {
+                    Picker("download.preset.title", selection: $selectedPreset) {
                         ForEach(DownloadPreset.allCases) { preset in
                             Text(preset.title).tag(preset)
                         }
@@ -144,7 +144,7 @@ struct DownloadTabView: View {
                                     .foregroundStyle(.blue)
 
                                 VStack(alignment: .leading, spacing: 2) {
-                                    Text("More options")
+                                    Text("download.options.title")
                                         .font(.subheadline.weight(.semibold))
                                         .foregroundStyle(primaryTextColor)
                                     Text(downloadOptionsSummary)
@@ -170,16 +170,16 @@ struct DownloadTabView: View {
                         if showDownloadOptions {
                             VStack(spacing: 8) {
                                 downloadOptionToggle(
-                                    title: "Download playlist",
-                                    subtitle: "Allow yt-dlp to fetch multiple items",
+                                    title: String(localized: "download.options.playlist.title"),
+                                    subtitle: String(localized: "download.options.playlist.help"),
                                     isOn: $downloadPlaylist
                                 )
 
                                 subtitleDownloadOptionRow
 
                                 downloadOptionToggle(
-                                    title: "Embed thumbnail",
-                                    subtitle: "Attach artwork to supported media files",
+                                    title: String(localized: "download.options.thumbnail.title"),
+                                    subtitle: String(localized: "download.options.thumbnail.help"),
                                     isOn: $embedThumbnail
                                 )
                             }
@@ -196,7 +196,7 @@ struct DownloadTabView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 8))
 
                     HStack(spacing: 8) {
-                        TextField("Enter video URL", text: $urlText)
+                        TextField("download.url.placeholder", text: $urlText)
                             .textInputAutocapitalization(.never)
                             .autocorrectionDisabled()
                             .foregroundStyle(primaryTextColor)
@@ -233,7 +233,7 @@ struct DownloadTabView: View {
                     }) {
                         HStack(spacing: 8) {
                             Image(systemName: isRunning ? "stop.circle.fill" : "arrow.down.circle.fill")
-                            Text(isRunning ? "Cancel" : "Download")
+                            Text(isRunning ? "common.cancel" : "tab.download")
                         }
                         .font(.headline)
                         .frame(maxWidth: .infinity)
@@ -318,10 +318,10 @@ struct DownloadTabView: View {
                             .foregroundStyle(downloadSubtitles ? .blue : primaryTextColor)
 
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("Download subtitles")
+                            Text("download.options.subtitles.title")
                                 .font(.subheadline.weight(.semibold))
                                 .foregroundStyle(primaryTextColor)
-                            Text("Save subtitle sidecars with the media")
+                            Text("download.options.subtitles.help")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                                 .multilineTextAlignment(.leading)
@@ -334,7 +334,7 @@ struct DownloadTabView: View {
                 .disabled(isRunning)
 
                 if downloadSubtitles {
-                    Picker("Subtitle language", selection: $subtitleLanguagePattern) {
+                    Picker("download.options.subtitles.language", selection: $subtitleLanguagePattern) {
                         ForEach(SubtitleLanguageOption.allCases) { option in
                             Text(option.title).tag(option.subtitlePattern)
                         }
@@ -347,7 +347,7 @@ struct DownloadTabView: View {
             }
 
             if downloadSubtitles, subtitleLanguagePattern == SubtitleLanguageOption.custom.subtitlePattern {
-                TextField("Subtitle pattern, e.g. en.*, es.*, zh-Hans", text: normalizedCustomSubtitlePattern)
+                TextField("download.options.subtitles.pattern", text: normalizedCustomSubtitlePattern)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
                     .foregroundStyle(primaryTextColor)
@@ -367,13 +367,17 @@ struct DownloadTabView: View {
     private var subtitleSummaryText: String {
         if subtitleLanguagePattern == SubtitleLanguageOption.custom.subtitlePattern {
             let trimmed = customSubtitleLanguagePattern.trimmingCharacters(in: .whitespacesAndNewlines)
-            return trimmed.isEmpty ? "Custom" : "Custom: \(trimmed)"
+            return trimmed.isEmpty
+                ? String(localized: "common.custom")
+                : String(format: String(localized: "download.custom.value"), trimmed)
         }
         if let option = selectedSubtitleOption {
             return option.title
         }
         let trimmed = subtitleLanguagePattern.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed.isEmpty ? "Custom" : "Custom: \(trimmed)"
+        return trimmed.isEmpty
+            ? String(localized: "common.custom")
+            : String(format: String(localized: "download.custom.value"), trimmed)
     }
 
     private var normalizedCustomSubtitlePattern: Binding<String> {
@@ -392,15 +396,15 @@ struct DownloadTabView: View {
     private var downloadOptionsSummary: String {
         var parts: [String] = []
         if downloadPlaylist {
-            parts.append("Playlist")
+            parts.append(String(localized: "download.options.playlist.short"))
         }
         if downloadSubtitles {
-            parts.append("Subtitles: \(subtitleSummaryText)")
+            parts.append(String(format: String(localized: "download.options.subtitles.value"), subtitleSummaryText))
         }
         if embedThumbnail {
-            parts.append("Embed thumbnail")
+            parts.append(String(localized: "download.options.thumbnail.title"))
         }
-        return parts.isEmpty ? "Playlist, subtitles, and thumbnail settings" : parts.joined(separator: " • ")
+        return parts.isEmpty ? String(localized: "download.options.summary.default") : parts.joined(separator: " • ")
     }
 
     @ViewBuilder
@@ -441,9 +445,9 @@ struct DownloadTabView: View {
             Group {
                 if historyEntries.isEmpty {
                     ContentUnavailableView(
-                        "No history yet",
+                        "history.empty.title",
                         systemImage: "clock",
-                        description: Text("Downloaded links will appear here.")
+                        description: Text("history.empty.subtitle")
                     )
                 } else {
                     List {
@@ -460,7 +464,7 @@ struct DownloadTabView: View {
                                 Button {
                                     onCopyHistoryLink(entry.url)
                                 } label: {
-                                    Label("Copy", systemImage: "doc.on.doc")
+                                    Label("common.copy", systemImage: "doc.on.doc")
                                 }
                                 .tint(.blue)
                             }
@@ -468,7 +472,7 @@ struct DownloadTabView: View {
                                 Button(role: .destructive) {
                                     onDeleteHistoryEntry(entry)
                                 } label: {
-                                    Label("Delete", systemImage: "trash")
+                                    Label("common.delete", systemImage: "trash")
                                 }
                             }
                         }
@@ -477,11 +481,11 @@ struct DownloadTabView: View {
                     .scrollContentBackground(.hidden)
                 }
             }
-            .navigationTitle("Link History")
+            .navigationTitle("history.title")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") {
+                    Button("common.done") {
                         showHistorySheet = false
                     }
                 }

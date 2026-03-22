@@ -8,23 +8,23 @@ struct ConsoleTabView: View {
 
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("console")
+                Text("console.title")
                     .font(.title2.bold())
                 Spacer()
-                Button("Clear") {
+                Button("common.clear") {
                     logStore.clearAll()
                 }
                 .buttonStyle(.bordered)
             }
 
-            Picker("Source", selection: $logStore.selectedFilter) {
+            Picker("console.source.title", selection: $logStore.selectedFilter) {
                 ForEach(ConsoleLogFilter.allCases) { filter in
                     Text(filter.title).tag(filter)
                 }
             }
             .pickerStyle(.segmented)
 
-            Text("showing \(visibleEntries.count) of \(logStore.entryCount) lines")
+            Text(String(format: String(localized: "console.lines.visible"), visibleEntries.count, logStore.entryCount))
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
@@ -32,7 +32,7 @@ struct ConsoleTabView: View {
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 4) {
                         if visibleEntries.isEmpty {
-                            Text("No logs yet.")
+                            Text("console.empty")
                                 .foregroundStyle(.secondary)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         } else {

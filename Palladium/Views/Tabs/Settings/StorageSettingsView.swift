@@ -19,7 +19,7 @@ struct StorageSettingsView: View {
         Form {
             Section {
                 summaryRow(
-                    title: "Temporary Downloads",
+                    title: String(localized: "settings.storage.downloads.title"),
                     subtitle: summary.downloads.locationLabel,
                     systemImage: "tray.full.fill",
                     accentColor: .blue,
@@ -27,7 +27,7 @@ struct StorageSettingsView: View {
                 )
 
                 summaryRow(
-                    title: "Saved Files",
+                    title: String(localized: "settings.storage.saved.title"),
                     subtitle: summary.saved.locationLabel,
                     systemImage: "folder.fill",
                     accentColor: .green,
@@ -35,7 +35,7 @@ struct StorageSettingsView: View {
                 )
 
                 summaryRow(
-                    title: "yt-dlp Cache",
+                    title: String(localized: "settings.storage.cache.title"),
                     subtitle: summary.cache.locationLabel,
                     systemImage: "internaldrive.fill",
                     accentColor: .orange,
@@ -43,27 +43,27 @@ struct StorageSettingsView: View {
                 )
 
                 HStack {
-                    Text("Total")
+                    Text("settings.storage.total")
                     Spacer()
                     Text(summary.formattedTotalSize)
                         .foregroundStyle(.secondary)
                 }
 
-                Button("Refresh Usage", action: onRefresh)
+                Button("settings.storage.refresh", action: onRefresh)
                     .disabled(isBusy)
             } header: {
-                Text("Overview")
+                Text("settings.storage.overview.title")
             } footer: {
-                Text("Temporary Downloads stores active and recent run folders. Saved Files keeps copies made with Save to App Folder.")
+                Text("settings.storage.overview.help")
             }
 
             Section {
-                Button("Clear download folder", role: .destructive) {
+                Button("storage.action.clear_downloads", role: .destructive) {
                     showClearDownloadsConfirmation = true
                 }
                 .disabled(isBusy)
 
-                Menu("Remove older than") {
+                Menu("storage.prune.title") {
                     ForEach(StoragePruneWindow.allCases) { window in
                         Button(window.title) {
                             onPruneDownloads(window)
@@ -72,18 +72,18 @@ struct StorageSettingsView: View {
                 }
                 .disabled(isBusy)
             } header: {
-                Text("Temporary Downloads")
+                Text("settings.storage.downloads.title")
             } footer: {
-                Text("This only affects Palladium's temporary download folder. Use it to remove stale run folders without touching Saved Files.")
+                Text("settings.storage.downloads.help")
             }
 
             Section {
-                Button("Clear saved folder", role: .destructive) {
+                Button("storage.action.clear_saved", role: .destructive) {
                     showClearSavedConfirmation = true
                 }
                 .disabled(isBusy)
 
-                Menu("Remove older than") {
+                Menu("storage.prune.title") {
                     ForEach(StoragePruneWindow.allCases) { window in
                         Button(window.title) {
                             onPruneSaved(window)
@@ -92,16 +92,16 @@ struct StorageSettingsView: View {
                 }
                 .disabled(isBusy)
             } header: {
-                Text("Saved Files")
+                Text("settings.storage.saved.title")
             } footer: {
-                Text("Saved Files contains downloads you explicitly kept. Clearing this section removes those copies from Palladium storage.")
+                Text("settings.storage.saved.help")
             }
 
             Section {
-                Button("Clear cache", role: .destructive, action: onClearCache)
+                Button("storage.action.clear_cache", role: .destructive, action: onClearCache)
                     .disabled(isBusy)
 
-                Menu("Remove older than") {
+                Menu("storage.prune.title") {
                     ForEach(StoragePruneWindow.allCases) { window in
                         Button(window.title) {
                             onPruneCache(window)
@@ -110,32 +110,32 @@ struct StorageSettingsView: View {
                 }
                 .disabled(isBusy)
             } header: {
-                Text("yt-dlp Cache")
+                Text("settings.storage.cache.title")
             } footer: {
-                Text("The cache stores yt-dlp metadata and web assets. Clearing it may make the next run a little slower.")
+                Text("settings.storage.cache.help")
             }
 
             if isBusy {
                 Section {
-                    Text("Storage actions are disabled while a download or package task is running.")
+                    Text("settings.storage.disabled_help")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
             }
         }
-        .navigationTitle("Download Storage")
+        .navigationTitle("settings.storage.title")
         .navigationBarTitleDisplayMode(.inline)
-        .alert("Clear the temporary download folder?", isPresented: $showClearDownloadsConfirmation) {
-            Button("Cancel", role: .cancel) {}
-            Button("Clear", role: .destructive, action: onClearDownloads)
+        .alert("storage.confirm.downloads.title", isPresented: $showClearDownloadsConfirmation) {
+            Button("common.cancel", role: .cancel) {}
+            Button("common.clear", role: .destructive, action: onClearDownloads)
         } message: {
-            Text("This removes everything in Palladium/Documents/Temp, including old run folders.")
+            Text("storage.confirm.downloads.message")
         }
-        .alert("Clear the saved folder?", isPresented: $showClearSavedConfirmation) {
-            Button("Cancel", role: .cancel) {}
-            Button("Clear", role: .destructive, action: onClearSaved)
+        .alert("storage.confirm.saved.title", isPresented: $showClearSavedConfirmation) {
+            Button("common.cancel", role: .cancel) {}
+            Button("common.clear", role: .destructive, action: onClearSaved)
         } message: {
-            Text("This removes everything in Palladium/Documents/Saved.")
+            Text("storage.confirm.saved.message")
         }
         .onAppear(perform: onAppear)
     }
@@ -183,9 +183,9 @@ struct StorageManagementSummary {
     let cache: StorageLocationSummary
 
     static let empty = StorageManagementSummary(
-        downloads: .empty(locationLabel: "Documents/Temp"),
-        saved: .empty(locationLabel: "Documents/Saved"),
-        cache: .empty(locationLabel: "Library/Caches/yt-dlp")
+        downloads: .empty(locationLabel: String(localized: "storage.path.temp")),
+        saved: .empty(locationLabel: String(localized: "storage.path.saved")),
+        cache: .empty(locationLabel: String(localized: "storage.path.cache"))
     )
 
     var totalBytes: Int64 {
@@ -220,7 +220,10 @@ struct StorageLocationSummary {
     }
 
     var itemDescription: String {
-        "\(itemCount) item\(itemCount == 1 ? "" : "s")"
+        if itemCount == 1 {
+            return String(localized: "storage.items.one")
+        }
+        return String(format: String(localized: "storage.items.many"), itemCount)
     }
 }
 
@@ -235,13 +238,13 @@ enum StoragePruneWindow: String, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .oneDay:
-            return "1 day"
+            return String(localized: "storage.prune.day_1")
         case .sevenDays:
-            return "7 days"
+            return String(localized: "storage.prune.day_7")
         case .thirtyDays:
-            return "30 days"
+            return String(localized: "storage.prune.day_30")
         case .ninetyDays:
-            return "90 days"
+            return String(localized: "storage.prune.day_90")
         }
     }
 

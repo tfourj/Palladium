@@ -6,16 +6,16 @@ struct NotificationsSettingsView: View {
 
     var body: some View {
         Form {
-            Section("Download Notifications") {
-                Toggle("Notify when download completes in background", isOn: $notificationsEnabled)
+            Section("settings.notifications.section") {
+                Toggle("settings.notifications.toggle_single", isOn: $notificationsEnabled)
                     .disabled(isRunning)
 
-                Text("A notification is sent when a download finishes and the app is not active.")
+                Text("settings.notifications.help")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
         }
-        .navigationTitle("Notifications")
+        .navigationTitle("settings.notifications.title")
         .navigationBarTitleDisplayMode(.inline)
     }
 }

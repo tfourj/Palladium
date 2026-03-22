@@ -18,14 +18,14 @@ struct PackagesSettingsView: View {
     let onAppear: () -> Void
 
     @State private var showCustomVersionSheet = false
-    @State private var ytDlpSelectedVersion = "__latest__"
-    @State private var webkitJSISelectedVersion = "__latest__"
-    @State private var pipSelectedVersion = "__latest__"
+    @State private var ytDlpSelectedVersion = Self.latestSelectionToken
+    @State private var webkitJSISelectedVersion = Self.latestSelectionToken
+    @State private var pipSelectedVersion = Self.latestSelectionToken
 
     var body: some View {
         Form {
-            Section("Status") {
-                Text("status: \(packageStatusText)")
+            Section("packages.status.title") {
+                Text(String(format: String(localized: "packages.status.value"), packageStatusText))
                     .font(.subheadline.monospaced())
 
                 if isRunning {
@@ -38,29 +38,29 @@ struct PackagesSettingsView: View {
                 }
             }
 
-            Section("Installed Versions") {
+            Section("packages.installed.title") {
                 Text(versionsText)
                     .font(.system(.footnote, design: .monospaced))
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
 
-            Section("Update Summary") {
+            Section("packages.summary.title") {
                 Text(updatesSummaryText)
                     .font(.system(.footnote, design: .monospaced))
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
 
-            Section("Actions") {
+            Section("packages.actions.title") {
                 if isRunning {
                     Button(action: onCancel) {
-                        Text("Cancel")
+                        Text("common.cancel")
                             .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.borderedProminent)
                     .tint(.red)
                 } else {
                     Button(action: onRefreshVersions) {
-                        Text("Check for Updates")
+                        Text("packages.check_updates")
                             .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.borderedProminent)
@@ -70,7 +70,7 @@ struct PackagesSettingsView: View {
                     guard !isRunning, updatesAvailable else { return }
                     onUpdatePackages()
                 } label: {
-                    Text(isRunning ? "Running..." : "Update Packages")
+                    Text(isRunning ? "packages.status.running" : "packages.update")
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
@@ -85,12 +85,12 @@ struct PackagesSettingsView: View {
                     }
                 )
 
-                Text("Long press Update Packages to set custom package versions.")
+                Text("packages.update.long_press_help")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
         }
-        .navigationTitle("Package Manager")
+        .navigationTitle("settings.packages.title")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear(perform: onAppear)
         .sheet(isPresented: $showCustomVersionSheet) {
@@ -101,7 +101,7 @@ struct PackagesSettingsView: View {
     private var customVersionSheet: some View {
         NavigationStack {
             Form {
-                Section("Target Versions") {
+                Section("packages.custom_update.targets") {
                     packageVersionPicker(
                         title: "yt-dlp",
                         packageName: "yt-dlp",
@@ -119,41 +119,41 @@ struct PackagesSettingsView: View {
                     )
                 }
 
-                Section("Version Source") {
+                Section("packages.custom_update.source") {
                     Button(action: onFetchPackageVersions) {
                         HStack {
                             if isLoadingPackageVersions {
                                 ProgressView()
                                     .controlSize(.small)
                             }
-                            Text(isLoadingPackageVersions ? "Loading versions..." : "Reload Available Versions")
+                            Text(isLoadingPackageVersions ? "packages.loading_versions" : "packages.reload_versions")
                         }
                     }
                     .disabled(isRunning || isLoadingPackageVersions)
 
                     if !isLoadingPackageVersions {
-                        Text("Uses pip index versions for each package.")
+                        Text("packages.custom_update.source_help")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
                 }
 
                 Section {
-                    Text("Select a version to pin for update or downgrade. Choose Latest available to skip pinning a package.")
+                    Text("packages.custom_update.help")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
             }
-            .navigationTitle("Custom Update")
+            .navigationTitle("packages.custom_update.title")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("Cancel") {
+                    Button("common.cancel") {
                         showCustomVersionSheet = false
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Apply") {
+                    Button("common.apply") {
                         let ytDlp = normalizeSelection(ytDlpSelectedVersion)
                         let webkit = normalizeSelection(webkitJSISelectedVersion)
                         let pip = normalizeSelection(pipSelectedVersion)
@@ -207,7 +207,7 @@ struct PackagesSettingsView: View {
     ) -> some View {
         let options = availableVersions(for: packageName)
         Picker(title, selection: selection) {
-            Text("Latest available")
+            Text("packages.latest")
                 .tag(Self.latestSelectionToken)
             ForEach(options, id: \.self) { version in
                 Text(version).tag(version)
@@ -238,11 +238,11 @@ struct PackagesSettingsView: View {
 
     private var progressStatusMessage: String {
         if packageStatusText == "updating" {
-            return "Updating packages..."
+            return String(localized: "packages.status.updating")
         }
         if packageStatusText == "indexing" {
-            return "Loading package versions..."
+            return String(localized: "packages.status.loading_index")
         }
-        return "Checking versions..."
+        return String(localized: "packages.status.checking")
     }
 }

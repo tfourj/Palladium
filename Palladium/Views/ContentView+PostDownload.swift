@@ -11,7 +11,7 @@ import AVFoundation
 extension ContentView {
     var downloadCompleteActionSheet: some View {
         VStack(spacing: 20) {
-            Text("Download Complete")
+            Text("post_download.title")
                 .font(.title2)
                 .fontWeight(.bold)
                 .padding(.top)
@@ -33,8 +33,8 @@ extension ContentView {
 
             VStack(spacing: 14) {
                 downloadCompleteActionButton(
-                    title: completedResultIsCollection ? "Share All" : "Open Share Sheet",
-                    subtitle: completedResultIsCollection ? "Share every downloaded file" : "Share or save with other apps",
+                    title: completedResultIsCollection ? String(localized: "post_download.action.share_all.title") : String(localized: "post_download.action.share.title"),
+                    subtitle: completedResultIsCollection ? String(localized: "post_download.action.share_all.help") : String(localized: "post_download.action.share.help"),
                     icon: "square.and.arrow.up",
                     color: .blue
                 ) {
@@ -43,7 +43,7 @@ extension ContentView {
 
                 if shouldOfferPhotosAction {
                     downloadCompleteActionButton(
-                        title: "Save to Photos",
+                        title: String(localized: "photos.action.save"),
                         subtitle: saveToPhotosButtonSubtitle,
                         icon: "photo.on.rectangle",
                         color: .green,
@@ -54,10 +54,10 @@ extension ContentView {
                 }
 
                 downloadCompleteActionButton(
-                    title: "Save to App Folder",
+                    title: String(localized: "post_download.action.save_folder.title"),
                     subtitle: completedResultIsCollection
-                        ? "Keep the whole download folder in Palladium/Saved"
-                        : "Keep a copy in Palladium/Saved",
+                        ? String(localized: "post_download.action.save_folder.collection_help")
+                        : String(localized: "post_download.action.save_folder.help"),
                     icon: "folder.badge.plus",
                     color: .orange
                 ) {
@@ -67,7 +67,7 @@ extension ContentView {
             .padding(.horizontal)
 
             Button(action: dismissDownloadActionSheet) {
-                Text("Cancel")
+                Text("common.cancel")
                     .font(.headline)
                     .foregroundStyle(.red)
                     .padding()
@@ -147,24 +147,24 @@ extension ContentView {
 
     var downloadCompleteSummaryText: String {
         guard let result = completedDownloadResult else {
-            return "Choose what to do with the downloaded files."
+            return String(localized: "post_download.summary.collection")
         }
         if result.isCollection {
-            return "This download produced \(result.items.count) files. Photos import is disabled for collections and subtitle sidecars."
+            return String(format: String(localized: "post_download.summary.collection_count"), result.items.count)
         }
-        return "Choose what to do with the downloaded file."
+        return String(localized: "post_download.summary.single")
     }
 
     var saveToPhotosButtonSubtitle: String {
         switch completedPhotosCompatibility {
         case .checking:
-            return "Checking compatibility..."
+            return String(localized: "photos.compatibility.checking")
         case .compatible(let mediaType):
             switch mediaType {
             case .video:
-                return "Import video into Photos library"
+                return String(localized: "photos.action.import_video")
             case .image:
-                return "Import image into Photos library"
+                return String(localized: "photos.action.import_image")
             }
         case .incompatible(let reason):
             return reason
@@ -185,11 +185,11 @@ extension ContentView {
                 if case .incompatible(let details) = compatibility {
                     reason = details
                 } else {
-                    reason = "Could not verify media compatibility."
+                    reason = String(localized: "photos.compatibility.unknown")
                 }
                 await MainActor.run {
                     reopenDownloadActionAfterAlert = true
-                    alertMessage = "iOS Photos cannot import this file: \(reason)"
+                    alertMessage = String(format: String(localized: "photos.error.import_reason"), reason)
                     showAlert = true
                 }
                 return
@@ -199,7 +199,7 @@ extension ContentView {
             guard permission == .authorized || permission == .limited else {
                 await MainActor.run {
                     reopenDownloadActionAfterAlert = true
-                    alertMessage = "Photo library permission was denied."
+                    alertMessage = String(localized: "photos.error.permission")
                     showAlert = true
                 }
                 return
@@ -218,12 +218,12 @@ extension ContentView {
                     reopenDownloadActionAfterAlert = false
                     alertMessage = nil
                     showAlert = false
-                    showTemporaryToast("Saved to Photos")
+                    showTemporaryToast(String(localized: "photos.toast.saved"))
                 }
             } catch {
                 await MainActor.run {
                     reopenDownloadActionAfterAlert = true
-                    alertMessage = "Failed to save to Photos: \(error.localizedDescription)"
+                    alertMessage = String(format: String(localized: "photos.error.save"), error.localizedDescription)
                     showAlert = true
                 }
             }
@@ -236,7 +236,9 @@ extension ContentView {
         let videoExtensions: Set<String> = ["mp4", "mov", "m4v", "mkv", "webm", "avi", "flv", "ts", "mpeg", "mpg"]
 
         if imageExtensions.contains(ext) {
-            return isImageIOSCompatible(fileURL) ? .compatible(.image) : .incompatible("Unsupported image format (\(ext)).")
+            return isImageIOSCompatible(fileURL)
+                ? .compatible(.image)
+                : .incompatible(String(format: String(localized: "photos.error.unsupported_image_format"), ext))
         }
 
         if videoExtensions.contains(ext) {
@@ -252,14 +254,16 @@ extension ContentView {
             return fallbackVideo
         }
 
-        return .incompatible("Unsupported format (\(ext.isEmpty ? "unknown" : ext)).")
+        return .incompatible(
+            String(format: String(localized: "photos.error.unsupported_format"), ext.isEmpty ? "unknown" : ext)
+        )
     }
 
     func videoCompatibilityState(for fileURL: URL) async -> PhotosCompatibilityState {
         let ext = fileURL.pathExtension.lowercased()
         let compatibleExtensions: Set<String> = ["mp4", "mov", "m4v"]
         guard compatibleExtensions.contains(ext) else {
-            return .incompatible("Only MP4, MOV, or M4V can be saved.")
+            return .incompatible(String(localized: "photos.error.video_format"))
         }
 
         if UIVideoAtPathIsCompatibleWithSavedPhotosAlbum(fileURL.path) {
@@ -270,7 +274,7 @@ extension ContentView {
             let asset = AVAsset(url: fileURL)
             let tracks = try await asset.loadTracks(withMediaType: .video)
             guard !tracks.isEmpty else {
-                return .incompatible("No video track found.")
+                return .incompatible(String(localized: "photos.error.no_video_track"))
             }
 
             for track in tracks {
@@ -285,9 +289,9 @@ extension ContentView {
                 }
             }
 
-            return .incompatible("Video codec must be H.264 or H.265.")
+            return .incompatible(String(localized: "photos.error.codec"))
         } catch {
-            return .incompatible("Failed to inspect media codec.")
+            return .incompatible(String(localized: "photos.error.inspect_codec"))
         }
     }
 
@@ -323,7 +327,7 @@ extension ContentView {
                 throw NSError(
                     domain: "Palladium",
                     code: 1,
-                    userInfo: [NSLocalizedDescriptionKey: "No downloaded files were available."]
+                    userInfo: [NSLocalizedDescriptionKey: String(localized: "post_download.error.no_files")]
                 )
             }
 
@@ -334,12 +338,16 @@ extension ContentView {
             alertMessage = nil
             showAlert = false
             if result.isCollection {
-                showTemporaryToast("Saved folder: \(destination.lastPathComponent)")
+                showTemporaryToast(
+                    String(format: String(localized: "post_download.toast.saved_folder_name"), destination.lastPathComponent)
+                )
             } else {
-                showTemporaryToast("Saved to app folder: \(destination.lastPathComponent)")
+                showTemporaryToast(
+                    String(format: String(localized: "post_download.toast.saved_folder"), destination.lastPathComponent)
+                )
             }
         } catch {
-            alertMessage = "Failed to save to app folder: \(error.localizedDescription)"
+            alertMessage = String(format: String(localized: "post_download.error.save_folder"), error.localizedDescription)
             showAlert = true
         }
     }
@@ -349,7 +357,7 @@ extension ContentView {
         case .saveToPhotos:
             guard let fileURL = result.photosCandidateURL else {
                 reopenDownloadActionAfterAlert = true
-                alertMessage = "Photos is only available for a single media file."
+                alertMessage = String(localized: "photos.error.single_only")
                 showAlert = true
                 return
             }
@@ -399,7 +407,7 @@ struct CompletedDownloadResult {
            let sanitized = sanitizedFolderName(folderURL.lastPathComponent) {
             return sanitized
         }
-        return "download"
+        return String(localized: "download.fallback_title")
     }
 
     private func sanitizedFolderName(_ rawValue: String?) -> String? {

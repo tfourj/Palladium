@@ -27,14 +27,14 @@ struct SettingsAboutView: View {
                         .scaledToFit()
                         .frame(width: 80, height: 80)
 
-                    Text("Palladium")
+                    Text("app.name")
                         .font(.title2.bold())
                     
                     Text(appVersion)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                     
-                    Text("Powered by yt-dlp and ffmpeg")
+                    Text("about.powered_by")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
@@ -43,11 +43,11 @@ struct SettingsAboutView: View {
                 .padding(.vertical, 12)
             }
 
-            Section("Developer") {
+            Section("about.developer.title") {
                 HStack {
-                    Text("Developer")
+                    Text("about.developer.title")
                     Spacer()
-                    Text("TfourJ")
+                    Text("about.developer.name")
                         .foregroundStyle(.secondary)
                 }
                 
@@ -58,7 +58,7 @@ struct SettingsAboutView: View {
                 }
             }
 
-            Section("Links") {
+            Section("about.links.title") {
                 if let discordURL {
                     Link(destination: discordURL) {
                         linkRow("Discord")
@@ -71,7 +71,7 @@ struct SettingsAboutView: View {
                 }
             }
         }
-        .navigationTitle("About")
+        .navigationTitle("settings.about.title")
         .navigationBarTitleDisplayMode(.inline)
     }
 

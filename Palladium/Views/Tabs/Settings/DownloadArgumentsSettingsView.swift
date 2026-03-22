@@ -7,39 +7,39 @@ struct DownloadArgumentsSettingsView: View {
 
     var body: some View {
         Form {
-            Section("Custom Preset Args") {
-                TextField("--format best --no-playlist", text: $customArgsText, axis: .vertical)
+            Section("download.args.custom.title") {
+                TextField("downloadargs.custom", text: $customArgsText, axis: .vertical)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
                     .font(.system(.footnote, design: .monospaced))
                     .disabled(isRunning)
 
-                Text("Used only when Preset is Custom.")
+                Text("download.args.custom.help")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
 
-            Section("Global Extra Args") {
-                TextField("--embed-subs --write-subs", text: $extraArgsText, axis: .vertical)
+            Section("download.args.global.title") {
+                TextField("downloadargs.global", text: $extraArgsText, axis: .vertical)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
                     .font(.system(.footnote, design: .monospaced))
                     .disabled(isRunning)
 
-                Text("Appended for every run.")
+                Text("download.args.global.help")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
 
-            Section("Examples") {
+            Section("download.args.examples") {
                 HStack {
-                    exampleButton("mp4", value: DownloadPreset.autoVideo.defaultArguments)
-                    exampleButton("mp3", value: DownloadPreset.audio.defaultArguments)
-                    exampleButton("mute", value: DownloadPreset.mute.defaultArguments)
+                    exampleButton(String(localized: "download.args.example.mp4"), value: DownloadPreset.autoVideo.defaultArguments)
+                    exampleButton(String(localized: "download.args.example.mp3"), value: DownloadPreset.audio.defaultArguments)
+                    exampleButton(String(localized: "download.args.example.mute"), value: DownloadPreset.mute.defaultArguments)
                 }
             }
         }
-        .navigationTitle("Download Arguments")
+        .navigationTitle("settings.download_args.title")
         .navigationBarTitleDisplayMode(.inline)
     }
 

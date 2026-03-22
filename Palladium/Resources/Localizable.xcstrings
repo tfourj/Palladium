@@ -1,0 +1,2342 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "%lld" : {
+
+    },
+    "about.developer.name" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TfourJ"
+          }
+        }
+      }
+    },
+    "about.developer.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Developer"
+          }
+        }
+      }
+    },
+    "about.links.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Links"
+          }
+        }
+      }
+    },
+    "about.powered_by" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Powered by yt-dlp and ffmpeg"
+          }
+        }
+      }
+    },
+    "app.name" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Palladium"
+          }
+        }
+      }
+    },
+    "appearance.dark" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dark Mode"
+          }
+        }
+      }
+    },
+    "appearance.light" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Light Mode"
+          }
+        }
+      }
+    },
+    "appearance.system" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "System"
+          }
+        }
+      }
+    },
+    "common.all" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All"
+          }
+        }
+      }
+    },
+    "common.apply" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apply"
+          }
+        }
+      }
+    },
+    "common.ask" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ask"
+          }
+        }
+      }
+    },
+    "common.cancel" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        }
+      }
+    },
+    "common.clear" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear"
+          }
+        }
+      }
+    },
+    "common.copy" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy"
+          }
+        }
+      }
+    },
+    "common.custom" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Custom"
+          }
+        }
+      }
+    },
+    "common.delete" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete"
+          }
+        }
+      }
+    },
+    "common.done" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        }
+      }
+    },
+    "common.ok" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        }
+      }
+    },
+    "common.result" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Result"
+          }
+        }
+      }
+    },
+    "console.empty" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No logs yet."
+          }
+        }
+      }
+    },
+    "console.lines.visible" : {
+
+    },
+    "console.source.app" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App"
+          }
+        }
+      }
+    },
+    "console.source.ffmpeg" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FFmpeg"
+          }
+        }
+      }
+    },
+    "console.source.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Source"
+          }
+        }
+      }
+    },
+    "console.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "console"
+          }
+        }
+      }
+    },
+    "download.args.custom.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Used only when Preset is Custom."
+          }
+        }
+      }
+    },
+    "download.args.custom.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Custom Preset Args"
+          }
+        }
+      }
+    },
+    "download.args.example.mp3" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "mp3"
+          }
+        }
+      }
+    },
+    "download.args.example.mp4" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "mp4"
+          }
+        }
+      }
+    },
+    "download.args.example.mute" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "mute"
+          }
+        }
+      }
+    },
+    "download.args.examples" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Examples"
+          }
+        }
+      }
+    },
+    "download.args.global.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Appended for every run."
+          }
+        }
+      }
+    },
+    "download.args.global.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Global Extra Args"
+          }
+        }
+      }
+    },
+    "download.custom.value" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Custom: %@"
+          }
+        }
+      }
+    },
+    "download.error.last_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last Error"
+          }
+        }
+      }
+    },
+    "download.error.no_files_found" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download finished but no files were found."
+          }
+        }
+      }
+    },
+    "download.error.prepare_folder" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to prepare download folder."
+          }
+        }
+      }
+    },
+    "download.fallback_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "download"
+          }
+        }
+      }
+    },
+    "download.mode.audio.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Extract audio track"
+          }
+        }
+      }
+    },
+    "download.mode.audio.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio Only"
+          }
+        }
+      }
+    },
+    "download.mode.custom.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use custom preset arguments"
+          }
+        }
+      }
+    },
+    "download.mode.mute.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video without audio"
+          }
+        }
+      }
+    },
+    "download.mode.mute.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video (Muted)"
+          }
+        }
+      }
+    },
+    "download.mode.sheet.subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How would you like to download this content?"
+          }
+        }
+      }
+    },
+    "download.mode.sheet.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose Download Mode"
+          }
+        }
+      }
+    },
+    "download.mode.video.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Best quality available"
+          }
+        }
+      }
+    },
+    "download.options.playlist.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allow yt-dlp to fetch multiple items"
+          }
+        }
+      }
+    },
+    "download.options.playlist.short" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Playlist"
+          }
+        }
+      }
+    },
+    "download.options.playlist.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download playlist"
+          }
+        }
+      }
+    },
+    "download.options.subtitles.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save subtitle sidecars with the media"
+          }
+        }
+      }
+    },
+    "download.options.subtitles.language" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subtitle language"
+          }
+        }
+      }
+    },
+    "download.options.subtitles.pattern" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subtitle pattern, e.g. en.*, es.*, zh-Hans"
+          }
+        }
+      }
+    },
+    "download.options.subtitles.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download subtitles"
+          }
+        }
+      }
+    },
+    "download.options.subtitles.value" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subtitles: %@"
+          }
+        }
+      }
+    },
+    "download.options.summary.default" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Playlist, subtitles, and thumbnail settings"
+          }
+        }
+      }
+    },
+    "download.options.thumbnail.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attach artwork to supported media files"
+          }
+        }
+      }
+    },
+    "download.options.thumbnail.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Embed thumbnail"
+          }
+        }
+      }
+    },
+    "download.options.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More options"
+          }
+        }
+      }
+    },
+    "download.preset.audio" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio"
+          }
+        }
+      }
+    },
+    "download.preset.mute" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mute"
+          }
+        }
+      }
+    },
+    "download.preset.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preset"
+          }
+        }
+      }
+    },
+    "download.preset.video" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video"
+          }
+        }
+      }
+    },
+    "download.prompt.idle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter a URL and tap Download."
+          }
+        }
+      }
+    },
+    "download.status.cancelled" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "download cancelled"
+          }
+        }
+      }
+    },
+    "download.status.cancelling" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelling..."
+          }
+        }
+      }
+    },
+    "download.status.complete" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "download complete"
+          }
+        }
+      }
+    },
+    "download.status.failed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "download failed"
+          }
+        }
+      }
+    },
+    "download.status.merge_finished" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Merge finished"
+          }
+        }
+      }
+    },
+    "download.status.merging" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Merging audio and video..."
+          }
+        }
+      }
+    },
+    "download.status.processing" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Processing with ffmpeg..."
+          }
+        }
+      }
+    },
+    "download.status.processing_percent" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Processing with ffmpeg... %.1f%%"
+          }
+        }
+      }
+    },
+    "download.status.processing_percent_speed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Processing with ffmpeg... %1$.1f%% (%2$@)"
+          }
+        }
+      }
+    },
+    "download.status.running" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloading..."
+          }
+        }
+      }
+    },
+    "download.url.placeholder" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter video URL"
+          }
+        }
+      }
+    },
+    "downloadargs.custom" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "—format best —no-playlist"
+          }
+        }
+      }
+    },
+    "downloadargs.global" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "--embed-subs --write-subs"
+          }
+        }
+      }
+    },
+    "history.empty.subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloaded links will appear here."
+          }
+        }
+      }
+    },
+    "history.empty.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No history yet"
+          }
+        }
+      }
+    },
+    "history.open" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open link history"
+          }
+        }
+      }
+    },
+    "history.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link History"
+          }
+        }
+      }
+    },
+    "packages.actions.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actions"
+          }
+        }
+      }
+    },
+    "packages.check_updates" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check for Updates"
+          }
+        }
+      }
+    },
+    "packages.custom_update.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select a version to pin for update or downgrade. Choose Latest available to skip pinning a package."
+          }
+        }
+      }
+    },
+    "packages.custom_update.source" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version Source"
+          }
+        }
+      }
+    },
+    "packages.custom_update.source_help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uses pip index versions for each package."
+          }
+        }
+      }
+    },
+    "packages.custom_update.targets" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Target Versions"
+          }
+        }
+      }
+    },
+    "packages.custom_update.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Custom Update"
+          }
+        }
+      }
+    },
+    "packages.installed.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Installed Versions"
+          }
+        }
+      }
+    },
+    "packages.latest" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Latest available"
+          }
+        }
+      }
+    },
+    "packages.loading_versions" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading versions..."
+          }
+        }
+      }
+    },
+    "packages.reload_versions" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reload Available Versions"
+          }
+        }
+      }
+    },
+    "packages.status.checking" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Checking versions..."
+          }
+        }
+      }
+    },
+    "packages.status.loading_index" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading package versions..."
+          }
+        }
+      }
+    },
+    "packages.status.running" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Running..."
+          }
+        }
+      }
+    },
+    "packages.status.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Status"
+          }
+        }
+      }
+    },
+    "packages.status.updating" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Updating packages..."
+          }
+        }
+      }
+    },
+    "packages.status.value" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "status: %@"
+          }
+        }
+      }
+    },
+    "packages.summary.idle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Updates not checked yet."
+          }
+        }
+      }
+    },
+    "packages.summary.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update Summary"
+          }
+        }
+      }
+    },
+    "packages.tab_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "package manager"
+          }
+        }
+      }
+    },
+    "packages.update" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update Packages"
+          }
+        }
+      }
+    },
+    "packages.update.long_press_help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Long press Update Packages to set custom package versions."
+          }
+        }
+      }
+    },
+    "photos.action.import_image" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import image into Photos library"
+          }
+        }
+      }
+    },
+    "photos.action.import_video" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import video into Photos library"
+          }
+        }
+      }
+    },
+    "photos.action.save" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save to Photos"
+          }
+        }
+      }
+    },
+    "photos.compatibility.checking" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Checking compatibility..."
+          }
+        }
+      }
+    },
+    "photos.compatibility.unknown" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not verify media compatibility."
+          }
+        }
+      }
+    },
+    "photos.error.codec" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video codec must be H.264 or H.265."
+          }
+        }
+      }
+    },
+    "photos.error.import_reason" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOS Photos cannot import this file: %@"
+          }
+        }
+      }
+    },
+    "photos.error.inspect_codec" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to inspect media codec."
+          }
+        }
+      }
+    },
+    "photos.error.no_video_track" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No video track found."
+          }
+        }
+      }
+    },
+    "photos.error.permission" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photo library permission was denied."
+          }
+        }
+      }
+    },
+    "photos.error.save" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to save to Photos: %@"
+          }
+        }
+      }
+    },
+    "photos.error.single_only" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photos is only available for a single media file."
+          }
+        }
+      }
+    },
+    "photos.error.unsupported_format" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unsupported format (%@)."
+          }
+        }
+      }
+    },
+    "photos.error.unsupported_image_format" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unsupported image format (%@)."
+          }
+        }
+      }
+    },
+    "photos.error.video_format" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only MP4, MOV, or M4V can be saved."
+          }
+        }
+      }
+    },
+    "photos.toast.saved" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved to Photos"
+          }
+        }
+      }
+    },
+    "post_download.action.save_folder.collection_help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep the whole download folder in Palladium/Saved"
+          }
+        }
+      }
+    },
+    "post_download.action.save_folder.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep a copy in Palladium/Saved"
+          }
+        }
+      }
+    },
+    "post_download.action.save_folder.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save to App Folder"
+          }
+        }
+      }
+    },
+    "post_download.action.share_all.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share every downloaded file"
+          }
+        }
+      }
+    },
+    "post_download.action.share_all.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share All"
+          }
+        }
+      }
+    },
+    "post_download.action.share.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share or save with other apps"
+          }
+        }
+      }
+    },
+    "post_download.action.share.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Share Sheet"
+          }
+        }
+      }
+    },
+    "post_download.error.no_files" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No downloaded files were available."
+          }
+        }
+      }
+    },
+    "post_download.error.save_folder" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to save to app folder: %@"
+          }
+        }
+      }
+    },
+    "post_download.summary.collection" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose what to do with the downloaded files."
+          }
+        }
+      }
+    },
+    "post_download.summary.collection_count" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This download produced %lld files. Photos import is disabled for collections and subtitle sidecars."
+          }
+        }
+      }
+    },
+    "post_download.summary.single" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose what to do with the downloaded file."
+          }
+        }
+      }
+    },
+    "post_download.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download Complete"
+          }
+        }
+      }
+    },
+    "post_download.toast.saved_folder" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved to app folder: %@"
+          }
+        }
+      }
+    },
+    "post_download.toast.saved_folder_name" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved folder: %@"
+          }
+        }
+      }
+    },
+    "settings.about.subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version and quick help"
+          }
+        }
+      }
+    },
+    "settings.about.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About"
+          }
+        }
+      }
+    },
+    "settings.after_download.ask_user" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ask user what to do after download"
+          }
+        }
+      }
+    },
+    "settings.after_download.behavior" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Behavior"
+          }
+        }
+      }
+    },
+    "settings.after_download.default_action" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Default Action"
+          }
+        }
+      }
+    },
+    "settings.after_download.default_picker" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When ask-user is off"
+          }
+        }
+      }
+    },
+    "settings.after_download.disabled_help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disabled while ask-user mode is on."
+          }
+        }
+      }
+    },
+    "settings.after_download.enabled_help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This action runs automatically after each successful download."
+          }
+        }
+      }
+    },
+    "settings.download_args.subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Custom and global yt-dlp args"
+          }
+        }
+      }
+    },
+    "settings.download_args.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download Arguments"
+          }
+        }
+      }
+    },
+    "settings.general.section" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "General"
+          }
+        }
+      }
+    },
+    "settings.maintenance.section" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maintenance"
+          }
+        }
+      }
+    },
+    "settings.notifications.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A notification is sent when a download finishes and the app is not active."
+          }
+        }
+      }
+    },
+    "settings.notifications.section" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download Notifications"
+          }
+        }
+      }
+    },
+    "settings.notifications.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notifications"
+          }
+        }
+      }
+    },
+    "settings.notifications.toggle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notify when downloads finish in background"
+          }
+        }
+      }
+    },
+    "settings.notifications.toggle_single" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notify when download completes in background"
+          }
+        }
+      }
+    },
+    "settings.packages.subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check and update yt-dlp and pip"
+          }
+        }
+      }
+    },
+    "settings.packages.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Package Manager"
+          }
+        }
+      }
+    },
+    "settings.storage.cache.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The cache stores yt-dlp metadata and web assets. Clearing it may make the next run a little slower."
+          }
+        }
+      }
+    },
+    "settings.storage.cache.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "yt-dlp Cache"
+          }
+        }
+      }
+    },
+    "settings.storage.disabled_help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Storage actions are disabled while a download or package task is running."
+          }
+        }
+      }
+    },
+    "settings.storage.downloads.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This only affects Palladium's temporary download folder. Use it to remove stale run folders without touching Saved Files."
+          }
+        }
+      }
+    },
+    "settings.storage.downloads.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Temporary Downloads"
+          }
+        }
+      }
+    },
+    "settings.storage.overview.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Temporary Downloads stores active and recent run folders. Saved Files keeps copies made with Save to App Folder."
+          }
+        }
+      }
+    },
+    "settings.storage.overview.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Overview"
+          }
+        }
+      }
+    },
+    "settings.storage.refresh" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Refresh Usage"
+          }
+        }
+      }
+    },
+    "settings.storage.saved.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved Files contains downloads you explicitly kept. Clearing this section removes those copies from Palladium storage."
+          }
+        }
+      }
+    },
+    "settings.storage.saved.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved Files"
+          }
+        }
+      }
+    },
+    "settings.storage.summary.total" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ across temp, saved, and cache"
+          }
+        }
+      }
+    },
+    "settings.storage.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download Storage"
+          }
+        }
+      }
+    },
+    "settings.storage.total" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total"
+          }
+        }
+      }
+    },
+    "settings.ui.after_download.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ask shows the same action picker after each successful download. Other options run automatically."
+          }
+        }
+      }
+    },
+    "settings.ui.after_download.picker" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "After download"
+          }
+        }
+      }
+    },
+    "settings.ui.after_download.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "After Download"
+          }
+        }
+      }
+    },
+    "settings.ui.appearance.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "System uses the phone setting by default."
+          }
+        }
+      }
+    },
+    "settings.ui.appearance.picker" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App theme"
+          }
+        }
+      }
+    },
+    "settings.ui.appearance.section" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Appearance"
+          }
+        }
+      }
+    },
+    "settings.ui.history.enable" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enable link history"
+          }
+        }
+      }
+    },
+    "settings.ui.history.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stores up to 10 recent links with mode and title."
+          }
+        }
+      }
+    },
+    "settings.ui.history.section" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "History"
+          }
+        }
+      }
+    },
+    "settings.ui.modes.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Normal download mode matches the main picker on the Download tab. If memory is off, it resets to Video when the app launches."
+          }
+        }
+      }
+    },
+    "settings.ui.modes.normal" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Normal download mode"
+          }
+        }
+      }
+    },
+    "settings.ui.modes.remember" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remember picker options"
+          }
+        }
+      }
+    },
+    "settings.ui.modes.section" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download Modes"
+          }
+        }
+      }
+    },
+    "settings.ui.modes.share_sheet" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share sheet mode"
+          }
+        }
+      }
+    },
+    "settings.ui.paste.auto_download" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auto download on paste"
+          }
+        }
+      }
+    },
+    "settings.ui.paste.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Starts download immediately after pasting a URL from the Download tab."
+          }
+        }
+      }
+    },
+    "settings.ui.paste.section" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paste"
+          }
+        }
+      }
+    },
+    "settings.ui.progress.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shows most live yt-dlp, Palladium, and downloader log lines in the main progress label while a download is running."
+          }
+        }
+      }
+    },
+    "settings.ui.progress.section" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Progress"
+          }
+        }
+      }
+    },
+    "settings.ui.progress.verbose" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show verbose progress lines"
+          }
+        }
+      }
+    },
+    "settings.ui.subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download behavior and share sheet flow"
+          }
+        }
+      }
+    },
+    "settings.ui.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "User Interface"
+          }
+        }
+      }
+    },
+    "storage.action.clear_cache" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear cache"
+          }
+        }
+      }
+    },
+    "storage.action.clear_downloads" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear download folder"
+          }
+        }
+      }
+    },
+    "storage.action.clear_saved" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear saved folder"
+          }
+        }
+      }
+    },
+    "storage.confirm.downloads.message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This removes everything in Palladium/Documents/Temp, including old run folders."
+          }
+        }
+      }
+    },
+    "storage.confirm.downloads.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear the temporary download folder?"
+          }
+        }
+      }
+    },
+    "storage.confirm.saved.message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This removes everything in Palladium/Documents/Saved."
+          }
+        }
+      }
+    },
+    "storage.confirm.saved.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear the saved folder?"
+          }
+        }
+      }
+    },
+    "storage.error.clear_cache" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to clear cache: %@"
+          }
+        }
+      }
+    },
+    "storage.error.clear_downloads" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to clear download folder: %@"
+          }
+        }
+      }
+    },
+    "storage.error.clear_saved" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to clear saved folder: %@"
+          }
+        }
+      }
+    },
+    "storage.error.prune_cache" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to remove old cache files: %@"
+          }
+        }
+      }
+    },
+    "storage.error.prune_downloads" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to remove old downloads: %@"
+          }
+        }
+      }
+    },
+    "storage.error.prune_saved" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to remove old saved files: %@"
+          }
+        }
+      }
+    },
+    "storage.error.refresh_summary" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to refresh storage summary: %@"
+          }
+        }
+      }
+    },
+    "storage.items.many" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld items"
+          }
+        }
+      }
+    },
+    "storage.items.one" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 item"
+          }
+        }
+      }
+    },
+    "storage.path.cache" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Library/Caches/yt-dlp"
+          }
+        }
+      }
+    },
+    "storage.path.saved" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Documents/Saved"
+          }
+        }
+      }
+    },
+    "storage.path.temp" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Documents/Temp"
+          }
+        }
+      }
+    },
+    "storage.prune.day_1" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 day"
+          }
+        }
+      }
+    },
+    "storage.prune.day_7" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "7 days"
+          }
+        }
+      }
+    },
+    "storage.prune.day_30" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 days"
+          }
+        }
+      }
+    },
+    "storage.prune.day_90" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "90 days"
+          }
+        }
+      }
+    },
+    "storage.prune.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove older than"
+          }
+        }
+      }
+    },
+    "storage.toast.cache_cleared" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cleared cache"
+          }
+        }
+      }
+    },
+    "storage.toast.cache_empty" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cache already empty"
+          }
+        }
+      }
+    },
+    "storage.toast.downloads_cleared" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cleared download folder"
+          }
+        }
+      }
+    },
+    "storage.toast.downloads_empty" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download folder already empty"
+          }
+        }
+      }
+    },
+    "storage.toast.nothing" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing to remove"
+          }
+        }
+      }
+    },
+    "storage.toast.removed_old_items" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Removed %lld old item(s)"
+          }
+        }
+      }
+    },
+    "storage.toast.saved_cleared" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cleared saved folder"
+          }
+        }
+      }
+    },
+    "storage.toast.saved_empty" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved folder already empty"
+          }
+        }
+      }
+    },
+    "subtitle.language.all" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All Available"
+          }
+        }
+      }
+    },
+    "subtitle.language.arabic" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arabic"
+          }
+        }
+      }
+    },
+    "subtitle.language.chinese" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chinese"
+          }
+        }
+      }
+    },
+    "subtitle.language.english" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "English"
+          }
+        }
+      }
+    },
+    "subtitle.language.french" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "French"
+          }
+        }
+      }
+    },
+    "subtitle.language.german" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "German"
+          }
+        }
+      }
+    },
+    "subtitle.language.italian" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Italian"
+          }
+        }
+      }
+    },
+    "subtitle.language.japanese" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Japanese"
+          }
+        }
+      }
+    },
+    "subtitle.language.korean" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Korean"
+          }
+        }
+      }
+    },
+    "subtitle.language.portuguese" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Portuguese"
+          }
+        }
+      }
+    },
+    "subtitle.language.russian" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Russian"
+          }
+        }
+      }
+    },
+    "subtitle.language.spanish" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spanish"
+          }
+        }
+      }
+    },
+    "tab.console" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Console"
+          }
+        }
+      }
+    },
+    "tab.download" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download"
+          }
+        }
+      }
+    },
+    "tab.settings" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.1"
+}

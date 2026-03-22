@@ -11,10 +11,10 @@ enum ConsoleLogFilter: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .all: return "All"
-        case .app: return "App"
-        case .ffmpeg: return "FFmpeg"
-        case .download: return "Download"
+        case .all: return String(localized: "common.all")
+        case .app: return String(localized: "console.source.app")
+        case .ffmpeg: return String(localized: "console.source.ffmpeg")
+        case .download: return String(localized: "tab.download")
         }
     }
 }

@@ -16,7 +16,7 @@ struct UseInterfaceSettingsView: View {
     var body: some View {
         Form {
             Section {
-                Picker("Normal download mode", selection: $selectedPreset) {
+                Picker("settings.ui.modes.normal", selection: $selectedPreset) {
                     ForEach(DownloadPreset.allCases) { preset in
                         Text(preset.title).tag(preset)
                     }
@@ -24,7 +24,7 @@ struct UseInterfaceSettingsView: View {
                 .pickerStyle(.menu)
                 .disabled(isRunning)
 
-                Picker("Share sheet mode", selection: $shareSheetDownloadMode) {
+                Picker("settings.ui.modes.share_sheet", selection: $shareSheetDownloadMode) {
                     ForEach(ShareSheetDownloadMode.allCases) { mode in
                         Text(mode.title).tag(mode)
                     }
@@ -32,16 +32,16 @@ struct UseInterfaceSettingsView: View {
                 .pickerStyle(.menu)
                 .disabled(isRunning)
 
-                Toggle("Remember picker options", isOn: $rememberSelectedPreset)
+                Toggle("settings.ui.modes.remember", isOn: $rememberSelectedPreset)
                     .disabled(isRunning)
             } header: {
-                Text("Download Modes")
+                Text("settings.ui.modes.section")
             } footer: {
-                Text("Normal download mode matches the main picker on the Download tab. If memory is off, it resets to Video when the app launches.")
+                Text("settings.ui.modes.help")
             }
 
             Section {
-                Picker("After download", selection: $afterDownloadBehavior) {
+                Picker("settings.ui.after_download.picker", selection: $afterDownloadBehavior) {
                     ForEach(AfterDownloadBehavior.allCases) { behavior in
                         Label(behavior.title, systemImage: behavior.icon).tag(behavior)
                     }
@@ -49,13 +49,13 @@ struct UseInterfaceSettingsView: View {
                 .pickerStyle(.menu)
                 .disabled(isRunning)
             } header: {
-                Text("After Download")
+                Text("settings.ui.after_download.title")
             } footer: {
-                Text("Ask shows the same action picker after each successful download. Other options run automatically.")
+                Text("settings.ui.after_download.help")
             }
 
             Section {
-                Picker("App theme", selection: $appAppearanceMode) {
+                Picker("settings.ui.appearance.picker", selection: $appAppearanceMode) {
                     ForEach(AppAppearanceMode.allCases) { mode in
                         Text(mode.title).tag(mode)
                     }
@@ -63,44 +63,44 @@ struct UseInterfaceSettingsView: View {
                 .pickerStyle(.menu)
                 .disabled(isRunning)
             } header: {
-                Text("Appearance")
+                Text("settings.ui.appearance.section")
             } footer: {
-                Text("System uses the phone setting by default.")
+                Text("settings.ui.appearance.help")
             }
 
             Section {
-                Toggle("Auto download on paste", isOn: $autoDownloadOnPaste)
+                Toggle("settings.ui.paste.auto_download", isOn: $autoDownloadOnPaste)
                     .disabled(isRunning)
             } header: {
-                Text("Paste")
+                Text("settings.ui.paste.section")
             } footer: {
-                Text("Starts download immediately after pasting a URL from the Download tab.")
+                Text("settings.ui.paste.help")
             }
 
             Section {
-                Toggle("Show verbose progress lines", isOn: $detailedProgressEnabled)
+                Toggle("settings.ui.progress.verbose", isOn: $detailedProgressEnabled)
                     .disabled(isRunning)
             } header: {
-                Text("Progress")
+                Text("settings.ui.progress.section")
             } footer: {
-                Text("Shows most live yt-dlp, Palladium, and downloader log lines in the main progress label while a download is running.")
+                Text("settings.ui.progress.help")
             }
 
             Section {
-                Toggle("Enable link history", isOn: $linkHistoryEnabled)
+                Toggle("settings.ui.history.enable", isOn: $linkHistoryEnabled)
                     .disabled(isRunning)
             } header: {
-                Text("History")
+                Text("settings.ui.history.section")
             } footer: {
-                Text("Stores up to 10 recent links with mode and title.")
+                Text("settings.ui.history.help")
             }
 
-            Section("Notifications") {
-                Toggle("Notify when downloads finish in background", isOn: $notificationsEnabled)
+            Section("settings.notifications.title") {
+                Toggle("settings.notifications.toggle", isOn: $notificationsEnabled)
                     .disabled(isRunning)
             }
         }
-        .navigationTitle("User Interface")
+        .navigationTitle("settings.ui.title")
         .navigationBarTitleDisplayMode(.inline)
     }
 }

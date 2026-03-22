@@ -48,11 +48,11 @@ struct SettingsTabView: View {
     var body: some View {
         NavigationStack {
             List {
-                Section(header: Text("General")) {
+                Section(header: Text("settings.general.section")) {
                     NavigationLink(value: SettingsRoute.useInterface) {
                         settingsRow(
-                            title: "User Interface",
-                            subtitle: "Download behavior and share sheet flow",
+                            title: String(localized: "settings.ui.title"),
+                            subtitle: String(localized: "settings.ui.subtitle"),
                             icon: "slider.horizontal.3",
                             color: .green
                         )
@@ -60,8 +60,8 @@ struct SettingsTabView: View {
 
                     NavigationLink(value: SettingsRoute.downloadArguments) {
                         settingsRow(
-                            title: "Download Arguments",
-                            subtitle: "Custom and global yt-dlp args",
+                            title: String(localized: "settings.download_args.title"),
+                            subtitle: String(localized: "settings.download_args.subtitle"),
                             icon: "terminal",
                             color: .blue
                         )
@@ -69,37 +69,37 @@ struct SettingsTabView: View {
 
                     NavigationLink(value: SettingsRoute.storage) {
                         settingsRow(
-                            title: "Download Storage",
-                            subtitle: "\(storageSummary.formattedTotalSize) across temp, saved, and cache",
+                            title: String(localized: "settings.storage.title"),
+                            subtitle: String(format: String(localized: "settings.storage.summary.total"), storageSummary.formattedTotalSize),
                             icon: "internaldrive.fill",
                             color: .teal
                         )
                     }
                 }
 
-                Section(header: Text("Maintenance")) {
+                Section(header: Text("settings.maintenance.section")) {
                     NavigationLink(value: SettingsRoute.packages) {
                         settingsRow(
-                            title: "Package Manager",
-                            subtitle: "Check and update yt-dlp and pip",
+                            title: String(localized: "settings.packages.title"),
+                            subtitle: String(localized: "settings.packages.subtitle"),
                             icon: "shippingbox.fill",
                             color: .indigo
                         )
                     }
                 }
 
-                Section(header: Text("About")) {
+                Section(header: Text("settings.about.title")) {
                     NavigationLink(value: SettingsRoute.about) {
                         settingsRow(
-                            title: "About",
-                            subtitle: "Version and quick help",
+                            title: String(localized: "settings.about.title"),
+                            subtitle: String(localized: "settings.about.subtitle"),
                             icon: "info.circle.fill",
                             color: .orange
                         )
                     }
                 }
             }
-            .navigationTitle("Settings")
+            .navigationTitle("tab.settings")
             .navigationBarTitleDisplayMode(.inline)
             .onAppear(perform: onRefreshStorage)
             .navigationDestination(for: SettingsRoute.self) { route in

@@ -14,12 +14,12 @@ extension ContentView {
 
     var shareSheetModePickerSheet: some View {
         VStack(spacing: 20) {
-            Text("Choose Download Mode")
+            Text("download.mode.sheet.title")
                 .font(.title2)
                 .fontWeight(.bold)
                 .padding(.top)
 
-            Text("How would you like to download this content?")
+            Text("download.mode.sheet.subtitle")
                 .font(.body)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
@@ -27,29 +27,29 @@ extension ContentView {
 
             VStack(spacing: 14) {
                 shareSheetModeButton(
-                    title: "Video",
-                    subtitle: "Best quality available",
+                    title: String(localized: "download.preset.video"),
+                    subtitle: String(localized: "download.mode.video.help"),
                     icon: "wand.and.stars",
                     color: .blue,
                     preset: .autoVideo
                 )
                 shareSheetModeButton(
-                    title: "Audio Only",
-                    subtitle: "Extract audio track",
+                    title: String(localized: "download.mode.audio.title"),
+                    subtitle: String(localized: "download.mode.audio.help"),
                     icon: "music.note",
                     color: .green,
                     preset: .audio
                 )
                 shareSheetModeButton(
-                    title: "Video (Muted)",
-                    subtitle: "Video without audio",
+                    title: String(localized: "download.mode.mute.title"),
+                    subtitle: String(localized: "download.mode.mute.help"),
                     icon: "speaker.slash",
                     color: .orange,
                     preset: .mute
                 )
                 shareSheetModeButton(
-                    title: "Custom",
-                    subtitle: "Use custom preset arguments",
+                    title: String(localized: "common.custom"),
+                    subtitle: String(localized: "download.mode.custom.help"),
                     icon: "slider.horizontal.3",
                     color: .indigo,
                     preset: .custom
@@ -61,7 +61,7 @@ extension ContentView {
                 showShareSheetDownloadPicker = false
                 shareSheetURL = ""
             }) {
-                Text("Cancel")
+                Text("common.cancel")
                     .font(.headline)
                     .foregroundStyle(.red)
                     .padding()
@@ -153,14 +153,14 @@ extension ContentView {
             appendConsoleText("[palladium] run output folder: \(runOutputURL.lastPathComponent)\n")
         } catch {
             appendConsoleText("[palladium] failed to create run output folder: \(error.localizedDescription)\n")
-            downloadErrorText = "Failed to prepare download folder."
-            progressText = "download failed"
+            downloadErrorText = String(localized: "download.error.prepare_folder")
+            progressText = String(localized: "download.status.failed")
             return
         }
 
         isRunning = true
         statusText = "running"
-        progressText = "Downloading..."
+        progressText = String(localized: "download.status.running")
         downloadCancelRequested = false
         lastDownloadProgressPercent = nil
         ffmpegProgressDurationSeconds = nil
@@ -240,9 +240,9 @@ extension ContentView {
             pendingDownloadProgressLine = ""
             statusText = outcome.statusText
             if outcome.statusText == "cancelled" {
-                progressText = "download cancelled"
+                progressText = String(localized: "download.status.cancelled")
             } else {
-                progressText = outcome.statusText == "success" ? "download complete" : "download failed"
+                progressText = outcome.statusText == "success" ? String(localized: "download.status.complete") : String(localized: "download.status.failed")
             }
             if outcome.statusText == "error" {
                 downloadErrorText = downloadErrorDetails(from: outcome)
@@ -292,7 +292,7 @@ extension ContentView {
                     completedPhotosCompatibility = .checking
                     completedPhotosCompatibility = await evaluatePhotosCompatibility(for: photosCandidateURL)
                 } else {
-                    completedPhotosCompatibility = .incompatible("Photos is only available for a single media file.")
+                    completedPhotosCompatibility = .incompatible(String(localized: "photos.error.single_only"))
                 }
 
                 if afterDownloadBehaviorAtStart == .ask {
@@ -307,7 +307,7 @@ extension ContentView {
                     handlePostDownloadAction(action, for: result)
                 }
             } else if outcome.statusText == "success" {
-                downloadErrorText = "Download finished but no files were found."
+                downloadErrorText = String(localized: "download.error.no_files_found")
             }
         }
         currentDownloadTask = task
@@ -354,7 +354,7 @@ extension ContentView {
         currentDownloadTask?.cancel()
         pendingDownloadProgressLine = ""
         ffmpegProgressDurationSeconds = nil
-        progressText = "Cancelling..."
+        progressText = String(localized: "download.status.cancelling")
     }
 
     func updateProgress(from chunk: String) {
@@ -389,12 +389,12 @@ extension ContentView {
                     lastDownloadProgressPercent = progressPercent
                     let clampedPercent = min(max(progressPercent, 0), 100)
                     if let speedText = update.speedText {
-                        progressText = String(format: "Processing with ffmpeg... %.1f%% (%@)", clampedPercent, speedText)
+                        progressText = String(format: String(localized: "download.status.processing_percent_speed"), clampedPercent, speedText)
                     } else {
-                        progressText = String(format: "Processing with ffmpeg... %.1f%%", clampedPercent)
+                        progressText = String(format: String(localized: "download.status.processing_percent"), clampedPercent)
                     }
                 } else {
-                    progressText = "Processing with ffmpeg..."
+                    progressText = String(localized: "download.status.processing")
                 }
             }
         } else if detailedProgressEnabled, shouldShowDetailedProgressLine(trimmed) {
@@ -405,15 +405,15 @@ extension ContentView {
         } else if trimmed.contains("[Merger]") {
             progressText = trimmed
         } else if trimmed.contains("yt-dlp Popen running ffmpeg") {
-            progressText = "Merging audio and video..."
+            progressText = String(localized: "download.status.merging")
         } else if trimmed.contains("yt-dlp Popen ffmpeg finished") {
-            progressText = "Merge finished"
+            progressText = String(localized: "download.status.merge_finished")
         } else if trimmed.contains("[palladium] downloaded file:") {
-            progressText = "download complete"
+            progressText = String(localized: "download.status.complete")
         } else if trimmed.hasPrefix("[ExtractAudio]") {
             progressText = trimmed
         } else if trimmed.hasPrefix("[palladium] running yt-dlp") {
-            progressText = "Downloading..."
+            progressText = String(localized: "download.status.running")
             lastDownloadProgressPercent = nil
         }
     }

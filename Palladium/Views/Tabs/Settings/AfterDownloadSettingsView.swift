@@ -7,13 +7,13 @@ struct AfterDownloadSettingsView: View {
 
     var body: some View {
         Form {
-            Section("Behavior") {
-                Toggle("Ask user what to do after download", isOn: $askUserAfterDownload)
+            Section("settings.after_download.behavior") {
+                Toggle("settings.after_download.ask_user", isOn: $askUserAfterDownload)
                     .disabled(isRunning)
             }
 
-            Section("Default Action") {
-                Picker("When ask-user is off", selection: $selectedPostDownloadAction) {
+            Section("settings.after_download.default_action") {
+                Picker("settings.after_download.default_picker", selection: $selectedPostDownloadAction) {
                     ForEach(PostDownloadAction.allCases) { action in
                         Label(action.title, systemImage: action.icon).tag(action)
                     }
@@ -21,13 +21,13 @@ struct AfterDownloadSettingsView: View {
                 .disabled(isRunning || askUserAfterDownload)
 
                 Text(askUserAfterDownload
-                     ? "Disabled while ask-user mode is on."
-                     : "This action runs automatically after each successful download.")
+                     ? "settings.after_download.disabled_help"
+                     : "settings.after_download.enabled_help")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
         }
-        .navigationTitle("After Download")
+        .navigationTitle("settings.ui.after_download.title")
         .navigationBarTitleDisplayMode(.inline)
     }
 }

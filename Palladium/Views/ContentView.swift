@@ -64,7 +64,7 @@ struct ContentView: View {
     @State var isRunning = false
     @State var statusText = "idle"
     @State var urlText: String
-    @State var progressText = "Enter a URL and tap Download."
+    @State var progressText = String(localized: "download.prompt.idle")
     @State var downloadErrorText: String?
     @State var selectedPreset: DownloadPreset
     @State var customArgsText: String
@@ -87,7 +87,7 @@ struct ContentView: View {
     @State var packageStatusText = "idle"
     @State var versionsText: String
     @State var packageUpdatesAvailable = false
-    @State var packageUpdatesSummaryText = "Updates not checked yet."
+    @State var packageUpdatesSummaryText = String(localized: "packages.summary.idle")
     @State var availablePackageVersions: [String: [String]] = [:]
     @State var isLoadingPackageVersions = false
     @State var isPackageRunning = false
@@ -165,7 +165,7 @@ struct ContentView: View {
                     onCopyHistoryLink: copyHistoryLink
                 )
                 .tabItem {
-                    Label("Download", systemImage: "arrow.down.circle")
+                    Label(String(localized: "tab.download"), systemImage: "arrow.down.circle")
                 }
                 .tag(AppTab.download)
 
@@ -206,13 +206,13 @@ struct ContentView: View {
                     onOpenStorageManager: refreshStorageSummary
                 )
                 .tabItem {
-                    Label("Settings", systemImage: "slider.horizontal.3")
+                    Label(String(localized: "tab.settings"), systemImage: "slider.horizontal.3")
                 }
                 .tag(AppTab.settings)
 
                 ConsoleTabView(logStore: consoleLogStore)
                     .tabItem {
-                        Label("Console", systemImage: "terminal")
+                        Label(String(localized: "tab.console"), systemImage: "terminal")
                     }
                     .tag(AppTab.console)
             }
@@ -293,8 +293,8 @@ struct ContentView: View {
             downloadCompleteActionSheet
                 .interactiveDismissDisabled(true)
         }
-        .alert("Result", isPresented: $showAlert) {
-            Button("OK", role: .cancel) {
+        .alert(String(localized: "common.result"), isPresented: $showAlert) {
+            Button(String(localized: "common.ok"), role: .cancel) {
                 if reopenDownloadActionAfterAlert, completedDownloadResult != nil {
                     reopenDownloadActionAfterAlert = false
                     showDownloadActionSheet = true

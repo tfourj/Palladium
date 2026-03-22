@@ -11,16 +11,16 @@ struct PackagesTabView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("package manager")
+            Text("packages.tab_title")
                 .font(.title2.bold())
 
-            Text("status: \(packageStatusText)")
+            Text(String(format: String(localized: "packages.status.value"), packageStatusText))
                 .font(.subheadline.monospaced())
 
             if isRunning {
                 HStack(spacing: 8) {
                     ProgressView()
-                    Text(packageStatusText == "updating" ? "Updating packages..." : "Checking versions...")
+                    Text(packageStatusText == "updating" ? "packages.status.updating" : "packages.status.checking")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }
@@ -42,14 +42,14 @@ struct PackagesTabView: View {
 
             HStack(spacing: 12) {
                 Button(action: onRefreshVersions) {
-                    Text(isRunning ? "Running..." : "Check for Updates")
+                    Text(isRunning ? "packages.status.running" : "packages.check_updates")
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
                 .disabled(isRunning)
 
                 Button(action: onUpdatePackages) {
-                    Text(isRunning ? "Running..." : "Update Packages")
+                    Text(isRunning ? "packages.status.running" : "packages.update")
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
