@@ -388,10 +388,12 @@ extension ContentView {
                 if let progressPercent = update.percent {
                     lastDownloadProgressPercent = progressPercent
                     let clampedPercent = min(max(progressPercent, 0), 100)
+                    let baseProcessingText = String(localized: "download.status.processing")
+                    let percentText = String(format: "%.1f%%", locale: .current, clampedPercent)
                     if let speedText = update.speedText {
-                        progressText = String(format: String(localized: "download.status.processing_percent_speed"), clampedPercent, speedText)
+                        progressText = "\(baseProcessingText) \(percentText) (\(speedText))"
                     } else {
-                        progressText = String(format: String(localized: "download.status.processing_percent"), clampedPercent)
+                        progressText = "\(baseProcessingText) \(percentText)"
                     }
                 } else {
                     progressText = String(localized: "download.status.processing")

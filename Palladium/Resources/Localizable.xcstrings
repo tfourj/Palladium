@@ -724,26 +724,6 @@
         }
       }
     },
-    "download.status.processing_percent" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Processing with ffmpeg... %.1f%%"
-          }
-        }
-      }
-    },
-    "download.status.processing_percent_speed" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Processing with ffmpeg... %1$.1f%% (%2$@)"
-          }
-        }
-      }
-    },
     "download.status.running" : {
       "localizations" : {
         "en" : {
