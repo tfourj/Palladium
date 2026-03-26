@@ -56,9 +56,12 @@ struct ContentView: View {
     static let subtitleLanguagePatternDefaultsKey = "palladium.subtitleLanguagePattern"
     static let customSubtitleLanguagePatternDefaultsKey = "palladium.customSubtitleLanguagePattern"
     static let linkHistoryEnabledDefaultsKey = "palladium.linkHistoryEnabled"
+    static let linkHistoryLimitDefaultsKey = "palladium.linkHistoryLimit"
     static let linkHistoryEntriesDefaultsKey = "palladium.linkHistoryEntries"
     static let appAppearanceModeDefaultsKey = "palladium.appAppearanceMode"
     static let packageVersionsTextDefaultsKey = "palladium.packageVersionsText"
+    static let defaultLinkHistoryLimit = 10
+    static let maxLinkHistoryLimit = 50
 
     @Environment(\.scenePhase) var scenePhase
     @State var isRunning = false
@@ -81,6 +84,7 @@ struct ContentView: View {
     @State var subtitleLanguagePattern: String
     @State var customSubtitleLanguagePattern: String
     @State var linkHistoryEnabled: Bool
+    @State var linkHistoryLimit: Int
     @State var linkHistoryEntries: [LinkHistoryEntry]
     @State var appAppearanceMode: AppAppearanceMode
     @State var selectedTab: AppTab = .download
@@ -134,7 +138,9 @@ struct ContentView: View {
         _subtitleLanguagePattern = State(initialValue: Self.loadSubtitleLanguagePattern())
         _customSubtitleLanguagePattern = State(initialValue: Self.loadCustomSubtitleLanguagePattern())
         _linkHistoryEnabled = State(initialValue: Self.loadLinkHistoryEnabled())
-        _linkHistoryEntries = State(initialValue: Self.loadLinkHistoryEntries())
+        let linkHistoryLimit = Self.loadLinkHistoryLimit()
+        _linkHistoryLimit = State(initialValue: linkHistoryLimit)
+        _linkHistoryEntries = State(initialValue: Self.loadLinkHistoryEntries(limit: linkHistoryLimit))
         _appAppearanceMode = State(initialValue: Self.loadAppAppearanceMode())
         _versionsText = State(initialValue: Self.loadCachedPackageVersionsText())
         _consoleLogStore = StateObject(wrappedValue: ConsoleLogStore())
@@ -180,6 +186,7 @@ struct ContentView: View {
                     detailedProgressEnabled: $detailedProgressEnabled,
                     shareSheetDownloadMode: $shareSheetDownloadMode,
                     linkHistoryEnabled: $linkHistoryEnabled,
+                    linkHistoryLimit: $linkHistoryLimit,
                     appAppearanceMode: $appAppearanceMode,
                     storageSummary: storageSummary,
                     packageStatusText: packageStatusText,
@@ -278,6 +285,10 @@ struct ContentView: View {
             persistPreferences()
         }
         .onChange(of: linkHistoryEnabled, initial: false) {
+            persistPreferences()
+        }
+        .onChange(of: linkHistoryLimit, initial: false) {
+            trimLinkHistoryEntriesIfNeeded()
             persistPreferences()
         }
         .onChange(of: appAppearanceMode, initial: false) {

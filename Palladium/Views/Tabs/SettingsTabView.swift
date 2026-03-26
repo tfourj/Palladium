@@ -19,6 +19,7 @@ struct SettingsTabView: View {
     @Binding var detailedProgressEnabled: Bool
     @Binding var shareSheetDownloadMode: ShareSheetDownloadMode
     @Binding var linkHistoryEnabled: Bool
+    @Binding var linkHistoryLimit: Int
     @Binding var appAppearanceMode: AppAppearanceMode
 
     let storageSummary: StorageManagementSummary
@@ -114,6 +115,7 @@ struct SettingsTabView: View {
                         detailedProgressEnabled: $detailedProgressEnabled,
                         shareSheetDownloadMode: $shareSheetDownloadMode,
                         linkHistoryEnabled: $linkHistoryEnabled,
+                        linkHistoryLimit: $linkHistoryLimit,
                         appAppearanceMode: $appAppearanceMode,
                         isRunning: isRunning
                     )

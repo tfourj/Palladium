@@ -49,6 +49,7 @@ extension ContentView {
         defaults.set(subtitleLanguagePattern, forKey: Self.subtitleLanguagePatternDefaultsKey)
         defaults.set(customSubtitleLanguagePattern, forKey: Self.customSubtitleLanguagePatternDefaultsKey)
         defaults.set(linkHistoryEnabled, forKey: Self.linkHistoryEnabledDefaultsKey)
+        defaults.set(linkHistoryLimit, forKey: Self.linkHistoryLimitDefaultsKey)
         defaults.set(appAppearanceMode.rawValue, forKey: Self.appAppearanceModeDefaultsKey)
     }
 
@@ -211,12 +212,21 @@ extension ContentView {
         return UserDefaults.standard.bool(forKey: linkHistoryEnabledDefaultsKey)
     }
 
-    static func loadLinkHistoryEntries() -> [LinkHistoryEntry] {
+    static func loadLinkHistoryLimit() -> Int {
+        if UserDefaults.standard.object(forKey: linkHistoryLimitDefaultsKey) == nil {
+            return defaultLinkHistoryLimit
+        }
+        let storedLimit = UserDefaults.standard.integer(forKey: linkHistoryLimitDefaultsKey)
+        return max(0, min(storedLimit, maxLinkHistoryLimit))
+    }
+
+    static func loadLinkHistoryEntries(limit: Int = maxLinkHistoryLimit) -> [LinkHistoryEntry] {
         guard let data = UserDefaults.standard.data(forKey: linkHistoryEntriesDefaultsKey),
               let decoded = try? JSONDecoder().decode([LinkHistoryEntry].self, from: data) else {
             return []
         }
-        return Array(decoded.prefix(10))
+        let clampedLimit = max(0, min(limit, maxLinkHistoryLimit))
+        return Array(decoded.prefix(clampedLimit))
     }
 
     static func loadAppAppearanceMode() -> AppAppearanceMode {

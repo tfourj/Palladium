@@ -46,10 +46,15 @@ extension ContentView {
 
         linkHistoryEntries.removeAll { $0.url == entry.url && $0.presetRawValue == entry.presetRawValue }
         linkHistoryEntries.insert(entry, at: 0)
-        if linkHistoryEntries.count > 10 {
-            linkHistoryEntries = Array(linkHistoryEntries.prefix(10))
-        }
+        trimLinkHistoryEntriesIfNeeded()
         persistLinkHistoryEntries()
+    }
+
+    func trimLinkHistoryEntriesIfNeeded() {
+        let maxEntries = max(0, min(linkHistoryLimit, Self.maxLinkHistoryLimit))
+        if linkHistoryEntries.count > maxEntries {
+            linkHistoryEntries = Array(linkHistoryEntries.prefix(maxEntries))
+        }
     }
 
     func extractHistoryTitle(

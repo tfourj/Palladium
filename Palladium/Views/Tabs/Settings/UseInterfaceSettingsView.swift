@@ -9,9 +9,11 @@ struct UseInterfaceSettingsView: View {
     @Binding var detailedProgressEnabled: Bool
     @Binding var shareSheetDownloadMode: ShareSheetDownloadMode
     @Binding var linkHistoryEnabled: Bool
+    @Binding var linkHistoryLimit: Int
     @Binding var appAppearanceMode: AppAppearanceMode
 
     let isRunning: Bool
+    private let historyLimitRange = 0...ContentView.maxLinkHistoryLimit
 
     var body: some View {
         Form {
@@ -89,6 +91,14 @@ struct UseInterfaceSettingsView: View {
             Section {
                 Toggle("settings.ui.history.enable", isOn: $linkHistoryEnabled)
                     .disabled(isRunning)
+
+                Picker("settings.ui.history.limit", selection: $linkHistoryLimit) {
+                    ForEach(historyLimitRange, id: \.self) { limit in
+                        Text("\(limit)").tag(limit)
+                    }
+                }
+                .pickerStyle(.menu)
+                .disabled(isRunning || !linkHistoryEnabled)
             } header: {
                 Text("settings.ui.history.section")
             } footer: {

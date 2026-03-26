@@ -1729,7 +1729,17 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Stores up to 10 recent links with mode and title."
+            "value" : "Stores recent links with mode and title. Set it from 0 to 50."
+          }
+        }
+      }
+    },
+    "settings.ui.history.limit" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Links to keep"
           }
         }
       }
