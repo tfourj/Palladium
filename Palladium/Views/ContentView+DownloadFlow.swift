@@ -413,10 +413,15 @@ extension ContentView {
             progressText = trimmed
         } else if trimmed.contains("[Merger]") {
             progressText = trimmed
-        } else if trimmed.contains("yt-dlp Popen running ffmpeg") {
-            progressText = String(localized: "download.status.merging")
-        } else if trimmed.contains("yt-dlp Popen ffmpeg finished") {
-            progressText = String(localized: "download.status.merge_finished")
+        } else if trimmed.contains("[VideoRemuxer]") {
+            if trimmed.localizedCaseInsensitiveContains("already is in target format") {
+                progressText = String(localized: "download.status.merge_finished")
+            } else {
+                progressText = trimmed
+            }
+        } else if trimmed.contains("[palladium] downloaded files detected:")
+            || trimmed.contains("[palladium] primary downloaded file:") {
+            progressText = String(localized: "download.status.complete")
         } else if trimmed.contains("[palladium] downloaded file:") {
             progressText = String(localized: "download.status.complete")
         } else if trimmed.hasPrefix("[ExtractAudio]") {

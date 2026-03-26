@@ -704,16 +704,6 @@
         }
       }
     },
-    "download.status.merging" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Merging audio and video..."
-          }
-        }
-      }
-    },
     "download.status.processing" : {
       "localizations" : {
         "en" : {
