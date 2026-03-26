@@ -165,6 +165,7 @@ extension ContentView {
         lastDownloadProgressPercent = nil
         ffmpegProgressDurationSeconds = nil
         pendingDownloadProgressLine = ""
+        isInstallingPackagesDuringDownload = false
 
         let logPipe = Pipe()
         let readHandle = logPipe.fileHandleForReading
@@ -238,6 +239,7 @@ extension ContentView {
             lastDownloadProgressPercent = nil
             ffmpegProgressDurationSeconds = nil
             pendingDownloadProgressLine = ""
+            isInstallingPackagesDuringDownload = false
             statusText = outcome.statusText
             if outcome.statusText == "cancelled" {
                 progressText = String(localized: "download.status.cancelled")
@@ -354,6 +356,7 @@ extension ContentView {
         currentDownloadTask?.cancel()
         pendingDownloadProgressLine = ""
         ffmpegProgressDurationSeconds = nil
+        isInstallingPackagesDuringDownload = false
         progressText = String(localized: "download.status.cancelling")
     }
 
@@ -380,6 +383,10 @@ extension ContentView {
         let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
         guard !downloadCancelRequested else { return }
+
+        if handlePackageInstallProgressLine(trimmed) {
+            return
+        }
 
         if trimmed.hasPrefix("[palladium][ffmpeg-progress] duration=") {
             ffmpegProgressDurationSeconds = parseFFmpegDuration(from: trimmed)
@@ -415,9 +422,53 @@ extension ContentView {
         } else if trimmed.hasPrefix("[ExtractAudio]") {
             progressText = trimmed
         } else if trimmed.hasPrefix("[palladium] running yt-dlp") {
+            isInstallingPackagesDuringDownload = false
             progressText = String(localized: "download.status.running")
             lastDownloadProgressPercent = nil
         }
+    }
+
+    private func handlePackageInstallProgressLine(_ line: String) -> Bool {
+        let lower = line.lowercased()
+        let missingPackage = line.hasPrefix("[palladium]") && lower.contains("package missing")
+        let activeInstallStep = lower.contains("before pip install")
+            || lower.hasPrefix("collecting ")
+            || lower.hasPrefix("downloading ")
+            || lower.hasPrefix("installing collected packages")
+        let installFinished = lower.hasPrefix("successfully installed ")
+            || lower.contains("pip installed into target")
+            || lower.contains("pip exit code")
+            || lower.contains("after install")
+        let verbosePackageLine = line.hasPrefix("[palladium]") && (
+            lower.contains("package install target")
+                || lower.contains("checking yt-dlp package metadata")
+                || lower.contains("checking yt-dlp-apple-webkit-jsi package metadata")
+                || lower.contains("already installed")
+                || lower.contains("pip module missing")
+                || lower.contains("ensurepip")
+        )
+
+        if missingPackage || activeInstallStep {
+            isInstallingPackagesDuringDownload = true
+            progressText = line
+            return true
+        }
+
+        if installFinished {
+            if isInstallingPackagesDuringDownload || detailedProgressEnabled {
+                progressText = line
+            }
+            return true
+        }
+
+        if verbosePackageLine || lower.hasPrefix("requirement already satisfied:") {
+            if detailedProgressEnabled {
+                progressText = line
+                return true
+            }
+        }
+
+        return false
     }
 
     private func shouldShowDetailedProgressLine(_ line: String) -> Bool {

@@ -114,6 +114,7 @@ struct ContentView: View {
     @State var lastDownloadProgressPercent: Double?
     @State var ffmpegProgressDurationSeconds: Double?
     @State var pendingDownloadProgressLine = ""
+    @State var isInstallingPackagesDuringDownload = false
     @State var pendingConsoleChunks = ""
     @State var isConsoleFlushScheduled = false
     @State var keyboardDismissTapInstalled = false
