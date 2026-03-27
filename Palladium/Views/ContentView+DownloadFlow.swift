@@ -196,12 +196,7 @@ extension ContentView {
         readHandle.readabilityHandler = { handle in
             let data = handle.availableData
             guard !data.isEmpty else { return }
-            let chunk = liveLogDecoder.append(data)
-            guard !chunk.isEmpty else { return }
-            receivedPythonLiveOutput = true
-            Task { @MainActor in
-                enqueueConsoleChunk(chunk, trackProgress: true)
-            }
+            processLiveLogData(data, decoder: liveLogDecoder, didReceiveLiveOutput: &receivedPythonLiveOutput)
         }
 
         let task = Task {
@@ -221,8 +216,9 @@ extension ContentView {
             unsetenv("PALLADIUM_LOG_FD")
             unsetenv("PALLADIUM_CANCEL_FILE")
             readHandle.readabilityHandler = nil
-            try? readHandle.close()
             try? logPipe.fileHandleForWriting.close()
+            drainLiveLogPipe(readHandle, decoder: liveLogDecoder, didReceiveLiveOutput: &receivedPythonLiveOutput)
+            try? readHandle.close()
             let trailingChunk = liveLogDecoder.finish()
             await MainActor.run {
                 if !trailingChunk.isEmpty {
@@ -520,6 +516,31 @@ extension ContentView {
         guard !pendingConsoleChunks.isEmpty else { return }
         appendConsoleText(pendingConsoleChunks)
         pendingConsoleChunks = ""
+    }
+
+    private func processLiveLogData(
+        _ data: Data,
+        decoder: StreamingUTF8Decoder,
+        didReceiveLiveOutput: inout Bool
+    ) {
+        let chunk = decoder.append(data)
+        guard !chunk.isEmpty else { return }
+        didReceiveLiveOutput = true
+        Task { @MainActor in
+            enqueueConsoleChunk(chunk, trackProgress: true)
+        }
+    }
+
+    private func drainLiveLogPipe(
+        _ readHandle: FileHandle,
+        decoder: StreamingUTF8Decoder,
+        didReceiveLiveOutput: inout Bool
+    ) {
+        while true {
+            let data = readHandle.availableData
+            guard !data.isEmpty else { return }
+            processLiveLogData(data, decoder: decoder, didReceiveLiveOutput: &didReceiveLiveOutput)
+        }
     }
 
     private func appendBufferedConsoleOutputIfNeeded(_ outputText: String, receivedLiveOutput: Bool) {
