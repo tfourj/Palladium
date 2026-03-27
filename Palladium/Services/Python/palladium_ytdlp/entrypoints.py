@@ -48,6 +48,7 @@ def run_yt_dlp_flow(
     download_subtitles_override=None,
     embed_thumbnail_override=None,
     subtitle_language_pattern_override=None,
+    cookie_file_path_override=None,
     run_output_dir_override=None,
 ):
     output = TailBuffer()
@@ -95,6 +96,10 @@ def run_yt_dlp_flow(
         subtitle_language_pattern = str(subtitle_language_pattern_override).strip() or "en"
     if subtitle_language_pattern == "en.*":
         subtitle_language_pattern = "en"
+    if cookie_file_path_override is None:
+        cookie_file_path = os.environ.get("PALLADIUM_COOKIE_FILE_PATH", "").strip()
+    else:
+        cookie_file_path = str(cookie_file_path_override).strip()
     downloads_dir = os.environ.get("PALLADIUM_DOWNLOADS", "").strip()
     if run_output_dir_override is None:
         run_output_dir = os.environ.get("PALLADIUM_RUN_OUTPUT_DIR", "").strip() or downloads_dir
@@ -258,6 +263,13 @@ def run_yt_dlp_flow(
 
                         if embed_thumbnail:
                             download_behavior_args.extend(["--convert-thumbnails", "png", "--embed-thumbnail"])
+
+                        if cookie_file_path:
+                            if os.path.isfile(cookie_file_path):
+                                print(f"[palladium] using cookie file: {cookie_file_path}")
+                                download_behavior_args.extend(["--cookies", cookie_file_path])
+                            else:
+                                print(f"[palladium] cookie file missing, ignoring: {cookie_file_path}")
 
                         sys.argv = [
                             "yt-dlp",

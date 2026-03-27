@@ -14,6 +14,7 @@ enum PythonFlowRunner {
         downloadSubtitles: Bool,
         embedThumbnail: Bool,
         subtitleLanguagePattern: String,
+        cookieFilePath: String?,
         runOutputDir: String
     ) async -> PythonFlowOutcome {
         await runOnPythonThread {
@@ -32,6 +33,7 @@ enum PythonFlowRunner {
                         downloadSubtitles,
                         embedThumbnail,
                         subtitleLanguagePattern,
+                        cookieFilePath ?? "",
                         runOutputDir
                     ]
                 )

@@ -48,6 +48,8 @@ extension ContentView {
         defaults.set(embedThumbnail, forKey: Self.embedThumbnailDefaultsKey)
         defaults.set(subtitleLanguagePattern, forKey: Self.subtitleLanguagePatternDefaultsKey)
         defaults.set(customSubtitleLanguagePattern, forKey: Self.customSubtitleLanguagePatternDefaultsKey)
+        defaults.set(useCookies, forKey: Self.useCookiesDefaultsKey)
+        defaults.set(selectedCookieFileName, forKey: Self.selectedCookieFileNameDefaultsKey)
         defaults.set(linkHistoryEnabled, forKey: Self.linkHistoryEnabledDefaultsKey)
         defaults.set(linkHistoryLimit, forKey: Self.linkHistoryLimitDefaultsKey)
         defaults.set(appAppearanceMode.rawValue, forKey: Self.appAppearanceModeDefaultsKey)
@@ -203,6 +205,13 @@ extension ContentView {
             return ""
         }
         return rawValue
+    }
+
+    static func loadUseCookies() -> Bool {
+        if UserDefaults.standard.object(forKey: useCookiesDefaultsKey) == nil {
+            return false
+        }
+        return UserDefaults.standard.bool(forKey: useCookiesDefaultsKey)
     }
 
     static func loadLinkHistoryEnabled() -> Bool {

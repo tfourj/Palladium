@@ -184,6 +184,16 @@
         }
       }
     },
+    "common.none" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "None"
+          }
+        }
+      }
+    },
     "common.result" : {
       "localizations" : {
         "en" : {
@@ -574,6 +584,56 @@
         }
       }
     },
+    "download.options.cookies.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use one imported Netscape cookie file for this download"
+          }
+        }
+      }
+    },
+    "download.options.cookies.empty" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import a cookie file in Settings before enabling this option."
+          }
+        }
+      }
+    },
+    "download.options.cookies.picker" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cookie file"
+          }
+        }
+      }
+    },
+    "download.options.cookies.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cookies"
+          }
+        }
+      }
+    },
+    "download.options.cookies.value" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cookies: %@"
+          }
+        }
+      }
+    },
     "download.options.thumbnail.help" : {
       "localizations" : {
         "en" : {
@@ -730,6 +790,126 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enter video URL"
+          }
+        }
+      }
+    },
+    "cookies.empty.subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import a Netscape cookie file from Files to make it available in downloads."
+          }
+        }
+      }
+    },
+    "cookies.empty.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No cookie files"
+          }
+        }
+      }
+    },
+    "cookies.error.invalid_format" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The selected file does not look like Netscape cookies format."
+          }
+        }
+      }
+    },
+    "cookies.error.name_conflict" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not create a unique filename for the imported cookie file."
+          }
+        }
+      }
+    },
+    "cookies.error.unreadable" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The selected file could not be read as text."
+          }
+        }
+      }
+    },
+    "cookies.file.meta" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ • %@"
+          }
+        }
+      }
+    },
+    "cookies.import.button" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import Cookie File"
+          }
+        }
+      }
+    },
+    "cookies.path.documents" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Documents/Cookies"
+          }
+        }
+      }
+    },
+    "cookies.path.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App folder"
+          }
+        }
+      }
+    },
+    "cookies.selected.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Default Selection"
+          }
+        }
+      }
+    },
+    "cookies.settings.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imported files are copied into Palladium storage so yt-dlp can reuse them later."
+          }
+        }
+      }
+    },
+    "cookies.toast.imported" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imported cookie file: %@"
           }
         }
       }
@@ -1420,6 +1600,36 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Download Arguments"
+          }
+        }
+      }
+    },
+    "settings.cookies.subtitle_count" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld imported cookie files"
+          }
+        }
+      }
+    },
+    "settings.cookies.subtitle_empty" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import Netscape cookie files"
+          }
+        }
+      }
+    },
+    "settings.cookies.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cookies"
           }
         }
       }

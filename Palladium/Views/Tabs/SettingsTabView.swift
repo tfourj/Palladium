@@ -4,6 +4,7 @@ struct SettingsTabView: View {
     private enum SettingsRoute: Hashable {
         case useInterface
         case downloadArguments
+        case cookies
         case storage
         case packages
         case about
@@ -21,6 +22,8 @@ struct SettingsTabView: View {
     @Binding var linkHistoryEnabled: Bool
     @Binding var linkHistoryLimit: Int
     @Binding var appAppearanceMode: AppAppearanceMode
+    @Binding var selectedCookieFileName: String
+    let importedCookieFiles: [ImportedCookieFile]
 
     let storageSummary: StorageManagementSummary
     let packageStatusText: String
@@ -45,6 +48,9 @@ struct SettingsTabView: View {
     let onPruneSavedStorage: (_ window: StoragePruneWindow) -> Void
     let onPruneCacheStorage: (_ window: StoragePruneWindow) -> Void
     let onOpenStorageManager: () -> Void
+    let onRefreshCookieFiles: () -> Void
+    let onImportCookieFile: (_ sourceURL: URL) throws -> Void
+    let onDeleteCookieFile: (_ cookieFile: ImportedCookieFile) throws -> Void
 
     var body: some View {
         NavigationStack {
@@ -65,6 +71,17 @@ struct SettingsTabView: View {
                             subtitle: String(localized: "settings.download_args.subtitle"),
                             icon: "terminal",
                             color: .blue
+                        )
+                    }
+
+                    NavigationLink(value: SettingsRoute.cookies) {
+                        settingsRow(
+                            title: String(localized: "settings.cookies.title"),
+                            subtitle: importedCookieFiles.isEmpty
+                                ? String(localized: "settings.cookies.subtitle_empty")
+                                : String(format: String(localized: "settings.cookies.subtitle_count"), importedCookieFiles.count),
+                            icon: "lock.doc.fill",
+                            color: .brown
                         )
                     }
 
@@ -137,6 +154,15 @@ struct SettingsTabView: View {
                         onPruneSaved: onPruneSavedStorage,
                         onPruneCache: onPruneCacheStorage,
                         onAppear: onOpenStorageManager
+                    )
+                case .cookies:
+                    CookiesSettingsView(
+                        selectedCookieFileName: $selectedCookieFileName,
+                        importedCookieFiles: importedCookieFiles,
+                        isBusy: isRunning || isPackageRunning,
+                        onRefresh: onRefreshCookieFiles,
+                        onImport: onImportCookieFile,
+                        onDelete: onDeleteCookieFile
                     )
                 case .packages:
                     PackagesSettingsView(

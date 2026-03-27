@@ -12,6 +12,9 @@ struct DownloadTabView: View {
     @Binding var embedThumbnail: Bool
     @Binding var subtitleLanguagePattern: String
     @Binding var customSubtitleLanguagePattern: String
+    @Binding var useCookies: Bool
+    @Binding var selectedCookieFileName: String
+    let importedCookieFiles: [ImportedCookieFile]
 
     let isRunning: Bool
     let progressText: String
@@ -182,6 +185,8 @@ struct DownloadTabView: View {
                                     subtitle: String(localized: "download.options.thumbnail.help"),
                                     isOn: $embedThumbnail
                                 )
+
+                                cookieSelectionRow
                             }
                             .transition(
                                 .asymmetric(
@@ -360,6 +365,57 @@ struct DownloadTabView: View {
         }
     }
 
+    private var cookieSelectionRow: some View {
+        VStack(spacing: 8) {
+            HStack(spacing: 10) {
+                Button {
+                    guard !isRunning else { return }
+                    useCookies.toggle()
+                } label: {
+                    HStack(spacing: 10) {
+                        Image(systemName: useCookies ? "checkmark.square.fill" : "square")
+                            .font(.system(size: 19, weight: .semibold))
+                            .foregroundStyle(useCookies ? .blue : primaryTextColor)
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("download.options.cookies.title")
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(primaryTextColor)
+                            Text("download.options.cookies.help")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .multilineTextAlignment(.leading)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .disabled(isRunning)
+
+                if useCookies {
+                    Picker("download.options.cookies.picker", selection: $selectedCookieFileName) {
+                        Text("common.none").tag("")
+                        ForEach(importedCookieFiles) { cookieFile in
+                            Text(cookieFile.displayName).tag(cookieFile.fileName)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .labelsHidden()
+                    .disabled(isRunning || importedCookieFiles.isEmpty)
+                    .tint(.blue)
+                }
+            }
+
+            if useCookies && importedCookieFiles.isEmpty {
+                Text("download.options.cookies.empty")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+    }
+
     private var selectedSubtitleOption: SubtitleLanguageOption? {
         SubtitleLanguageOption.allCases.first(where: { $0.subtitlePattern == subtitleLanguagePattern })
     }
@@ -403,6 +459,12 @@ struct DownloadTabView: View {
         }
         if embedThumbnail {
             parts.append(String(localized: "download.options.thumbnail.title"))
+        }
+        let selectedCookieName = selectedCookieFileName.trimmingCharacters(in: .whitespacesAndNewlines)
+        if useCookies, !selectedCookieName.isEmpty {
+            parts.append(String(format: String(localized: "download.options.cookies.value"), selectedCookieName))
+        } else if useCookies {
+            parts.append(String(localized: "download.options.cookies.title"))
         }
         return parts.isEmpty ? String(localized: "download.options.summary.default") : parts.joined(separator: " • ")
     }

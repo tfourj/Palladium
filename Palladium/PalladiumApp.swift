@@ -92,12 +92,17 @@ private enum PythonRuntimeBootstrap {
             )
             let downloadsDir = documents.appendingPathComponent("Temp", isDirectory: true)
             let savedDir = documents.appendingPathComponent("Saved", isDirectory: true)
+            let cookiesDir = documents.appendingPathComponent("Cookies", isDirectory: true)
             try FileManager.default.createDirectory(
                 at: downloadsDir,
                 withIntermediateDirectories: true
             )
             try FileManager.default.createDirectory(
                 at: savedDir,
+                withIntermediateDirectories: true
+            )
+            try FileManager.default.createDirectory(
+                at: cookiesDir,
                 withIntermediateDirectories: true
             )
 
@@ -109,6 +114,7 @@ private enum PythonRuntimeBootstrap {
 
                 Temp: temporary video/audio output files
                 Saved: files copied via "Save to App Folder"
+                Cookies: imported Netscape cookie files for yt-dlp
                 """
                 try text.write(to: readmeURL, atomically: true, encoding: .utf8)
             }

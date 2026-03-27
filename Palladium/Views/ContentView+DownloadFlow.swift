@@ -179,6 +179,8 @@ extension ContentView {
         let downloadSubtitlesAtStart = downloadSubtitles
         let embedThumbnailAtStart = embedThumbnail
         let subtitleLanguagePatternAtStart = resolvedSubtitleLanguagePattern
+        let useCookiesAtStart = useCookies
+        let cookieFilePathAtStart = useCookiesAtStart ? resolvedSelectedCookieFilePath() : nil
         var receivedPythonLiveOutput = false
         let liveLogDecoder = StreamingUTF8Decoder()
         let cancelMarker = makeCancelMarkerURL()
@@ -212,6 +214,7 @@ extension ContentView {
                 downloadSubtitles: downloadSubtitlesAtStart,
                 embedThumbnail: embedThumbnailAtStart,
                 subtitleLanguagePattern: subtitleLanguagePatternAtStart,
+                cookieFilePath: cookieFilePathAtStart,
                 runOutputDir: runOutputURL.path
             )
 
