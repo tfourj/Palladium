@@ -143,7 +143,8 @@ final class ConsoleLogStore: ObservableObject {
     private func classify(_ line: String) -> ConsoleLogSource {
         let lower = line.lowercased()
 
-        if line.contains("[palladium][ffmpeg-bridge]")
+        if line.contains("[palladium][ffmpeg-progress]")
+            || line.contains("[palladium][ffmpeg-bridge]")
             || lower.contains("ffmpeg-bridge")
             || line.contains("ffprobe") {
             return .ffmpeg

@@ -252,16 +252,8 @@ extension ContentView {
             if outcome.statusText == "error" {
                 downloadErrorText = downloadErrorDetails(from: outcome)
             }
+            appendBufferedConsoleOutputIfNeeded(outcome.outputText, receivedLiveOutput: receivedPythonLiveOutput)
             appendConsoleText("\n\(outcome.summaryText)\n")
-            if !receivedPythonLiveOutput {
-                appendConsoleText(
-                    "[palladium] live python log stream produced no decodable chunks; using buffered output fallback\n",
-                    source: .app
-                )
-            }
-            if !receivedPythonLiveOutput, !outcome.outputText.isEmpty {
-                appendConsoleText("\n\(outcome.outputText)\n")
-            }
             Self.logger.info("yt-dlp flow finished with status: \(outcome.statusText, privacy: .public)")
 
             if outcome.statusText == "success", !outcome.downloadedPaths.isEmpty {
@@ -528,6 +520,40 @@ extension ContentView {
         guard !pendingConsoleChunks.isEmpty else { return }
         appendConsoleText(pendingConsoleChunks)
         pendingConsoleChunks = ""
+    }
+
+    private func appendBufferedConsoleOutputIfNeeded(_ outputText: String, receivedLiveOutput: Bool) {
+        let bufferedLines = outputText
+            .components(separatedBy: .newlines)
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+
+        guard !bufferedLines.isEmpty else { return }
+
+        if !receivedLiveOutput {
+            appendConsoleText(
+                "[palladium] live python log stream produced no decodable chunks; using buffered output fallback\n",
+                source: .app
+            )
+            appendConsoleText(bufferedLines.joined(separator: "\n") + "\n")
+            return
+        }
+
+        let streamedLines = consoleLogStore.entries
+            .filter { $0.source != .ffmpeg }
+            .map(\.text)
+
+        var matchedPrefixCount = 0
+        while matchedPrefixCount < streamedLines.count,
+              matchedPrefixCount < bufferedLines.count,
+              streamedLines[matchedPrefixCount] == bufferedLines[matchedPrefixCount] {
+            matchedPrefixCount += 1
+        }
+
+        guard matchedPrefixCount < bufferedLines.count else { return }
+
+        let missingLines = bufferedLines.dropFirst(matchedPrefixCount)
+        appendConsoleText(missingLines.joined(separator: "\n") + "\n")
     }
 
     private func shouldAcceptDownloadProgressLine(_ line: String) -> Bool {
