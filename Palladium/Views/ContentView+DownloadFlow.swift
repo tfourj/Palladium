@@ -131,7 +131,11 @@ extension ContentView {
         runDownloadFlow(urlOverride: pastedURL, presetOverride: selectedPreset)
     }
 
-    func runDownloadFlow(urlOverride: String? = nil, presetOverride: DownloadPreset? = nil) {
+    func runDownloadFlow(
+        urlOverride: String? = nil,
+        presetOverride: DownloadPreset? = nil,
+        afterDownloadOverride: AfterDownloadBehavior? = nil
+    ) {
         guard !isRunning, !isPackageRunning else { return }
         let targetURL = (urlOverride ?? urlText).trimmingCharacters(in: .whitespacesAndNewlines)
         guard !targetURL.isEmpty else { return }
@@ -173,7 +177,7 @@ extension ContentView {
         let presetAtStart = (presetOverride ?? selectedPreset).pythonValue
         let extraArgsAtStart = extraArgsText.trimmingCharacters(in: .whitespacesAndNewlines)
         let presetArgsJSONAtStart = buildPresetArgumentsJSON()
-        let afterDownloadBehaviorAtStart = afterDownloadBehavior
+        let afterDownloadBehaviorAtStart = afterDownloadOverride ?? afterDownloadBehavior
         let linkHistoryEnabledAtStart = linkHistoryEnabled
         let downloadPlaylistAtStart = downloadPlaylist
         let downloadSubtitlesAtStart = downloadSubtitles
@@ -304,6 +308,57 @@ extension ContentView {
             }
         }
         currentDownloadTask = task
+    }
+
+    func consumePendingShortcutDownloadRequestIfNeeded() {
+        ShortcutDownloadRequestStore.clearStaleRequest()
+
+        guard let request = ShortcutDownloadRequestStore.consumePendingRequest() else {
+            return
+        }
+        guard lastConsumedShortcutRequestID != request.id else {
+            return
+        }
+
+        lastConsumedShortcutRequestID = request.id
+        runShortcutDownload(request)
+    }
+
+    func runShortcutDownload(_ request: PendingShortcutDownloadRequest) {
+        let trimmedURL = request.url.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedURL.isEmpty else {
+            appendConsoleText("[palladium] shortcut request ignored because url was empty\n")
+            return
+        }
+
+        let preset = request.preset.downloadPreset
+        let destinationBehavior: AfterDownloadBehavior = switch request.destination {
+        case .appFolder:
+            .saveToApplicationFolder
+        case .photos:
+            .saveToPhotos
+        }
+
+        selectedTab = .download
+        urlText = trimmedURL
+        selectedPreset = preset
+
+        if isRunning || isPackageRunning {
+            appendConsoleText("[palladium] shortcut request received while another operation is running\n")
+            alertMessage = String(localized: "shortcuts.error.busy")
+            showAlert = true
+            showTemporaryToast(String(localized: "shortcuts.toast.received"))
+            return
+        }
+
+        appendConsoleText(
+            "[palladium] running shortcut download preset=\(preset.rawValue) destination=\(request.destination.rawValue)\n"
+        )
+        runDownloadFlow(
+            urlOverride: trimmedURL,
+            presetOverride: preset,
+            afterDownloadOverride: destinationBehavior
+        )
     }
 
     func handleIncomingDownloadURL(_ incomingURL: URL) {

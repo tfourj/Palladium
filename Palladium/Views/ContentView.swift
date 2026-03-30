@@ -125,6 +125,7 @@ struct ContentView: View {
     @State var keyboardDismissTapInstalled = false
     @State var showShareSheetDownloadPicker = false
     @State var shareSheetURL = ""
+    @State var lastConsumedShortcutRequestID: UUID?
 
     init() {
         let rememberPreset = Self.loadRememberSelectedPreset()
@@ -342,9 +343,15 @@ struct ContentView: View {
         .onAppear {
             installKeyboardDismissTapIfNeeded()
             refreshImportedCookieFiles()
+            consumePendingShortcutDownloadRequestIfNeeded()
+        }
+        .onChange(of: scenePhase, initial: true) { _, newPhase in
+            guard newPhase == .active else { return }
+            consumePendingShortcutDownloadRequestIfNeeded()
         }
         .onOpenURL { incomingURL in
             handleIncomingDownloadURL(incomingURL)
+            consumePendingShortcutDownloadRequestIfNeeded()
         }
         .preferredColorScheme(appAppearanceMode.preferredColorScheme)
     }

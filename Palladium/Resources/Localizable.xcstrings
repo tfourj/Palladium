@@ -244,6 +244,106 @@
         }
       }
     },
+    "shortcuts.download_type.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What to Download"
+          }
+        }
+      }
+    },
+    "shortcuts.error.busy" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Another download or package task is already running. Palladium filled in the shortcut URL, but you need to start it again after the current task finishes."
+          }
+        }
+      }
+    },
+    "shortcuts.parameter.download_type" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What to Download"
+          }
+        }
+      }
+    },
+    "shortcuts.parameter.save_destination" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Where to Save"
+          }
+        }
+      }
+    },
+    "shortcuts.parameter.url" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL"
+          }
+        }
+      }
+    },
+    "shortcuts.save_destination.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Where to Save"
+          }
+        }
+      }
+    },
+    "shortcuts.start_download.description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Palladium and start a download with the selected preset and save destination."
+          }
+        }
+      }
+    },
+    "shortcuts.start_download.dialog" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opening Palladium to start the download."
+          }
+        }
+      }
+    },
+    "shortcuts.start_download.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start Download"
+          }
+        }
+      }
+    },
+    "shortcuts.toast.received" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shortcut URL loaded into Palladium."
+          }
+        }
+      }
+    },
     "console.source.app" : {
       "localizations" : {
         "en" : {
