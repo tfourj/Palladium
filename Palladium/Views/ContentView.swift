@@ -70,6 +70,7 @@ struct ContentView: View {
     @State var statusText = "idle"
     @State var urlText: String
     @State var progressText = String(localized: "download.prompt.idle")
+    @State var playlistProgress: PlaylistProgressSnapshot?
     @State var downloadErrorText: String?
     @State var selectedPreset: DownloadPreset
     @State var customArgsText: String
@@ -173,6 +174,7 @@ struct ContentView: View {
                     importedCookieFiles: importedCookieFiles,
                     isRunning: isRunning,
                     progressText: progressText,
+                    playlistProgress: playlistProgress,
                     downloadErrorText: downloadErrorText,
                     onDownload: { runDownloadFlow() },
                     onCancel: cancelDownloadFlow,

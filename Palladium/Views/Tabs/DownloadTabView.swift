@@ -18,6 +18,7 @@ struct DownloadTabView: View {
 
     let isRunning: Bool
     let progressText: String
+    let playlistProgress: PlaylistProgressSnapshot?
     let downloadErrorText: String?
     let onDownload: () -> Void
     let onCancel: () -> Void
@@ -81,22 +82,28 @@ struct DownloadTabView: View {
                 .padding(.horizontal, 20)
                 .padding(.top, 10)
 
-                if isRunning {
+                if isRunning || shouldShowPlaylistProgress {
                     VStack(alignment: .leading, spacing: 8) {
-                        HStack(spacing: 8) {
-                            ProgressView()
-                            Text("download.status.running")
-                                .font(.footnote)
-                                .foregroundStyle(primaryTextColor)
+                        if let playlistProgress, playlistProgress.isPlaylist {
+                            playlistProgressCard(playlistProgress)
                         }
 
-                        Text(progressText)
-                            .font(.system(.footnote, design: .monospaced))
-                            .foregroundStyle(primaryTextColor)
-                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-                            .padding(12)
-                            .background(cardElementBackground)
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                        if isRunning {
+                            HStack(spacing: 8) {
+                                ProgressView()
+                                Text("download.status.running")
+                                    .font(.footnote)
+                                    .foregroundStyle(primaryTextColor)
+                            }
+
+                            Text(progressText)
+                                .font(.system(.footnote, design: .monospaced))
+                                .foregroundStyle(primaryTextColor)
+                                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                                .padding(12)
+                                .background(cardElementBackground)
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                        }
                     }
                     .padding(.horizontal, 20)
                     .frame(maxHeight: .infinity)
@@ -467,6 +474,181 @@ struct DownloadTabView: View {
             parts.append(String(localized: "download.options.cookies.title"))
         }
         return parts.isEmpty ? String(localized: "download.options.summary.default") : parts.joined(separator: " • ")
+    }
+
+    private func playlistProgressCard(_ snapshot: PlaylistProgressSnapshot) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .center, spacing: 8) {
+                Image(systemName: playlistStatusIcon(for: snapshot))
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(playlistStatusColor(for: snapshot))
+
+                Text(playlistStatusText(for: snapshot))
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(primaryTextColor)
+
+                Spacer()
+            }
+
+            if let title = snapshot.title, !title.isEmpty {
+                Text(title)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(primaryTextColor)
+                    .lineLimit(2)
+            }
+
+            HStack(spacing: 8) {
+                playlistMetric(
+                    label: String(localized: "download.playlist.total"),
+                    value: snapshot.expectedCount.map(String.init) ?? "?"
+                )
+                playlistMetric(
+                    label: String(localized: "download.playlist.completed"),
+                    value: "\(snapshot.completedCount)"
+                )
+                playlistMetric(
+                    label: String(localized: "download.playlist.failed"),
+                    value: "\(snapshot.failedCount)"
+                )
+            }
+
+            Text(playlistSummaryText(for: snapshot))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.leading)
+
+            if let currentLine = playlistCurrentLine(for: snapshot) {
+                Text(currentLine)
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(primaryTextColor)
+                    .lineLimit(2)
+            }
+        }
+        .padding(12)
+        .background(cardElementBackground)
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(playlistStatusColor(for: snapshot).opacity(0.28), lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+    }
+
+    private func playlistMetric(label: String, value: String) -> some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text(label)
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(.secondary)
+            Text(value)
+                .font(.system(.footnote, design: .monospaced).weight(.semibold))
+                .foregroundStyle(primaryTextColor)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(8)
+        .background(cardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+    }
+
+    private var shouldShowPlaylistProgress: Bool {
+        playlistProgress?.isPlaylist == true
+    }
+
+    private func playlistStatusText(for snapshot: PlaylistProgressSnapshot) -> String {
+        switch snapshot.resultKind {
+        case "partial":
+            return String(localized: "download.status.partial")
+        case "success":
+            return String(localized: "download.status.complete")
+        case "error":
+            return String(localized: "download.status.failed")
+        case "cancelled":
+            return String(localized: "download.status.cancelled")
+        default:
+            return String(localized: "download.status.running")
+        }
+    }
+
+    private func playlistStatusIcon(for snapshot: PlaylistProgressSnapshot) -> String {
+        switch snapshot.resultKind {
+        case "partial":
+            return "exclamationmark.triangle.fill"
+        case "success":
+            return "checkmark.circle.fill"
+        case "error":
+            return "xmark.octagon.fill"
+        case "cancelled":
+            return "stop.circle.fill"
+        default:
+            return "arrow.down.circle.fill"
+        }
+    }
+
+    private func playlistStatusColor(for snapshot: PlaylistProgressSnapshot) -> Color {
+        switch snapshot.resultKind {
+        case "partial":
+            return .orange
+        case "success":
+            return .green
+        case "error":
+            return .red
+        case "cancelled":
+            return .secondary
+        default:
+            return .blue
+        }
+    }
+
+    private func playlistSummaryText(for snapshot: PlaylistProgressSnapshot) -> String {
+        let expectedCount = snapshot.expectedCount ?? max(snapshot.completedCount + snapshot.failedCount, 0)
+        switch snapshot.resultKind {
+        case "partial":
+            return String(
+                format: String(localized: "download.playlist.summary.partial"),
+                snapshot.completedCount,
+                expectedCount,
+                snapshot.failedCount
+            )
+        case "success":
+            return String(
+                format: String(localized: "download.playlist.summary.success"),
+                snapshot.completedCount,
+                expectedCount
+            )
+        case "error":
+            return String(
+                format: String(localized: "download.playlist.summary.failed"),
+                snapshot.failedCount,
+                expectedCount
+            )
+        case "cancelled":
+            return String(
+                format: String(localized: "download.playlist.summary.cancelled"),
+                snapshot.completedCount,
+                expectedCount
+            )
+        default:
+            return String(
+                format: String(localized: "download.playlist.summary.running"),
+                snapshot.completedCount,
+                expectedCount,
+                snapshot.failedCount
+            )
+        }
+    }
+
+    private func playlistCurrentLine(for snapshot: PlaylistProgressSnapshot) -> String? {
+        guard snapshot.resultKind == "running" || snapshot.resultKind.isEmpty else { return nil }
+        guard let currentItemIndex = snapshot.currentItemIndex else { return nil }
+        if let currentItemTitle = snapshot.currentItemTitle, !currentItemTitle.isEmpty {
+            return String(
+                format: String(localized: "download.playlist.current.value"),
+                currentItemIndex,
+                currentItemTitle
+            )
+        }
+        return String(
+            format: String(localized: "download.playlist.current.index"),
+            currentItemIndex
+        )
     }
 
     @ViewBuilder

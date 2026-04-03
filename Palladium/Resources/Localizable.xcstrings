@@ -814,6 +814,106 @@
         }
       }
     },
+    "download.playlist.completed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Completed"
+          }
+        }
+      }
+    },
+    "download.playlist.current.index" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Current item: %d"
+          }
+        }
+      }
+    },
+    "download.playlist.current.value" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Current item %d: %@"
+          }
+        }
+      }
+    },
+    "download.playlist.failed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed"
+          }
+        }
+      }
+    },
+    "download.playlist.summary.cancelled" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%d of %d downloaded before cancellation"
+          }
+        }
+      }
+    },
+    "download.playlist.summary.failed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%d of %d items failed"
+          }
+        }
+      }
+    },
+    "download.playlist.summary.partial" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%d of %d downloaded, %d failed"
+          }
+        }
+      }
+    },
+    "download.playlist.summary.running" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%d completed of %d, %d failed so far"
+          }
+        }
+      }
+    },
+    "download.playlist.summary.success" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%d of %d downloaded"
+          }
+        }
+      }
+    },
+    "download.playlist.total" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total"
+          }
+        }
+      }
+    },
     "download.status.cancelled" : {
       "localizations" : {
         "en" : {
@@ -870,6 +970,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Processing with ffmpeg..."
+          }
+        }
+      }
+    },
+    "download.status.partial" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "completed with issues"
           }
         }
       }

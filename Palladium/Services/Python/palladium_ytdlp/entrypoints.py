@@ -1,6 +1,7 @@
 import contextlib
 import json
 import os
+import re
 import runpy
 import sys
 import traceback
@@ -31,6 +32,186 @@ from .packages import (
 )
 from .shared import TRACKED_PACKAGES, TailBuffer, Tee, open_live_log_stream
 from .webkit_jsi import ensure_safe_webkit_jsi_runtime
+
+PLAYLIST_PROGRESS_PREFIX = "[palladium][playlist-progress] "
+
+
+class PlaylistProgressCollector:
+    playlist_title_pattern = re.compile(r"^\[download\] Downloading playlist: (?P<title>.+)$")
+    playlist_count_pattern = re.compile(
+        r"^\[(?:youtube:tab|download)\].*Downloading (?P<count>\d+) items? of (?P<total>\d+)$"
+    )
+    playlist_item_pattern = re.compile(r"^\[download\] Downloading item (?P<index>\d+) of (?P<total>\d+)$")
+    destination_pattern = re.compile(r"^\[(?:download|ExtractAudio)\] Destination: (?P<path>.+)$")
+
+    def __init__(self, live_log_stream=None):
+        self.live_log_stream = live_log_stream
+        self.pending_line = ""
+        self.playlist_title = None
+        self.playlist_expected_count = None
+        self.playlist_completed_count = 0
+        self.playlist_failed_count = 0
+        self.playlist_failed_items = []
+        self.current_item_index = None
+        self.current_item_title = None
+        self.current_item_paths = set()
+        self.current_item_had_error = False
+        self.current_item_error_line = None
+        self.is_playlist_run = False
+        self.last_emitted_payload = None
+
+    def write(self, data):
+        text = str(data)
+        if not text:
+            return 0
+
+        normalized = text.replace("\r\n", "\n").replace("\r", "\n")
+        combined = self.pending_line + normalized
+        lines = combined.split("\n")
+        if normalized.endswith("\n"):
+            self.pending_line = ""
+        else:
+            self.pending_line = lines.pop() if lines else combined
+
+        for line in lines:
+            self._handle_line(line.strip())
+
+        return len(text)
+
+    def flush(self):
+        return None
+
+    def finalize(self):
+        if self.pending_line:
+            self._handle_line(self.pending_line.strip())
+            self.pending_line = ""
+        self._finalize_current_item()
+
+    def result_kind(self, success, cancelled):
+        if cancelled:
+            return "cancelled"
+
+        if not self.is_playlist_run:
+            return "success" if success else "error"
+
+        completed = self.playlist_completed_count
+        failed = self.playlist_failed_count
+
+        if completed > 0 and failed > 0:
+            return "partial"
+        if completed > 0 and failed == 0:
+            return "success"
+        return "error"
+
+    def snapshot(self, result_kind=None):
+        return {
+            "playlist_title": self.playlist_title,
+            "playlist_expected_count": self.playlist_expected_count,
+            "playlist_completed_count": self.playlist_completed_count,
+            "playlist_failed_count": self.playlist_failed_count,
+            "playlist_failed_items": list(self.playlist_failed_items),
+            "current_item_index": self.current_item_index,
+            "current_item_title": self.current_item_title,
+            "result_kind": result_kind,
+        }
+
+    def _handle_line(self, line):
+        if not line:
+            return
+
+        playlist_title_match = self.playlist_title_pattern.match(line)
+        if playlist_title_match:
+            self.is_playlist_run = True
+            self.playlist_title = playlist_title_match.group("title").strip() or None
+            self._emit()
+            return
+
+        playlist_count_match = self.playlist_count_pattern.match(line)
+        if playlist_count_match:
+            self.is_playlist_run = True
+            self.playlist_expected_count = int(playlist_count_match.group("total"))
+            self._emit()
+            return
+
+        playlist_item_match = self.playlist_item_pattern.match(line)
+        if playlist_item_match:
+            self._finalize_current_item()
+            self.is_playlist_run = True
+            self.current_item_index = int(playlist_item_match.group("index"))
+            self.playlist_expected_count = int(playlist_item_match.group("total"))
+            self.current_item_title = None
+            self.current_item_paths = set()
+            self.current_item_had_error = False
+            self.current_item_error_line = None
+            self._emit()
+            return
+
+        destination_match = self.destination_pattern.match(line)
+        if destination_match and self.current_item_index is not None:
+            path = destination_match.group("path").strip()
+            if path:
+                self.current_item_paths.add(path)
+                guessed_title = self._title_from_path(path)
+                if guessed_title:
+                    self.current_item_title = guessed_title
+                    self._emit()
+            return
+
+        if line.startswith("ERROR:") and self.current_item_index is not None:
+            self.current_item_had_error = True
+            self.current_item_error_line = line
+            self._emit()
+
+    def _finalize_current_item(self):
+        if self.current_item_index is None:
+            return
+
+        has_output = any(self._path_exists(path) for path in self.current_item_paths)
+        if has_output:
+            self.playlist_completed_count += 1
+        else:
+            self.playlist_failed_count += 1
+            failed_label = self.current_item_title or f"Item {self.current_item_index}"
+            if self.current_item_error_line:
+                failed_label = f"{failed_label}: {self.current_item_error_line}"
+            self.playlist_failed_items.append(failed_label)
+
+        self.current_item_index = None
+        self.current_item_title = None
+        self.current_item_paths = set()
+        self.current_item_had_error = False
+        self.current_item_error_line = None
+        self._emit()
+
+    def _emit(self):
+        if self.live_log_stream is None:
+            return
+
+        payload = self.snapshot()
+        encoded_payload = json.dumps(payload, ensure_ascii=False, sort_keys=True)
+        if encoded_payload == self.last_emitted_payload:
+            return
+
+        self.last_emitted_payload = encoded_payload
+        try:
+            self.live_log_stream.write(f"{PLAYLIST_PROGRESS_PREFIX}{encoded_payload}\n")
+            self.live_log_stream.flush()
+        except Exception:
+            pass
+
+    def _path_exists(self, path):
+        try:
+            return os.path.isfile(path) and os.path.getsize(path) > 0
+        except Exception:
+            return False
+
+    def _title_from_path(self, path):
+        file_name = os.path.splitext(os.path.basename(path))[0].strip()
+        if not file_name:
+            return None
+
+        cleaned = re.sub(r"^\d+\s+-\s+", "", file_name).strip()
+        return cleaned or file_name
 
 
 def raise_if_cancel_requested(cancel_file_path, message):
@@ -109,8 +290,9 @@ def run_yt_dlp_flow(
     cache_dir = os.environ.get("PALLADIUM_CACHE_DIR", "").strip()
     cancel_file_path = os.environ.get("PALLADIUM_CANCEL_FILE", "").strip()
     live_log_stream = open_live_log_stream(os.environ.get("PALLADIUM_LOG_FD"))
+    playlist_progress = PlaylistProgressCollector(live_log_stream=live_log_stream)
 
-    with contextlib.redirect_stdout(Tee(output, console_stdout, live_log_stream)), contextlib.redirect_stderr(Tee(output, console_stderr, live_log_stream)):
+    with contextlib.redirect_stdout(Tee(output, console_stdout, live_log_stream, playlist_progress)), contextlib.redirect_stderr(Tee(output, console_stderr, live_log_stream, playlist_progress)):
         argv_backup = sys.argv[:]
         cwd_backup = os.getcwd()
         try:
@@ -351,9 +533,14 @@ def run_yt_dlp_flow(
                 except Exception:
                     pass
 
+        playlist_progress.finalize()
         success = (pip_exit_code in (None, 0)) and (yt_exit_code == 0) and not cancelled
+        result_kind = playlist_progress.result_kind(success, cancelled)
+        if result_kind == "partial":
+            success = True
         print(f"[palladium] flow success: {success}")
 
+    final_result_kind = playlist_progress.result_kind(success, cancelled)
     return json.dumps({
         "pip_attempted": pip_attempted,
         "pip_exit_code": pip_exit_code,
@@ -364,6 +551,7 @@ def run_yt_dlp_flow(
         "primary_downloaded_path": primary_downloaded_path,
         "downloaded_path": primary_downloaded_path,
         "output": output.getvalue(),
+        **playlist_progress.snapshot(result_kind=final_result_kind),
     })
 
 

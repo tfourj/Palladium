@@ -139,6 +139,14 @@ enum PythonFlowRunner {
             "primary_downloaded_path": NSNull(),
             "downloaded_path": NSNull(),
             "output": message,
+            "playlist_title": NSNull(),
+            "playlist_expected_count": NSNull(),
+            "playlist_completed_count": 0,
+            "playlist_failed_count": 0,
+            "playlist_failed_items": [],
+            "current_item_index": NSNull(),
+            "current_item_title": NSNull(),
+            "result_kind": isCancelled ? "cancelled" : "error",
             "updates_available": false,
             "updates_summary": isCancelled ? "Cancelled." : "Not checked yet.",
             "versions": [:],
@@ -163,6 +171,8 @@ enum PythonFlowRunner {
                 Raw payload:
                 \(payload)
                 """,
+                resultKind: "error",
+                playlistProgress: nil,
                 versionsText: nil,
                 downloadedPaths: [],
                 primaryDownloadedPath: nil,
@@ -182,12 +192,15 @@ enum PythonFlowRunner {
         let output = result["output"] as? String ?? ""
         let downloadedPaths = (result["downloaded_paths"] as? [String]) ?? []
         let primaryDownloadedPath = result["primary_downloaded_path"] as? String
+        let resultKind = normalizedResultKind(from: result["result_kind"], success: success, cancelled: cancelled)
+        let playlistProgress = playlistProgress(from: result, resultKind: resultKind)
 
         let summary = """
         pip attempted: \(pipAttempted)
         pip exit code: \(pipExitCode.map(String.init) ?? "none")
         yt-dlp exit code: \(ytExitCode.map(String.init) ?? "none")
         cancelled: \(cancelled)
+        result kind: \(resultKind)
         success: \(success)
         """
 
@@ -195,6 +208,8 @@ enum PythonFlowRunner {
             statusText: cancelled ? "cancelled" : (success ? "success" : "error"),
             summaryText: summary,
             outputText: output,
+            resultKind: resultKind,
+            playlistProgress: playlistProgress,
             versionsText: nil,
             downloadedPaths: downloadedPaths,
             primaryDownloadedPath: primaryDownloadedPath,
@@ -218,6 +233,8 @@ enum PythonFlowRunner {
                 Raw payload:
                 \(payload)
                 """,
+                resultKind: nil,
+                playlistProgress: nil,
                 versionsText: nil,
                 downloadedPaths: [],
                 primaryDownloadedPath: nil,
@@ -263,6 +280,8 @@ enum PythonFlowRunner {
             statusText: cancelled ? "cancelled" : (success ? "success" : "error"),
             summaryText: summary,
             outputText: output,
+            resultKind: nil,
+            playlistProgress: nil,
             versionsText: versionsText,
             downloadedPaths: [],
             primaryDownloadedPath: nil,
@@ -306,6 +325,53 @@ enum PythonFlowRunner {
         }
         return result
     }
+
+    private static func normalizedResultKind(from value: Any?, success: Bool, cancelled: Bool) -> String {
+        if let text = value as? String,
+           !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return text
+        }
+        if cancelled {
+            return "cancelled"
+        }
+        return success ? "success" : "error"
+    }
+
+    private static func playlistProgress(from result: [String: Any], resultKind: String) -> PlaylistProgressSnapshot? {
+        let title = normalizedOptionalString(result["playlist_title"])
+        let expectedCount = result["playlist_expected_count"] as? Int
+        let completedCount = result["playlist_completed_count"] as? Int ?? 0
+        let failedCount = result["playlist_failed_count"] as? Int ?? 0
+        let failedItems = (result["playlist_failed_items"] as? [String]) ?? []
+        let currentItemIndex = result["current_item_index"] as? Int
+        let currentItemTitle = normalizedOptionalString(result["current_item_title"])
+
+        let hasPlaylistData = title != nil
+            || expectedCount != nil
+            || completedCount > 0
+            || failedCount > 0
+            || currentItemIndex != nil
+            || !failedItems.isEmpty
+
+        guard hasPlaylistData else { return nil }
+
+        return PlaylistProgressSnapshot(
+            title: title,
+            expectedCount: expectedCount,
+            completedCount: completedCount,
+            failedCount: failedCount,
+            failedItems: failedItems,
+            currentItemIndex: currentItemIndex,
+            currentItemTitle: currentItemTitle,
+            resultKind: resultKind
+        )
+    }
+
+    private static func normalizedOptionalString(_ value: Any?) -> String? {
+        guard let text = value as? String else { return nil }
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? nil : trimmed
+    }
 }
 
 private enum PythonModuleLoadError: Error, CustomStringConvertible {
@@ -323,6 +389,8 @@ struct PythonFlowOutcome: Sendable {
     let statusText: String
     let summaryText: String
     let outputText: String
+    let resultKind: String?
+    let playlistProgress: PlaylistProgressSnapshot?
     let versionsText: String?
     let downloadedPaths: [String]
     let primaryDownloadedPath: String?
@@ -331,6 +399,21 @@ struct PythonFlowOutcome: Sendable {
     let updatesAvailable: Bool?
     let updatesSummary: String?
     let availableVersions: [String: [String]]?
+}
+
+struct PlaylistProgressSnapshot: Sendable {
+    let title: String?
+    let expectedCount: Int?
+    let completedCount: Int
+    let failedCount: Int
+    let failedItems: [String]
+    let currentItemIndex: Int?
+    let currentItemTitle: String?
+    let resultKind: String
+
+    var isPlaylist: Bool {
+        title != nil || expectedCount != nil || completedCount > 0 || failedCount > 0 || currentItemIndex != nil
+    }
 }
 
 private final class PythonExecutor: NSObject {

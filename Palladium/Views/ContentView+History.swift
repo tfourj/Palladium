@@ -25,6 +25,7 @@ extension ContentView {
     func addLinkHistoryEntry(
         url: String,
         presetRawValue: String,
+        playlistTitle: String?,
         downloadedPaths: [String],
         primaryDownloadedPath: String?,
         outputText: String
@@ -32,6 +33,7 @@ extension ContentView {
         let trimmedURL = url.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedURL.isEmpty else { return }
         let title = extractHistoryTitle(
+            playlistTitle: playlistTitle,
             downloadedPaths: downloadedPaths,
             primaryDownloadedPath: primaryDownloadedPath,
             outputText: outputText
@@ -58,10 +60,16 @@ extension ContentView {
     }
 
     func extractHistoryTitle(
+        playlistTitle: String? = nil,
         downloadedPaths: [String],
         primaryDownloadedPath: String?,
         outputText: String
     ) -> String? {
+        if let playlistTitle = playlistTitle?.trimmingCharacters(in: .whitespacesAndNewlines),
+           !playlistTitle.isEmpty {
+            return playlistTitle
+        }
+
         if let playlistTitle = outputText.components(separatedBy: .newlines)
             .compactMap({ line -> String? in
                 let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)

@@ -143,6 +143,7 @@ extension ContentView {
         consoleLogStore.clearAll()
         downloadErrorText = nil
         completedDownloadResult = nil
+        playlistProgress = nil
 
         do {
             let removedCount = try clearDownloadsDirectoryContents()
@@ -243,21 +244,30 @@ extension ContentView {
             ffmpegProgressDurationSeconds = nil
             pendingDownloadProgressLine = ""
             isInstallingPackagesDuringDownload = false
-            statusText = outcome.statusText
-            if outcome.statusText == "cancelled" {
+            let finalResultKind = outcome.resultKind ?? outcome.statusText
+            statusText = finalResultKind
+            playlistProgress = outcome.playlistProgress ?? playlistProgress
+            if finalResultKind == "cancelled" {
                 progressText = String(localized: "download.status.cancelled")
+            } else if finalResultKind == "partial" {
+                progressText = String(localized: "download.status.partial")
             } else {
-                progressText = outcome.statusText == "success" ? String(localized: "download.status.complete") : String(localized: "download.status.failed")
+                progressText = finalResultKind == "success"
+                    ? String(localized: "download.status.complete")
+                    : String(localized: "download.status.failed")
             }
-            if outcome.statusText == "error" {
+            if finalResultKind == "error" {
                 downloadErrorText = downloadErrorDetails(from: outcome)
+            } else {
+                downloadErrorText = nil
             }
             appendBufferedConsoleOutputIfNeeded(outcome.outputText, receivedLiveOutput: receivedPythonLiveOutput)
             appendConsoleText("\n\(outcome.summaryText)\n")
-            Self.logger.info("yt-dlp flow finished with status: \(outcome.statusText, privacy: .public)")
+            Self.logger.info("yt-dlp flow finished with status: \(finalResultKind, privacy: .public)")
 
-            if outcome.statusText == "success", !outcome.downloadedPaths.isEmpty {
+            if (finalResultKind == "success" || finalResultKind == "partial"), !outcome.downloadedPaths.isEmpty {
                 let resultTitle = extractHistoryTitle(
+                    playlistTitle: outcome.playlistProgress?.title,
                     downloadedPaths: outcome.downloadedPaths,
                     primaryDownloadedPath: outcome.primaryDownloadedPath,
                     outputText: outcome.outputText
@@ -272,6 +282,7 @@ extension ContentView {
                     addLinkHistoryEntry(
                         url: targetURL,
                         presetRawValue: presetAtStart,
+                        playlistTitle: outcome.playlistProgress?.title,
                         downloadedPaths: outcome.downloadedPaths,
                         primaryDownloadedPath: outcome.primaryDownloadedPath,
                         outputText: outcome.outputText
@@ -303,7 +314,7 @@ extension ContentView {
                 } else if let action = afterDownloadBehaviorAtStart.postDownloadAction {
                     handlePostDownloadAction(action, for: result)
                 }
-            } else if outcome.statusText == "success" {
+            } else if finalResultKind == "success" || finalResultKind == "partial" {
                 downloadErrorText = String(localized: "download.error.no_files_found")
             }
         }
@@ -430,6 +441,10 @@ extension ContentView {
         guard !trimmed.isEmpty else { return }
         guard !downloadCancelRequested else { return }
 
+        if handlePlaylistProgressMarkerLine(trimmed) {
+            return
+        }
+
         if handlePackageInstallProgressLine(trimmed) {
             return
         }
@@ -523,10 +538,65 @@ extension ContentView {
     }
 
     private func shouldShowDetailedProgressLine(_ line: String) -> Bool {
-        if line.hasPrefix("[palladium][ffmpeg-progress]") {
+        if line.hasPrefix("[palladium][ffmpeg-progress]")
+            || line.hasPrefix("[palladium][playlist-progress]") {
             return false
         }
         return true
+    }
+
+    private func handlePlaylistProgressMarkerLine(_ line: String) -> Bool {
+        let prefix = "[palladium][playlist-progress] "
+        guard line.hasPrefix(prefix) else { return false }
+        let payload = String(line.dropFirst(prefix.count))
+        guard let data = payload.data(using: .utf8),
+              let raw = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any],
+              let snapshot = playlistProgressSnapshot(from: raw, fallbackResultKind: playlistProgress?.resultKind ?? "running") else {
+            return true
+        }
+
+        playlistProgress = snapshot
+        return true
+    }
+
+    private func playlistProgressSnapshot(
+        from raw: [String: Any],
+        fallbackResultKind: String
+    ) -> PlaylistProgressSnapshot? {
+        let title = normalizedOptionalString(raw["playlist_title"])
+        let expectedCount = raw["playlist_expected_count"] as? Int
+        let completedCount = raw["playlist_completed_count"] as? Int ?? 0
+        let failedCount = raw["playlist_failed_count"] as? Int ?? 0
+        let failedItems = (raw["playlist_failed_items"] as? [String]) ?? []
+        let currentItemIndex = raw["current_item_index"] as? Int
+        let currentItemTitle = normalizedOptionalString(raw["current_item_title"])
+        let resultKind = normalizedOptionalString(raw["result_kind"]) ?? fallbackResultKind
+
+        let hasPlaylistData = title != nil
+            || expectedCount != nil
+            || completedCount > 0
+            || failedCount > 0
+            || currentItemIndex != nil
+            || !failedItems.isEmpty
+
+        guard hasPlaylistData else { return nil }
+
+        return PlaylistProgressSnapshot(
+            title: title,
+            expectedCount: expectedCount,
+            completedCount: completedCount,
+            failedCount: failedCount,
+            failedItems: failedItems,
+            currentItemIndex: currentItemIndex,
+            currentItemTitle: currentItemTitle,
+            resultKind: resultKind
+        )
+    }
+
+    private func normalizedOptionalString(_ value: Any?) -> String? {
+        guard let text = value as? String else { return nil }
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? nil : trimmed
     }
 
     func downloadErrorDetails(from outcome: PythonFlowOutcome) -> String? {
