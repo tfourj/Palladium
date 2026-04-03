@@ -240,17 +240,22 @@ extension ContentView {
             self.cancelMarkerURL = nil
             self.currentDownloadTask = nil
 
+            let cancelWasRequested = downloadCancelRequested
             isRunning = false
             downloadCancelRequested = false
             lastDownloadProgressPercent = nil
             ffmpegProgressDurationSeconds = nil
             pendingDownloadProgressLine = ""
             isInstallingPackagesDuringDownload = false
-            let finalResultKind = outcome.resultKind ?? outcome.statusText
+            let finalResultKind = cancelWasRequested ? "cancelled" : (outcome.resultKind ?? outcome.statusText)
             statusText = finalResultKind
             playlistProgress = outcome.playlistProgress ?? playlistProgress
             if finalResultKind == "cancelled" {
                 progressText = String(localized: "download.status.cancelled")
+                showDownloadActionSheet = false
+                completedDownloadResult = nil
+                completedPhotosCompatibility = .checking
+                reopenDownloadActionAfterAlert = false
             } else if finalResultKind == "partial" {
                 progressText = String(localized: "download.status.partial")
             } else {
