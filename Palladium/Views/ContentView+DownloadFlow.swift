@@ -183,6 +183,7 @@ extension ContentView {
         let downloadPlaylistAtStart = downloadPlaylist
         let downloadSubtitlesAtStart = downloadSubtitles
         let embedThumbnailAtStart = embedThumbnail
+        let autoRetryFailedDownloadsAtStart = autoRetryFailedDownloads
         let subtitleLanguagePatternAtStart = resolvedSubtitleLanguagePattern
         let useCookiesAtStart = useCookies
         let cookieFilePathAtStart = useCookiesAtStart ? resolvedSelectedCookieFilePath() : nil
@@ -213,6 +214,7 @@ extension ContentView {
                 downloadPlaylist: downloadPlaylistAtStart,
                 downloadSubtitles: downloadSubtitlesAtStart,
                 embedThumbnail: embedThumbnailAtStart,
+                autoRetryFailedDownloads: autoRetryFailedDownloadsAtStart,
                 subtitleLanguagePattern: subtitleLanguagePatternAtStart,
                 cookieFilePath: cookieFilePathAtStart,
                 runOutputDir: runOutputURL.path

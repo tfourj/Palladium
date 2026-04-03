@@ -46,6 +46,7 @@ extension ContentView {
         defaults.set(downloadPlaylist, forKey: Self.downloadPlaylistDefaultsKey)
         defaults.set(downloadSubtitles, forKey: Self.downloadSubtitlesDefaultsKey)
         defaults.set(embedThumbnail, forKey: Self.embedThumbnailDefaultsKey)
+        defaults.set(autoRetryFailedDownloads, forKey: Self.autoRetryFailedDownloadsDefaultsKey)
         defaults.set(subtitleLanguagePattern, forKey: Self.subtitleLanguagePatternDefaultsKey)
         defaults.set(customSubtitleLanguagePattern, forKey: Self.customSubtitleLanguagePatternDefaultsKey)
         defaults.set(useCookies, forKey: Self.useCookiesDefaultsKey)
@@ -179,6 +180,13 @@ extension ContentView {
             return false
         }
         return UserDefaults.standard.bool(forKey: embedThumbnailDefaultsKey)
+    }
+
+    static func loadAutoRetryFailedDownloads() -> Bool {
+        if UserDefaults.standard.object(forKey: autoRetryFailedDownloadsDefaultsKey) == nil {
+            return false
+        }
+        return UserDefaults.standard.bool(forKey: autoRetryFailedDownloadsDefaultsKey)
     }
 
     static func loadSubtitleLanguagePattern() -> String {

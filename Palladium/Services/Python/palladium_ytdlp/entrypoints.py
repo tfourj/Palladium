@@ -42,6 +42,7 @@ class PlaylistProgressCollector:
         r"^\[(?:youtube:tab|download)\].*Downloading (?P<count>\d+) items? of (?P<total>\d+)$"
     )
     playlist_item_pattern = re.compile(r"^\[download\] Downloading item (?P<index>\d+) of (?P<total>\d+)$")
+    item_url_pattern = re.compile(r"^\[[^\]]+\] Extracting URL: (?P<url>.+)$")
     destination_pattern = re.compile(r"^\[(?:download|ExtractAudio)\] Destination: (?P<path>.+)$")
 
     def __init__(self, live_log_stream=None):
@@ -52,18 +53,24 @@ class PlaylistProgressCollector:
         self.playlist_completed_count = 0
         self.playlist_failed_count = 0
         self.playlist_failed_items = []
+        self.failed_item_records = []
         self.current_item_index = None
         self.current_item_title = None
+        self.current_item_url = None
         self.current_item_paths = set()
         self.current_item_had_error = False
         self.current_item_error_line = None
         self.is_playlist_run = False
         self.last_emitted_payload = None
+        self.suspend_tracking = False
 
     def write(self, data):
         text = str(data)
         if not text:
             return 0
+
+        if self.suspend_tracking:
+            return len(text)
 
         normalized = text.replace("\r\n", "\n").replace("\r", "\n")
         combined = self.pending_line + normalized
@@ -140,10 +147,16 @@ class PlaylistProgressCollector:
             self.current_item_index = int(playlist_item_match.group("index"))
             self.playlist_expected_count = int(playlist_item_match.group("total"))
             self.current_item_title = None
+            self.current_item_url = None
             self.current_item_paths = set()
             self.current_item_had_error = False
             self.current_item_error_line = None
             self._emit()
+            return
+
+        item_url_match = self.item_url_pattern.match(line)
+        if item_url_match and self.current_item_index is not None:
+            self.current_item_url = item_url_match.group("url").strip() or None
             return
 
         destination_match = self.destination_pattern.match(line)
@@ -171,18 +184,84 @@ class PlaylistProgressCollector:
             if has_output:
                 self.playlist_completed_count += 1
             else:
-                self.playlist_failed_count += 1
-                failed_label = self.current_item_title or f"Item {self.current_item_index}"
-                if self.current_item_error_line:
-                    failed_label = f"{failed_label}: {self.current_item_error_line}"
-                self.playlist_failed_items.append(failed_label)
+                self._record_failed_item()
 
         self.current_item_index = None
         self.current_item_title = None
+        self.current_item_url = None
         self.current_item_paths = set()
         self.current_item_had_error = False
         self.current_item_error_line = None
         self._emit()
+
+    def retry_candidates(self):
+        return [dict(record) for record in self.failed_item_records if self._is_thumbnail_failure(record.get("error_line"))]
+
+    def mark_retry_success(self, item_index):
+        updated_records = []
+        removed_count = 0
+        for record in self.failed_item_records:
+            if record.get("index") == item_index:
+                removed_count += 1
+                continue
+            updated_records.append(record)
+
+        if removed_count == 0:
+            return
+
+        self.failed_item_records = updated_records
+        self.playlist_failed_count = max(0, self.playlist_failed_count - removed_count)
+        self.playlist_completed_count += removed_count
+        self._rebuild_failed_items()
+        self._emit()
+
+    def mark_retry_failed(self, item_index, error_line):
+        for record in self.failed_item_records:
+            if record.get("index") != item_index:
+                continue
+            if error_line:
+                record["error_line"] = error_line
+            break
+        self._rebuild_failed_items()
+        self._emit()
+
+    def _record_failed_item(self):
+        self.playlist_failed_count += 1
+        failed_label = self.current_item_title or f"Item {self.current_item_index}"
+        if self.current_item_error_line:
+            failed_label = f"{failed_label}: {self.current_item_error_line}"
+        self.playlist_failed_items.append(failed_label)
+        self.failed_item_records.append({
+            "index": self.current_item_index,
+            "title": self.current_item_title,
+            "url": self.current_item_url,
+            "error_line": self.current_item_error_line,
+        })
+
+    def _rebuild_failed_items(self):
+        labels = []
+        for record in self.failed_item_records:
+            failed_label = record.get("title") or f"Item {record.get('index')}"
+            if record.get("error_line"):
+                failed_label = f"{failed_label}: {record['error_line']}"
+            labels.append(failed_label)
+        self.playlist_failed_items = labels
+
+    def _is_thumbnail_failure(self, error_line):
+        if not error_line:
+            return False
+        lower = error_line.lower()
+        return (
+            "thumbnail" in lower
+            or "thumbnails" in lower
+            or "embed-thumbnail" in lower
+            or "convert-thumbnails" in lower
+            or ".webp" in lower
+            or ".png" in lower
+        )
+
+    def set_tracking_suspended(self, suspended):
+        self.suspend_tracking = bool(suspended)
 
     def _emit(self):
         if self.live_log_stream is None:
@@ -221,6 +300,81 @@ def raise_if_cancel_requested(cancel_file_path, message):
         raise KeyboardInterrupt("cancel requested")
 
 
+def without_thumbnail_download_args(download_behavior_args):
+    result = []
+    skip_next = False
+    for arg in download_behavior_args:
+        if skip_next:
+            skip_next = False
+            continue
+        if arg == "--convert-thumbnails":
+            skip_next = True
+            continue
+        if arg == "--embed-thumbnail":
+            continue
+        result.append(arg)
+    return result
+
+
+def extract_last_error_line(output):
+    lines = [line.strip() for line in str(output).splitlines() if line.strip().startswith("ERROR:")]
+    return lines[-1] if lines else None
+
+
+def run_retry_without_thumbnails(
+    retry_candidate,
+    download_url,
+    run_output_dir,
+    cache_dir,
+    download_playlist,
+    output_args,
+    download_behavior_args,
+    preset_args,
+    extra_args,
+    bridge_adapter,
+):
+    item_index = retry_candidate.get("index")
+    if item_index is None:
+        return False, "ERROR: retry skipped because playlist item index was missing"
+
+    retry_behavior_args = without_thumbnail_download_args(download_behavior_args)
+    retry_url = download_url
+    retry_args = [
+        "yt-dlp",
+        "-v",
+        "--no-check-certificate",
+        "--remote-components",
+        "ejs:github",
+        "--cache-dir",
+        cache_dir if cache_dir else os.path.join(".", ".cache"),
+        "--force-overwrites",
+        "--no-continue",
+        "-P",
+        run_output_dir if run_output_dir else ".",
+        *output_args,
+        *retry_behavior_args,
+        *preset_args,
+        *extra_args,
+    ]
+
+    if download_playlist:
+        retry_args.extend(["--playlist-items", str(item_index)])
+    retry_args.append(retry_url)
+
+    sys.argv = retry_args
+    try:
+        with patch_ytdlp_for_swiftffmpeg(bridge_adapter):
+            runpy.run_module("yt_dlp", run_name="__main__", alter_sys=True)
+        return True, None
+    except SystemExit as exc:
+        if exc.code in (None, 0):
+            return True, None
+        return False, f"ERROR: retry without thumbnails failed with exit code {exc.code}"
+    except Exception:
+        traceback.print_exc()
+        return False, extract_last_error_line(traceback.format_exc()) or "ERROR: retry without thumbnails failed"
+
+
 def run_yt_dlp_flow(
     download_url_override=None,
     download_preset_override=None,
@@ -229,6 +383,7 @@ def run_yt_dlp_flow(
     download_playlist_override=None,
     download_subtitles_override=None,
     embed_thumbnail_override=None,
+    auto_retry_failed_downloads_override=None,
     subtitle_language_pattern_override=None,
     cookie_file_path_override=None,
     run_output_dir_override=None,
@@ -272,6 +427,10 @@ def run_yt_dlp_flow(
         embed_thumbnail = os.environ.get("PALLADIUM_EMBED_THUMBNAIL", "").strip().lower() in ("1", "true", "yes", "on")
     else:
         embed_thumbnail = bool(embed_thumbnail_override)
+    if auto_retry_failed_downloads_override is None:
+        auto_retry_failed_downloads = os.environ.get("PALLADIUM_AUTO_RETRY_FAILED_DOWNLOADS", "").strip().lower() in ("1", "true", "yes", "on")
+    else:
+        auto_retry_failed_downloads = bool(auto_retry_failed_downloads_override)
     if subtitle_language_pattern_override is None:
         subtitle_language_pattern = os.environ.get("PALLADIUM_SUBTITLE_LANGUAGE_PATTERN", "en").strip() or "en"
     else:
@@ -493,6 +652,41 @@ def run_yt_dlp_flow(
                             print("[palladium] yt-dlp execution failed")
                             traceback.print_exc()
                             yt_exit_code = 1
+
+                        if (
+                            not cancelled
+                            and auto_retry_failed_downloads
+                            and embed_thumbnail
+                            and download_playlist
+                            and playlist_progress.failed_item_records
+                        ):
+                            retry_candidates = playlist_progress.retry_candidates()
+                            for candidate in retry_candidates:
+                                item_index = candidate.get("index")
+                                item_title = candidate.get("title") or f"item {item_index}"
+                                print(f"[palladium] retrying playlist item without thumbnails: {item_title}")
+                                playlist_progress.set_tracking_suspended(True)
+                                retry_success, retry_error = run_retry_without_thumbnails(
+                                    retry_candidate=candidate,
+                                    download_url=download_url,
+                                    run_output_dir=run_output_dir,
+                                    cache_dir=cache_dir,
+                                    download_playlist=download_playlist,
+                                    output_args=output_args,
+                                    download_behavior_args=download_behavior_args,
+                                    preset_args=preset_args,
+                                    extra_args=extra_args,
+                                    bridge_adapter=bridge_adapter,
+                                )
+                                playlist_progress.set_tracking_suspended(False)
+                                if retry_success:
+                                    print(f"[palladium] retry without thumbnails succeeded: {item_title}")
+                                    playlist_progress.mark_retry_success(item_index)
+                                else:
+                                    print(f"[palladium] retry without thumbnails failed: {item_title}")
+                                    if retry_error:
+                                        print(retry_error)
+                                    playlist_progress.mark_retry_failed(item_index, retry_error)
 
             if not cancelled and yt_exit_code is not None:
                 try:

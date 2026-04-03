@@ -6,6 +6,7 @@ struct UseInterfaceSettingsView: View {
     @Binding var notificationsEnabled: Bool
     @Binding var rememberSelectedPreset: Bool
     @Binding var autoDownloadOnPaste: Bool
+    @Binding var autoRetryFailedDownloads: Bool
     @Binding var detailedProgressEnabled: Bool
     @Binding var shareSheetDownloadMode: ShareSheetDownloadMode
     @Binding var linkHistoryEnabled: Bool
@@ -80,12 +81,18 @@ struct UseInterfaceSettingsView: View {
             }
 
             Section {
+                Toggle("settings.ui.retry_failed.toggle", isOn: $autoRetryFailedDownloads)
+                    .disabled(isRunning)
+
                 Toggle("settings.ui.progress.verbose", isOn: $detailedProgressEnabled)
                     .disabled(isRunning)
             } header: {
                 Text("settings.ui.progress.section")
             } footer: {
-                Text("settings.ui.progress.help")
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("settings.ui.retry_failed.help")
+                    Text("settings.ui.progress.help")
+                }
             }
 
             Section {

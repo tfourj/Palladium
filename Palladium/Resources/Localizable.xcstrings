@@ -2254,6 +2254,26 @@
         }
       }
     },
+    "settings.ui.retry_failed.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatically retries playlist items that fail because of thumbnail download or thumbnail embedding by rerunning them once without thumbnail options."
+          }
+        }
+      }
+    },
+    "settings.ui.retry_failed.toggle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatically retry failed downloads"
+          }
+        }
+      }
+    },
     "settings.ui.progress.section" : {
       "localizations" : {
         "en" : {

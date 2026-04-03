@@ -13,6 +13,7 @@ enum PythonFlowRunner {
         downloadPlaylist: Bool,
         downloadSubtitles: Bool,
         embedThumbnail: Bool,
+        autoRetryFailedDownloads: Bool,
         subtitleLanguagePattern: String,
         cookieFilePath: String?,
         runOutputDir: String
@@ -32,6 +33,7 @@ enum PythonFlowRunner {
                         downloadPlaylist,
                         downloadSubtitles,
                         embedThumbnail,
+                        autoRetryFailedDownloads,
                         subtitleLanguagePattern,
                         cookieFilePath ?? "",
                         runOutputDir
