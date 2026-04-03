@@ -81,11 +81,11 @@ class PlaylistProgressCollector:
     def flush(self):
         return None
 
-    def finalize(self):
+    def finalize(self, cancelled=False):
         if self.pending_line:
             self._handle_line(self.pending_line.strip())
             self.pending_line = ""
-        self._finalize_current_item()
+        self._finalize_current_item(aborted=cancelled)
 
     def result_kind(self, success, cancelled):
         if cancelled:
@@ -162,19 +162,20 @@ class PlaylistProgressCollector:
             self.current_item_error_line = line
             self._emit()
 
-    def _finalize_current_item(self):
+    def _finalize_current_item(self, aborted=False):
         if self.current_item_index is None:
             return
 
-        has_output = any(self._path_exists(path) for path in self.current_item_paths)
-        if has_output:
-            self.playlist_completed_count += 1
-        else:
-            self.playlist_failed_count += 1
-            failed_label = self.current_item_title or f"Item {self.current_item_index}"
-            if self.current_item_error_line:
-                failed_label = f"{failed_label}: {self.current_item_error_line}"
-            self.playlist_failed_items.append(failed_label)
+        if not aborted:
+            has_output = any(self._path_exists(path) for path in self.current_item_paths)
+            if has_output:
+                self.playlist_completed_count += 1
+            else:
+                self.playlist_failed_count += 1
+                failed_label = self.current_item_title or f"Item {self.current_item_index}"
+                if self.current_item_error_line:
+                    failed_label = f"{failed_label}: {self.current_item_error_line}"
+                self.playlist_failed_items.append(failed_label)
 
         self.current_item_index = None
         self.current_item_title = None
@@ -533,7 +534,7 @@ def run_yt_dlp_flow(
                 except Exception:
                     pass
 
-        playlist_progress.finalize()
+        playlist_progress.finalize(cancelled=cancelled)
         success = (pip_exit_code in (None, 0)) and (yt_exit_code == 0) and not cancelled
         result_kind = playlist_progress.result_kind(success, cancelled)
         if result_kind == "partial":
