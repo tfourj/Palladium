@@ -164,6 +164,7 @@ extension ContentView {
         }
 
         isRunning = true
+        syncIdleTimerDisabled()
         statusText = "running"
         progressText = String(localized: "download.status.running")
         downloadCancelRequested = false
@@ -244,6 +245,7 @@ extension ContentView {
 
             let cancelWasRequested = downloadCancelRequested
             isRunning = false
+            syncIdleTimerDisabled()
             downloadCancelRequested = false
             lastDownloadProgressPercent = nil
             ffmpegProgressDurationSeconds = nil

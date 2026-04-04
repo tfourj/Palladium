@@ -7,6 +7,23 @@ import SwiftUI
 import UIKit
 
 extension ContentView {
+    var shouldDisableIdleTimer: Bool {
+        isRunning || isPackageRunning
+    }
+
+    func syncIdleTimerDisabled() {
+        let shouldDisable = shouldDisableIdleTimer
+        Task { @MainActor in
+            UIApplication.shared.isIdleTimerDisabled = shouldDisable
+        }
+    }
+
+    func clearIdleTimerOverride() {
+        Task { @MainActor in
+            UIApplication.shared.isIdleTimerDisabled = false
+        }
+    }
+
     func showTemporaryToast(_ message: String) {
         toastMessage = message
         withAnimation(.easeIn(duration: 0.18)) {

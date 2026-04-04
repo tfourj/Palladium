@@ -351,11 +351,22 @@ struct ContentView: View {
         }
         .onAppear {
             installKeyboardDismissTapIfNeeded()
+            syncIdleTimerDisabled()
             refreshImportedCookieFiles()
             consumePendingShortcutDownloadRequestIfNeeded()
         }
+        .onDisappear {
+            clearIdleTimerOverride()
+        }
+        .onChange(of: isRunning, initial: true) { _, _ in
+            syncIdleTimerDisabled()
+        }
+        .onChange(of: isPackageRunning, initial: true) { _, _ in
+            syncIdleTimerDisabled()
+        }
         .onChange(of: scenePhase, initial: true) { _, newPhase in
             guard newPhase == .active else { return }
+            syncIdleTimerDisabled()
             consumePendingShortcutDownloadRequestIfNeeded()
         }
         .onOpenURL { incomingURL in

@@ -17,6 +17,7 @@ extension ContentView {
         guard !isRunning, !isPackageRunning else { return }
 
         isPackageRunning = true
+        syncIdleTimerDisabled()
         switch action {
         case "update":
             packageStatusText = "updating"
@@ -78,6 +79,7 @@ extension ContentView {
             self.currentPackageTask = nil
 
             isPackageRunning = false
+            syncIdleTimerDisabled()
             isLoadingPackageVersions = false
             packageStatusText = outcome.statusText
             appendConsoleText("\n\(outcome.summaryText)\n")
