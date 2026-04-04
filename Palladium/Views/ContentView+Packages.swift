@@ -30,10 +30,11 @@ extension ContentView {
         let logPipe = Pipe()
         let readHandle = logPipe.fileHandleForReading
         let writeFD = logPipe.fileHandleForWriting.fileDescriptor
+        let liveLogFD: Int32? = writeFD
         let liveLogDecoder = StreamingUTF8Decoder()
         let cancelMarker = makeCancelMarkerURL()
         cancelMarkerURL = cancelMarker
-        setenv("PALLADIUM_LOG_FD", "\(writeFD)", 1)
+        FFmpegBridgeControl.setLiveLogFD(liveLogFD)
         if let cancelMarker {
             setenv("PALLADIUM_CANCEL_FILE", cancelMarker.path, 1)
             try? FileManager.default.removeItem(at: cancelMarker)
@@ -52,9 +53,13 @@ extension ContentView {
         }
 
         let task = Task {
-            let outcome = await PythonFlowRunner.executePackageFlow(action: action, customVersions: customVersions)
+            let outcome = await PythonFlowRunner.executePackageFlow(
+                action: action,
+                customVersions: customVersions,
+                liveLogFD: liveLogFD
+            )
 
-            unsetenv("PALLADIUM_LOG_FD")
+            FFmpegBridgeControl.setLiveLogFD(nil)
             unsetenv("PALLADIUM_CANCEL_FILE")
             readHandle.readabilityHandler = nil
             try? readHandle.close()

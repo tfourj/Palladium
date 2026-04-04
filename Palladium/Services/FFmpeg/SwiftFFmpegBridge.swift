@@ -16,6 +16,22 @@ private struct FFmpegBridgeResponse: Encodable {
 }
 
 enum FFmpegBridgeControl {
+    private static let stateLock = NSLock()
+    private static var activeLiveLogFD: Int32?
+
+    static func setLiveLogFD(_ fd: Int32?) {
+        stateLock.lock()
+        activeLiveLogFD = fd
+        stateLock.unlock()
+    }
+
+    static func currentLiveLogFD() -> Int32? {
+        stateLock.lock()
+        let fd = activeLiveLogFD
+        stateLock.unlock()
+        return fd
+    }
+
     static func requestCancellation() {
         SwiftFFmpeg.requestCancel()
     }
@@ -27,12 +43,7 @@ private final class FFmpegLiveLogForwarder {
     private var pendingMessage = ""
 
     init() {
-        if let rawValue = ProcessInfo.processInfo.environment["PALLADIUM_LOG_FD"],
-           let fdValue = Int32(rawValue) {
-            liveLogFD = fdValue
-        } else {
-            liveLogFD = nil
-        }
+        liveLogFD = FFmpegBridgeControl.currentLiveLogFD()
     }
 
     func ingest(_ message: String) {

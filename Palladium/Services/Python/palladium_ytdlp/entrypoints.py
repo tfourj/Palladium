@@ -387,6 +387,7 @@ def run_yt_dlp_flow(
     subtitle_language_pattern_override=None,
     cookie_file_path_override=None,
     run_output_dir_override=None,
+    live_log_fd_override=None,
 ):
     output = TailBuffer()
     console_stdout = sys.__stdout__ if sys.__stdout__ is not None else None
@@ -449,7 +450,7 @@ def run_yt_dlp_flow(
     install_target = os.environ.get("PALLADIUM_PYTHON_PACKAGES")
     cache_dir = os.environ.get("PALLADIUM_CACHE_DIR", "").strip()
     cancel_file_path = os.environ.get("PALLADIUM_CANCEL_FILE", "").strip()
-    live_log_stream = open_live_log_stream(os.environ.get("PALLADIUM_LOG_FD"))
+    live_log_stream = open_live_log_stream(live_log_fd_override)
     playlist_progress = PlaylistProgressCollector(live_log_stream=live_log_stream)
 
     with contextlib.redirect_stdout(Tee(output, console_stdout, live_log_stream, playlist_progress)), contextlib.redirect_stderr(Tee(output, console_stderr, live_log_stream, playlist_progress)):
@@ -750,7 +751,7 @@ def run_yt_dlp_flow(
     })
 
 
-def run_package_maintenance(action, custom_versions_json=None):
+def run_package_maintenance(action, custom_versions_json=None, live_log_fd_override=None):
     output = TailBuffer()
     console_stdout = sys.__stdout__ if sys.__stdout__ is not None else None
     console_stderr = sys.__stderr__ if sys.__stderr__ is not None else None
@@ -764,7 +765,7 @@ def run_package_maintenance(action, custom_versions_json=None):
     cancelled = False
     install_target = os.environ.get("PALLADIUM_PYTHON_PACKAGES")
     cancel_file_path = os.environ.get("PALLADIUM_CANCEL_FILE", "").strip()
-    live_log_stream = open_live_log_stream(os.environ.get("PALLADIUM_LOG_FD"))
+    live_log_stream = open_live_log_stream(live_log_fd_override)
 
     with contextlib.redirect_stdout(Tee(output, console_stdout, live_log_stream)), contextlib.redirect_stderr(Tee(output, console_stderr, live_log_stream)):
         os.environ["PYTHONIOENCODING"] = "utf-8"

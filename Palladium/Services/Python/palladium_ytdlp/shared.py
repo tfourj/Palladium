@@ -93,11 +93,13 @@ class Tee:
 
 
 def open_live_log_stream(live_fd_value):
-    if not live_fd_value:
+    if live_fd_value in (None, "", False):
         return None
 
     try:
         live_fd = int(live_fd_value)
+        if live_fd < 0:
+            return None
         return os.fdopen(live_fd, "w", buffering=1, encoding="utf-8", errors="replace", closefd=False)
     except Exception:
         return None

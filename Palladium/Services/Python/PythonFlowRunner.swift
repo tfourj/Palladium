@@ -16,16 +16,17 @@ enum PythonFlowRunner {
         autoRetryFailedDownloads: Bool,
         subtitleLanguagePattern: String,
         cookieFilePath: String?,
-        runOutputDir: String
+        runOutputDir: String,
+        liveLogFD: Int32?
     ) async -> PythonFlowOutcome {
         await runOnPythonThread {
             let payload: String
             do {
                 let module = try loadYtDlpModule()
                 let function = try pythonMember(module, named: "run_yt_dlp_flow")
-                payload = callPythonFunction(
-                    function,
-                    arguments: [
+                let liveLogArgument: PythonObject = liveLogFD.map { PythonObject(Int($0)) } ?? Python.None
+                let result = try function.throwing.dynamicallyCall(
+                    withArguments: [
                         url,
                         preset,
                         presetArgsJSON,
@@ -36,9 +37,11 @@ enum PythonFlowRunner {
                         autoRetryFailedDownloads,
                         subtitleLanguagePattern,
                         cookieFilePath ?? "",
-                        runOutputDir
+                        runOutputDir,
+                        liveLogArgument
                     ]
                 )
+                payload = String(result) ?? ""
             } catch {
                 payload = fallbackPythonErrorPayload(error)
             }
@@ -46,7 +49,11 @@ enum PythonFlowRunner {
         }
     }
 
-    static func executePackageFlow(action: String, customVersions: [String: String]? = nil) async -> PythonFlowOutcome {
+    static func executePackageFlow(
+        action: String,
+        customVersions: [String: String]? = nil,
+        liveLogFD: Int32?
+    ) async -> PythonFlowOutcome {
         await runOnPythonThread {
             let customVersionsJSON: String
             if let customVersions,
@@ -61,10 +68,11 @@ enum PythonFlowRunner {
             do {
                 let module = try loadYtDlpModule()
                 let function = try pythonMember(module, named: "run_package_maintenance")
-                payload = callPythonFunction(
-                    function,
-                    arguments: [action, customVersionsJSON]
+                let liveLogArgument: PythonObject = liveLogFD.map { PythonObject(Int($0)) } ?? Python.None
+                let result = try function.throwing.dynamicallyCall(
+                    withArguments: [action, customVersionsJSON, liveLogArgument]
                 )
+                payload = String(result) ?? ""
             } catch {
                 payload = fallbackPythonErrorPayload(error)
             }
@@ -114,18 +122,6 @@ enum PythonFlowRunner {
             throw PythonModuleLoadError.missingAttribute(name)
         }
         return member
-    }
-
-    private static func callPythonFunction(
-        _ function: PythonObject,
-        arguments: [PythonConvertible]
-    ) -> String {
-        do {
-            let result = try function.throwing.dynamicallyCall(withArguments: arguments)
-            return String(result) ?? ""
-        } catch {
-            return fallbackPythonErrorPayload(error)
-        }
     }
 
     private static func fallbackPythonErrorPayload(_ error: Error) -> String {

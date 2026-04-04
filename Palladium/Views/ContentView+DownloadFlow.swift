@@ -175,6 +175,7 @@ extension ContentView {
         let logPipe = Pipe()
         let readHandle = logPipe.fileHandleForReading
         let writeFD = logPipe.fileHandleForWriting.fileDescriptor
+        let liveLogFD: Int32? = writeFD
         let presetAtStart = (presetOverride ?? selectedPreset).pythonValue
         let extraArgsAtStart = extraArgsText.trimmingCharacters(in: .whitespacesAndNewlines)
         let presetArgsJSONAtStart = buildPresetArgumentsJSON()
@@ -191,7 +192,7 @@ extension ContentView {
         let liveLogDecoder = StreamingUTF8Decoder()
         let cancelMarker = makeCancelMarkerURL()
         cancelMarkerURL = cancelMarker
-        setenv("PALLADIUM_LOG_FD", "\(writeFD)", 1)
+        FFmpegBridgeControl.setLiveLogFD(liveLogFD)
         if let cancelMarker {
             setenv("PALLADIUM_CANCEL_FILE", cancelMarker.path, 1)
             try? FileManager.default.removeItem(at: cancelMarker)
@@ -217,10 +218,11 @@ extension ContentView {
                 autoRetryFailedDownloads: autoRetryFailedDownloadsAtStart,
                 subtitleLanguagePattern: subtitleLanguagePatternAtStart,
                 cookieFilePath: cookieFilePathAtStart,
-                runOutputDir: runOutputURL.path
+                runOutputDir: runOutputURL.path,
+                liveLogFD: liveLogFD
             )
 
-            unsetenv("PALLADIUM_LOG_FD")
+            FFmpegBridgeControl.setLiveLogFD(nil)
             unsetenv("PALLADIUM_CANCEL_FILE")
             readHandle.readabilityHandler = nil
             try? logPipe.fileHandleForWriting.close()
