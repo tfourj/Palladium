@@ -4,7 +4,8 @@ struct SettingsAboutView: View {
     @Environment(\.colorScheme) private var colorScheme
 
     private let githubURL = URL(string: "https://github.com/TfourJ")
-    private let discordURL = URL(string: "https://getnickel.app/discord")
+    private let websiteURL = URL(string: "https://getpalladium.app")
+    private let discordURL = URL(string: "https://discord.tfourj.com")
     private let licenseURL = URL(string: "https://github.com/TfourJ/Palladium/blob/main/LICENSE")
     
     private var appVersion: String {
@@ -59,6 +60,11 @@ struct SettingsAboutView: View {
             }
 
             Section("about.links.title") {
+                if let websiteURL {
+                    Link(destination: websiteURL) {
+                        linkRow("Website")
+                    }
+                }
                 if let discordURL {
                     Link(destination: discordURL) {
                         linkRow("Discord")
