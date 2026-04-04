@@ -22,9 +22,8 @@ On-device iOS media downloader powered by `yt-dlp`, `ffmpeg`, and `PythonKit`.
 
 ## Download
 
-- TestFlight: [Join here!](https://testflight.apple.com/join/y3nRxfpn)
-- AltStore PAL: coming soon
-- IPA
+- [Palladium Downloads](https://getpalladium.app/#downloads) (TestFlight, ~~AltStore~~, ~~AltStore PAL~~)
+- .ipa from GitHub
   - Stable: [GitHub Releases](https://github.com/tfourj/Palladium/releases)
   - Nightly: [GitHub Actions](https://github.com/tfourj/Palladium/actions)
 
