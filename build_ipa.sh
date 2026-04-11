@@ -38,7 +38,7 @@ echo "✅ Using SDK: $SDK"
 export PALLADIUM_DISABLE_PYTHON_DYLIB_CODESIGN=1
 
 patch_python_apple_support_utils() {
-  local utils_path="Python.xcframework/build/utils.sh"
+  local utils_path="Frameworks/Python.xcframework/build/utils.sh"
   if [ ! -f "$utils_path" ]; then
     echo "❌ Missing $utils_path"
     exit 1

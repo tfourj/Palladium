@@ -4,8 +4,12 @@ on:
   push:
     branches: [main]
     paths:
+      - ".github/workflows/build_ipa.yml"
+      - "Frameworks/**"
       - "Palladium/**"
       - "Palladium.xcodeproj/project.pbxproj"
+      - "build_ipa.sh"
+      - "scripts/**"
   workflow_dispatch:
 
 jobs:
@@ -34,6 +38,7 @@ jobs:
         set -euo pipefail
 
         TMP_DIR=$(mktemp -d)
+        FRAMEWORKS_DIR="$GITHUB_WORKSPACE/Frameworks"
         ARCHIVE_PATH=$(find "$GITHUB_WORKSPACE/python-download" -maxdepth 1 -type f -name "*iOS-support*.tar.gz" | head -n 1)
 
         if [ -z "$ARCHIVE_PATH" ]; then
@@ -53,11 +58,12 @@ jobs:
           exit 1
         fi
 
-        rm -rf "$GITHUB_WORKSPACE/Python.xcframework"
-        cp -R "$XCFRAMEWORK_PATH" "$GITHUB_WORKSPACE/Python.xcframework"
+        mkdir -p "$FRAMEWORKS_DIR"
+        rm -rf "$FRAMEWORKS_DIR/Python.xcframework"
+        cp -R "$XCFRAMEWORK_PATH" "$FRAMEWORKS_DIR/Python.xcframework"
 
         echo "✅ Installed Python.xcframework:"
-        ls -la "$GITHUB_WORKSPACE/Python.xcframework"
+        ls -la "$FRAMEWORKS_DIR/Python.xcframework"
 
     - name: Download SwiftFFmpeg-iOS
       uses: robinraju/release-downloader@v1
@@ -74,8 +80,10 @@ jobs:
         set -euo pipefail
 
         TMP_DIR=$(mktemp -d)
-        TARGET_DIR="$GITHUB_WORKSPACE/../SwiftFFmpeg-iOS"
+        FRAMEWORKS_DIR="$GITHUB_WORKSPACE/Frameworks"
+        TARGET_DIR="$FRAMEWORKS_DIR/SwiftFFmpeg-iOS"
         EXTRACT_DIR="$TMP_DIR/extracted"
+        mkdir -p "$FRAMEWORKS_DIR"
         mkdir -p "$EXTRACT_DIR"
         cp -R "$GITHUB_WORKSPACE/swiftffmpeg-download/." "$EXTRACT_DIR"
 

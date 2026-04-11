@@ -14,8 +14,8 @@ if [ -z "$SIGN_IDENTITY_TRIMMED" ]; then
   export CODE_SIGNING_ALLOWED=NO
 fi
 
-source "$PROJECT_DIR/Python.xcframework/build/utils.sh"
-install_python Python.xcframework
+source "$PROJECT_DIR/Frameworks/Python.xcframework/build/utils.sh"
+install_python Frameworks/Python.xcframework
 
 copy_privacy_manifest() {
   MANIFEST_NAME=$1

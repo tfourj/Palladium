@@ -52,8 +52,8 @@
 /* Begin PBXFileReference section */
 		8256E3AC2F57A8960067DF6E /* ShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		82BF06BE2F5761E800133331 /* Palladium.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Palladium.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		82BF06CD2F5762BC00133331 /* Python.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = Python.xcframework; sourceTree = "<group>"; };
-		82FD7E012F5B666000E69220 /* FFmpeg.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = FFmpeg.xcframework; path = "../SwiftFFmpeg-iOS/FFmpeg.xcframework"; sourceTree = "<group>"; };
+		82BF06CD2F5762BC00133331 /* Python.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = Frameworks/Python.xcframework; sourceTree = "<group>"; };
+		82FD7E012F5B666000E69220 /* FFmpeg.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = FFmpeg.xcframework; path = Frameworks/SwiftFFmpeg-iOS/FFmpeg.xcframework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -223,7 +223,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				82BF06D12F5762DD00133331 /* XCRemoteSwiftPackageReference "PythonKit" */,
-				82FD7E042F5B673000E69220 /* XCLocalSwiftPackageReference "../SwiftFFmpeg-iOS" */,
+				82FD7E042F5B673000E69220 /* XCLocalSwiftPackageReference "Frameworks/SwiftFFmpeg-iOS" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 82BF06BF2F5761E800133331 /* Products */;
@@ -636,9 +636,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		82FD7E042F5B673000E69220 /* XCLocalSwiftPackageReference "../SwiftFFmpeg-iOS" */ = {
+		82FD7E042F5B673000E69220 /* XCLocalSwiftPackageReference "Frameworks/SwiftFFmpeg-iOS" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = "../SwiftFFmpeg-iOS";
+			relativePath = Frameworks/SwiftFFmpeg-iOS;
 		};
 /* End XCLocalSwiftPackageReference section */
 

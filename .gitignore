@@ -3,3 +3,4 @@ nc_*.md
 /Palladium.xcodeproj/xcuserdata
 /build
 *.log
+/Frameworks
