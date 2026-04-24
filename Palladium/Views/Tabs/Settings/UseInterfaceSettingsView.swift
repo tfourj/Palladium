@@ -13,8 +13,39 @@ struct UseInterfaceSettingsView: View {
     @Binding var linkHistoryLimit: Int
     @Binding var appAppearanceMode: AppAppearanceMode
 
+    @State private var linkHistoryLimitText: String
+    @FocusState private var isHistoryLimitFieldFocused: Bool
+
     let isRunning: Bool
-    private let historyLimitRange = 0...ContentView.maxLinkHistoryLimit
+
+    init(
+        selectedPreset: Binding<DownloadPreset>,
+        afterDownloadBehavior: Binding<AfterDownloadBehavior>,
+        notificationsEnabled: Binding<Bool>,
+        rememberSelectedPreset: Binding<Bool>,
+        autoDownloadOnPaste: Binding<Bool>,
+        autoRetryFailedDownloads: Binding<Bool>,
+        detailedProgressEnabled: Binding<Bool>,
+        shareSheetDownloadMode: Binding<ShareSheetDownloadMode>,
+        linkHistoryEnabled: Binding<Bool>,
+        linkHistoryLimit: Binding<Int>,
+        appAppearanceMode: Binding<AppAppearanceMode>,
+        isRunning: Bool
+    ) {
+        _selectedPreset = selectedPreset
+        _afterDownloadBehavior = afterDownloadBehavior
+        _notificationsEnabled = notificationsEnabled
+        _rememberSelectedPreset = rememberSelectedPreset
+        _autoDownloadOnPaste = autoDownloadOnPaste
+        _autoRetryFailedDownloads = autoRetryFailedDownloads
+        _detailedProgressEnabled = detailedProgressEnabled
+        _shareSheetDownloadMode = shareSheetDownloadMode
+        _linkHistoryEnabled = linkHistoryEnabled
+        _linkHistoryLimit = linkHistoryLimit
+        _appAppearanceMode = appAppearanceMode
+        _linkHistoryLimitText = State(initialValue: String(linkHistoryLimit.wrappedValue))
+        self.isRunning = isRunning
+    }
 
     var body: some View {
         Form {
@@ -99,12 +130,23 @@ struct UseInterfaceSettingsView: View {
                 Toggle("settings.ui.history.enable", isOn: $linkHistoryEnabled)
                     .disabled(isRunning)
 
-                Picker("settings.ui.history.limit", selection: $linkHistoryLimit) {
-                    ForEach(historyLimitRange, id: \.self) { limit in
-                        Text("\(limit)").tag(limit)
-                    }
+                HStack {
+                    Text("settings.ui.history.limit")
+                    Spacer()
+                    TextField("0", text: $linkHistoryLimitText)
+                        .keyboardType(.numberPad)
+                        .multilineTextAlignment(.trailing)
+                        .foregroundStyle(.blue)
+                        .frame(width: 64)
+                        .focused($isHistoryLimitFieldFocused)
+                        .onChange(of: linkHistoryLimitText) { _, newValue in
+                            let filteredValue = newValue.filter(\.isNumber)
+                            if filteredValue != newValue {
+                                linkHistoryLimitText = filteredValue
+                            }
+                        }
+                        .onSubmit(commitLinkHistoryLimit)
                 }
-                .pickerStyle(.menu)
                 .disabled(isRunning || !linkHistoryEnabled)
             } header: {
                 Text("settings.ui.history.section")
@@ -119,5 +161,35 @@ struct UseInterfaceSettingsView: View {
         }
         .navigationTitle("settings.ui.title")
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            syncLinkHistoryLimitText()
+        }
+        .onChange(of: linkHistoryLimit) { _, _ in
+            guard !isHistoryLimitFieldFocused else { return }
+            syncLinkHistoryLimitText()
+        }
+        .onChange(of: isHistoryLimitFieldFocused) { _, isFocused in
+            guard !isFocused else { return }
+            commitLinkHistoryLimit()
+        }
+    }
+
+    private func syncLinkHistoryLimitText() {
+        linkHistoryLimitText = String(linkHistoryLimit)
+    }
+
+    private func commitLinkHistoryLimit() {
+        let trimmedValue = linkHistoryLimitText.trimmingCharacters(in: .whitespacesAndNewlines)
+        let parsedValue = Int(trimmedValue) ?? 0
+        let clampedValue = min(max(parsedValue, 0), ContentView.maxLinkHistoryLimit)
+
+        if linkHistoryLimit != clampedValue {
+            linkHistoryLimit = clampedValue
+        }
+
+        let normalizedText = String(clampedValue)
+        if linkHistoryLimitText != normalizedText {
+            linkHistoryLimitText = normalizedText
+        }
     }
 }
