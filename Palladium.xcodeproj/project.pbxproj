@@ -8,8 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		8256E3B62F57A8970067DF6E /* ShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 8256E3AC2F57A8960067DF6E /* ShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		82BF06CE2F5762BC00133331 /* Python.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82BF06CD2F5762BC00133331 /* Python.xcframework */; };
-		82BF06CF2F5762BC00133331 /* Python.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 82BF06CD2F5762BC00133331 /* Python.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		82BF06CE2F5762BC00133331 /* Frameworks/Python.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82BF06CD2F5762BC00133331 /* Frameworks/Python.xcframework */; };
+		82BF06CF2F5762BC00133331 /* Frameworks/Python.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 82BF06CD2F5762BC00133331 /* Frameworks/Python.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		82BF06D32F5762DD00133331 /* PythonKit in Frameworks */ = {isa = PBXBuildFile; productRef = 82BF06D22F5762DD00133331 /* PythonKit */; };
 		82FD7E062F5B673000E69220 /* SwiftFFmpeg in Frameworks */ = {isa = PBXBuildFile; productRef = 82FD7E052F5B673000E69220 /* SwiftFFmpeg */; };
 /* End PBXBuildFile section */
@@ -42,7 +42,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				82BF06CF2F5762BC00133331 /* Python.xcframework in Embed Frameworks */,
+				82BF06CF2F5762BC00133331 /* Frameworks/Python.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -52,8 +52,8 @@
 /* Begin PBXFileReference section */
 		8256E3AC2F57A8960067DF6E /* ShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		82BF06BE2F5761E800133331 /* Palladium.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Palladium.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		82BF06CD2F5762BC00133331 /* Python.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = Frameworks/Python.xcframework; sourceTree = "<group>"; };
-		82FD7E012F5B666000E69220 /* FFmpeg.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = FFmpeg.xcframework; path = Frameworks/SwiftFFmpeg-iOS/FFmpeg.xcframework; sourceTree = "<group>"; };
+		82BF06CD2F5762BC00133331 /* Frameworks/Python.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = Frameworks/Python.xcframework; sourceTree = "<group>"; };
+		82FD7E012F5B666000E69220 /* FFmpeg.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = FFmpeg.xcframework; path = "Frameworks/SwiftFFmpeg-iOS/FFmpeg.xcframework"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -104,7 +104,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				82BF06CE2F5762BC00133331 /* Python.xcframework in Frameworks */,
+				82BF06CE2F5762BC00133331 /* Frameworks/Python.xcframework in Frameworks */,
 				82FD7E062F5B673000E69220 /* SwiftFFmpeg in Frameworks */,
 				82BF06D32F5762DD00133331 /* PythonKit in Frameworks */,
 			);
@@ -136,7 +136,7 @@
 			isa = PBXGroup;
 			children = (
 				82FD7E012F5B666000E69220 /* FFmpeg.xcframework */,
-				82BF06CD2F5762BC00133331 /* Python.xcframework */,
+				82BF06CD2F5762BC00133331 /* Frameworks/Python.xcframework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -373,7 +373,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				APP_BUILD = 3;
+				APP_BUILD = 4;
 				APP_FINAL = false;
 				APP_VERSION = 1.0.1;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -441,7 +441,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				APP_BUILD = 3;
+				APP_BUILD = 4;
 				APP_FINAL = false;
 				APP_VERSION = 1.0.1;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -638,7 +638,7 @@
 /* Begin XCLocalSwiftPackageReference section */
 		82FD7E042F5B673000E69220 /* XCLocalSwiftPackageReference "Frameworks/SwiftFFmpeg-iOS" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = Frameworks/SwiftFFmpeg-iOS;
+			relativePath = "Frameworks/SwiftFFmpeg-iOS";
 		};
 /* End XCLocalSwiftPackageReference section */
 

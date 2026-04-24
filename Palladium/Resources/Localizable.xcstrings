@@ -4,6 +4,9 @@
     "%lld" : {
 
     },
+    "0" : {
+
+    },
     "about.developer.name" : {
       "localizations" : {
         "en" : {
@@ -174,22 +177,22 @@
         }
       }
     },
-    "common.ok" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "OK"
-          }
-        }
-      }
-    },
     "common.none" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "None"
+          }
+        }
+      }
+    },
+    "common.ok" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
           }
         }
       }
@@ -244,106 +247,6 @@
         }
       }
     },
-    "shortcuts.download_type.title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "What to Download"
-          }
-        }
-      }
-    },
-    "shortcuts.error.busy" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Another download or package task is already running. Palladium filled in the shortcut URL, but you need to start it again after the current task finishes."
-          }
-        }
-      }
-    },
-    "shortcuts.parameter.download_type" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "What to Download"
-          }
-        }
-      }
-    },
-    "shortcuts.parameter.save_destination" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Where to Save"
-          }
-        }
-      }
-    },
-    "shortcuts.parameter.url" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "URL"
-          }
-        }
-      }
-    },
-    "shortcuts.save_destination.title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Where to Save"
-          }
-        }
-      }
-    },
-    "shortcuts.start_download.description" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Open Palladium and start a download with the selected preset and save destination."
-          }
-        }
-      }
-    },
-    "shortcuts.start_download.dialog" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Opening Palladium to start the download."
-          }
-        }
-      }
-    },
-    "shortcuts.start_download.title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Start Download"
-          }
-        }
-      }
-    },
-    "shortcuts.toast.received" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Shortcut URL loaded into Palladium."
-          }
-        }
-      }
-    },
     "console.source.app" : {
       "localizations" : {
         "en" : {
@@ -380,6 +283,126 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "console"
+          }
+        }
+      }
+    },
+    "cookies.empty.subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import a Netscape cookie file from Files to make it available in downloads."
+          }
+        }
+      }
+    },
+    "cookies.empty.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No cookie files"
+          }
+        }
+      }
+    },
+    "cookies.error.invalid_format" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The selected file does not look like Netscape cookies format."
+          }
+        }
+      }
+    },
+    "cookies.error.name_conflict" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not create a unique filename for the imported cookie file."
+          }
+        }
+      }
+    },
+    "cookies.error.unreadable" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The selected file could not be read as text."
+          }
+        }
+      }
+    },
+    "cookies.file.meta" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ • %@"
+          }
+        }
+      }
+    },
+    "cookies.import.button" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import Cookie File"
+          }
+        }
+      }
+    },
+    "cookies.path.documents" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Documents/Cookies"
+          }
+        }
+      }
+    },
+    "cookies.path.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App folder"
+          }
+        }
+      }
+    },
+    "cookies.selected.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Default Selection"
+          }
+        }
+      }
+    },
+    "cookies.settings.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imported files are copied into Palladium storage so yt-dlp can reuse them later."
+          }
+        }
+      }
+    },
+    "cookies.toast.imported" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imported cookie file: %@"
           }
         }
       }
@@ -594,6 +617,56 @@
         }
       }
     },
+    "download.options.cookies.empty" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import a cookie file in Settings before enabling this option."
+          }
+        }
+      }
+    },
+    "download.options.cookies.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use one imported Netscape cookie file for this download"
+          }
+        }
+      }
+    },
+    "download.options.cookies.picker" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cookie file"
+          }
+        }
+      }
+    },
+    "download.options.cookies.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cookies"
+          }
+        }
+      }
+    },
+    "download.options.cookies.value" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cookies: %@"
+          }
+        }
+      }
+    },
     "download.options.playlist.help" : {
       "localizations" : {
         "en" : {
@@ -684,56 +757,6 @@
         }
       }
     },
-    "download.options.cookies.help" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Use one imported Netscape cookie file for this download"
-          }
-        }
-      }
-    },
-    "download.options.cookies.empty" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Import a cookie file in Settings before enabling this option."
-          }
-        }
-      }
-    },
-    "download.options.cookies.picker" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cookie file"
-          }
-        }
-      }
-    },
-    "download.options.cookies.title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cookies"
-          }
-        }
-      }
-    },
-    "download.options.cookies.value" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cookies: %@"
-          }
-        }
-      }
-    },
     "download.options.thumbnail.help" : {
       "localizations" : {
         "en" : {
@@ -760,56 +783,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "More options"
-          }
-        }
-      }
-    },
-    "download.preset.audio" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Audio"
-          }
-        }
-      }
-    },
-    "download.preset.mute" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mute"
-          }
-        }
-      }
-    },
-    "download.preset.title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Preset"
-          }
-        }
-      }
-    },
-    "download.preset.video" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Video"
-          }
-        }
-      }
-    },
-    "download.prompt.idle" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enter a URL and tap Download."
           }
         }
       }
@@ -914,6 +887,56 @@
         }
       }
     },
+    "download.preset.audio" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio"
+          }
+        }
+      }
+    },
+    "download.preset.mute" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mute"
+          }
+        }
+      }
+    },
+    "download.preset.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preset"
+          }
+        }
+      }
+    },
+    "download.preset.video" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video"
+          }
+        }
+      }
+    },
+    "download.prompt.idle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter a URL and tap Download."
+          }
+        }
+      }
+    },
     "download.status.cancelled" : {
       "localizations" : {
         "en" : {
@@ -964,22 +987,22 @@
         }
       }
     },
-    "download.status.processing" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Processing with ffmpeg..."
-          }
-        }
-      }
-    },
     "download.status.partial" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "completed with issues"
+          }
+        }
+      }
+    },
+    "download.status.processing" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Processing with ffmpeg..."
           }
         }
       }
@@ -1000,126 +1023,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enter video URL"
-          }
-        }
-      }
-    },
-    "cookies.empty.subtitle" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Import a Netscape cookie file from Files to make it available in downloads."
-          }
-        }
-      }
-    },
-    "cookies.empty.title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No cookie files"
-          }
-        }
-      }
-    },
-    "cookies.error.invalid_format" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The selected file does not look like Netscape cookies format."
-          }
-        }
-      }
-    },
-    "cookies.error.name_conflict" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Could not create a unique filename for the imported cookie file."
-          }
-        }
-      }
-    },
-    "cookies.error.unreadable" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The selected file could not be read as text."
-          }
-        }
-      }
-    },
-    "cookies.file.meta" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ • %@"
-          }
-        }
-      }
-    },
-    "cookies.import.button" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Import Cookie File"
-          }
-        }
-      }
-    },
-    "cookies.path.documents" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Documents/Cookies"
-          }
-        }
-      }
-    },
-    "cookies.path.title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "App folder"
-          }
-        }
-      }
-    },
-    "cookies.selected.title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Default Selection"
-          }
-        }
-      }
-    },
-    "cookies.settings.help" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Imported files are copied into Palladium storage so yt-dlp can reuse them later."
-          }
-        }
-      }
-    },
-    "cookies.toast.imported" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Imported cookie file: %@"
           }
         }
       }
@@ -1794,26 +1697,6 @@
         }
       }
     },
-    "settings.download_args.subtitle" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Custom and global yt-dlp args"
-          }
-        }
-      }
-    },
-    "settings.download_args.title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Download Arguments"
-          }
-        }
-      }
-    },
     "settings.cookies.subtitle_count" : {
       "localizations" : {
         "en" : {
@@ -1840,6 +1723,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cookies"
+          }
+        }
+      }
+    },
+    "settings.download_args.subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Custom and global yt-dlp args"
+          }
+        }
+      }
+    },
+    "settings.download_args.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download Arguments"
           }
         }
       }
@@ -2254,26 +2157,6 @@
         }
       }
     },
-    "settings.ui.retry_failed.help" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Automatically retries playlist items that fail because of thumbnail download or thumbnail embedding by rerunning them once without thumbnail options."
-          }
-        }
-      }
-    },
-    "settings.ui.retry_failed.toggle" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Automatically retry failed downloads"
-          }
-        }
-      }
-    },
     "settings.ui.progress.section" : {
       "localizations" : {
         "en" : {
@@ -2294,6 +2177,26 @@
         }
       }
     },
+    "settings.ui.retry_failed.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatically retries playlist items that fail because of thumbnail download or thumbnail embedding by rerunning them once without thumbnail options."
+          }
+        }
+      }
+    },
+    "settings.ui.retry_failed.toggle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatically retry failed downloads"
+          }
+        }
+      }
+    },
     "settings.ui.subtitle" : {
       "localizations" : {
         "en" : {
@@ -2310,6 +2213,106 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "User Interface"
+          }
+        }
+      }
+    },
+    "shortcuts.download_type.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What to Download"
+          }
+        }
+      }
+    },
+    "shortcuts.error.busy" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Another download or package task is already running. Palladium filled in the shortcut URL, but you need to start it again after the current task finishes."
+          }
+        }
+      }
+    },
+    "shortcuts.parameter.download_type" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What to Download"
+          }
+        }
+      }
+    },
+    "shortcuts.parameter.save_destination" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Where to Save"
+          }
+        }
+      }
+    },
+    "shortcuts.parameter.url" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL"
+          }
+        }
+      }
+    },
+    "shortcuts.save_destination.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Where to Save"
+          }
+        }
+      }
+    },
+    "shortcuts.start_download.description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Palladium and start a download with the selected preset and save destination."
+          }
+        }
+      }
+    },
+    "shortcuts.start_download.dialog" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opening Palladium to start the download."
+          }
+        }
+      }
+    },
+    "shortcuts.start_download.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start Download"
+          }
+        }
+      }
+    },
+    "shortcuts.toast.received" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shortcut URL loaded into Palladium."
           }
         }
       }
