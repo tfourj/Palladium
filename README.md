@@ -8,6 +8,12 @@ On-device iOS media downloader powered by `yt-dlp`, `ffmpeg`, and `PythonKit`.
 
 </div>
 
+<div align="center">
+  <a href="https://getpalladium.app" style="text-decoration:none; font-size:18px;">
+    getpalladium.app
+  </a>
+</div>
+
 ## What It Does
 
 - Downloads media directly on iPhone and iPad
@@ -22,7 +28,7 @@ On-device iOS media downloader powered by `yt-dlp`, `ffmpeg`, and `PythonKit`.
 
 ## Download
 
-- [Palladium Downloads](https://getpalladium.app/#downloads) (TestFlight, ~~AltStore~~, ~~AltStore PAL~~)
+- [Palladium Downloads](https://getpalladium.app/downloads) (TestFlight, AltStore PAL, .ipa, ~~AltStore Classic~~)
 - .ipa from GitHub
   - Stable: [GitHub Releases](https://github.com/tfourj/Palladium/releases)
   - Nightly: [GitHub Actions](https://github.com/tfourj/Palladium/actions)
@@ -41,6 +47,7 @@ Build instructions: [BUILD.md](BUILD.md)
 - [`ffmpeg`](https://ffmpeg.org/)
 - [`PythonKit`](https://github.com/pvieito/PythonKit)
 - [`python-apple-support`](https://github.com/beeware/Python-Apple-support)
+- [`LAME`](https://lame.sourceforge.io/)
 - [`SwiftFFmpeg-iOS`](https://github.com/tfourj/SwiftFFmpeg-iOS)
 
 ## License
