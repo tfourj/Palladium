@@ -251,6 +251,14 @@ extension ContentView {
             ffmpegProgressDurationSeconds = nil
             pendingDownloadProgressLine = ""
             isInstallingPackagesDuringDownload = false
+
+            if restoreDownloadDefaults {
+                downloadPlaylist = defaultDownloadPlaylist
+                downloadSubtitles = defaultDownloadSubtitles
+                embedThumbnail = defaultEmbedThumbnail
+                useCookies = defaultUseCookies
+            }
+
             let finalResultKind = cancelWasRequested ? "cancelled" : (outcome.resultKind ?? outcome.statusText)
             statusText = finalResultKind
             playlistProgress = outcome.playlistProgress ?? playlistProgress

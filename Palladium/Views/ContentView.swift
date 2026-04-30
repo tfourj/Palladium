@@ -52,6 +52,11 @@ struct ContentView: View {
     static let downloadPlaylistDefaultsKey = "palladium.downloadPlaylist"
     static let downloadSubtitlesDefaultsKey = "palladium.downloadSubtitles"
     static let embedThumbnailDefaultsKey = "palladium.embedThumbnail"
+    static let defaultDownloadPlaylistDefaultsKey = "palladium.defaultDownloadPlaylist"
+    static let defaultDownloadSubtitlesDefaultsKey = "palladium.defaultDownloadSubtitles"
+    static let defaultEmbedThumbnailDefaultsKey = "palladium.defaultEmbedThumbnail"
+    static let defaultUseCookiesDefaultsKey = "palladium.defaultUseCookies"
+    static let restoreDownloadDefaultsDefaultsKey = "palladium.restoreDownloadDefaults"
     static let autoRetryFailedDownloadsDefaultsKey = "palladium.autoRetryFailedDownloads"
     static let detailedProgressEnabledDefaultsKey = "palladium.detailedProgressEnabled"
     static let subtitleLanguagePatternDefaultsKey = "palladium.subtitleLanguagePattern"
@@ -84,6 +89,11 @@ struct ContentView: View {
     @State var downloadPlaylist: Bool
     @State var downloadSubtitles: Bool
     @State var embedThumbnail: Bool
+    @State var defaultDownloadPlaylist: Bool
+    @State var defaultDownloadSubtitles: Bool
+    @State var defaultEmbedThumbnail: Bool
+    @State var defaultUseCookies: Bool
+    @State var restoreDownloadDefaults: Bool
     @State var autoRetryFailedDownloads: Bool
     @State var detailedProgressEnabled: Bool
     @State var subtitleLanguagePattern: String
@@ -141,14 +151,24 @@ struct ContentView: View {
         _rememberSelectedPreset = State(initialValue: rememberPreset)
         _autoDownloadOnPaste = State(initialValue: Self.loadAutoDownloadOnPaste())
         _shareSheetDownloadMode = State(initialValue: Self.loadShareSheetDownloadMode())
-        _downloadPlaylist = State(initialValue: Self.loadDownloadPlaylist())
-        _downloadSubtitles = State(initialValue: Self.loadDownloadSubtitles())
-        _embedThumbnail = State(initialValue: Self.loadEmbedThumbnail())
+        let restoreDefaults = Self.loadRestoreDownloadDefaults()
+        let defPlaylist = Self.loadDefaultDownloadPlaylist()
+        let defSubtitles = Self.loadDefaultDownloadSubtitles()
+        let defThumbnail = Self.loadDefaultEmbedThumbnail()
+        let defCookies = Self.loadDefaultUseCookies()
+        _downloadPlaylist = State(initialValue: restoreDefaults ? defPlaylist : Self.loadDownloadPlaylist())
+        _downloadSubtitles = State(initialValue: restoreDefaults ? defSubtitles : Self.loadDownloadSubtitles())
+        _embedThumbnail = State(initialValue: restoreDefaults ? defThumbnail : Self.loadEmbedThumbnail())
+        _defaultDownloadPlaylist = State(initialValue: defPlaylist)
+        _defaultDownloadSubtitles = State(initialValue: defSubtitles)
+        _defaultEmbedThumbnail = State(initialValue: defThumbnail)
+        _defaultUseCookies = State(initialValue: defCookies)
+        _restoreDownloadDefaults = State(initialValue: restoreDefaults)
         _autoRetryFailedDownloads = State(initialValue: Self.loadAutoRetryFailedDownloads())
         _detailedProgressEnabled = State(initialValue: Self.loadDetailedProgressEnabled())
         _subtitleLanguagePattern = State(initialValue: Self.loadSubtitleLanguagePattern())
         _customSubtitleLanguagePattern = State(initialValue: Self.loadCustomSubtitleLanguagePattern())
-        _useCookies = State(initialValue: Self.loadUseCookies())
+        _useCookies = State(initialValue: restoreDefaults ? defCookies : Self.loadUseCookies())
         _selectedCookieFileName = State(initialValue: Self.loadSelectedCookieFileName())
         _importedCookieFiles = State(initialValue: [])
         _linkHistoryEnabled = State(initialValue: Self.loadLinkHistoryEnabled())
@@ -208,6 +228,11 @@ struct ContentView: View {
                     linkHistoryLimit: $linkHistoryLimit,
                     appAppearanceMode: $appAppearanceMode,
                     selectedCookieFileName: $selectedCookieFileName,
+                    defaultDownloadPlaylist: $defaultDownloadPlaylist,
+                    defaultDownloadSubtitles: $defaultDownloadSubtitles,
+                    defaultEmbedThumbnail: $defaultEmbedThumbnail,
+                    defaultUseCookies: $defaultUseCookies,
+                    restoreDownloadDefaults: $restoreDownloadDefaults,
                     importedCookieFiles: importedCookieFiles,
                     storageSummary: storageSummary,
                     packageStatusText: packageStatusText,
@@ -300,6 +325,21 @@ struct ContentView: View {
             persistPreferences()
         }
         .onChange(of: embedThumbnail, initial: false) {
+            persistPreferences()
+        }
+        .onChange(of: defaultDownloadPlaylist, initial: false) {
+            persistPreferences()
+        }
+        .onChange(of: defaultDownloadSubtitles, initial: false) {
+            persistPreferences()
+        }
+        .onChange(of: defaultEmbedThumbnail, initial: false) {
+            persistPreferences()
+        }
+        .onChange(of: defaultUseCookies, initial: false) {
+            persistPreferences()
+        }
+        .onChange(of: restoreDownloadDefaults, initial: false) {
             persistPreferences()
         }
         .onChange(of: autoRetryFailedDownloads, initial: false) {

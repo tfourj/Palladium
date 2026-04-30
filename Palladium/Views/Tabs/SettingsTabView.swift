@@ -3,6 +3,7 @@ import SwiftUI
 struct SettingsTabView: View {
     private enum SettingsRoute: Hashable {
         case useInterface
+        case downloadOptions
         case downloadArguments
         case cookies
         case storage
@@ -24,6 +25,11 @@ struct SettingsTabView: View {
     @Binding var linkHistoryLimit: Int
     @Binding var appAppearanceMode: AppAppearanceMode
     @Binding var selectedCookieFileName: String
+    @Binding var defaultDownloadPlaylist: Bool
+    @Binding var defaultDownloadSubtitles: Bool
+    @Binding var defaultEmbedThumbnail: Bool
+    @Binding var defaultUseCookies: Bool
+    @Binding var restoreDownloadDefaults: Bool
     let importedCookieFiles: [ImportedCookieFile]
 
     let storageSummary: StorageManagementSummary
@@ -63,6 +69,15 @@ struct SettingsTabView: View {
                             subtitle: String(localized: "settings.ui.subtitle"),
                             icon: "slider.horizontal.3",
                             color: .green
+                        )
+                    }
+
+                    NavigationLink(value: SettingsRoute.downloadOptions) {
+                        settingsRow(
+                            title: String(localized: "settings.download_defaults.page"),
+                            subtitle: String(localized: "settings.download_defaults.page_subtitle"),
+                            icon: "square.split.bottomrightquarter",
+                            color: .cyan
                         )
                     }
 
@@ -136,6 +151,15 @@ struct SettingsTabView: View {
                         linkHistoryEnabled: $linkHistoryEnabled,
                         linkHistoryLimit: $linkHistoryLimit,
                         appAppearanceMode: $appAppearanceMode,
+                        isRunning: isRunning
+                    )
+                case .downloadOptions:
+                    DownloadOptionsSettingsView(
+                        defaultDownloadPlaylist: $defaultDownloadPlaylist,
+                        defaultDownloadSubtitles: $defaultDownloadSubtitles,
+                        defaultEmbedThumbnail: $defaultEmbedThumbnail,
+                        defaultUseCookies: $defaultUseCookies,
+                        restoreDownloadDefaults: $restoreDownloadDefaults,
                         isRunning: isRunning
                     )
                 case .downloadArguments:

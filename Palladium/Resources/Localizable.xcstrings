@@ -1747,6 +1747,116 @@
         }
       }
     },
+    "settings.download_defaults.cookies.default" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use Cookies"
+          }
+        }
+      }
+    },
+    "settings.download_defaults.defaults.section" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Default Values"
+          }
+        }
+      }
+    },
+    "settings.download_defaults.page" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download Options"
+          }
+        }
+      }
+    },
+    "settings.download_defaults.page_subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set default values for each download session"
+          }
+        }
+      }
+    },
+    "settings.download_defaults.playlist.default" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download Playlist"
+          }
+        }
+      }
+    },
+    "settings.download_defaults.restore" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restore defaults after download"
+          }
+        }
+      }
+    },
+    "settings.download_defaults.restore.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When on, options reset to their default values after each download."
+          }
+        }
+      }
+    },
+    "settings.download_defaults.restore.section" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset After Download"
+          }
+        }
+      }
+    },
+    "settings.download_defaults.subtitles.default" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download Subtitles"
+          }
+        }
+      }
+    },
+    "settings.download_defaults.thumbnail.default" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Embed Thumbnail"
+          }
+        }
+      }
+    },
+    "settings.download_defaults.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Default Download Options"
+          }
+        }
+      }
+    },
     "settings.general.section" : {
       "localizations" : {
         "en" : {

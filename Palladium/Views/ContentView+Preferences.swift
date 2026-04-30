@@ -46,6 +46,11 @@ extension ContentView {
         defaults.set(downloadPlaylist, forKey: Self.downloadPlaylistDefaultsKey)
         defaults.set(downloadSubtitles, forKey: Self.downloadSubtitlesDefaultsKey)
         defaults.set(embedThumbnail, forKey: Self.embedThumbnailDefaultsKey)
+        defaults.set(defaultDownloadPlaylist, forKey: Self.defaultDownloadPlaylistDefaultsKey)
+        defaults.set(defaultDownloadSubtitles, forKey: Self.defaultDownloadSubtitlesDefaultsKey)
+        defaults.set(defaultEmbedThumbnail, forKey: Self.defaultEmbedThumbnailDefaultsKey)
+        defaults.set(defaultUseCookies, forKey: Self.defaultUseCookiesDefaultsKey)
+        defaults.set(restoreDownloadDefaults, forKey: Self.restoreDownloadDefaultsDefaultsKey)
         defaults.set(autoRetryFailedDownloads, forKey: Self.autoRetryFailedDownloadsDefaultsKey)
         defaults.set(subtitleLanguagePattern, forKey: Self.subtitleLanguagePatternDefaultsKey)
         defaults.set(customSubtitleLanguagePattern, forKey: Self.customSubtitleLanguagePatternDefaultsKey)
@@ -180,6 +185,41 @@ extension ContentView {
             return false
         }
         return UserDefaults.standard.bool(forKey: embedThumbnailDefaultsKey)
+    }
+
+    static func loadDefaultDownloadPlaylist() -> Bool {
+        if UserDefaults.standard.object(forKey: defaultDownloadPlaylistDefaultsKey) == nil {
+            return false
+        }
+        return UserDefaults.standard.bool(forKey: defaultDownloadPlaylistDefaultsKey)
+    }
+
+    static func loadDefaultDownloadSubtitles() -> Bool {
+        if UserDefaults.standard.object(forKey: defaultDownloadSubtitlesDefaultsKey) == nil {
+            return false
+        }
+        return UserDefaults.standard.bool(forKey: defaultDownloadSubtitlesDefaultsKey)
+    }
+
+    static func loadDefaultEmbedThumbnail() -> Bool {
+        if UserDefaults.standard.object(forKey: defaultEmbedThumbnailDefaultsKey) == nil {
+            return false
+        }
+        return UserDefaults.standard.bool(forKey: defaultEmbedThumbnailDefaultsKey)
+    }
+
+    static func loadDefaultUseCookies() -> Bool {
+        if UserDefaults.standard.object(forKey: defaultUseCookiesDefaultsKey) == nil {
+            return false
+        }
+        return UserDefaults.standard.bool(forKey: defaultUseCookiesDefaultsKey)
+    }
+
+    static func loadRestoreDownloadDefaults() -> Bool {
+        if UserDefaults.standard.object(forKey: restoreDownloadDefaultsDefaultsKey) == nil {
+            return false
+        }
+        return UserDefaults.standard.bool(forKey: restoreDownloadDefaultsDefaultsKey)
     }
 
     static func loadAutoRetryFailedDownloads() -> Bool {
