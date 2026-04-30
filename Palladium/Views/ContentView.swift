@@ -328,18 +328,28 @@ struct ContentView: View {
             persistPreferences()
         }
         .onChange(of: defaultDownloadPlaylist, initial: false) {
+            if restoreDownloadDefaults { downloadPlaylist = defaultDownloadPlaylist }
             persistPreferences()
         }
         .onChange(of: defaultDownloadSubtitles, initial: false) {
+            if restoreDownloadDefaults { downloadSubtitles = defaultDownloadSubtitles }
             persistPreferences()
         }
         .onChange(of: defaultEmbedThumbnail, initial: false) {
+            if restoreDownloadDefaults { embedThumbnail = defaultEmbedThumbnail }
             persistPreferences()
         }
         .onChange(of: defaultUseCookies, initial: false) {
+            if restoreDownloadDefaults { useCookies = defaultUseCookies }
             persistPreferences()
         }
         .onChange(of: restoreDownloadDefaults, initial: false) {
+            if restoreDownloadDefaults {
+                downloadPlaylist = defaultDownloadPlaylist
+                downloadSubtitles = defaultDownloadSubtitles
+                embedThumbnail = defaultEmbedThumbnail
+                useCookies = defaultUseCookies
+            }
             persistPreferences()
         }
         .onChange(of: autoRetryFailedDownloads, initial: false) {
