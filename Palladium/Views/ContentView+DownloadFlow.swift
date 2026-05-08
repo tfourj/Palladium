@@ -6,6 +6,7 @@
 import SwiftUI
 import Foundation
 import OSLog
+import UIKit
 
 extension ContentView {
     var shareSheetDefaultPreset: DownloadPreset {
@@ -207,6 +208,21 @@ extension ContentView {
             processLiveLogData(data, decoder: liveLogDecoder, didReceiveLiveOutput: &receivedPythonLiveOutput)
         }
 
+        var backgroundTaskID = UIBackgroundTaskIdentifier.invalid
+        backgroundTaskID = UIApplication.shared.beginBackgroundTask(withName: "Palladium download") {
+            PythonFlowRunner.interruptActiveFlow()
+            Task { @MainActor in
+                appendConsoleText("[palladium] background time expired; stopping download\n")
+                if backgroundTaskID != .invalid {
+                    UIApplication.shared.endBackgroundTask(backgroundTaskID)
+                    backgroundTaskID = .invalid
+                }
+            }
+        }
+        if backgroundTaskID != .invalid {
+            appendConsoleText("[palladium] background download time requested\n")
+        }
+
         let task = Task {
             let outcome = await PythonFlowRunner.executeDownloadFlow(
                 url: targetURL,
@@ -242,6 +258,11 @@ extension ContentView {
             }
             self.cancelMarkerURL = nil
             self.currentDownloadTask = nil
+
+            if backgroundTaskID != .invalid {
+                UIApplication.shared.endBackgroundTask(backgroundTaskID)
+                backgroundTaskID = .invalid
+            }
 
             let cancelWasRequested = downloadCancelRequested
             isRunning = false

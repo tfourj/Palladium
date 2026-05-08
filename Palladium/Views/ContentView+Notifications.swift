@@ -51,17 +51,49 @@ extension ContentView {
             return
         }
 
+        scheduleAuthorizedCompletionNotification(fileURL: fileURL)
+    }
+
+    func scheduleAuthorizedCompletionNotification(fileURL: URL) {
+        let center = UNUserNotificationCenter.current()
+        center.getNotificationSettings { settings in
+            debugNotification("delivery permission status=\(settings.authorizationStatus.rawValue)")
+            switch settings.authorizationStatus {
+            case .authorized, .provisional, .ephemeral:
+                addCompletionNotification(fileURL: fileURL)
+            case .notDetermined:
+                center.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+                    if let error {
+                        Self.logger.error("notification permission request failed: \(error.localizedDescription, privacy: .public)")
+                        debugNotification("delivery permission request failed: \(error.localizedDescription)")
+                    } else if granted {
+                        debugNotification("delivery permission granted")
+                        addCompletionNotification(fileURL: fileURL)
+                    } else {
+                        debugNotification("delivery permission denied by prompt")
+                    }
+                }
+            case .denied:
+                debugNotification("completion notification skipped (permission denied)")
+            @unknown default:
+                debugNotification("completion notification skipped (unknown permission)")
+            }
+        }
+    }
+
+    func addCompletionNotification(fileURL: URL) {
         debugNotification("scheduling notification file=\(fileURL.lastPathComponent)")
 
         let content = UNMutableNotificationContent()
         content.title = String(localized: "post_download.title")
         content.body = fileURL.lastPathComponent
         content.sound = .default
+        content.interruptionLevel = .active
 
         let request = UNNotificationRequest(
             identifier: "palladium-download-\(UUID().uuidString)",
             content: content,
-            trigger: nil
+            trigger: UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
         )
 
         UNUserNotificationCenter.current().add(request) { error in
