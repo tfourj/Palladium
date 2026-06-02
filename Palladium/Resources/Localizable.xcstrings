@@ -57,6 +57,256 @@
         }
       }
     },
+    "allowlists.add.button" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Allowlist"
+          }
+        }
+      }
+    },
+    "allowlists.add.placeholder" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://example.com/allowlist.json"
+          }
+        }
+      }
+    },
+    "allowlists.allowed.by" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allowed by %@"
+          }
+        }
+      }
+    },
+    "allowlists.blocked.invalid_url" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter a valid http or https URL."
+          }
+        }
+      }
+    },
+    "allowlists.blocked.no_entries" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No download allowlist entries are available. Refresh allowlists in Settings and try again."
+          }
+        }
+      }
+    },
+    "allowlists.blocked.not_allowed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This URL is not allowed by the configured download allowlists."
+          }
+        }
+      }
+    },
+    "allowlists.default.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Default allowlist"
+          }
+        }
+      }
+    },
+    "allowlists.entry.fallback_name" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entry %lld"
+          }
+        }
+      }
+    },
+    "allowlists.error.duplicate_source" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "That allowlist is already added."
+          }
+        }
+      }
+    },
+    "allowlists.error.empty_document" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The allowlist did not contain any enabled entries."
+          }
+        }
+      }
+    },
+    "allowlists.error.http_status" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server returned HTTP %lld."
+          }
+        }
+      }
+    },
+    "allowlists.error.invalid_source" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter a valid https allowlist URL."
+          }
+        }
+      }
+    },
+    "allowlists.error.unsupported_version" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The allowlist format version is not supported."
+          }
+        }
+      }
+    },
+    "allowlists.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download URLs must match at least one enabled regex entry from the default allowlist or a custom allowlist."
+          }
+        }
+      }
+    },
+    "allowlists.last_refresh" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last refreshed %@"
+          }
+        }
+      }
+    },
+    "allowlists.refresh.button" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Refresh Allowlists"
+          }
+        }
+      }
+    },
+    "allowlists.sources.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sources"
+          }
+        }
+      }
+    },
+    "allowlists.status.cached" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Using %lld cached entries."
+          }
+        }
+      }
+    },
+    "allowlists.status.checking" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Checking URL allowlists..."
+          }
+        }
+      }
+    },
+    "allowlists.status.failed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed: %@"
+          }
+        }
+      }
+    },
+    "allowlists.status.invalid_source" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invalid source URL."
+          }
+        }
+      }
+    },
+    "allowlists.status.loaded" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loaded %lld entries."
+          }
+        }
+      }
+    },
+    "allowlists.status.not_loaded" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not loaded yet."
+          }
+        }
+      }
+    },
+    "allowlists.subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld sources configured"
+          }
+        }
+      }
+    },
+    "allowlists.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL Allowlists"
+          }
+        }
+      }
+    },
     "appearance.dark" : {
       "localizations" : {
         "en" : {

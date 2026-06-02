@@ -5,6 +5,7 @@ struct SettingsTabView: View {
         case useInterface
         case downloadOptions
         case downloadArguments
+        case urlAllowlists
         case cookies
         case storage
         case packages
@@ -31,6 +32,7 @@ struct SettingsTabView: View {
     @Binding var defaultEmbedThumbnail: Bool
     @Binding var defaultUseCookies: Bool
     @Binding var restoreDownloadDefaults: Bool
+    let urlAllowlistSources: [URLAllowlistSource]
     let importedCookieFiles: [ImportedCookieFile]
 
     let storageSummary: StorageManagementSummary
@@ -59,6 +61,9 @@ struct SettingsTabView: View {
     let onRefreshCookieFiles: () -> Void
     let onImportCookieFile: (_ sourceURL: URL) throws -> Void
     let onDeleteCookieFile: (_ cookieFile: ImportedCookieFile) throws -> Void
+    let onRefreshURLAllowlists: () -> Void
+    let onAddURLAllowlist: (_ urlString: String) -> Void
+    let onRemoveURLAllowlist: (_ source: URLAllowlistSource) -> Void
 
     var body: some View {
         NavigationStack {
@@ -88,6 +93,15 @@ struct SettingsTabView: View {
                             subtitle: String(localized: "settings.download_args.subtitle"),
                             icon: "terminal",
                             color: .blue
+                        )
+                    }
+
+                    NavigationLink(value: SettingsRoute.urlAllowlists) {
+                        settingsRow(
+                            title: String(localized: "allowlists.title"),
+                            subtitle: String(format: String(localized: "allowlists.subtitle"), urlAllowlistSources.count),
+                            icon: "checkmark.shield.fill",
+                            color: .mint
                         )
                     }
 
@@ -182,6 +196,14 @@ struct SettingsTabView: View {
                         customArgsText: $customArgsText,
                         extraArgsText: $extraArgsText,
                         isRunning: isRunning
+                    )
+                case .urlAllowlists:
+                    URLAllowlistsSettingsView(
+                        sources: urlAllowlistSources,
+                        isBusy: isRunning || isPackageRunning,
+                        onRefresh: onRefreshURLAllowlists,
+                        onAdd: onAddURLAllowlist,
+                        onRemove: onRemoveURLAllowlist
                     )
                 case .storage:
                     StorageSettingsView(

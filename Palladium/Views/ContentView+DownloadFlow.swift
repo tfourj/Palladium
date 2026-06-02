@@ -135,11 +135,42 @@ extension ContentView {
     func runDownloadFlow(
         urlOverride: String? = nil,
         presetOverride: DownloadPreset? = nil,
-        afterDownloadOverride: AfterDownloadBehavior? = nil
+        afterDownloadOverride: AfterDownloadBehavior? = nil,
+        allowlistChecked: Bool = false
     ) {
-        guard !isRunning, !isPackageRunning else { return }
+        guard !isRunning, !isPackageRunning, !isCheckingDownloadAllowlist else { return }
         let targetURL = (urlOverride ?? urlText).trimmingCharacters(in: .whitespacesAndNewlines)
         guard !targetURL.isEmpty else { return }
+
+        guard allowlistChecked else {
+            isCheckingDownloadAllowlist = true
+            progressText = String(localized: "allowlists.status.checking")
+            appendConsoleText("[palladium] checking download url allowlists\n")
+
+            Task { @MainActor in
+                let result = await URLAllowlistManager.validateDownloadURL(targetURL)
+                isCheckingDownloadAllowlist = false
+                urlAllowlistSources = URLAllowlistManager.loadSources()
+
+                guard result.isAllowed else {
+                    appendConsoleText("[palladium] blocked download url: \(result.message)\n")
+                    progressText = String(localized: "download.prompt.idle")
+                    downloadErrorText = result.message
+                    alertMessage = result.message
+                    showAlert = true
+                    return
+                }
+
+                appendConsoleText("[palladium] allowed download url: \(result.message)\n")
+                runDownloadFlow(
+                    urlOverride: targetURL,
+                    presetOverride: presetOverride,
+                    afterDownloadOverride: afterDownloadOverride,
+                    allowlistChecked: true
+                )
+            }
+            return
+        }
 
         consoleLogStore.clearAll()
         downloadErrorText = nil
