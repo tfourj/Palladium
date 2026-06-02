@@ -120,8 +120,8 @@ enum URLAllowlistManager {
         return entries
     }
 
-    static func addCustomSource(_ urlString: String) async throws {
-        let trimmed = urlString.trimmingCharacters(in: .whitespacesAndNewlines)
+    static func addCustomSource(_ urlString: String) async throws -> URLAllowlistSource {
+        let trimmed = normalizedSourceURLString(from: urlString)
         try validateSourceURL(trimmed)
         guard trimmed != defaultAllowlistURLString,
               !loadCustomSources().contains(where: { $0.urlString == trimmed }) else {
@@ -146,6 +146,7 @@ enum URLAllowlistManager {
             statusMessage: refreshed.source.statusMessage
         )
         saveSourceStatuses(statuses)
+        return refreshed.source
     }
 
     static func removeCustomSource(_ source: URLAllowlistSource) {
@@ -386,6 +387,15 @@ enum URLAllowlistManager {
     private static func saveSourceStatuses(_ statuses: [String: URLAllowlistSourceStatus]) {
         guard let data = try? JSONEncoder().encode(statuses) else { return }
         UserDefaults.standard.set(data, forKey: sourceStatusesDefaultsKey)
+    }
+
+    private static func normalizedSourceURLString(from urlString: String) -> String {
+        let trimmed = urlString.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return trimmed }
+        guard trimmed.range(of: "^[a-zA-Z][a-zA-Z0-9+.-]*://", options: .regularExpression) == nil else {
+            return trimmed
+        }
+        return "https://\(trimmed)"
     }
 
     private static func validateSourceURL(_ urlString: String) throws {

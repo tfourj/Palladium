@@ -267,12 +267,42 @@
         }
       }
     },
+    "allowlists.status.add_failed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to add allowlist: %@"
+          }
+        }
+      }
+    },
+    "allowlists.status.added" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Added %@."
+          }
+        }
+      }
+    },
     "allowlists.status.checking" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Checking URL allowlists..."
+          }
+        }
+      }
+    },
+    "allowlists.status.fetching" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fetching..."
           }
         }
       }
@@ -313,6 +343,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Not loaded yet."
+          }
+        }
+      }
+    },
+    "allowlists.status.refresh_complete" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allowlists refreshed."
           }
         }
       }

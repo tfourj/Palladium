@@ -62,8 +62,8 @@ struct SettingsTabView: View {
     let onRefreshCookieFiles: () -> Void
     let onImportCookieFile: (_ sourceURL: URL) throws -> Void
     let onDeleteCookieFile: (_ cookieFile: ImportedCookieFile) throws -> Void
-    let onRefreshURLAllowlists: () -> Void
-    let onAddURLAllowlist: (_ urlString: String) -> Void
+    let onRefreshURLAllowlists: (_ onComplete: ((_ message: String) -> Void)?) -> Void
+    let onAddURLAllowlist: (_ urlString: String, _ onComplete: ((_ message: String) -> Void)?) -> Void
     let onRemoveURLAllowlist: (_ source: URLAllowlistSource) -> Void
 
     var body: some View {

@@ -4,12 +4,13 @@ struct URLAllowlistsSettingsView: View {
     let sources: [URLAllowlistSource]
     let isBusy: Bool
     let isRefreshing: Bool
-    let onRefresh: () -> Void
-    let onAdd: (_ urlString: String) -> Void
+    let onRefresh: (_ onComplete: ((_ message: String) -> Void)?) -> Void
+    let onAdd: (_ urlString: String, _ onComplete: ((_ message: String) -> Void)?) -> Void
     let onRemove: (_ source: URLAllowlistSource) -> Void
 
     @State private var newAllowlistURL = ""
     @State private var showAddAllowlistPrompt = false
+    @State private var feedbackMessage: String?
 
     var body: some View {
         Form {
@@ -22,7 +23,12 @@ struct URLAllowlistsSettingsView: View {
                 }
                 .disabled(isBusy || isRefreshing)
 
-                Button(action: onRefresh) {
+                Button {
+                    feedbackMessage = String(localized: "allowlists.status.fetching")
+                    onRefresh { message in
+                        feedbackMessage = message
+                    }
+                } label: {
                     HStack {
                         Image(systemName: "arrow.clockwise")
                             .rotationEffect(.degrees(isRefreshing ? 360 : 0))
@@ -38,6 +44,19 @@ struct URLAllowlistsSettingsView: View {
                 .disabled(isBusy || isRefreshing)
             } footer: {
                 Text("allowlists.help")
+            }
+
+            if isRefreshing || feedbackMessage != nil {
+                Section {
+                    HStack(spacing: 10) {
+                        if isRefreshing {
+                            ProgressView()
+                        }
+                        Text(isRefreshing ? String(localized: "allowlists.status.fetching") : feedbackMessage ?? "")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                }
             }
 
             Section("allowlists.sources.title") {
@@ -103,7 +122,10 @@ struct URLAllowlistsSettingsView: View {
             Button("common.save") {
                 let trimmed = newAllowlistURL.trimmingCharacters(in: .whitespacesAndNewlines)
                 guard !trimmed.isEmpty else { return }
-                onAdd(trimmed)
+                feedbackMessage = String(localized: "allowlists.status.fetching")
+                onAdd(trimmed) { message in
+                    feedbackMessage = message
+                }
                 newAllowlistURL = ""
             }
         } message: {
