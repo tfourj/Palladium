@@ -44,6 +44,7 @@ struct SettingsTabView: View {
     let isLoadingPackageVersions: Bool
     let isRunning: Bool
     let isPackageRunning: Bool
+    let isRefreshingURLAllowlists: Bool
     let onRefreshVersions: () -> Void
     let onCancelPackages: () -> Void
     let onUpdatePackages: () -> Void
@@ -201,6 +202,7 @@ struct SettingsTabView: View {
                     URLAllowlistsSettingsView(
                         sources: urlAllowlistSources,
                         isBusy: isRunning || isPackageRunning,
+                        isRefreshing: isRefreshingURLAllowlists,
                         onRefresh: onRefreshURLAllowlists,
                         onAdd: onAddURLAllowlist,
                         onRemove: onRemoveURLAllowlist

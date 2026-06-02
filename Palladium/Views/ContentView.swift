@@ -252,6 +252,7 @@ struct ContentView: View {
                     isLoadingPackageVersions: isLoadingPackageVersions,
                     isRunning: isRunning,
                     isPackageRunning: isPackageRunning,
+                    isRefreshingURLAllowlists: isRefreshingURLAllowlists,
                     onRefreshVersions: refreshPackageVersions,
                     onCancelPackages: cancelPackageFlow,
                     onUpdatePackages: updatePackages,
@@ -422,7 +423,6 @@ struct ContentView: View {
                 requestNotificationAuthorizationIfNeeded()
             }
             refreshImportedCookieFiles()
-            refreshURLAllowlists()
             consumePendingShortcutDownloadRequestIfNeeded()
             if checkPackageUpdatesOnLaunch {
                 runPackageFlow(action: "check")

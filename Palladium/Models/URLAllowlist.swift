@@ -3,6 +3,7 @@ import Foundation
 struct URLAllowlistSource: Codable, Identifiable, Equatable {
     let id: UUID
     var urlString: String
+    var name: String?
     var isDefault: Bool
     var lastRefreshDate: Date?
     var statusMessage: String
@@ -10,15 +11,22 @@ struct URLAllowlistSource: Codable, Identifiable, Equatable {
     init(
         id: UUID = UUID(),
         urlString: String,
+        name: String? = nil,
         isDefault: Bool = false,
         lastRefreshDate: Date? = nil,
         statusMessage: String = String(localized: "allowlists.status.not_loaded")
     ) {
         self.id = id
         self.urlString = urlString
+        self.name = name
         self.isDefault = isDefault
         self.lastRefreshDate = lastRefreshDate
         self.statusMessage = statusMessage
+    }
+
+    var displayName: String {
+        let trimmedName = name?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        return trimmedName.isEmpty ? displayURL : trimmedName
     }
 
     var displayURL: String {
@@ -67,6 +75,7 @@ enum URLAllowlistManager {
         let defaultSource = URLAllowlistSource(
             id: UUID(uuidString: "2D1D091A-53D0-4978-BDB5-2F831250B263") ?? UUID(),
             urlString: defaultAllowlistURLString,
+            name: defaultStatus?.name,
             isDefault: true,
             lastRefreshDate: defaultStatus?.lastRefreshDate,
             statusMessage: defaultStatus?.statusMessage ?? String(localized: "allowlists.status.not_loaded")
@@ -90,6 +99,7 @@ enum URLAllowlistManager {
             return URLAllowlistSource(
                 id: source.id,
                 urlString: trimmed,
+                name: status?.name ?? source.name,
                 isDefault: false,
                 lastRefreshDate: status?.lastRefreshDate ?? source.lastRefreshDate,
                 statusMessage: status?.statusMessage ?? source.statusMessage
@@ -105,22 +115,32 @@ enum URLAllowlistManager {
         return entries
     }
 
-    static func addCustomSource(_ urlString: String) throws {
+    static func addCustomSource(_ urlString: String) async throws {
         let trimmed = urlString.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard let url = URL(string: trimmed),
-              let scheme = url.scheme?.lowercased(),
-              scheme == "https",
-              url.host?.isEmpty == false else {
-            throw URLAllowlistError.invalidSourceURL
-        }
+        try validateSourceURL(trimmed)
         guard trimmed != defaultAllowlistURLString,
               !loadCustomSources().contains(where: { $0.urlString == trimmed }) else {
             throw URLAllowlistError.duplicateSource
         }
 
+        let source = URLAllowlistSource(urlString: trimmed)
+        let refreshed = await refreshSource(source)
         var sources = loadCustomSources()
-        sources.append(URLAllowlistSource(urlString: trimmed))
+        sources.append(refreshed.source)
         saveCustomSources(sources)
+
+        var cachedEntries = loadCachedEntries()
+        cachedEntries.removeAll { $0.sourceID == source.id }
+        cachedEntries.append(contentsOf: refreshed.entries)
+        saveCachedEntries(cachedEntries)
+
+        var statuses = loadSourceStatuses()
+        statuses[refreshed.source.urlString] = URLAllowlistSourceStatus(
+            name: refreshed.source.name,
+            lastRefreshDate: refreshed.source.lastRefreshDate,
+            statusMessage: refreshed.source.statusMessage
+        )
+        saveSourceStatuses(statuses)
     }
 
     static func removeCustomSource(_ source: URLAllowlistSource) {
@@ -151,7 +171,7 @@ enum URLAllowlistManager {
         saveCustomSources(sources.filter { !$0.isDefault })
         saveCachedEntries(cachedEntries)
         saveSourceStatuses(Dictionary(uniqueKeysWithValues: sources.map {
-            ($0.urlString, URLAllowlistSourceStatus(lastRefreshDate: $0.lastRefreshDate, statusMessage: $0.statusMessage))
+            ($0.urlString, URLAllowlistSourceStatus(name: $0.name, lastRefreshDate: $0.lastRefreshDate, statusMessage: $0.statusMessage))
         }))
         return loadSources()
     }
@@ -169,7 +189,6 @@ enum URLAllowlistManager {
             )
         }
 
-        _ = await refreshAllSources()
         let entries = loadCachedEntries()
         guard !entries.isEmpty else {
             return URLAllowlistValidationResult(
@@ -215,14 +234,15 @@ enum URLAllowlistManager {
                !(200...299).contains(httpResponse.statusCode) {
                 throw URLAllowlistError.httpStatus(httpResponse.statusCode)
             }
-            let entries = try decodeEntries(from: data, source: source)
+            let document = try decodeDocument(from: data, source: source)
             return (
                 sourceWithStatus(
                     source,
-                    status: String(format: String(localized: "allowlists.status.loaded"), entries.count),
+                    name: document.name,
+                    status: String(format: String(localized: "allowlists.status.loaded"), document.entries.count),
                     refreshedAt: Date()
                 ),
-                entries
+                document.entries
             )
         } catch {
             let cached = cachedEntries(for: source)
@@ -233,7 +253,7 @@ enum URLAllowlistManager {
         }
     }
 
-    private static func decodeEntries(from data: Data, source: URLAllowlistSource) throws -> [URLAllowlistEntry] {
+    private static func decodeDocument(from data: Data, source: URLAllowlistSource) throws -> (name: String?, entries: [URLAllowlistEntry]) {
         let document = try JSONDecoder().decode(URLAllowlistDocument.self, from: data)
         guard document.version == 1 else {
             throw URLAllowlistError.unsupportedVersion
@@ -257,7 +277,8 @@ enum URLAllowlistManager {
         guard !entries.isEmpty else {
             throw URLAllowlistError.emptyDocument
         }
-        return entries
+        let name = document.name?.trimmingCharacters(in: .whitespacesAndNewlines)
+        return (name?.isEmpty == false ? name : nil, entries)
     }
 
     private static func cachedEntries(for source: URLAllowlistSource) -> [URLAllowlistEntry] {
@@ -266,12 +287,14 @@ enum URLAllowlistManager {
 
     private static func sourceWithStatus(
         _ source: URLAllowlistSource,
+        name: String? = nil,
         status: String,
         refreshedAt: Date? = nil
     ) -> URLAllowlistSource {
         URLAllowlistSource(
             id: source.id,
             urlString: source.urlString,
+            name: name ?? source.name,
             isDefault: source.isDefault,
             lastRefreshDate: refreshedAt ?? source.lastRefreshDate,
             statusMessage: status
@@ -283,6 +306,7 @@ enum URLAllowlistManager {
             URLAllowlistSource(
                 id: $0.id,
                 urlString: $0.urlString,
+                name: $0.name,
                 isDefault: false,
                 lastRefreshDate: $0.lastRefreshDate,
                 statusMessage: $0.statusMessage
@@ -309,6 +333,15 @@ enum URLAllowlistManager {
         guard let data = try? JSONEncoder().encode(statuses) else { return }
         UserDefaults.standard.set(data, forKey: sourceStatusesDefaultsKey)
     }
+
+    private static func validateSourceURL(_ urlString: String) throws {
+        guard let url = URL(string: urlString),
+              let scheme = url.scheme?.lowercased(),
+              scheme == "https",
+              url.host?.isEmpty == false else {
+            throw URLAllowlistError.invalidSourceURL
+        }
+    }
 }
 
 private struct URLAllowlistDocument: Codable {
@@ -324,6 +357,7 @@ private struct URLAllowlistDocumentEntry: Codable {
 }
 
 private struct URLAllowlistSourceStatus: Codable {
+    let name: String?
     let lastRefreshDate: Date?
     let statusMessage: String
 }

@@ -11,13 +11,17 @@ extension ContentView {
     }
 
     func addURLAllowlist(_ urlString: String) {
-        do {
-            try URLAllowlistManager.addCustomSource(urlString)
-            urlAllowlistSources = URLAllowlistManager.loadSources()
-            refreshURLAllowlists()
-        } catch {
-            alertMessage = error.localizedDescription
-            showAlert = true
+        guard !isRefreshingURLAllowlists else { return }
+        isRefreshingURLAllowlists = true
+        Task { @MainActor in
+            do {
+                try await URLAllowlistManager.addCustomSource(urlString)
+                urlAllowlistSources = URLAllowlistManager.loadSources()
+            } catch {
+                alertMessage = error.localizedDescription
+                showAlert = true
+            }
+            isRefreshingURLAllowlists = false
         }
     }
 

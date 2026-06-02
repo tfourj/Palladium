@@ -3,37 +3,70 @@ import SwiftUI
 struct URLAllowlistsSettingsView: View {
     let sources: [URLAllowlistSource]
     let isBusy: Bool
+    let isRefreshing: Bool
     let onRefresh: () -> Void
     let onAdd: (_ urlString: String) -> Void
     let onRemove: (_ source: URLAllowlistSource) -> Void
 
     @State private var newAllowlistURL = ""
+    @State private var isAddingAllowlist = false
 
     var body: some View {
         Form {
             Section {
-                TextField("allowlists.add.placeholder", text: $newAllowlistURL)
-                    .textInputAutocapitalization(.never)
-                    .keyboardType(.URL)
-                    .autocorrectionDisabled()
-                    .disabled(isBusy)
-
                 Button {
-                    let trimmed = newAllowlistURL.trimmingCharacters(in: .whitespacesAndNewlines)
-                    guard !trimmed.isEmpty else { return }
-                    onAdd(trimmed)
-                    newAllowlistURL = ""
+                    withAnimation(.snappy) {
+                        isAddingAllowlist = true
+                    }
                 } label: {
                     Label("allowlists.add.button", systemImage: "plus.circle")
                 }
-                .disabled(isBusy || newAllowlistURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                .disabled(isBusy || isRefreshing || isAddingAllowlist)
 
-                Button {
-                    onRefresh()
-                } label: {
-                    Label("allowlists.refresh.button", systemImage: "arrow.clockwise")
+                if isAddingAllowlist {
+                    TextField("allowlists.add.placeholder", text: $newAllowlistURL)
+                        .textInputAutocapitalization(.never)
+                        .keyboardType(.URL)
+                        .autocorrectionDisabled()
+                        .disabled(isBusy || isRefreshing)
+
+                    HStack {
+                        Button("common.cancel", role: .cancel) {
+                            withAnimation(.snappy) {
+                                newAllowlistURL = ""
+                                isAddingAllowlist = false
+                            }
+                        }
+
+                        Spacer()
+
+                        Button("common.save") {
+                            let trimmed = newAllowlistURL.trimmingCharacters(in: .whitespacesAndNewlines)
+                            guard !trimmed.isEmpty else { return }
+                            onAdd(trimmed)
+                            withAnimation(.snappy) {
+                                newAllowlistURL = ""
+                                isAddingAllowlist = false
+                            }
+                        }
+                        .disabled(isBusy || isRefreshing || newAllowlistURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    }
                 }
-                .disabled(isBusy)
+
+                Button(action: onRefresh) {
+                    HStack {
+                        Image(systemName: "arrow.clockwise")
+                            .rotationEffect(.degrees(isRefreshing ? 360 : 0))
+                            .animation(
+                                isRefreshing
+                                    ? .linear(duration: 0.9).repeatForever(autoreverses: false)
+                                    : .default,
+                                value: isRefreshing
+                            )
+                        Text("allowlists.refresh.button")
+                    }
+                }
+                .disabled(isBusy || isRefreshing)
             } footer: {
                 Text("allowlists.help")
             }
@@ -42,7 +75,7 @@ struct URLAllowlistsSettingsView: View {
                 ForEach(sources) { source in
                     VStack(alignment: .leading, spacing: 6) {
                         HStack(alignment: .firstTextBaseline) {
-                            Text(source.isDefault ? String(localized: "allowlists.default.title") : source.displayURL)
+                            Text(sourceTitle(for: source))
                                 .font(.subheadline.weight(.semibold))
                             Spacer()
                             if source.isDefault {
@@ -52,7 +85,7 @@ struct URLAllowlistsSettingsView: View {
                             }
                         }
 
-                        if source.isDefault {
+                        if source.isDefault || source.displayName != source.displayURL {
                             Text(source.displayURL)
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
@@ -88,6 +121,12 @@ struct URLAllowlistsSettingsView: View {
         }
         .navigationTitle("allowlists.title")
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear(perform: onRefresh)
+    }
+
+    private func sourceTitle(for source: URLAllowlistSource) -> String {
+        if source.isDefault, source.displayName == source.displayURL {
+            return String(localized: "allowlists.default.title")
+        }
+        return source.displayName
     }
 }

@@ -457,6 +457,16 @@
         }
       }
     },
+    "common.save" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        }
+      }
+    },
     "console.empty" : {
       "localizations" : {
         "en" : {
