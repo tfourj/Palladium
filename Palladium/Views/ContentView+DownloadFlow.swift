@@ -156,8 +156,6 @@ extension ContentView {
                     appendConsoleText("[palladium] blocked download url: \(result.message)\n")
                     progressText = String(localized: "download.prompt.idle")
                     downloadErrorText = result.message
-                    alertMessage = result.message
-                    showAlert = true
                     return
                 }
 

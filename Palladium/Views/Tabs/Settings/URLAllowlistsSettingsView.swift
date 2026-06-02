@@ -9,49 +9,18 @@ struct URLAllowlistsSettingsView: View {
     let onRemove: (_ source: URLAllowlistSource) -> Void
 
     @State private var newAllowlistURL = ""
-    @State private var isAddingAllowlist = false
+    @State private var showAddAllowlistPrompt = false
 
     var body: some View {
         Form {
             Section {
                 Button {
-                    withAnimation(.snappy) {
-                        isAddingAllowlist = true
-                    }
+                    newAllowlistURL = ""
+                    showAddAllowlistPrompt = true
                 } label: {
                     Label("allowlists.add.button", systemImage: "plus.circle")
                 }
-                .disabled(isBusy || isRefreshing || isAddingAllowlist)
-
-                if isAddingAllowlist {
-                    TextField("allowlists.add.placeholder", text: $newAllowlistURL)
-                        .textInputAutocapitalization(.never)
-                        .keyboardType(.URL)
-                        .autocorrectionDisabled()
-                        .disabled(isBusy || isRefreshing)
-
-                    HStack {
-                        Button("common.cancel", role: .cancel) {
-                            withAnimation(.snappy) {
-                                newAllowlistURL = ""
-                                isAddingAllowlist = false
-                            }
-                        }
-
-                        Spacer()
-
-                        Button("common.save") {
-                            let trimmed = newAllowlistURL.trimmingCharacters(in: .whitespacesAndNewlines)
-                            guard !trimmed.isEmpty else { return }
-                            onAdd(trimmed)
-                            withAnimation(.snappy) {
-                                newAllowlistURL = ""
-                                isAddingAllowlist = false
-                            }
-                        }
-                        .disabled(isBusy || isRefreshing || newAllowlistURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                    }
-                }
+                .disabled(isBusy || isRefreshing)
 
                 Button(action: onRefresh) {
                     HStack {
@@ -121,6 +90,25 @@ struct URLAllowlistsSettingsView: View {
         }
         .navigationTitle("allowlists.title")
         .navigationBarTitleDisplayMode(.inline)
+        .alert("allowlists.add.title", isPresented: $showAddAllowlistPrompt) {
+            TextField("allowlists.add.placeholder", text: $newAllowlistURL)
+                .textInputAutocapitalization(.never)
+                .keyboardType(.URL)
+                .autocorrectionDisabled()
+
+            Button("common.cancel", role: .cancel) {
+                newAllowlistURL = ""
+            }
+
+            Button("common.save") {
+                let trimmed = newAllowlistURL.trimmingCharacters(in: .whitespacesAndNewlines)
+                guard !trimmed.isEmpty else { return }
+                onAdd(trimmed)
+                newAllowlistURL = ""
+            }
+        } message: {
+            Text("allowlists.add.message")
+        }
     }
 
     private func sourceTitle(for source: URLAllowlistSource) -> String {

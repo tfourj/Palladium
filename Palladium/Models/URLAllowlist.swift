@@ -68,14 +68,16 @@ enum URLAllowlistManager {
     private static let customSourcesDefaultsKey = "palladium.urlAllowlistCustomSources"
     private static let cachedEntriesDefaultsKey = "palladium.urlAllowlistCachedEntries"
     private static let sourceStatusesDefaultsKey = "palladium.urlAllowlistSourceStatuses"
+    private static let defaultSourceID = UUID(uuidString: "2D1D091A-53D0-4978-BDB5-2F831250B263") ?? UUID()
+    private static let builtInDefaultName = "Palladium's default allowlist"
 
     static func loadSources() -> [URLAllowlistSource] {
         let customSources = loadCustomSources()
         let defaultStatus = loadSourceStatuses()[defaultAllowlistURLString]
         let defaultSource = URLAllowlistSource(
-            id: UUID(uuidString: "2D1D091A-53D0-4978-BDB5-2F831250B263") ?? UUID(),
+            id: defaultSourceID,
             urlString: defaultAllowlistURLString,
-            name: defaultStatus?.name,
+            name: defaultStatus?.name ?? builtInDefaultName,
             isDefault: true,
             lastRefreshDate: defaultStatus?.lastRefreshDate,
             statusMessage: defaultStatus?.statusMessage ?? String(localized: "allowlists.status.not_loaded")
@@ -110,7 +112,10 @@ enum URLAllowlistManager {
     static func loadCachedEntries() -> [URLAllowlistEntry] {
         guard let data = UserDefaults.standard.data(forKey: cachedEntriesDefaultsKey),
               let entries = try? JSONDecoder().decode([URLAllowlistEntry].self, from: data) else {
-            return []
+            return builtInDefaultEntries()
+        }
+        guard entries.contains(where: { $0.sourceID == defaultSourceID }) else {
+            return builtInDefaultEntries() + entries
         }
         return entries
     }
@@ -246,6 +251,17 @@ enum URLAllowlistManager {
             )
         } catch {
             let cached = cachedEntries(for: source)
+            if source.isDefault, cached.isEmpty {
+                let entries = builtInDefaultEntries()
+                return (
+                    sourceWithStatus(
+                        source,
+                        name: builtInDefaultName,
+                        status: String(format: String(localized: "allowlists.status.built_in"), entries.count)
+                    ),
+                    entries
+                )
+            }
             let status = cached.isEmpty
                 ? String(format: String(localized: "allowlists.status.failed"), error.localizedDescription)
                 : String(format: String(localized: "allowlists.status.cached"), cached.count)
@@ -282,7 +298,45 @@ enum URLAllowlistManager {
     }
 
     private static func cachedEntries(for source: URLAllowlistSource) -> [URLAllowlistEntry] {
-        loadCachedEntries().filter { $0.sourceID == source.id }
+        if source.isDefault {
+            let entries = rawCachedEntries().filter { $0.sourceID == source.id }
+            return entries.isEmpty ? builtInDefaultEntries() : entries
+        }
+        return rawCachedEntries().filter { $0.sourceID == source.id }
+    }
+
+    private static func rawCachedEntries() -> [URLAllowlistEntry] {
+        guard let data = UserDefaults.standard.data(forKey: cachedEntriesDefaultsKey),
+              let entries = try? JSONDecoder().decode([URLAllowlistEntry].self, from: data) else {
+            return []
+        }
+        return entries
+    }
+
+    private static func builtInDefaultEntries() -> [URLAllowlistEntry] {
+        [
+            URLAllowlistEntry(
+                id: UUID(uuidString: "B4A16D19-A49E-4563-8A23-46D5973F3435") ?? UUID(),
+                sourceID: defaultSourceID,
+                sourceURLString: defaultAllowlistURLString,
+                name: "Vimeo",
+                pattern: "^https?://(www\\.)?vimeo\\.com/.+$"
+            ),
+            URLAllowlistEntry(
+                id: UUID(uuidString: "4A26E825-7D75-497C-94E3-11C124F77727") ?? UUID(),
+                sourceID: defaultSourceID,
+                sourceURLString: defaultAllowlistURLString,
+                name: "Internet Archive",
+                pattern: "^https?://(www\\.)?archive\\.org/.+$"
+            ),
+            URLAllowlistEntry(
+                id: UUID(uuidString: "703D7C38-70E5-42F7-8A9A-16B026C71A5B") ?? UUID(),
+                sourceID: defaultSourceID,
+                sourceURLString: defaultAllowlistURLString,
+                name: "PeerTube",
+                pattern: "^https?://([a-zA-Z0-9-]+\\.)?peertube\\.[a-zA-Z]{2,}/.+$"
+            )
+        ]
     }
 
     private static func sourceWithStatus(

@@ -67,12 +67,32 @@
         }
       }
     },
+    "allowlists.add.message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter a remote allowlist JSON URL."
+          }
+        }
+      }
+    },
     "allowlists.add.placeholder" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "https://example.com/allowlist.json"
+          }
+        }
+      }
+    },
+    "allowlists.add.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Allowlist"
           }
         }
       }
@@ -233,6 +253,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Using %lld cached entries."
+          }
+        }
+      }
+    },
+    "allowlists.status.built_in" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Using %lld built-in default entries."
           }
         }
       }
