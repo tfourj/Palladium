@@ -149,6 +149,49 @@ enum URLAllowlistManager {
         return refreshed.source
     }
 
+    static func duplicateCustomSource(for urlString: String) throws -> URLAllowlistSource? {
+        let trimmed = normalizedSourceURLString(from: urlString)
+        try validateSourceURL(trimmed)
+        guard trimmed != defaultAllowlistURLString else {
+            return URLAllowlistSource(
+                id: defaultSourceID,
+                urlString: defaultAllowlistURLString,
+                name: builtInDefaultName,
+                isDefault: true
+            )
+        }
+        return loadCustomSources().first { $0.urlString == trimmed }
+    }
+
+    static func replaceCustomSource(_ urlString: String) async throws -> URLAllowlistSource {
+        let trimmed = normalizedSourceURLString(from: urlString)
+        try validateSourceURL(trimmed)
+        guard trimmed != defaultAllowlistURLString,
+              let existingSource = loadCustomSources().first(where: { $0.urlString == trimmed }) else {
+            throw URLAllowlistError.invalidSourceURL
+        }
+
+        let refreshed = await refreshSource(existingSource)
+        let sources = loadCustomSources().map { source in
+            source.id == existingSource.id ? refreshed.source : source
+        }
+        saveCustomSources(sources)
+
+        var cachedEntries = loadCachedEntries()
+        cachedEntries.removeAll { $0.sourceID == existingSource.id }
+        cachedEntries.append(contentsOf: refreshed.entries)
+        saveCachedEntries(cachedEntries)
+
+        var statuses = loadSourceStatuses()
+        statuses[refreshed.source.urlString] = URLAllowlistSourceStatus(
+            name: refreshed.source.name,
+            lastRefreshDate: refreshed.source.lastRefreshDate,
+            statusMessage: refreshed.source.statusMessage
+        )
+        saveSourceStatuses(statuses)
+        return refreshed.source
+    }
+
     static func removeCustomSource(_ source: URLAllowlistSource) {
         guard !source.isDefault else { return }
         let remainingSources = loadCustomSources().filter { $0.id != source.id }

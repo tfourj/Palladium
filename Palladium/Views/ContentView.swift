@@ -127,6 +127,8 @@ struct ContentView: View {
     @State var alertMessage: String?
     @State var showAlert = false
     @State var reopenDownloadActionAfterAlert = false
+    @State var pendingDuplicateAllowlistURL: String?
+    @State var showDuplicateAllowlistPrompt = false
     @State var toastMessage: String?
     @State var showToastMessage = false
     @State var sharePayload: SharePayload?
@@ -416,6 +418,19 @@ struct ContentView: View {
         } message: {
             Text(alertMessage ?? "")
         }
+        .alert(String(localized: "allowlists.duplicate.title"), isPresented: $showDuplicateAllowlistPrompt) {
+            Button(String(localized: "common.cancel"), role: .cancel) {
+                pendingDuplicateAllowlistURL = nil
+            }
+
+            Button(String(localized: "allowlists.duplicate.replace")) {
+                guard let urlString = pendingDuplicateAllowlistURL else { return }
+                pendingDuplicateAllowlistURL = nil
+                replaceURLAllowlist(urlString)
+            }
+        } message: {
+            Text("allowlists.duplicate.message")
+        }
         .onAppear {
             installKeyboardDismissTapIfNeeded()
             syncIdleTimerDisabled()
@@ -443,7 +458,7 @@ struct ContentView: View {
             consumePendingShortcutDownloadRequestIfNeeded()
         }
         .onOpenURL { incomingURL in
-            handleIncomingDownloadURL(incomingURL)
+            handleIncomingURL(incomingURL)
             consumePendingShortcutDownloadRequestIfNeeded()
         }
         .preferredColorScheme(appAppearanceMode.preferredColorScheme)

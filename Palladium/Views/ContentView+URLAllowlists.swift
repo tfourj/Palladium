@@ -29,6 +29,46 @@ extension ContentView {
         }
     }
 
+    func addURLAllowlistFromScheme(_ urlString: String) {
+        do {
+            if let duplicate = try URLAllowlistManager.duplicateCustomSource(for: urlString) {
+                if duplicate.isDefault {
+                    alertMessage = String(localized: "allowlists.error.duplicate_source")
+                    showAlert = true
+                    return
+                }
+                pendingDuplicateAllowlistURL = duplicate.urlString
+                showDuplicateAllowlistPrompt = true
+                return
+            }
+        } catch {
+            alertMessage = error.localizedDescription
+            showAlert = true
+            return
+        }
+
+        addURLAllowlist(urlString) { message in
+            showTemporaryToast(message)
+        }
+    }
+
+    func replaceURLAllowlist(_ urlString: String) {
+        guard !isRefreshingURLAllowlists else { return }
+        isRefreshingURLAllowlists = true
+        Task { @MainActor in
+            do {
+                let source = try await URLAllowlistManager.replaceCustomSource(urlString)
+                urlAllowlistSources = URLAllowlistManager.loadSources()
+                let message = String(format: String(localized: "allowlists.status.replaced"), source.displayName)
+                showTemporaryToast(message)
+            } catch {
+                alertMessage = error.localizedDescription
+                showAlert = true
+            }
+            isRefreshingURLAllowlists = false
+        }
+    }
+
     func removeURLAllowlist(_ source: URLAllowlistSource) {
         URLAllowlistManager.removeCustomSource(source)
         urlAllowlistSources = URLAllowlistManager.loadSources()

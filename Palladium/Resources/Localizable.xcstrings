@@ -167,6 +167,36 @@
         }
       }
     },
+    "allowlists.duplicate.message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This allowlist is already added. Replace it by fetching the latest copy?"
+          }
+        }
+      }
+    },
+    "allowlists.duplicate.replace" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Replace"
+          }
+        }
+      }
+    },
+    "allowlists.duplicate.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Replace Allowlist?"
+          }
+        }
+      }
+    },
     "allowlists.error.empty_document" : {
       "localizations" : {
         "en" : {
@@ -353,6 +383,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Allowlists refreshed."
+          }
+        }
+      }
+    },
+    "allowlists.status.replaced" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Replaced %@."
           }
         }
       }

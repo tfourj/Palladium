@@ -441,6 +441,36 @@ extension ContentView {
         )
     }
 
+    func handleIncomingURL(_ incomingURL: URL) {
+        guard incomingURL.scheme?.lowercased() == "palladium" else {
+            return
+        }
+
+        switch incomingURL.host?.lowercased() {
+        case "download":
+            handleIncomingDownloadURL(incomingURL)
+        case "allowlist":
+            handleIncomingAllowlistURL(incomingURL)
+        default:
+            return
+        }
+    }
+
+    func handleIncomingAllowlistURL(_ incomingURL: URL) {
+        guard let components = URLComponents(url: incomingURL, resolvingAgainstBaseURL: false),
+              let queryItems = components.queryItems,
+              let urlItem = queryItems.first(where: { $0.name == "url" }),
+              let allowlistURL = urlItem.value,
+              !allowlistURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            appendConsoleText("[palladium] allowlist url scheme received but missing url query param\n")
+            return
+        }
+
+        selectedTab = .settings
+        appendConsoleText("[palladium] app opened via allowlist url scheme. allowlist: \(allowlistURL)\n")
+        addURLAllowlistFromScheme(allowlistURL)
+    }
+
     func handleIncomingDownloadURL(_ incomingURL: URL) {
         guard incomingURL.scheme?.lowercased() == "palladium",
               incomingURL.host?.lowercased() == "download" else {
