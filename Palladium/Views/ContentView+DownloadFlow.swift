@@ -135,11 +135,40 @@ extension ContentView {
     func runDownloadFlow(
         urlOverride: String? = nil,
         presetOverride: DownloadPreset? = nil,
-        afterDownloadOverride: AfterDownloadBehavior? = nil
+        afterDownloadOverride: AfterDownloadBehavior? = nil,
+        allowlistChecked: Bool = false
     ) {
-        guard !isRunning, !isPackageRunning else { return }
+        guard !isRunning, !isPackageRunning, !isCheckingDownloadAllowlist else { return }
         let targetURL = (urlOverride ?? urlText).trimmingCharacters(in: .whitespacesAndNewlines)
         guard !targetURL.isEmpty else { return }
+
+        guard allowlistChecked else {
+            isCheckingDownloadAllowlist = true
+            progressText = String(localized: "allowlists.status.checking")
+            appendConsoleText("[palladium] checking download url allowlists\n")
+
+            Task { @MainActor in
+                let result = await URLAllowlistManager.validateDownloadURL(targetURL)
+                isCheckingDownloadAllowlist = false
+                urlAllowlistSources = URLAllowlistManager.loadSources()
+
+                guard result.isAllowed else {
+                    appendConsoleText("[palladium] blocked download url: \(result.message)\n")
+                    progressText = String(localized: "download.prompt.idle")
+                    downloadErrorText = result.message
+                    return
+                }
+
+                appendConsoleText("[palladium] allowed download url: \(result.message)\n")
+                runDownloadFlow(
+                    urlOverride: targetURL,
+                    presetOverride: presetOverride,
+                    afterDownloadOverride: afterDownloadOverride,
+                    allowlistChecked: true
+                )
+            }
+            return
+        }
 
         consoleLogStore.clearAll()
         downloadErrorText = nil
@@ -410,6 +439,36 @@ extension ContentView {
             presetOverride: preset,
             afterDownloadOverride: destinationBehavior
         )
+    }
+
+    func handleIncomingURL(_ incomingURL: URL) {
+        guard incomingURL.scheme?.lowercased() == "palladium" else {
+            return
+        }
+
+        switch incomingURL.host?.lowercased() {
+        case "download":
+            handleIncomingDownloadURL(incomingURL)
+        case "allowlist":
+            handleIncomingAllowlistURL(incomingURL)
+        default:
+            return
+        }
+    }
+
+    func handleIncomingAllowlistURL(_ incomingURL: URL) {
+        guard let components = URLComponents(url: incomingURL, resolvingAgainstBaseURL: false),
+              let queryItems = components.queryItems,
+              let urlItem = queryItems.first(where: { $0.name == "url" }),
+              let allowlistURL = urlItem.value,
+              !allowlistURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            appendConsoleText("[palladium] allowlist url scheme received but missing url query param\n")
+            return
+        }
+
+        selectedTab = .settings
+        appendConsoleText("[palladium] app opened via allowlist url scheme. allowlist: \(allowlistURL)\n")
+        addURLAllowlistFromScheme(allowlistURL)
     }
 
     func handleIncomingDownloadURL(_ incomingURL: URL) {

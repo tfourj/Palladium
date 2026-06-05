@@ -105,6 +105,9 @@ struct ContentView: View {
     @State var linkHistoryEnabled: Bool
     @State var linkHistoryLimit: Int
     @State var linkHistoryEntries: [LinkHistoryEntry]
+    @State var urlAllowlistSources: [URLAllowlistSource]
+    @State var isCheckingDownloadAllowlist = false
+    @State var isRefreshingURLAllowlists = false
     @State var appAppearanceMode: AppAppearanceMode
     @State var selectedTab: AppTab = .download
     @State var packageStatusText = "idle"
@@ -124,6 +127,8 @@ struct ContentView: View {
     @State var alertMessage: String?
     @State var showAlert = false
     @State var reopenDownloadActionAfterAlert = false
+    @State var pendingDuplicateAllowlistURL: String?
+    @State var showDuplicateAllowlistPrompt = false
     @State var toastMessage: String?
     @State var showToastMessage = false
     @State var sharePayload: SharePayload?
@@ -177,6 +182,7 @@ struct ContentView: View {
         let linkHistoryLimit = Self.loadLinkHistoryLimit()
         _linkHistoryLimit = State(initialValue: linkHistoryLimit)
         _linkHistoryEntries = State(initialValue: Self.loadLinkHistoryEntries(limit: linkHistoryLimit))
+        _urlAllowlistSources = State(initialValue: URLAllowlistManager.loadSources())
         _appAppearanceMode = State(initialValue: Self.loadAppAppearanceMode())
         _versionsText = State(initialValue: Self.loadCachedPackageVersionsText())
         _checkPackageUpdatesOnLaunch = State(initialValue: Self.loadCheckPackageUpdatesOnLaunch())
@@ -237,6 +243,7 @@ struct ContentView: View {
                     defaultEmbedThumbnail: $defaultEmbedThumbnail,
                     defaultUseCookies: $defaultUseCookies,
                     restoreDownloadDefaults: $restoreDownloadDefaults,
+                    urlAllowlistSources: urlAllowlistSources,
                     importedCookieFiles: importedCookieFiles,
                     storageSummary: storageSummary,
                     packageStatusText: packageStatusText,
@@ -247,6 +254,7 @@ struct ContentView: View {
                     isLoadingPackageVersions: isLoadingPackageVersions,
                     isRunning: isRunning,
                     isPackageRunning: isPackageRunning,
+                    isRefreshingURLAllowlists: isRefreshingURLAllowlists,
                     onRefreshVersions: refreshPackageVersions,
                     onCancelPackages: cancelPackageFlow,
                     onUpdatePackages: updatePackages,
@@ -263,7 +271,10 @@ struct ContentView: View {
                     onOpenStorageManager: refreshStorageSummary,
                     onRefreshCookieFiles: refreshImportedCookieFiles,
                     onImportCookieFile: importCookieFile,
-                    onDeleteCookieFile: deleteImportedCookieFile
+                    onDeleteCookieFile: deleteImportedCookieFile,
+                    onRefreshURLAllowlists: refreshURLAllowlists,
+                    onAddURLAllowlist: addURLAllowlist,
+                    onRemoveURLAllowlist: removeURLAllowlist
                 )
                 .tabItem {
                     Label(String(localized: "tab.settings"), systemImage: "slider.horizontal.3")
@@ -407,6 +418,19 @@ struct ContentView: View {
         } message: {
             Text(alertMessage ?? "")
         }
+        .alert(String(localized: "allowlists.duplicate.title"), isPresented: $showDuplicateAllowlistPrompt) {
+            Button(String(localized: "common.cancel"), role: .cancel) {
+                pendingDuplicateAllowlistURL = nil
+            }
+
+            Button(String(localized: "allowlists.duplicate.replace")) {
+                guard let urlString = pendingDuplicateAllowlistURL else { return }
+                pendingDuplicateAllowlistURL = nil
+                replaceURLAllowlist(urlString)
+            }
+        } message: {
+            Text("allowlists.duplicate.message")
+        }
         .onAppear {
             installKeyboardDismissTapIfNeeded()
             syncIdleTimerDisabled()
@@ -434,7 +458,7 @@ struct ContentView: View {
             consumePendingShortcutDownloadRequestIfNeeded()
         }
         .onOpenURL { incomingURL in
-            handleIncomingDownloadURL(incomingURL)
+            handleIncomingURL(incomingURL)
             consumePendingShortcutDownloadRequestIfNeeded()
         }
         .preferredColorScheme(appAppearanceMode.preferredColorScheme)
