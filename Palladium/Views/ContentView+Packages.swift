@@ -57,6 +57,7 @@ extension ContentView {
             let outcome = await PythonFlowRunner.executePackageFlow(
                 action: action,
                 customVersions: customVersions,
+                packageSourceJSON: buildPackageSourceJSON(),
                 liveLogFD: liveLogFD
             )
 
@@ -136,5 +137,21 @@ extension ContentView {
 
     func persistPackageVersionsText(_ text: String) {
         UserDefaults.standard.set(text, forKey: Self.packageVersionsTextDefaultsKey)
+    }
+
+    func buildPackageSourceJSON() -> String {
+        let specs = customPackageSpecsText
+            .components(separatedBy: .newlines)
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty && !$0.hasPrefix("#") }
+        let payload: [String: Any] = [
+            "mode": packageSourceMode.rawValue,
+            "custom_specs": specs
+        ]
+        guard let data = try? JSONSerialization.data(withJSONObject: payload),
+              let text = String(data: data, encoding: .utf8) else {
+            return "{\"mode\":\"stable\",\"custom_specs\":[]}"
+        }
+        return text
     }
 }

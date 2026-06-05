@@ -265,6 +265,7 @@ extension ContentView {
                 subtitleLanguagePattern: subtitleLanguagePatternAtStart,
                 cookieFilePath: cookieFilePathAtStart,
                 runOutputDir: runOutputURL.path,
+                packageSourceJSON: buildPackageSourceJSON(),
                 liveLogFD: liveLogFD
             )
 

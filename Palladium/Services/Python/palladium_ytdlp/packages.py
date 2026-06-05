@@ -333,6 +333,43 @@ def normalized_version_text(value):
     return str(value or "").strip()
 
 
+def parse_package_source(source_json=None):
+    source = {
+        "mode": "stable",
+        "custom_specs": [],
+        "allow_prereleases": False,
+        "skip_webkit_patch": False,
+    }
+    if not source_json:
+        return source
+
+    try:
+        parsed = json.loads(str(source_json))
+    except Exception:
+        return source
+
+    if not isinstance(parsed, dict):
+        return source
+
+    mode = str(parsed.get("mode", "stable")).strip().lower()
+    if mode not in ("stable", "nightly", "custom"):
+        mode = "stable"
+
+    specs = []
+    raw_specs = parsed.get("custom_specs", [])
+    if isinstance(raw_specs, list):
+        for item in raw_specs:
+            spec = str(item).strip()
+            if spec and not spec.startswith("#"):
+                specs.append(spec)
+
+    source["mode"] = mode
+    source["custom_specs"] = specs
+    source["allow_prereleases"] = mode == "nightly"
+    source["skip_webkit_patch"] = mode == "custom"
+    return source
+
+
 def latest_index_version(indexed_versions, package_name):
     for candidate in indexed_versions.get(package_name) or []:
         resolved = normalized_version_text(candidate)
@@ -354,10 +391,17 @@ def build_package_update_lines(installed_versions, indexed_versions):
     return lines
 
 
-def build_package_install_plan(installed_versions, indexed_versions, custom_versions=None):
+def build_package_install_plan(installed_versions, indexed_versions, custom_versions=None, package_source=None):
     custom_versions = custom_versions or {}
+    package_source = package_source or parse_package_source()
     packages = []
     cleanup_packages = []
+
+    if package_source.get("mode") == "custom":
+        custom_specs = list(package_source.get("custom_specs") or [])
+        if custom_specs:
+            return custom_specs, list(CLEANUP_PACKAGES)
+        return [], []
 
     if custom_versions:
         for package_name in TRACKED_PACKAGES:
@@ -382,19 +426,31 @@ def build_package_install_plan(installed_versions, indexed_versions, custom_vers
 
         latest_version = latest_index_version(indexed_versions, package_name)
         if latest_version and latest_version != current_version:
-            packages.append(package_name)
+            packages.append(f"{package_name}=={latest_version}")
+            if package_name in CLEANUP_PACKAGES:
+                cleanup_packages.append(package_name)
 
     return packages, cleanup_packages
 
 
-def check_package_updates(install_target=None):
+def check_package_updates(install_target=None, package_source=None):
+    package_source = package_source or parse_package_source()
+    if package_source.get("mode") == "custom":
+        if package_source.get("custom_specs"):
+            return True, "Custom packages will be installed on update."
+        return False, "Add custom package requirements before updating."
+
     pip_main = ensure_pip_entrypoint(install_target)
     if pip_main is None:
         return False, "Unable to check updates (pip unavailable)."
 
     try:
         installed_versions = collect_versions(install_target=install_target, allow_cache_fallback=False)
-        indexed_versions = fetch_package_index_versions(install_target=install_target, pip_main=pip_main)
+        indexed_versions = fetch_package_index_versions(
+            install_target=install_target,
+            pip_main=pip_main,
+            allow_prereleases=bool(package_source.get("allow_prereleases")),
+        )
         update_lines = build_package_update_lines(installed_versions, indexed_versions)
         if update_lines:
             return True, "\\n".join(update_lines)
@@ -499,7 +555,7 @@ def parse_index_versions_output(raw_output):
     return []
 
 
-def fetch_package_index_versions(install_target=None, pip_main=None):
+def fetch_package_index_versions(install_target=None, pip_main=None, allow_prereleases=False):
     if pip_main is None:
         pip_main = ensure_pip_entrypoint(install_target)
     if pip_main is None:
@@ -516,6 +572,8 @@ def fetch_package_index_versions(install_target=None, pip_main=None):
                 "--no-color",
                 package_name,
             ]
+            if allow_prereleases:
+                pip_args.insert(-1, "--pre")
             with contextlib.redirect_stdout(capture), contextlib.redirect_stderr(capture):
                 pip_rc = pip_main(pip_args)
             if pip_rc not in (None, 0):

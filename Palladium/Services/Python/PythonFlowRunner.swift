@@ -17,6 +17,7 @@ enum PythonFlowRunner {
         subtitleLanguagePattern: String,
         cookieFilePath: String?,
         runOutputDir: String,
+        packageSourceJSON: String,
         liveLogFD: Int32?
     ) async -> PythonFlowOutcome {
         await runOnPythonThread {
@@ -38,7 +39,8 @@ enum PythonFlowRunner {
                         subtitleLanguagePattern,
                         cookieFilePath ?? "",
                         runOutputDir,
-                        liveLogArgument
+                        liveLogArgument,
+                        packageSourceJSON
                     ]
                 )
                 payload = String(result) ?? ""
@@ -52,6 +54,7 @@ enum PythonFlowRunner {
     static func executePackageFlow(
         action: String,
         customVersions: [String: String]? = nil,
+        packageSourceJSON: String,
         liveLogFD: Int32?
     ) async -> PythonFlowOutcome {
         await runOnPythonThread {
@@ -70,7 +73,7 @@ enum PythonFlowRunner {
                 let function = try pythonMember(module, named: "run_package_maintenance")
                 let liveLogArgument: PythonObject = liveLogFD.map { PythonObject(Int($0)) } ?? Python.None
                 let result = try function.throwing.dynamicallyCall(
-                    withArguments: [action, customVersionsJSON, liveLogArgument]
+                    withArguments: [action, customVersionsJSON, liveLogArgument, packageSourceJSON]
                 )
                 payload = String(result) ?? ""
             } catch {
