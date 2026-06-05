@@ -12,6 +12,11 @@ On-device iOS media downloader powered by `yt-dlp`, `ffmpeg`, and `PythonKit`.
   <a href="https://getpalladium.app" style="text-decoration:none; font-size:18px;">
     getpalladium.app
   </a>
+  <br>
+  <br>
+  <a href="https://apps.apple.com/us/app/palladium-media-manager/id6760206193">
+    <img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83" alt="Download on the App Store" height="48">
+  </a>
 </div>
 
 ## What It Does
@@ -28,7 +33,7 @@ On-device iOS media downloader powered by `yt-dlp`, `ffmpeg`, and `PythonKit`.
 
 ## Download
 
-- [Palladium Downloads](https://getpalladium.app/downloads) (TestFlight, AltStore PAL, .ipa, ~~AltStore Classic~~)
+- [Palladium Downloads](https://getpalladium.app/downloads) (AppStore, TestFlight, AltStore PAL, .ipa, ~~AltStore Classic~~)
 - .ipa from GitHub
   - Stable: [GitHub Releases](https://github.com/tfourj/Palladium/releases)
   - Nightly: [GitHub Actions](https://github.com/tfourj/Palladium/actions)

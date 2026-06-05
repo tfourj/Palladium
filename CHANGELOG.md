@@ -1,5 +1,8 @@
 # Palladium Changelog
 
+## v1.0.3
+- Added allowlist feature to downloads
+
 ## v1.0.2
 
 - Fixed background downloads
