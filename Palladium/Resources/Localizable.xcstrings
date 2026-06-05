@@ -1587,6 +1587,16 @@
         }
       }
     },
+    "packages.source.custom_specs.empty" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add at least one custom package requirement before updating."
+          }
+        }
+      }
+    },
     "packages.source.custom_specs.reset" : {
       "localizations" : {
         "en" : {

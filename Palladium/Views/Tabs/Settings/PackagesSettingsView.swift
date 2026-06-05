@@ -107,7 +107,7 @@ struct PackagesSettingsView: View {
                 }
 
                 Button {
-                    guard !isRunning, updatesAvailable else { return }
+                    guard canRequestPackageUpdate else { return }
                     onUpdatePackages()
                 } label: {
                     Text(isRunning ? "packages.status.running" : "packages.update")
@@ -115,10 +115,10 @@ struct PackagesSettingsView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .disabled(isRunning)
-                .opacity((isRunning || !updatesAvailable) ? 0.5 : 1.0)
+                .opacity(canRequestPackageUpdate ? 1.0 : 0.5)
                 .simultaneousGesture(
                     LongPressGesture(minimumDuration: 0.55).onEnded { _ in
-                        guard !isRunning else { return }
+                        guard !isRunning, packageSourceMode != .custom else { return }
                         prepareCustomVersionEditor()
                         showCustomVersionSheet = true
                         onFetchPackageVersions()
@@ -174,6 +174,11 @@ struct PackagesSettingsView: View {
         case .custom:
             return "packages.source.custom.help"
         }
+    }
+
+    private var canRequestPackageUpdate: Bool {
+        guard !isRunning else { return false }
+        return updatesAvailable || packageSourceMode == .custom
     }
 
     private var customVersionSheet: some View {

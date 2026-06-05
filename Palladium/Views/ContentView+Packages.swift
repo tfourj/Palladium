@@ -113,10 +113,16 @@ extension ContentView {
     }
 
     func updatePackages() {
+        if packageSourceMode == .custom && customPackageSpecs().isEmpty {
+            alertMessage = String(localized: "packages.source.custom_specs.empty")
+            showAlert = true
+            return
+        }
         runPackageFlow(action: "update")
     }
 
     func updatePackagesWithCustomVersions(_ ytDlpVersion: String?, _ webkitJSIVersion: String?, _ pipVersion: String?) {
+        guard packageSourceMode != .custom else { return }
         var customVersions: [String: String] = [:]
         if let ytDlpVersion {
             customVersions["yt-dlp"] = ytDlpVersion
@@ -140,10 +146,7 @@ extension ContentView {
     }
 
     func buildPackageSourceJSON() -> String {
-        let specs = customPackageSpecsText
-            .components(separatedBy: .newlines)
-            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-            .filter { !$0.isEmpty && !$0.hasPrefix("#") }
+        let specs = customPackageSpecs()
         let payload: [String: Any] = [
             "mode": packageSourceMode.rawValue,
             "custom_specs": specs
@@ -153,5 +156,12 @@ extension ContentView {
             return "{\"mode\":\"stable\",\"custom_specs\":[]}"
         }
         return text
+    }
+
+    func customPackageSpecs() -> [String] {
+        customPackageSpecsText
+            .components(separatedBy: .newlines)
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty && !$0.hasPrefix("#") }
     }
 }
