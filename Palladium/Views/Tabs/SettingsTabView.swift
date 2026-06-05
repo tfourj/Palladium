@@ -36,6 +36,8 @@ struct SettingsTabView: View {
     let importedCookieFiles: [ImportedCookieFile]
 
     let storageSummary: StorageManagementSummary
+    @Binding var packageSourceMode: PackageSourceMode
+    @Binding var customPackageSpecsText: String
     let packageStatusText: String
     let versionsText: String
     let updatesSummaryText: String
@@ -232,6 +234,8 @@ struct SettingsTabView: View {
                 case .packages:
                     PackagesSettingsView(
                         packageStatusText: packageStatusText,
+                        packageSourceMode: $packageSourceMode,
+                        customPackageSpecsText: $customPackageSpecsText,
                         versionsText: versionsText,
                         updatesSummaryText: updatesSummaryText,
                         updatesAvailable: updatesAvailable,

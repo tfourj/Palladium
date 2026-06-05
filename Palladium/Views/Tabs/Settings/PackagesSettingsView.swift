@@ -4,6 +4,8 @@ struct PackagesSettingsView: View {
     private static let latestSelectionToken = "__latest__"
 
     let packageStatusText: String
+    @Binding var packageSourceMode: PackageSourceMode
+    @Binding var customPackageSpecsText: String
     let versionsText: String
     let updatesSummaryText: String
     let updatesAvailable: Bool
