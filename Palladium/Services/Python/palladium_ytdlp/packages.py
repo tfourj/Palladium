@@ -472,7 +472,7 @@ def check_package_updates(install_target=None, package_source=None):
         )
         update_lines = build_package_update_lines(installed_versions, indexed_versions)
         if update_lines:
-            return True, "\\n".join(update_lines)
+            return True, "\n".join(update_lines)
         if indexed_versions:
             return False, "All packages are up to date."
 
@@ -532,7 +532,7 @@ def check_package_updates(install_target=None, package_source=None):
         if not lines:
             return False, "All packages are up to date."
 
-        return True, "\\n".join(lines)
+        return True, "\n".join(lines)
     except Exception:
         traceback.print_exc()
         return False, "Unable to check updates."
