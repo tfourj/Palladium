@@ -370,6 +370,25 @@ def parse_package_source(source_json=None):
     return source
 
 
+def build_pip_install_args(package_specs, install_target=None, allow_prereleases=False, upgrade=False):
+    args = ["install"]
+    if install_target:
+        args.extend(["--target", install_target])
+    if upgrade:
+        args.append("--upgrade")
+    if allow_prereleases:
+        args.append("--pre")
+    args.extend([
+        "--disable-pip-version-check",
+        "--no-cache-dir",
+        "--progress-bar",
+        "off",
+        "--no-color",
+    ])
+    args.extend(list(package_specs or []))
+    return args
+
+
 def latest_index_version(indexed_versions, package_name):
     for candidate in indexed_versions.get(package_name) or []:
         resolved = normalized_version_text(candidate)

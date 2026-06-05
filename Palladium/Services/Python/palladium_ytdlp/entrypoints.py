@@ -23,6 +23,7 @@ from .ffmpeg_bridge import (
 from .files import cleanup_temp_download_files, detect_downloaded_files, has_primary_media_file
 from .packages import (
     build_package_install_plan,
+    build_pip_install_args,
     check_package_updates,
     cleanup_target_package,
     collect_versions,
@@ -517,12 +518,11 @@ def run_yt_dlp_flow(
 
                     try:
                         raise_if_cancel_requested(cancel_file_path, "[palladium] cancellation requested before pip install")
-                        pip_args = ["install", "--no-cache-dir", "--progress-bar", "off", "--no-color", *packages]
-                        if package_source.get("allow_prereleases"):
-                            pip_args[1:1] = ["--pre"]
-                        if install_target:
-                            pip_args[1:1] = ["--target", install_target]
-                        pip_args[1:1] = ["--disable-pip-version-check"]
+                        pip_args = build_pip_install_args(
+                            packages,
+                            install_target=install_target,
+                            allow_prereleases=bool(package_source.get("allow_prereleases")),
+                        )
                         if packages:
                             pip_result = pip_main(pip_args)
                             pip_exit_code = 0 if pip_result is None else int(pip_result)
@@ -861,20 +861,12 @@ def run_package_maintenance(action, custom_versions_json=None, live_log_fd_overr
                                         stale_removed += cleanup_target_package(install_target, package_name)
                                     print(f"[palladium] removed stale target package entries: {stale_removed}")
                                 raise_if_cancel_requested(cancel_file_path, "[palladium] package action cancelled before pip install")
-                                pip_args = [
-                                    "install",
-                                    "--upgrade",
-                                    "--disable-pip-version-check",
-                                    "--no-cache-dir",
-                                    "--progress-bar",
-                                    "off",
-                                    "--no-color",
-                                    *packages,
-                                ]
-                                if package_source.get("allow_prereleases"):
-                                    pip_args[1:1] = ["--pre"]
-                                if install_target:
-                                    pip_args[1:1] = ["--target", install_target]
+                                pip_args = build_pip_install_args(
+                                    packages,
+                                    install_target=install_target,
+                                    allow_prereleases=bool(package_source.get("allow_prereleases")),
+                                    upgrade=True,
+                                )
                                 pip_result = pip_main(pip_args)
                                 pip_exit_code = 0 if pip_result is None else int(pip_result)
                                 print(f"[palladium] pip exit code: {pip_exit_code}")
