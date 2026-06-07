@@ -4,6 +4,8 @@ struct PackagesSettingsView: View {
     private static let latestSelectionToken = "__latest__"
 
     let packageStatusText: String
+    @Binding var packageSourceMode: PackageSourceMode
+    @Binding var customPackageSpecsText: String
     let versionsText: String
     let updatesSummaryText: String
     let updatesAvailable: Bool
@@ -18,12 +20,50 @@ struct PackagesSettingsView: View {
     let onAppear: () -> Void
 
     @State private var showCustomVersionSheet = false
+    @State private var showNightlyWarning = false
+    @State private var pendingPackageSourceMode: PackageSourceMode?
     @State private var ytDlpSelectedVersion = Self.latestSelectionToken
     @State private var webkitJSISelectedVersion = Self.latestSelectionToken
     @State private var pipSelectedVersion = Self.latestSelectionToken
 
     var body: some View {
         Form {
+            Section("packages.source.title") {
+                Picker("packages.source.picker", selection: packageSourceSelection) {
+                    ForEach(PackageSourceMode.allCases) { mode in
+                        Text(mode.title).tag(mode)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .disabled(isRunning)
+
+                Text(String(format: String(localized: "packages.source.active"), packageSourceMode.title))
+                    .font(.caption)
+                    .foregroundStyle(packageSourceMode == .nightly ? .orange : .secondary)
+
+                Text(sourceHelpText)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            if packageSourceMode == .custom {
+                Section("packages.source.custom_specs.title") {
+                    TextEditor(text: $customPackageSpecsText)
+                        .font(.system(.footnote, design: .monospaced))
+                        .frame(minHeight: 120)
+                        .disabled(isRunning)
+
+                    Button("packages.source.custom_specs.reset") {
+                        customPackageSpecsText = PackageSourceDefaults.customSpecs
+                    }
+                    .disabled(isRunning)
+
+                    Text("packages.source.custom_specs.help")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
             Section("packages.status.title") {
                 Text(String(format: String(localized: "packages.status.value"), packageStatusText))
                     .font(.subheadline.monospaced())
@@ -67,7 +107,7 @@ struct PackagesSettingsView: View {
                 }
 
                 Button {
-                    guard !isRunning, updatesAvailable else { return }
+                    guard canRequestPackageUpdate else { return }
                     onUpdatePackages()
                 } label: {
                     Text(isRunning ? "packages.status.running" : "packages.update")
@@ -75,10 +115,10 @@ struct PackagesSettingsView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .disabled(isRunning)
-                .opacity((isRunning || !updatesAvailable) ? 0.5 : 1.0)
+                .opacity(canRequestPackageUpdate ? 1.0 : 0.5)
                 .simultaneousGesture(
                     LongPressGesture(minimumDuration: 0.55).onEnded { _ in
-                        guard !isRunning else { return }
+                        guard !isRunning, packageSourceMode != .custom else { return }
                         prepareCustomVersionEditor()
                         showCustomVersionSheet = true
                         onFetchPackageVersions()
@@ -96,6 +136,49 @@ struct PackagesSettingsView: View {
         .sheet(isPresented: $showCustomVersionSheet) {
             customVersionSheet
         }
+        .alert("packages.source.nightly.warning.title", isPresented: $showNightlyWarning) {
+            Button("common.cancel", role: .cancel) {
+                pendingPackageSourceMode = nil
+            }
+
+            Button("packages.source.nightly.enable") {
+                packageSourceMode = .nightly
+                pendingPackageSourceMode = nil
+            }
+        } message: {
+            Text("packages.source.nightly.warning.message")
+        }
+    }
+
+    private var packageSourceSelection: Binding<PackageSourceMode> {
+        Binding(
+            get: { packageSourceMode },
+            set: { newValue in
+                guard !isRunning else { return }
+                if newValue == .nightly, packageSourceMode != .nightly {
+                    pendingPackageSourceMode = newValue
+                    showNightlyWarning = true
+                } else {
+                    packageSourceMode = newValue
+                }
+            }
+        )
+    }
+
+    private var sourceHelpText: LocalizedStringKey {
+        switch packageSourceMode {
+        case .stable:
+            return "packages.source.stable.help"
+        case .nightly:
+            return "packages.source.nightly.help"
+        case .custom:
+            return "packages.source.custom.help"
+        }
+    }
+
+    private var canRequestPackageUpdate: Bool {
+        guard !isRunning else { return false }
+        return updatesAvailable || packageSourceMode == .custom
     }
 
     private var customVersionSheet: some View {

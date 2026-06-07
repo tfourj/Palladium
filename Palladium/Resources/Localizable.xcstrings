@@ -1547,6 +1547,166 @@
         }
       }
     },
+    "packages.source.active" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Active source: %@"
+          }
+        }
+      }
+    },
+    "packages.source.custom" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Custom"
+          }
+        }
+      }
+    },
+    "packages.source.custom.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Installs the package requirements listed below and skips the built-in webkit-js patch."
+          }
+        }
+      }
+    },
+    "packages.source.custom_specs.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter one pip requirement per line. Requirement pins, package names, and package @ URL specs are supported."
+          }
+        }
+      }
+    },
+    "packages.source.custom_specs.empty" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add at least one custom package requirement before updating."
+          }
+        }
+      }
+    },
+    "packages.source.custom_specs.reset" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset to Palladium Default"
+          }
+        }
+      }
+    },
+    "packages.source.custom_specs.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Custom Requirements"
+          }
+        }
+      }
+    },
+    "packages.source.nightly" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nightly"
+          }
+        }
+      }
+    },
+    "packages.source.nightly.enable" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enable Nightly"
+          }
+        }
+      }
+    },
+    "packages.source.nightly.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uses prerelease package versions when pip offers them."
+          }
+        }
+      }
+    },
+    "packages.source.nightly.warning.message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nightly packages may be unstable or break downloads. You can switch back to stable packages at any time."
+          }
+        }
+      }
+    },
+    "packages.source.nightly.warning.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use Nightly Packages?"
+          }
+        }
+      }
+    },
+    "packages.source.picker" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Package Source"
+          }
+        }
+      }
+    },
+    "packages.source.stable" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stable"
+          }
+        }
+      }
+    },
+    "packages.source.stable.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uses the default stable package releases from pip."
+          }
+        }
+      }
+    },
+    "packages.source.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Package Source"
+          }
+        }
+      }
+    },
     "packages.loading_versions" : {
       "localizations" : {
         "en" : {

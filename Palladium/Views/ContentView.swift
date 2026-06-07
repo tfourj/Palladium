@@ -69,6 +69,8 @@ struct ContentView: View {
     static let appAppearanceModeDefaultsKey = "palladium.appAppearanceMode"
     static let packageVersionsTextDefaultsKey = "palladium.packageVersionsText"
     static let checkPackageUpdatesOnLaunchDefaultsKey = "palladium.checkPackageUpdatesOnLaunch"
+    static let packageSourceModeDefaultsKey = "palladium.packageSourceMode"
+    static let customPackageSpecsDefaultsKey = "palladium.customPackageSpecs"
     static let defaultLinkHistoryLimit = 10
     static let maxLinkHistoryLimit = 50
 
@@ -119,6 +121,8 @@ struct ContentView: View {
     @State var isPackageRunning = false
     @State var hasLoadedPackageStatus = false
     @State var checkPackageUpdatesOnLaunch: Bool
+    @State var packageSourceMode: PackageSourceMode
+    @State var customPackageSpecsText: String
     @State var storageSummary: StorageManagementSummary = .empty
     @StateObject var consoleLogStore: ConsoleLogStore
     @State var completedDownloadResult: CompletedDownloadResult?
@@ -186,6 +190,8 @@ struct ContentView: View {
         _appAppearanceMode = State(initialValue: Self.loadAppAppearanceMode())
         _versionsText = State(initialValue: Self.loadCachedPackageVersionsText())
         _checkPackageUpdatesOnLaunch = State(initialValue: Self.loadCheckPackageUpdatesOnLaunch())
+        _packageSourceMode = State(initialValue: Self.loadPackageSourceMode())
+        _customPackageSpecsText = State(initialValue: Self.loadCustomPackageSpecsText())
         _consoleLogStore = StateObject(wrappedValue: ConsoleLogStore())
     }
 
@@ -246,6 +252,8 @@ struct ContentView: View {
                     urlAllowlistSources: urlAllowlistSources,
                     importedCookieFiles: importedCookieFiles,
                     storageSummary: storageSummary,
+                    packageSourceMode: $packageSourceMode,
+                    customPackageSpecsText: $customPackageSpecsText,
                     packageStatusText: packageStatusText,
                     versionsText: versionsText,
                     updatesSummaryText: packageUpdatesSummaryText,
@@ -394,6 +402,12 @@ struct ContentView: View {
             persistPreferences()
         }
         .onChange(of: checkPackageUpdatesOnLaunch, initial: false) {
+            persistPreferences()
+        }
+        .onChange(of: packageSourceMode, initial: false) {
+            persistPreferences()
+        }
+        .onChange(of: customPackageSpecsText, initial: false) {
             persistPreferences()
         }
         .sheet(item: $sharePayload) { payload in

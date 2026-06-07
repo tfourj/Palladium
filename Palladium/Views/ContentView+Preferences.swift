@@ -60,6 +60,8 @@ extension ContentView {
         defaults.set(linkHistoryLimit, forKey: Self.linkHistoryLimitDefaultsKey)
         defaults.set(appAppearanceMode.rawValue, forKey: Self.appAppearanceModeDefaultsKey)
         defaults.set(checkPackageUpdatesOnLaunch, forKey: Self.checkPackageUpdatesOnLaunchDefaultsKey)
+        defaults.set(packageSourceMode.rawValue, forKey: Self.packageSourceModeDefaultsKey)
+        defaults.set(customPackageSpecsText, forKey: Self.customPackageSpecsDefaultsKey)
     }
 
     static func loadSelectedPreset(rememberSelection: Bool) -> DownloadPreset {
@@ -309,5 +311,21 @@ extension ContentView {
             return false
         }
         return UserDefaults.standard.bool(forKey: checkPackageUpdatesOnLaunchDefaultsKey)
+    }
+
+    static func loadPackageSourceMode() -> PackageSourceMode {
+        guard let rawValue = UserDefaults.standard.string(forKey: packageSourceModeDefaultsKey),
+              let mode = PackageSourceMode(rawValue: rawValue) else {
+            return .stable
+        }
+        return mode
+    }
+
+    static func loadCustomPackageSpecsText() -> String {
+        guard let value = UserDefaults.standard.string(forKey: customPackageSpecsDefaultsKey),
+              !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            return PackageSourceDefaults.customSpecs
+        }
+        return value
     }
 }

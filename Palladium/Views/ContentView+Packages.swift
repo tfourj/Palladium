@@ -57,6 +57,7 @@ extension ContentView {
             let outcome = await PythonFlowRunner.executePackageFlow(
                 action: action,
                 customVersions: customVersions,
+                packageSourceJSON: buildPackageSourceJSON(),
                 liveLogFD: liveLogFD
             )
 
@@ -112,10 +113,16 @@ extension ContentView {
     }
 
     func updatePackages() {
+        if packageSourceMode == .custom && customPackageSpecs().isEmpty {
+            alertMessage = String(localized: "packages.source.custom_specs.empty")
+            showAlert = true
+            return
+        }
         runPackageFlow(action: "update")
     }
 
     func updatePackagesWithCustomVersions(_ ytDlpVersion: String?, _ webkitJSIVersion: String?, _ pipVersion: String?) {
+        guard packageSourceMode != .custom else { return }
         var customVersions: [String: String] = [:]
         if let ytDlpVersion {
             customVersions["yt-dlp"] = ytDlpVersion
@@ -136,5 +143,25 @@ extension ContentView {
 
     func persistPackageVersionsText(_ text: String) {
         UserDefaults.standard.set(text, forKey: Self.packageVersionsTextDefaultsKey)
+    }
+
+    func buildPackageSourceJSON() -> String {
+        let specs = customPackageSpecs()
+        let payload: [String: Any] = [
+            "mode": packageSourceMode.rawValue,
+            "custom_specs": specs
+        ]
+        guard let data = try? JSONSerialization.data(withJSONObject: payload),
+              let text = String(data: data, encoding: .utf8) else {
+            return "{\"mode\":\"stable\",\"custom_specs\":[]}"
+        }
+        return text
+    }
+
+    func customPackageSpecs() -> [String] {
+        customPackageSpecsText
+            .components(separatedBy: .newlines)
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty && !$0.hasPrefix("#") }
     }
 }
