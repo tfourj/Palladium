@@ -204,6 +204,10 @@ extension ContentView {
         try documentsDirectoryURL().appendingPathComponent("Saved", isDirectory: true)
     }
 
+    func savedDownloadsDirectoryForView() -> URL {
+        (try? savedDirectoryURL()) ?? FileManager.default.temporaryDirectory.appendingPathComponent("Saved", isDirectory: true)
+    }
+
     func cacheDirectoryURL() throws -> URL {
         let caches = try FileManager.default.url(
             for: .cachesDirectory,

@@ -12,6 +12,7 @@ import Foundation
 struct ContentView: View {
     enum AppTab: Hashable {
         case download
+        case downloads
         case settings
         case console
     }
@@ -227,6 +228,15 @@ struct ContentView: View {
                     Label(String(localized: "tab.download"), systemImage: "arrow.down.circle")
                 }
                 .tag(AppTab.download)
+
+                SavedDownloadsTabView(
+                    savedDirectory: savedDownloadsDirectoryForView(),
+                    onSelectMedia: { _ in }
+                )
+                .tabItem {
+                    Label(String(localized: "tab.downloads"), systemImage: "tray.and.arrow.down")
+                }
+                .tag(AppTab.downloads)
 
                 SettingsTabView(
                     checkPackageUpdatesOnLaunch: $checkPackageUpdatesOnLaunch,
