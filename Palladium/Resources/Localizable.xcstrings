@@ -2677,6 +2677,36 @@
         }
       }
     },
+    "settings.ui.downloads.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When enabled, the Downloads tab also shows temporary download runs from Palladium/Temp."
+          }
+        }
+      }
+    },
+    "settings.ui.downloads.section" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloads Tab"
+          }
+        }
+      }
+    },
+    "settings.ui.downloads.show_temp" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show temporary downloads"
+          }
+        }
+      }
+    },
     "settings.ui.history.enable" : {
       "localizations" : {
         "en" : {
@@ -3483,6 +3513,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No media in this folder"
+          }
+        }
+      }
+    },
+    "downloads.location.saved" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved"
+          }
+        }
+      }
+    },
+    "downloads.location.temporary" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Temporary"
           }
         }
       }

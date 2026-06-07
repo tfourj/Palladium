@@ -5,6 +5,8 @@ import UIKit
 
 struct SavedDownloadsTabView: View {
     let savedDirectory: URL
+    let temporaryDirectory: URL
+    let showsTemporaryDownloads: Bool
     let onOpenOptions: (SavedDownloadItem) -> Void
 
     @State private var items: [SavedDownloadItem] = []
@@ -95,6 +97,9 @@ struct SavedDownloadsTabView: View {
             }
         }
         .onAppear(perform: loadItems)
+        .onChange(of: showsTemporaryDownloads) {
+            loadItems()
+        }
         .sheet(item: $playbackItem) { item in
             SavedMediaPlayerView(item: item)
         }
@@ -103,6 +108,10 @@ struct SavedDownloadsTabView: View {
     private func loadItems() {
         do {
             items = try SavedDownloadScanner.topLevelItems(in: savedDirectory)
+            if showsTemporaryDownloads {
+                items += try SavedDownloadScanner.topLevelItems(in: temporaryDirectory, location: .temporary)
+                items = items.sorted(by: SavedDownloadScanner.sortItems)
+            }
             loadError = nil
         } catch {
             items = []
@@ -204,7 +213,7 @@ private struct SavedDownloadsFolderView: View {
 
     private func loadItems() {
         do {
-            items = try SavedDownloadScanner.mediaItems(in: folder.url)
+            items = try SavedDownloadScanner.mediaItems(in: folder.url, location: folder.location)
             loadError = nil
         } catch {
             items = []
@@ -387,6 +396,11 @@ private enum SavedDownloadThumbnailLoader {
 }
 
 struct SavedDownloadItem: Identifiable, Hashable {
+    enum Location: Hashable {
+        case saved
+        case temporary
+    }
+
     enum Kind: Hashable {
         case folder(mediaCount: Int)
         case video
@@ -396,6 +410,7 @@ struct SavedDownloadItem: Identifiable, Hashable {
 
     let url: URL
     let kind: Kind
+    let location: Location
     let modifiedDate: Date?
     let fileSize: Int64?
 
@@ -421,9 +436,12 @@ struct SavedDownloadItem: Identifiable, Hashable {
     var subtitle: String {
         switch kind {
         case .folder(let mediaCount):
-            return String(format: String(localized: "downloads.folder.count"), mediaCount)
+            return [
+                locationTitle,
+                String(format: String(localized: "downloads.folder.count"), mediaCount)
+            ].joined(separator: " • ")
         case .video, .audio, .image:
-            var parts: [String] = [mediaTypeTitle]
+            var parts: [String] = [locationTitle, mediaTypeTitle]
             if let fileSize {
                 parts.append(ByteCountFormatter.string(fromByteCount: fileSize, countStyle: .file))
             }
@@ -431,6 +449,15 @@ struct SavedDownloadItem: Identifiable, Hashable {
                 parts.append(modifiedDate.formatted(date: .abbreviated, time: .shortened))
             }
             return parts.joined(separator: " • ")
+        }
+    }
+
+    var locationTitle: String {
+        switch location {
+        case .saved:
+            return String(localized: "downloads.location.saved")
+        case .temporary:
+            return String(localized: "downloads.location.temporary")
         }
     }
 
@@ -479,7 +506,10 @@ enum SavedDownloadScanner {
     nonisolated static let audioExtensions: Set<String> = ["mp3", "m4a", "aac", "wav", "flac", "opus", "ogg"]
     nonisolated static let imageExtensions: Set<String> = ["jpg", "jpeg", "png", "gif", "heif", "heic", "webp"]
 
-    nonisolated static func topLevelItems(in directory: URL) throws -> [SavedDownloadItem] {
+    nonisolated static func topLevelItems(
+        in directory: URL,
+        location: SavedDownloadItem.Location = .saved
+    ) throws -> [SavedDownloadItem] {
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         let contents = try FileManager.default.contentsOfDirectory(
             at: directory,
@@ -490,11 +520,12 @@ enum SavedDownloadScanner {
         return try contents.compactMap { url in
             let values = try url.resourceValues(forKeys: [.isDirectoryKey, .contentModificationDateKey, .fileSizeKey])
             if values.isDirectory == true {
-                let mediaCount = try mediaItems(in: url).count
+                let mediaCount = try mediaItems(in: url, location: location).count
                 guard mediaCount > 0 else { return nil }
                 return SavedDownloadItem(
                     url: url,
                     kind: .folder(mediaCount: mediaCount),
+                    location: location,
                     modifiedDate: values.contentModificationDate,
                     fileSize: nil
                 )
@@ -503,6 +534,7 @@ enum SavedDownloadScanner {
             return SavedDownloadItem(
                 url: url,
                 kind: kind,
+                location: location,
                 modifiedDate: values.contentModificationDate,
                 fileSize: Int64(values.fileSize ?? 0)
             )
@@ -510,7 +542,10 @@ enum SavedDownloadScanner {
         .sorted(by: sortItems)
     }
 
-    nonisolated static func mediaItems(in directory: URL) throws -> [SavedDownloadItem] {
+    nonisolated static func mediaItems(
+        in directory: URL,
+        location: SavedDownloadItem.Location = .saved
+    ) throws -> [SavedDownloadItem] {
         guard let enumerator = FileManager.default.enumerator(
             at: directory,
             includingPropertiesForKeys: [.isRegularFileKey, .contentModificationDateKey, .fileSizeKey],
@@ -528,6 +563,7 @@ enum SavedDownloadScanner {
                 SavedDownloadItem(
                     url: url,
                     kind: kind,
+                    location: location,
                     modifiedDate: values.contentModificationDate,
                     fileSize: Int64(values.fileSize ?? 0)
                 )
@@ -544,7 +580,7 @@ enum SavedDownloadScanner {
         return nil
     }
 
-    nonisolated private static func sortItems(_ lhs: SavedDownloadItem, _ rhs: SavedDownloadItem) -> Bool {
+    nonisolated static func sortItems(_ lhs: SavedDownloadItem, _ rhs: SavedDownloadItem) -> Bool {
         switch (lhs.isFolder, rhs.isFolder) {
         case (true, false):
             return true

@@ -181,7 +181,7 @@ extension ContentView {
     }
 
     func openSavedDownloadActions(_ item: SavedDownloadItem) {
-        completedDownloadAllowsSaveToApplicationFolder = false
+        completedDownloadAllowsSaveToApplicationFolder = item.location != .saved
         completedDownloadResult = CompletedDownloadResult(
             items: [item.url],
             primaryMediaURL: item.url,

@@ -13,6 +13,7 @@ struct UseInterfaceSettingsView: View {
     @Binding var linkHistoryEnabled: Bool
     @Binding var linkHistoryLimit: Int
     @Binding var appAppearanceMode: AppAppearanceMode
+    @Binding var showTemporaryDownloads: Bool
 
     @State private var linkHistoryLimitText: String
     @FocusState private var isHistoryLimitFieldFocused: Bool
@@ -32,6 +33,7 @@ struct UseInterfaceSettingsView: View {
         linkHistoryEnabled: Binding<Bool>,
         linkHistoryLimit: Binding<Int>,
         appAppearanceMode: Binding<AppAppearanceMode>,
+        showTemporaryDownloads: Binding<Bool>,
         isRunning: Bool
     ) {
         _checkPackageUpdatesOnLaunch = checkPackageUpdatesOnLaunch
@@ -46,6 +48,7 @@ struct UseInterfaceSettingsView: View {
         _linkHistoryEnabled = linkHistoryEnabled
         _linkHistoryLimit = linkHistoryLimit
         _appAppearanceMode = appAppearanceMode
+        _showTemporaryDownloads = showTemporaryDownloads
         _linkHistoryLimitText = State(initialValue: String(linkHistoryLimit.wrappedValue))
         self.isRunning = isRunning
     }
@@ -127,6 +130,15 @@ struct UseInterfaceSettingsView: View {
                     Text("settings.ui.retry_failed.help")
                     Text("settings.ui.progress.help")
                 }
+            }
+
+            Section {
+                Toggle("settings.ui.downloads.show_temp", isOn: $showTemporaryDownloads)
+                    .disabled(isRunning)
+            } header: {
+                Text("settings.ui.downloads.section")
+            } footer: {
+                Text("settings.ui.downloads.help")
             }
 
             Section {
