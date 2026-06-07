@@ -581,6 +581,15 @@ enum SavedDownloadScanner {
     }
 
     nonisolated static func sortItems(_ lhs: SavedDownloadItem, _ rhs: SavedDownloadItem) -> Bool {
+        switch (lhs.location, rhs.location) {
+        case (.temporary, .saved):
+            return true
+        case (.saved, .temporary):
+            return false
+        default:
+            break
+        }
+
         switch (lhs.isFolder, rhs.isFolder) {
         case (true, false):
             return true
