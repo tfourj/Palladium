@@ -37,7 +37,7 @@ struct SavedDownloadsTabView: View {
                                 }
                                 .listRowSeparator(.visible)
                                 .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
-                                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                                     Button(role: .destructive) {
                                         delete(item)
                                     } label: {
@@ -57,7 +57,7 @@ struct SavedDownloadsTabView: View {
                                     .onLongPressGesture {
                                         onOpenOptions(item)
                                     }
-                                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                                         Button(role: .destructive) {
                                             delete(item)
                                         } label: {
@@ -178,7 +178,7 @@ private struct SavedDownloadsFolderView: View {
                             .onLongPressGesture {
                                 onOpenOptions(item)
                             }
-                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                                 Button(role: .destructive) {
                                     delete(item)
                                 } label: {
