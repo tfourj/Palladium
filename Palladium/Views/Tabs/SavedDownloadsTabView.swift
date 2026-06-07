@@ -54,6 +54,7 @@ struct SavedDownloadsTabView: View {
                 }
             }
             .navigationTitle("tab.downloads")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(action: loadItems) {
@@ -131,6 +132,7 @@ private struct SavedDownloadsFolderView: View {
             }
         }
         .navigationTitle(folder.displayName)
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button(action: loadItems) {
@@ -274,13 +276,13 @@ struct SavedDownloadItem: Identifiable, Hashable {
     let modifiedDate: Date?
     let fileSize: Int64?
 
-    var id: String { url.path }
-    var isFolder: Bool {
+    nonisolated var id: String { url.path }
+    nonisolated var isFolder: Bool {
         if case .folder = kind { return true }
         return false
     }
 
-    var displayName: String {
+    nonisolated var displayName: String {
         url.deletingPathExtension().lastPathComponent
     }
 
@@ -341,11 +343,11 @@ struct SavedDownloadItem: Identifiable, Hashable {
 }
 
 enum SavedDownloadScanner {
-    static let videoExtensions: Set<String> = ["mp4", "mov", "m4v", "mkv", "webm", "avi", "flv", "ts", "mpeg", "mpg"]
-    static let audioExtensions: Set<String> = ["mp3", "m4a", "aac", "wav", "flac", "opus", "ogg"]
-    static let imageExtensions: Set<String> = ["jpg", "jpeg", "png", "gif", "heif", "heic", "webp"]
+    nonisolated static let videoExtensions: Set<String> = ["mp4", "mov", "m4v", "mkv", "webm", "avi", "flv", "ts", "mpeg", "mpg"]
+    nonisolated static let audioExtensions: Set<String> = ["mp3", "m4a", "aac", "wav", "flac", "opus", "ogg"]
+    nonisolated static let imageExtensions: Set<String> = ["jpg", "jpeg", "png", "gif", "heif", "heic", "webp"]
 
-    static func topLevelItems(in directory: URL) throws -> [SavedDownloadItem] {
+    nonisolated static func topLevelItems(in directory: URL) throws -> [SavedDownloadItem] {
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         let contents = try FileManager.default.contentsOfDirectory(
             at: directory,
@@ -376,7 +378,7 @@ enum SavedDownloadScanner {
         .sorted(by: sortItems)
     }
 
-    static func mediaItems(in directory: URL) throws -> [SavedDownloadItem] {
+    nonisolated static func mediaItems(in directory: URL) throws -> [SavedDownloadItem] {
         guard let enumerator = FileManager.default.enumerator(
             at: directory,
             includingPropertiesForKeys: [.isRegularFileKey, .contentModificationDateKey, .fileSizeKey],
@@ -402,7 +404,7 @@ enum SavedDownloadScanner {
         return items.sorted(by: sortItems)
     }
 
-    private static func mediaKind(for url: URL) -> SavedDownloadItem.Kind? {
+    nonisolated private static func mediaKind(for url: URL) -> SavedDownloadItem.Kind? {
         let ext = url.pathExtension.lowercased()
         if videoExtensions.contains(ext) { return .video }
         if audioExtensions.contains(ext) { return .audio }
@@ -410,7 +412,7 @@ enum SavedDownloadScanner {
         return nil
     }
 
-    private static func sortItems(_ lhs: SavedDownloadItem, _ rhs: SavedDownloadItem) -> Bool {
+    nonisolated private static func sortItems(_ lhs: SavedDownloadItem, _ rhs: SavedDownloadItem) -> Bool {
         switch (lhs.isFolder, rhs.isFolder) {
         case (true, false):
             return true
