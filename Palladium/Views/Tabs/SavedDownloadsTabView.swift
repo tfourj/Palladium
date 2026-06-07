@@ -27,11 +27,9 @@ struct SavedDownloadsTabView: View {
                 } else {
                     List {
                         ForEach(items) { item in
-                            SavedDownloadRow(item: item)
-                                .contentShape(Rectangle())
-                                .onTapGesture {
-                                    guard !item.isFolder else { return }
-                                    onSelectMedia(item)
+                            if item.isFolder {
+                                NavigationLink(value: item) {
+                                    SavedDownloadRow(item: item)
                                 }
                                 .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                     Button(role: .destructive) {
@@ -40,14 +38,20 @@ struct SavedDownloadsTabView: View {
                                         Label("common.delete", systemImage: "trash")
                                     }
                                 }
-                                .background {
-                                    if item.isFolder {
-                                        NavigationLink(value: item) {
-                                            EmptyView()
-                                        }
-                                        .opacity(0)
+                            } else {
+                                SavedDownloadRow(item: item)
+                                    .contentShape(Rectangle())
+                                    .onTapGesture {
+                                        onSelectMedia(item)
                                     }
-                                }
+                                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                        Button(role: .destructive) {
+                                            delete(item)
+                                        } label: {
+                                            Label("common.delete", systemImage: "trash")
+                                        }
+                                    }
+                            }
                         }
                     }
                     .listStyle(.plain)
