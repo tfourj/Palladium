@@ -300,7 +300,7 @@ extension ContentView {
 
     static func loadShowTemporaryDownloads() -> Bool {
         if UserDefaults.standard.object(forKey: showTemporaryDownloadsDefaultsKey) == nil {
-            return true
+            return false
         }
         return UserDefaults.standard.bool(forKey: showTemporaryDownloadsDefaultsKey)
     }
