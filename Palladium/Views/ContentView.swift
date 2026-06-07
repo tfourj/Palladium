@@ -127,6 +127,7 @@ struct ContentView: View {
     @State var storageSummary: StorageManagementSummary = .empty
     @StateObject var consoleLogStore: ConsoleLogStore
     @State var completedDownloadResult: CompletedDownloadResult?
+    @State var completedDownloadAllowsSaveToApplicationFolder = true
     @State var completedPhotosCompatibility: PhotosCompatibilityState = .checking
     @State var showDownloadActionSheet = false
     @State var alertMessage: String?
@@ -231,7 +232,7 @@ struct ContentView: View {
 
                 SavedDownloadsTabView(
                     savedDirectory: savedDownloadsDirectoryForView(),
-                    onSelectMedia: { _ in }
+                    onSelectMedia: openSavedDownloadActions
                 )
                 .tabItem {
                     Label(String(localized: "tab.downloads"), systemImage: "tray.and.arrow.down")
