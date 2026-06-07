@@ -25,21 +25,30 @@ struct SavedDownloadsTabView: View {
                         description: Text("downloads.empty.message")
                     )
                 } else {
-                    List(items) { item in
-                        SavedDownloadRow(item: item)
-                            .contentShape(Rectangle())
-                            .onTapGesture {
-                                guard !item.isFolder else { return }
-                                onSelectMedia(item)
-                            }
-                            .background {
-                                if item.isFolder {
-                                    NavigationLink(value: item) {
-                                        EmptyView()
-                                    }
-                                    .opacity(0)
+                    List {
+                        ForEach(items) { item in
+                            SavedDownloadRow(item: item)
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    guard !item.isFolder else { return }
+                                    onSelectMedia(item)
                                 }
-                            }
+                                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                    Button(role: .destructive) {
+                                        delete(item)
+                                    } label: {
+                                        Label("common.delete", systemImage: "trash")
+                                    }
+                                }
+                                .background {
+                                    if item.isFolder {
+                                        NavigationLink(value: item) {
+                                            EmptyView()
+                                        }
+                                        .opacity(0)
+                                    }
+                                }
+                        }
                     }
                     .listStyle(.plain)
                 }
@@ -69,6 +78,15 @@ struct SavedDownloadsTabView: View {
             loadError = error.localizedDescription
         }
     }
+
+    private func delete(_ item: SavedDownloadItem) {
+        do {
+            try FileManager.default.removeItem(at: item.url)
+            loadItems()
+        } catch {
+            loadError = error.localizedDescription
+        }
+    }
 }
 
 private struct SavedDownloadsFolderView: View {
@@ -93,12 +111,21 @@ private struct SavedDownloadsFolderView: View {
                     description: Text("downloads.folder.empty.message")
                 )
             } else {
-                List(items) { item in
-                    SavedDownloadRow(item: item)
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            onSelectMedia(item)
-                        }
+                List {
+                    ForEach(items) { item in
+                        SavedDownloadRow(item: item)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                onSelectMedia(item)
+                            }
+                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                Button(role: .destructive) {
+                                    delete(item)
+                                } label: {
+                                    Label("common.delete", systemImage: "trash")
+                                }
+                            }
+                    }
                 }
                 .listStyle(.plain)
             }
@@ -121,6 +148,15 @@ private struct SavedDownloadsFolderView: View {
             loadError = nil
         } catch {
             items = []
+            loadError = error.localizedDescription
+        }
+    }
+
+    private func delete(_ item: SavedDownloadItem) {
+        do {
+            try FileManager.default.removeItem(at: item.url)
+            loadItems()
+        } catch {
             loadError = error.localizedDescription
         }
     }
