@@ -3427,6 +3427,116 @@
         }
       }
     },
+    "downloads.empty.message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Media saved to Palladium/Saved will appear here."
+          }
+        }
+      }
+    },
+    "downloads.empty.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No saved downloads"
+          }
+        }
+      }
+    },
+    "downloads.error.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not load downloads"
+          }
+        }
+      }
+    },
+    "downloads.folder.count" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld media items"
+          }
+        }
+      }
+    },
+    "downloads.folder.empty.message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This saved folder does not contain any supported media."
+          }
+        }
+      }
+    },
+    "downloads.folder.empty.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No media in this folder"
+          }
+        }
+      }
+    },
+    "downloads.refresh" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Refresh Downloads"
+          }
+        }
+      }
+    },
+    "downloads.type.audio" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio"
+          }
+        }
+      }
+    },
+    "downloads.type.folder" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Folder"
+          }
+        }
+      }
+    },
+    "downloads.type.image" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Image"
+          }
+        }
+      }
+    },
+    "downloads.type.video" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video"
+          }
+        }
+      }
+    },
     "tab.console" : {
       "localizations" : {
         "en" : {
@@ -3443,6 +3553,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Download"
+          }
+        }
+      }
+    },
+    "tab.downloads" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloads"
           }
         }
       }
