@@ -1,4 +1,6 @@
 import SwiftUI
+import AVFoundation
+import UIKit
 
 struct SavedDownloadsTabView: View {
     let savedDirectory: URL
@@ -129,14 +131,7 @@ private struct SavedDownloadRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(Color(.secondarySystemBackground))
-                Image(systemName: item.iconName)
-                    .font(.system(size: 24, weight: .semibold))
-                    .foregroundStyle(item.iconColor)
-            }
-            .frame(width: 58, height: 44)
+            SavedDownloadPreview(item: item)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(item.displayName)
@@ -158,6 +153,75 @@ private struct SavedDownloadRow: View {
             }
         }
         .padding(.vertical, 4)
+    }
+}
+
+private struct SavedDownloadPreview: View {
+    let item: SavedDownloadItem
+
+    @State private var thumbnail: UIImage?
+    @State private var didLoadThumbnail = false
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 8)
+                .fill(Color(.secondarySystemBackground))
+
+            if let thumbnail {
+                Image(uiImage: thumbnail)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 58, height: 44)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+            } else {
+                Image(systemName: item.iconName)
+                    .font(.system(size: 24, weight: .semibold))
+                    .foregroundStyle(item.iconColor)
+            }
+        }
+        .frame(width: 58, height: 44)
+        .clipped()
+        .task(id: item.id) {
+            guard !didLoadThumbnail else { return }
+            didLoadThumbnail = true
+            thumbnail = SavedDownloadThumbnailLoader.thumbnail(for: item)
+        }
+    }
+}
+
+private enum SavedDownloadThumbnailLoader {
+    static func thumbnail(for item: SavedDownloadItem) -> UIImage? {
+        switch item.kind {
+        case .image:
+            return imageThumbnail(for: item.url)
+        case .video:
+            return videoThumbnail(for: item.url)
+        case .audio, .folder:
+            return nil
+        }
+    }
+
+    private static func imageThumbnail(for url: URL) -> UIImage? {
+        guard let image = UIImage(contentsOfFile: url.path) else { return nil }
+        let targetSize = CGSize(width: 116, height: 88)
+        return image.preparingThumbnail(of: targetSize) ?? image
+    }
+
+    private static func videoThumbnail(for url: URL) -> UIImage? {
+        let asset = AVAsset(url: url)
+        let generator = AVAssetImageGenerator(asset: asset)
+        generator.appliesPreferredTrackTransform = true
+        generator.maximumSize = CGSize(width: 232, height: 176)
+
+        do {
+            let cgImage = try generator.copyCGImage(
+                at: CMTime(seconds: 1, preferredTimescale: 600),
+                actualTime: nil
+            )
+            return UIImage(cgImage: cgImage)
+        } catch {
+            return nil
+        }
     }
 }
 
