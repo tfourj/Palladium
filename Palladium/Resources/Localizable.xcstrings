@@ -3487,6 +3487,16 @@
         }
       }
     },
+    "downloads.options" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Options"
+          }
+        }
+      }
+    },
     "downloads.refresh" : {
       "localizations" : {
         "en" : {

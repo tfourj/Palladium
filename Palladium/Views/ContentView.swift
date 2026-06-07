@@ -232,7 +232,7 @@ struct ContentView: View {
 
                 SavedDownloadsTabView(
                     savedDirectory: savedDownloadsDirectoryForView(),
-                    onSelectMedia: openSavedDownloadActions
+                    onOpenOptions: openSavedDownloadActions
                 )
                 .tabItem {
                     Label(String(localized: "tab.downloads"), systemImage: "tray.and.arrow.down")

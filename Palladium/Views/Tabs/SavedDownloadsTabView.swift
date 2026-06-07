@@ -1,13 +1,15 @@
 import SwiftUI
 import AVFoundation
+import AVKit
 import UIKit
 
 struct SavedDownloadsTabView: View {
     let savedDirectory: URL
-    let onSelectMedia: (SavedDownloadItem) -> Void
+    let onOpenOptions: (SavedDownloadItem) -> Void
 
     @State private var items: [SavedDownloadItem] = []
     @State private var loadError: String?
+    @State private var playbackItem: SavedMediaPlaybackItem?
 
     var body: some View {
         NavigationStack {
@@ -41,12 +43,17 @@ struct SavedDownloadsTabView: View {
                                     }
                                 }
                             } else {
-                                SavedDownloadRow(item: item)
+                                SavedDownloadRow(item: item) {
+                                    onOpenOptions(item)
+                                }
                                     .contentShape(Rectangle())
                                     .listRowSeparator(.visible)
                                     .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
                                     .onTapGesture {
-                                        onSelectMedia(item)
+                                        openMedia(item)
+                                    }
+                                    .onLongPressGesture {
+                                        onOpenOptions(item)
                                     }
                                     .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                         Button(role: .destructive) {
@@ -54,6 +61,14 @@ struct SavedDownloadsTabView: View {
                                         } label: {
                                             Label("common.delete", systemImage: "trash")
                                         }
+                                    }
+                                    .swipeActions(edge: .leading, allowsFullSwipe: false) {
+                                        Button {
+                                            onOpenOptions(item)
+                                        } label: {
+                                            Label("downloads.options", systemImage: "ellipsis.circle")
+                                        }
+                                        .tint(.blue)
                                     }
                             }
                         }
@@ -72,10 +87,17 @@ struct SavedDownloadsTabView: View {
                 }
             }
             .navigationDestination(for: SavedDownloadItem.self) { item in
-                SavedDownloadsFolderView(folder: item, onSelectMedia: onSelectMedia)
+                SavedDownloadsFolderView(
+                    folder: item,
+                    onOpenOptions: onOpenOptions,
+                    onOpenPlayback: openMedia
+                )
             }
         }
         .onAppear(perform: loadItems)
+        .sheet(item: $playbackItem) { item in
+            SavedMediaPlayerView(item: item)
+        }
     }
 
     private func loadItems() {
@@ -96,11 +118,20 @@ struct SavedDownloadsTabView: View {
             loadError = error.localizedDescription
         }
     }
+
+    private func openMedia(_ item: SavedDownloadItem) {
+        guard item.isPlayable else {
+            onOpenOptions(item)
+            return
+        }
+        playbackItem = SavedMediaPlaybackItem(url: item.url, title: item.displayName)
+    }
 }
 
 private struct SavedDownloadsFolderView: View {
     let folder: SavedDownloadItem
-    let onSelectMedia: (SavedDownloadItem) -> Void
+    let onOpenOptions: (SavedDownloadItem) -> Void
+    let onOpenPlayback: (SavedDownloadItem) -> Void
 
     @State private var items: [SavedDownloadItem] = []
     @State private var loadError: String?
@@ -122,12 +153,21 @@ private struct SavedDownloadsFolderView: View {
             } else {
                 List {
                     ForEach(items) { item in
-                        SavedDownloadRow(item: item)
+                        SavedDownloadRow(item: item) {
+                            onOpenOptions(item)
+                        }
                             .contentShape(Rectangle())
                             .listRowSeparator(.visible)
                             .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
                             .onTapGesture {
-                                onSelectMedia(item)
+                                if item.isPlayable {
+                                    onOpenPlayback(item)
+                                } else {
+                                    onOpenOptions(item)
+                                }
+                            }
+                            .onLongPressGesture {
+                                onOpenOptions(item)
                             }
                             .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                 Button(role: .destructive) {
@@ -135,6 +175,14 @@ private struct SavedDownloadsFolderView: View {
                                 } label: {
                                     Label("common.delete", systemImage: "trash")
                                 }
+                            }
+                            .swipeActions(edge: .leading, allowsFullSwipe: false) {
+                                Button {
+                                    onOpenOptions(item)
+                                } label: {
+                                    Label("downloads.options", systemImage: "ellipsis.circle")
+                                }
+                                .tint(.blue)
                             }
                     }
                 }
@@ -177,6 +225,7 @@ private struct SavedDownloadsFolderView: View {
 private struct SavedDownloadRow: View {
     let item: SavedDownloadItem
     var showsFolderChevron = true
+    var onOptions: (() -> Void)?
 
     var body: some View {
         HStack(spacing: 12) {
@@ -194,6 +243,18 @@ private struct SavedDownloadRow: View {
             }
 
             Spacer(minLength: 8)
+
+            if !item.isFolder {
+                Button {
+                    onOptions?()
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                        .font(.system(size: 20, weight: .semibold))
+                        .foregroundStyle(.secondary)
+                        .frame(width: 36, height: 36)
+                }
+                .buttonStyle(.plain)
+            }
 
             if item.isFolder && showsFolderChevron {
                 Image(systemName: "chevron.right")
@@ -235,6 +296,57 @@ private struct SavedDownloadPreview: View {
             didLoadThumbnail = true
             thumbnail = SavedDownloadThumbnailLoader.thumbnail(for: item)
         }
+    }
+}
+
+private struct SavedMediaPlaybackItem: Identifiable {
+    let id = UUID()
+    let url: URL
+    let title: String
+}
+
+private struct SavedMediaPlayerView: View {
+    let item: SavedMediaPlaybackItem
+
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            SavedAVPlayerView(url: item.url)
+                .ignoresSafeArea(edges: .bottom)
+                .navigationTitle(item.title)
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button("common.done") {
+                            dismiss()
+                        }
+                    }
+                }
+        }
+    }
+}
+
+private struct SavedAVPlayerView: UIViewControllerRepresentable {
+    let url: URL
+
+    func makeUIViewController(context: Context) -> AVPlayerViewController {
+        let controller = AVPlayerViewController()
+        controller.player = AVPlayer(url: url)
+        controller.allowsPictureInPicturePlayback = true
+        return controller
+    }
+
+    func updateUIViewController(_ controller: AVPlayerViewController, context: Context) {
+        if (controller.player?.currentItem?.asset as? AVURLAsset)?.url != url {
+            controller.player = AVPlayer(url: url)
+        }
+        controller.player?.play()
+    }
+
+    static func dismantleUIViewController(_ controller: AVPlayerViewController, coordinator: ()) {
+        controller.player?.pause()
+        controller.player = nil
     }
 }
 
@@ -291,6 +403,15 @@ struct SavedDownloadItem: Identifiable, Hashable {
     nonisolated var isFolder: Bool {
         if case .folder = kind { return true }
         return false
+    }
+
+    nonisolated var isPlayable: Bool {
+        switch kind {
+        case .video, .audio:
+            return true
+        case .folder, .image:
+            return false
+        }
     }
 
     nonisolated var displayName: String {
