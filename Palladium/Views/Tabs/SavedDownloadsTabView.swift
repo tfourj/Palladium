@@ -29,8 +29,10 @@ struct SavedDownloadsTabView: View {
                         ForEach(items) { item in
                             if item.isFolder {
                                 NavigationLink(value: item) {
-                                    SavedDownloadRow(item: item)
+                                    SavedDownloadRow(item: item, showsFolderChevron: false)
                                 }
+                                .listRowSeparator(.visible)
+                                .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
                                 .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                     Button(role: .destructive) {
                                         delete(item)
@@ -41,6 +43,8 @@ struct SavedDownloadsTabView: View {
                             } else {
                                 SavedDownloadRow(item: item)
                                     .contentShape(Rectangle())
+                                    .listRowSeparator(.visible)
+                                    .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
                                     .onTapGesture {
                                         onSelectMedia(item)
                                     }
@@ -120,6 +124,8 @@ private struct SavedDownloadsFolderView: View {
                     ForEach(items) { item in
                         SavedDownloadRow(item: item)
                             .contentShape(Rectangle())
+                            .listRowSeparator(.visible)
+                            .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
                             .onTapGesture {
                                 onSelectMedia(item)
                             }
@@ -170,6 +176,7 @@ private struct SavedDownloadsFolderView: View {
 
 private struct SavedDownloadRow: View {
     let item: SavedDownloadItem
+    var showsFolderChevron = true
 
     var body: some View {
         HStack(spacing: 12) {
@@ -188,7 +195,7 @@ private struct SavedDownloadRow: View {
 
             Spacer(minLength: 8)
 
-            if item.isFolder {
+            if item.isFolder && showsFolderChevron {
                 Image(systemName: "chevron.right")
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.secondary)
