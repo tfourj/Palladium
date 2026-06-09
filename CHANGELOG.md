@@ -1,5 +1,12 @@
 # Palladium Changelog
 
+## v1.1.0
+
+- Added a Downloads tab for browsing saved downloads.
+- Added saved media previews and playback.
+- Added package branch source settings.
+- Refactored Settings into grouped pages for User Interface, Download Settings, Storage, and About.
+
 ## v1.0.3
 - Added allowlist feature to downloads
 
