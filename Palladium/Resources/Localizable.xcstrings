@@ -2307,89 +2307,12 @@
         }
       }
     },
-    "settings.after_download.ask_user" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ask user what to do after download"
-          }
-        }
-      }
-    },
-    "settings.after_download.behavior" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Behavior"
-          }
-        }
-      }
-    },
-    "settings.after_download.default_action" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Default Action"
-          }
-        }
-      }
-    },
-    "settings.after_download.default_picker" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "When ask-user is off"
-          }
-        }
-      }
-    },
-    "settings.after_download.disabled_help" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Disabled while ask-user mode is on."
-          }
-        }
-      }
-    },
-    "settings.after_download.enabled_help" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This action runs automatically after each successful download."
-          }
-        }
-      }
-    },
     "settings.after_download.subtitle" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Choose what happens after a download finishes"
-          }
-        }
-      }
-    },
-    "settings.app.section" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "App"
           }
         }
       }
@@ -2500,28 +2423,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Default Values"
-          }
-        }
-      }
-    },
-    "settings.download_defaults.page" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Download Options"
-          }
-        }
-      }
-    },
-    "settings.download_defaults.page_subtitle" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Set default values for each download session"
           }
         }
       }
@@ -2696,17 +2597,6 @@
         }
       }
     },
-    "settings.downloads.section" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Downloads"
-          }
-        }
-      }
-    },
     "settings.general.section" : {
       "localizations" : {
         "en" : {
@@ -2723,17 +2613,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Recent links and history limit"
-          }
-        }
-      }
-    },
-    "settings.important.section" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Important"
           }
         }
       }
