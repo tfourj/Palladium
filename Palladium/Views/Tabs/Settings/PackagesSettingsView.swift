@@ -4,6 +4,7 @@ struct PackagesSettingsView: View {
     private static let latestSelectionToken = "__latest__"
 
     let packageStatusText: String
+    @Binding var checkPackageUpdatesOnLaunch: Bool
     @Binding var packageSourceMode: PackageSourceMode
     @Binding var customPackageSpecsText: String
     let versionsText: String
@@ -88,6 +89,15 @@ struct PackagesSettingsView: View {
                 Text(updatesSummaryText)
                     .font(.system(.footnote, design: .monospaced))
                     .frame(maxWidth: .infinity, alignment: .leading)
+            }
+
+            Section {
+                Toggle("settings.ui.packages.auto_check", isOn: $checkPackageUpdatesOnLaunch)
+                    .disabled(isRunning)
+            } header: {
+                Text("settings.packages.update_checks.section")
+            } footer: {
+                Text("settings.ui.packages.auto_check.help")
             }
 
             Section("packages.actions.title") {

@@ -2,11 +2,19 @@ import SwiftUI
 
 struct SettingsTabView: View {
     private enum SettingsRoute: Hashable {
-        case useInterface
+        case userInterface
+        case downloadSettings
+        case downloadModes
         case downloadOptions
+        case afterDownload
+        case downloadBehavior
         case downloadArguments
         case urlAllowlists
         case cookies
+        case appearance
+        case downloadsTab
+        case history
+        case notifications
         case storage
         case packages
         case about
@@ -73,29 +81,20 @@ struct SettingsTabView: View {
         NavigationStack {
             List {
                 Section(header: Text("settings.general.section")) {
-                    NavigationLink(value: SettingsRoute.useInterface) {
+                    NavigationLink(value: SettingsRoute.userInterface) {
                         settingsRow(
                             title: String(localized: "settings.ui.title"),
                             subtitle: String(localized: "settings.ui.subtitle"),
-                            icon: "slider.horizontal.3",
-                            color: .green
+                            icon: "switch.2",
+                            color: .indigo
                         )
                     }
 
-                    NavigationLink(value: SettingsRoute.downloadOptions) {
+                    NavigationLink(value: SettingsRoute.downloadSettings) {
                         settingsRow(
-                            title: String(localized: "settings.download_defaults.page"),
-                            subtitle: String(localized: "settings.download_defaults.page_subtitle"),
-                            icon: "square.split.bottomrightquarter",
-                            color: .cyan
-                        )
-                    }
-
-                    NavigationLink(value: SettingsRoute.downloadArguments) {
-                        settingsRow(
-                            title: String(localized: "settings.download_args.title"),
-                            subtitle: String(localized: "settings.download_args.subtitle"),
-                            icon: "terminal",
+                            title: String(localized: "settings.download_settings.title"),
+                            subtitle: String(localized: "settings.download_settings.subtitle"),
+                            icon: "arrow.down.circle.fill",
                             color: .blue
                         )
                     }
@@ -109,17 +108,12 @@ struct SettingsTabView: View {
                         )
                     }
 
-                    NavigationLink(value: SettingsRoute.cookies) {
-                        settingsRow(
-                            title: String(localized: "settings.cookies.title"),
-                            subtitle: importedCookieFiles.isEmpty
-                                ? String(localized: "settings.cookies.subtitle_empty")
-                                : String(format: String(localized: "settings.cookies.subtitle_count"), importedCookieFiles.count),
-                            icon: "lock.doc.fill",
-                            color: .brown
-                        )
+                    NavigationLink(value: SettingsRoute.packages) {
+                        packagesSettingsRow()
                     }
+                }
 
+                Section(header: Text("settings.storage.section")) {
                     NavigationLink(value: SettingsRoute.storage) {
                         settingsRow(
                             title: String(localized: "settings.storage.title"),
@@ -127,30 +121,6 @@ struct SettingsTabView: View {
                             icon: "internaldrive.fill",
                             color: .teal
                         )
-                    }
-                }
-
-                Section(header: Text("settings.maintenance.section")) {
-                    NavigationLink(value: SettingsRoute.packages) {
-                        HStack {
-                            settingsRow(
-                                title: String(localized: "settings.packages.title"),
-                                subtitle: updatesAvailable
-                                    ? String(localized: "settings.packages.subtitle.updates_available")
-                                    : String(localized: "settings.packages.subtitle"),
-                                icon: "shippingbox.fill",
-                                color: updatesAvailable ? .red : .indigo
-                            )
-                            if updatesAvailable {
-                                Spacer()
-                                Text(verbatim: "!")
-                                    .font(.caption2.bold())
-                                    .foregroundStyle(.white)
-                                    .frame(width: 20, height: 20)
-                                    .background(Color.red)
-                                    .clipShape(Circle())
-                            }
-                        }
                     }
                 }
 
@@ -170,21 +140,15 @@ struct SettingsTabView: View {
             .onAppear(perform: onRefreshStorage)
             .navigationDestination(for: SettingsRoute.self) { route in
                 switch route {
-                case .useInterface:
-                    UseInterfaceSettingsView(
-                        checkPackageUpdatesOnLaunch: $checkPackageUpdatesOnLaunch,
+                case .userInterface:
+                    userInterfaceSettingsList()
+                case .downloadSettings:
+                    downloadSettingsList()
+                case .downloadModes:
+                    DownloadModesSettingsView(
                         selectedPreset: $selectedPreset,
-                        afterDownloadBehavior: $afterDownloadBehavior,
-                        notificationsEnabled: $notificationsEnabled,
                         rememberSelectedPreset: $rememberSelectedPreset,
-                        autoDownloadOnPaste: $autoDownloadOnPaste,
-                        autoRetryFailedDownloads: $autoRetryFailedDownloads,
-                        detailedProgressEnabled: $detailedProgressEnabled,
                         shareSheetDownloadMode: $shareSheetDownloadMode,
-                        linkHistoryEnabled: $linkHistoryEnabled,
-                        linkHistoryLimit: $linkHistoryLimit,
-                        appAppearanceMode: $appAppearanceMode,
-                        showTemporaryDownloads: $showTemporaryDownloads,
                         isRunning: isRunning
                     )
                 case .downloadOptions:
@@ -194,6 +158,18 @@ struct SettingsTabView: View {
                         defaultEmbedThumbnail: $defaultEmbedThumbnail,
                         defaultUseCookies: $defaultUseCookies,
                         restoreDownloadDefaults: $restoreDownloadDefaults,
+                        isRunning: isRunning
+                    )
+                case .afterDownload:
+                    AfterDownloadSettingsView(
+                        afterDownloadBehavior: $afterDownloadBehavior,
+                        isRunning: isRunning
+                    )
+                case .downloadBehavior:
+                    DownloadBehaviorSettingsView(
+                        autoDownloadOnPaste: $autoDownloadOnPaste,
+                        autoRetryFailedDownloads: $autoRetryFailedDownloads,
+                        detailedProgressEnabled: $detailedProgressEnabled,
                         isRunning: isRunning
                     )
                 case .downloadArguments:
@@ -210,6 +186,27 @@ struct SettingsTabView: View {
                         onRefresh: onRefreshURLAllowlists,
                         onAdd: onAddURLAllowlist,
                         onRemove: onRemoveURLAllowlist
+                    )
+                case .appearance:
+                    AppearanceSettingsView(
+                        appAppearanceMode: $appAppearanceMode,
+                        isRunning: isRunning
+                    )
+                case .downloadsTab:
+                    DownloadsTabSettingsView(
+                        showTemporaryDownloads: $showTemporaryDownloads,
+                        isRunning: isRunning
+                    )
+                case .history:
+                    HistorySettingsView(
+                        linkHistoryEnabled: $linkHistoryEnabled,
+                        linkHistoryLimit: $linkHistoryLimit,
+                        isRunning: isRunning
+                    )
+                case .notifications:
+                    NotificationsSettingsView(
+                        notificationsEnabled: $notificationsEnabled,
+                        isRunning: isRunning
                     )
                 case .storage:
                     StorageSettingsView(
@@ -236,6 +233,7 @@ struct SettingsTabView: View {
                 case .packages:
                     PackagesSettingsView(
                         packageStatusText: packageStatusText,
+                        checkPackageUpdatesOnLaunch: $checkPackageUpdatesOnLaunch,
                         packageSourceMode: $packageSourceMode,
                         customPackageSpecsText: $customPackageSpecsText,
                         versionsText: versionsText,
@@ -254,6 +252,123 @@ struct SettingsTabView: View {
                 case .about:
                     SettingsAboutView()
                 }
+            }
+        }
+    }
+
+    private func userInterfaceSettingsList() -> some View {
+        List {
+            NavigationLink(value: SettingsRoute.appearance) {
+                settingsRow(
+                    title: String(localized: "settings.ui.appearance.section"),
+                    subtitle: String(localized: "settings.appearance.subtitle"),
+                    icon: "paintbrush.fill",
+                    color: .purple
+                )
+            }
+
+            NavigationLink(value: SettingsRoute.downloadsTab) {
+                settingsRow(
+                    title: String(localized: "settings.downloads_tab.title"),
+                    subtitle: String(localized: "settings.downloads_tab.subtitle"),
+                    icon: "tray.and.arrow.down.fill",
+                    color: .teal
+                )
+            }
+
+            NavigationLink(value: SettingsRoute.history) {
+                settingsRow(
+                    title: String(localized: "settings.ui.history.section"),
+                    subtitle: String(localized: "settings.history.subtitle"),
+                    icon: "clock.arrow.circlepath",
+                    color: .orange
+                )
+            }
+
+            NavigationLink(value: SettingsRoute.notifications) {
+                settingsRow(
+                    title: String(localized: "settings.notifications.title"),
+                    subtitle: String(localized: "settings.notifications.subtitle"),
+                    icon: "bell.badge.fill",
+                    color: .red
+                )
+            }
+        }
+        .navigationTitle("settings.ui.title")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private func downloadSettingsList() -> some View {
+        List {
+            NavigationLink(value: SettingsRoute.downloadModes) {
+                settingsRow(
+                    title: String(localized: "settings.download_modes.title"),
+                    subtitle: String(localized: "settings.download_modes.subtitle"),
+                    icon: "arrow.down.circle.fill",
+                    color: .blue
+                )
+            }
+
+            NavigationLink(value: SettingsRoute.afterDownload) {
+                settingsRow(
+                    title: String(localized: "settings.ui.after_download.title"),
+                    subtitle: String(localized: "settings.after_download.subtitle"),
+                    icon: "checkmark.circle.fill",
+                    color: .green
+                )
+            }
+
+            NavigationLink(value: SettingsRoute.downloadBehavior) {
+                settingsRow(
+                    title: String(localized: "settings.download_behavior.title"),
+                    subtitle: String(localized: "settings.download_behavior.subtitle"),
+                    icon: "bolt.fill",
+                    color: .yellow
+                )
+            }
+
+            NavigationLink(value: SettingsRoute.downloadArguments) {
+                settingsRow(
+                    title: String(localized: "settings.download_args.title"),
+                    subtitle: String(localized: "settings.download_args.subtitle"),
+                    icon: "terminal",
+                    color: .blue
+                )
+            }
+
+            NavigationLink(value: SettingsRoute.cookies) {
+                settingsRow(
+                    title: String(localized: "settings.cookies.title"),
+                    subtitle: importedCookieFiles.isEmpty
+                        ? String(localized: "settings.cookies.subtitle_empty")
+                        : String(format: String(localized: "settings.cookies.subtitle_count"), importedCookieFiles.count),
+                    icon: "lock.doc.fill",
+                    color: .brown
+                )
+            }
+        }
+        .navigationTitle("settings.download_settings.title")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private func packagesSettingsRow() -> some View {
+        HStack {
+            settingsRow(
+                title: String(localized: "settings.packages.title"),
+                subtitle: updatesAvailable
+                    ? String(localized: "settings.packages.subtitle.updates_available")
+                    : String(localized: "settings.packages.subtitle"),
+                icon: "shippingbox.fill",
+                color: updatesAvailable ? .red : .indigo
+            )
+            if updatesAvailable {
+                Spacer()
+                Text(verbatim: "!")
+                    .font(.caption2.bold())
+                    .foregroundStyle(.white)
+                    .frame(width: 20, height: 20)
+                    .background(Color.red)
+                    .clipShape(Circle())
             }
         }
     }
