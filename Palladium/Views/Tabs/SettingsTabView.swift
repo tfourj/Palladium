@@ -26,6 +26,7 @@ struct SettingsTabView: View {
     @Binding var linkHistoryEnabled: Bool
     @Binding var linkHistoryLimit: Int
     @Binding var appAppearanceMode: AppAppearanceMode
+    @Binding var showTemporaryDownloads: Bool
     @Binding var selectedCookieFileName: String
     @Binding var defaultDownloadPlaylist: Bool
     @Binding var defaultDownloadSubtitles: Bool
@@ -183,6 +184,7 @@ struct SettingsTabView: View {
                         linkHistoryEnabled: $linkHistoryEnabled,
                         linkHistoryLimit: $linkHistoryLimit,
                         appAppearanceMode: $appAppearanceMode,
+                        showTemporaryDownloads: $showTemporaryDownloads,
                         isRunning: isRunning
                     )
                 case .downloadOptions:

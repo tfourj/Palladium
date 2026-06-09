@@ -59,6 +59,7 @@ extension ContentView {
         defaults.set(linkHistoryEnabled, forKey: Self.linkHistoryEnabledDefaultsKey)
         defaults.set(linkHistoryLimit, forKey: Self.linkHistoryLimitDefaultsKey)
         defaults.set(appAppearanceMode.rawValue, forKey: Self.appAppearanceModeDefaultsKey)
+        defaults.set(showTemporaryDownloads, forKey: Self.showTemporaryDownloadsDefaultsKey)
         defaults.set(checkPackageUpdatesOnLaunch, forKey: Self.checkPackageUpdatesOnLaunchDefaultsKey)
         defaults.set(packageSourceMode.rawValue, forKey: Self.packageSourceModeDefaultsKey)
         defaults.set(customPackageSpecsText, forKey: Self.customPackageSpecsDefaultsKey)
@@ -295,6 +296,13 @@ extension ContentView {
             return .system
         }
         return mode
+    }
+
+    static func loadShowTemporaryDownloads() -> Bool {
+        if UserDefaults.standard.object(forKey: showTemporaryDownloadsDefaultsKey) == nil {
+            return false
+        }
+        return UserDefaults.standard.bool(forKey: showTemporaryDownloadsDefaultsKey)
     }
 
     static func loadCachedPackageVersionsText() -> String {

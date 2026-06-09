@@ -53,15 +53,17 @@ extension ContentView {
                     }
                 }
 
-                downloadCompleteActionButton(
-                    title: String(localized: "post_download.action.save_folder.title"),
-                    subtitle: completedResultIsCollection
-                        ? String(localized: "post_download.action.save_folder.collection_help")
-                        : String(localized: "post_download.action.save_folder.help"),
-                    icon: "folder.badge.plus",
-                    color: .orange
-                ) {
-                    performPromptedPostDownloadAction(.saveToApplicationFolder)
+                if completedDownloadAllowsSaveToApplicationFolder {
+                    downloadCompleteActionButton(
+                        title: String(localized: "post_download.action.save_folder.title"),
+                        subtitle: completedResultIsCollection
+                            ? String(localized: "post_download.action.save_folder.collection_help")
+                            : String(localized: "post_download.action.save_folder.help"),
+                        icon: "folder.badge.plus",
+                        color: .orange
+                    ) {
+                        performPromptedPostDownloadAction(.saveToApplicationFolder)
+                    }
                 }
             }
             .padding(.horizontal)
@@ -174,7 +176,28 @@ extension ContentView {
     func dismissDownloadActionSheet() {
         showDownloadActionSheet = false
         completedDownloadResult = nil
+        completedDownloadAllowsSaveToApplicationFolder = true
         completedPhotosCompatibility = .checking
+    }
+
+    func openSavedDownloadActions(_ item: SavedDownloadItem) {
+        completedDownloadAllowsSaveToApplicationFolder = item.location != .saved
+        completedDownloadResult = CompletedDownloadResult(
+            items: [item.url],
+            primaryMediaURL: item.url,
+            folderURL: nil,
+            titleHint: item.displayName
+        )
+        completedPhotosCompatibility = .checking
+        showDownloadActionSheet = true
+
+        Task {
+            let compatibility = await evaluatePhotosCompatibility(for: item.url)
+            await MainActor.run {
+                guard completedDownloadResult?.primaryMediaURL == item.url else { return }
+                completedPhotosCompatibility = compatibility
+            }
+        }
     }
 
     func saveDownloadedFileToPhotos(_ url: URL) {

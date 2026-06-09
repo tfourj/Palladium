@@ -317,6 +317,7 @@ extension ContentView {
                 progressText = String(localized: "download.status.cancelled")
                 showDownloadActionSheet = false
                 completedDownloadResult = nil
+                completedDownloadAllowsSaveToApplicationFolder = true
                 completedPhotosCompatibility = .checking
                 reopenDownloadActionAfterAlert = false
             } else if finalResultKind == "partial" {
@@ -348,6 +349,7 @@ extension ContentView {
                     folderURL: runOutputURL,
                     titleHint: resultTitle
                 )
+                completedDownloadAllowsSaveToApplicationFolder = true
                 if linkHistoryEnabledAtStart {
                     addLinkHistoryEntry(
                         url: targetURL,

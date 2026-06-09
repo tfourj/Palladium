@@ -12,6 +12,7 @@ import Foundation
 struct ContentView: View {
     enum AppTab: Hashable {
         case download
+        case downloads
         case settings
         case console
     }
@@ -67,6 +68,7 @@ struct ContentView: View {
     static let linkHistoryLimitDefaultsKey = "palladium.linkHistoryLimit"
     static let linkHistoryEntriesDefaultsKey = "palladium.linkHistoryEntries"
     static let appAppearanceModeDefaultsKey = "palladium.appAppearanceMode"
+    static let showTemporaryDownloadsDefaultsKey = "palladium.showTemporaryDownloads"
     static let packageVersionsTextDefaultsKey = "palladium.packageVersionsText"
     static let checkPackageUpdatesOnLaunchDefaultsKey = "palladium.checkPackageUpdatesOnLaunch"
     static let packageSourceModeDefaultsKey = "palladium.packageSourceMode"
@@ -111,6 +113,7 @@ struct ContentView: View {
     @State var isCheckingDownloadAllowlist = false
     @State var isRefreshingURLAllowlists = false
     @State var appAppearanceMode: AppAppearanceMode
+    @State var showTemporaryDownloads: Bool
     @State var selectedTab: AppTab = .download
     @State var packageStatusText = "idle"
     @State var versionsText: String
@@ -126,6 +129,7 @@ struct ContentView: View {
     @State var storageSummary: StorageManagementSummary = .empty
     @StateObject var consoleLogStore: ConsoleLogStore
     @State var completedDownloadResult: CompletedDownloadResult?
+    @State var completedDownloadAllowsSaveToApplicationFolder = true
     @State var completedPhotosCompatibility: PhotosCompatibilityState = .checking
     @State var showDownloadActionSheet = false
     @State var alertMessage: String?
@@ -188,6 +192,7 @@ struct ContentView: View {
         _linkHistoryEntries = State(initialValue: Self.loadLinkHistoryEntries(limit: linkHistoryLimit))
         _urlAllowlistSources = State(initialValue: URLAllowlistManager.loadSources())
         _appAppearanceMode = State(initialValue: Self.loadAppAppearanceMode())
+        _showTemporaryDownloads = State(initialValue: Self.loadShowTemporaryDownloads())
         _versionsText = State(initialValue: Self.loadCachedPackageVersionsText())
         _checkPackageUpdatesOnLaunch = State(initialValue: Self.loadCheckPackageUpdatesOnLaunch())
         _packageSourceMode = State(initialValue: Self.loadPackageSourceMode())
@@ -228,6 +233,17 @@ struct ContentView: View {
                 }
                 .tag(AppTab.download)
 
+                SavedDownloadsTabView(
+                    savedDirectory: savedDownloadsDirectoryForView(),
+                    temporaryDirectory: temporaryDownloadsDirectoryForView(),
+                    showsTemporaryDownloads: showTemporaryDownloads,
+                    onOpenOptions: openSavedDownloadActions
+                )
+                .tabItem {
+                    Label(String(localized: "tab.downloads"), systemImage: "tray.and.arrow.down")
+                }
+                .tag(AppTab.downloads)
+
                 SettingsTabView(
                     checkPackageUpdatesOnLaunch: $checkPackageUpdatesOnLaunch,
                     customArgsText: $customArgsText,
@@ -243,6 +259,7 @@ struct ContentView: View {
                     linkHistoryEnabled: $linkHistoryEnabled,
                     linkHistoryLimit: $linkHistoryLimit,
                     appAppearanceMode: $appAppearanceMode,
+                    showTemporaryDownloads: $showTemporaryDownloads,
                     selectedCookieFileName: $selectedCookieFileName,
                     defaultDownloadPlaylist: $defaultDownloadPlaylist,
                     defaultDownloadSubtitles: $defaultDownloadSubtitles,
@@ -399,6 +416,9 @@ struct ContentView: View {
             persistPreferences()
         }
         .onChange(of: appAppearanceMode, initial: false) {
+            persistPreferences()
+        }
+        .onChange(of: showTemporaryDownloads, initial: false) {
             persistPreferences()
         }
         .onChange(of: checkPackageUpdatesOnLaunch, initial: false) {
