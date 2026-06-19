@@ -317,13 +317,16 @@ extension ContentView {
 
     static func loadCheckPackageUpdatesOnLaunch() -> Bool {
         if UserDefaults.standard.object(forKey: checkPackageUpdatesOnLaunchDefaultsKey) == nil {
-            return false
+            return true
         }
         return UserDefaults.standard.bool(forKey: checkPackageUpdatesOnLaunchDefaultsKey)
     }
 
     static func loadAutoUpdatePackagesOnLaunch() -> Bool {
-        UserDefaults.standard.bool(forKey: autoUpdatePackagesOnLaunchDefaultsKey)
+        if UserDefaults.standard.object(forKey: autoUpdatePackagesOnLaunchDefaultsKey) == nil {
+            return true
+        }
+        return UserDefaults.standard.bool(forKey: autoUpdatePackagesOnLaunchDefaultsKey)
     }
 
     static func loadPackageSourceMode() -> PackageSourceMode {
