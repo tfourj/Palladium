@@ -2717,6 +2717,16 @@
         }
       }
     },
+    "settings.packages.manager.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Package Manager Settings"
+          }
+        }
+      }
+    },
     "settings.packages.update_checks.section" : {
       "localizations" : {
         "en" : {
