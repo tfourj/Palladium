@@ -4,3 +4,5 @@ nc_*.md
 /build
 *.log
 /Frameworks
+.DS_Store
+/Palladium.xcodeproj/project.xcworkspace/xcuserdata
