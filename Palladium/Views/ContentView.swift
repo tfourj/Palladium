@@ -71,6 +71,7 @@ struct ContentView: View {
     static let showTemporaryDownloadsDefaultsKey = "palladium.showTemporaryDownloads"
     static let packageVersionsTextDefaultsKey = "palladium.packageVersionsText"
     static let checkPackageUpdatesOnLaunchDefaultsKey = "palladium.checkPackageUpdatesOnLaunch"
+    static let autoUpdatePackagesOnLaunchDefaultsKey = "palladium.autoUpdatePackagesOnLaunch"
     static let packageSourceModeDefaultsKey = "palladium.packageSourceMode"
     static let customPackageSpecsDefaultsKey = "palladium.customPackageSpecs"
     static let defaultLinkHistoryLimit = 10
@@ -124,6 +125,7 @@ struct ContentView: View {
     @State var isPackageRunning = false
     @State var hasLoadedPackageStatus = false
     @State var checkPackageUpdatesOnLaunch: Bool
+    @State var autoUpdatePackagesOnLaunch: Bool
     @State var packageSourceMode: PackageSourceMode
     @State var customPackageSpecsText: String
     @State var storageSummary: StorageManagementSummary = .empty
@@ -195,6 +197,7 @@ struct ContentView: View {
         _showTemporaryDownloads = State(initialValue: Self.loadShowTemporaryDownloads())
         _versionsText = State(initialValue: Self.loadCachedPackageVersionsText())
         _checkPackageUpdatesOnLaunch = State(initialValue: Self.loadCheckPackageUpdatesOnLaunch())
+        _autoUpdatePackagesOnLaunch = State(initialValue: Self.loadAutoUpdatePackagesOnLaunch())
         _packageSourceMode = State(initialValue: Self.loadPackageSourceMode())
         _customPackageSpecsText = State(initialValue: Self.loadCustomPackageSpecsText())
         _consoleLogStore = StateObject(wrappedValue: ConsoleLogStore())
@@ -246,6 +249,7 @@ struct ContentView: View {
 
                 SettingsTabView(
                     checkPackageUpdatesOnLaunch: $checkPackageUpdatesOnLaunch,
+                    autoUpdatePackagesOnLaunch: $autoUpdatePackagesOnLaunch,
                     customArgsText: $customArgsText,
                     extraArgsText: $extraArgsText,
                     selectedPreset: $selectedPreset,
@@ -424,6 +428,9 @@ struct ContentView: View {
         .onChange(of: checkPackageUpdatesOnLaunch, initial: false) {
             persistPreferences()
         }
+        .onChange(of: autoUpdatePackagesOnLaunch, initial: false) {
+            persistPreferences()
+        }
         .onChange(of: packageSourceMode, initial: false) {
             persistPreferences()
         }
@@ -474,7 +481,7 @@ struct ContentView: View {
             refreshImportedCookieFiles()
             consumePendingShortcutDownloadRequestIfNeeded()
             if checkPackageUpdatesOnLaunch {
-                runPackageFlow(action: "check")
+                runPackageFlow(action: "check", updateWhenAvailable: autoUpdatePackagesOnLaunch)
             }
         }
         .onDisappear {

@@ -5,6 +5,7 @@ struct PackagesSettingsView: View {
 
     let packageStatusText: String
     @Binding var checkPackageUpdatesOnLaunch: Bool
+    @Binding var autoUpdatePackagesOnLaunch: Bool
     @Binding var packageSourceMode: PackageSourceMode
     @Binding var customPackageSpecsText: String
     let versionsText: String
@@ -31,6 +32,7 @@ struct PackagesSettingsView: View {
                 NavigationLink {
                     PackageManagerSettingsView(
                         checkPackageUpdatesOnLaunch: $checkPackageUpdatesOnLaunch,
+                        autoUpdatePackagesOnLaunch: $autoUpdatePackagesOnLaunch,
                         packageSourceMode: $packageSourceMode,
                         customPackageSpecsText: $customPackageSpecsText,
                         isRunning: isRunning

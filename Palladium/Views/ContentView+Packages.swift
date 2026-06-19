@@ -13,7 +13,11 @@ extension ContentView {
         currentPackageTask?.cancel()
     }
 
-    func runPackageFlow(action: String, customVersions: [String: String]? = nil) {
+    func runPackageFlow(
+        action: String,
+        customVersions: [String: String]? = nil,
+        updateWhenAvailable: Bool = false
+    ) {
         guard !isRunning, !isPackageRunning else { return }
 
         isPackageRunning = true
@@ -88,7 +92,9 @@ extension ContentView {
                 self.versionsText = versionsText
                 persistPackageVersionsText(versionsText)
             }
-            if let updatesAvailable = outcome.updatesAvailable {
+            let updatesAvailable = outcome.updatesAvailable ?? false
+            if outcome.updatesAvailable != nil {
+                self.packageUpdatesAvailable = updatesAvailable
                 self.packageUpdatesAvailable = updatesAvailable
             }
             if let updatesSummary = outcome.updatesSummary {
@@ -99,6 +105,12 @@ extension ContentView {
             }
             self.hasLoadedPackageStatus = true
             Self.logger.info("package flow finished with status: \(outcome.statusText, privacy: .public)")
+
+            if action == "check", updateWhenAvailable, updatesAvailable {
+                runPackageFlow(action: "update")
+            }
+
+
         }
         currentPackageTask = task
     }

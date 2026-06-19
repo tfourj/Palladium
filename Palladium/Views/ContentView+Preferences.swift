@@ -61,6 +61,7 @@ extension ContentView {
         defaults.set(appAppearanceMode.rawValue, forKey: Self.appAppearanceModeDefaultsKey)
         defaults.set(showTemporaryDownloads, forKey: Self.showTemporaryDownloadsDefaultsKey)
         defaults.set(checkPackageUpdatesOnLaunch, forKey: Self.checkPackageUpdatesOnLaunchDefaultsKey)
+        defaults.set(autoUpdatePackagesOnLaunch, forKey: Self.autoUpdatePackagesOnLaunchDefaultsKey)
         defaults.set(packageSourceMode.rawValue, forKey: Self.packageSourceModeDefaultsKey)
         defaults.set(customPackageSpecsText, forKey: Self.customPackageSpecsDefaultsKey)
     }
@@ -319,6 +320,10 @@ extension ContentView {
             return false
         }
         return UserDefaults.standard.bool(forKey: checkPackageUpdatesOnLaunchDefaultsKey)
+    }
+
+    static func loadAutoUpdatePackagesOnLaunch() -> Bool {
+        UserDefaults.standard.bool(forKey: autoUpdatePackagesOnLaunchDefaultsKey)
     }
 
     static func loadPackageSourceMode() -> PackageSourceMode {

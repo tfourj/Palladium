@@ -3077,6 +3077,26 @@
         }
       }
     },
+    "settings.ui.packages.auto_update" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatically install package updates"
+          }
+        }
+      }
+    },
+    "settings.ui.packages.auto_update.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Installs available package updates after the launch-time check completes."
+          }
+        }
+      }
+    },
     "settings.ui.paste.auto_download" : {
       "localizations" : {
         "en" : {

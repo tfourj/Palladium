@@ -21,6 +21,7 @@ struct SettingsTabView: View {
     }
 
     @Binding var checkPackageUpdatesOnLaunch: Bool
+    @Binding var autoUpdatePackagesOnLaunch: Bool
     @Binding var customArgsText: String
     @Binding var extraArgsText: String
     @Binding var selectedPreset: DownloadPreset
@@ -234,6 +235,7 @@ struct SettingsTabView: View {
                     PackagesSettingsView(
                         packageStatusText: packageStatusText,
                         checkPackageUpdatesOnLaunch: $checkPackageUpdatesOnLaunch,
+                        autoUpdatePackagesOnLaunch: $autoUpdatePackagesOnLaunch,
                         packageSourceMode: $packageSourceMode,
                         customPackageSpecsText: $customPackageSpecsText,
                         versionsText: versionsText,
