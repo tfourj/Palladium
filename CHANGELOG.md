@@ -4,6 +4,7 @@
 
 - Added automatic package update toggle
 - Moved package manager settings to a dedicated settings page.
+- Added clipboard and local-file imports for URL allowlists.
 
 ## v1.1.0
 
