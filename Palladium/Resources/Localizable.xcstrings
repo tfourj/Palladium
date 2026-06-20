@@ -1607,6 +1607,26 @@
         }
       }
     },
+    "packages.auto_update.message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Please wait while package updates are installed."
+          }
+        }
+      }
+    },
+    "packages.auto_update.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Updating packages"
+          }
+        }
+      }
+    },
     "packages.check_updates" : {
       "localizations" : {
         "en" : {

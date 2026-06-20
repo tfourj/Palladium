@@ -123,6 +123,7 @@ struct ContentView: View {
     @State var availablePackageVersions: [String: [String]] = [:]
     @State var isLoadingPackageVersions = false
     @State var isPackageRunning = false
+    @State var isAutomaticallyUpdatingPackages = false
     @State var hasLoadedPackageStatus = false
     @State var checkPackageUpdatesOnLaunch: Bool
     @State var autoUpdatePackagesOnLaunch: Bool
@@ -328,6 +329,10 @@ struct ContentView: View {
                     .padding(.top, 18)
                     .transition(.opacity)
             }
+
+            if isAutomaticallyUpdatingPackages {
+                automaticPackageUpdateOverlay
+            }
         }
         .onChange(of: selectedPreset, initial: false) {
             persistPreferences()
@@ -503,6 +508,36 @@ struct ContentView: View {
             consumePendingShortcutDownloadRequestIfNeeded()
         }
         .preferredColorScheme(appAppearanceMode.preferredColorScheme)
+    }
+}
+
+private extension ContentView {
+    var automaticPackageUpdateOverlay: some View {
+        ZStack {
+            Color.black.opacity(0.3)
+                .ignoresSafeArea()
+
+            VStack(spacing: 16) {
+                ProgressView()
+                    .controlSize(.large)
+
+                Text("packages.auto_update.title")
+                    .font(.headline)
+
+                Text("packages.auto_update.message")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+            .padding(24)
+            .frame(maxWidth: 280)
+            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14))
+            .shadow(radius: 18)
+            .accessibilityElement(children: .combine)
+            .accessibilityAddTraits(.isModal)
+        }
+        .contentShape(Rectangle())
+        .accessibilityIdentifier("automaticPackageUpdateOverlay")
     }
 }
 

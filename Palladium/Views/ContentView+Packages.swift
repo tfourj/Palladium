@@ -16,11 +16,13 @@ extension ContentView {
     func runPackageFlow(
         action: String,
         customVersions: [String: String]? = nil,
-        updateWhenAvailable: Bool = false
+        updateWhenAvailable: Bool = false,
+        isAutomaticUpdate: Bool = false
     ) {
         guard !isRunning, !isPackageRunning else { return }
 
         isPackageRunning = true
+        isAutomaticallyUpdatingPackages = isAutomaticUpdate
         syncIdleTimerDisabled()
         switch action {
         case "update":
@@ -84,6 +86,7 @@ extension ContentView {
             self.currentPackageTask = nil
 
             isPackageRunning = false
+            isAutomaticallyUpdatingPackages = false
             syncIdleTimerDisabled()
             isLoadingPackageVersions = false
             packageStatusText = outcome.statusText
@@ -107,7 +110,7 @@ extension ContentView {
             Self.logger.info("package flow finished with status: \(outcome.statusText, privacy: .public)")
 
             if action == "check", updateWhenAvailable, updatesAvailable {
-                runPackageFlow(action: "update")
+                runPackageFlow(action: "update", isAutomaticUpdate: true)
             }
 
 
