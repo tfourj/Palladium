@@ -1,4 +1,5 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct URLAllowlistsSettingsView: View {
     let sources: [URLAllowlistSource]
@@ -6,10 +7,15 @@ struct URLAllowlistsSettingsView: View {
     let isRefreshing: Bool
     let onRefresh: (_ onComplete: ((_ message: String) -> Void)?) -> Void
     let onAdd: (_ urlString: String, _ onComplete: ((_ message: String) -> Void)?) -> Void
+    let onImport: (_ sourceURL: URL, _ onComplete: ((_ message: String) -> Void)?) -> Void
+    let onPaste: (_ json: String, _ onComplete: ((_ message: String) -> Void)?) -> Void
     let onRemove: (_ source: URLAllowlistSource) -> Void
 
     @State private var newAllowlistURL = ""
     @State private var showAddAllowlistPrompt = false
+    @State private var showLocalFileImporter = false
+    @State private var showPasteAllowlistSheet = false
+    @State private var pastedAllowlistJSON = ""
     @State private var feedbackMessage: String?
 
     var body: some View {
@@ -20,6 +26,21 @@ struct URLAllowlistsSettingsView: View {
                     showAddAllowlistPrompt = true
                 } label: {
                     Label("allowlists.add.button", systemImage: "plus.circle")
+                }
+                .disabled(isBusy || isRefreshing)
+
+                Button {
+                    pastedAllowlistJSON = ""
+                    showPasteAllowlistSheet = true
+                } label: {
+                    Label("allowlists.paste.button", systemImage: "doc.on.clipboard")
+                }
+                .disabled(isBusy || isRefreshing)
+
+                Button {
+                    showLocalFileImporter = true
+                } label: {
+                    Label("allowlists.import.button", systemImage: "doc.badge.plus")
                 }
                 .disabled(isBusy || isRefreshing)
 
@@ -130,6 +151,62 @@ struct URLAllowlistsSettingsView: View {
             }
         } message: {
             Text("allowlists.add.message")
+        }
+        .fileImporter(
+            isPresented: $showLocalFileImporter,
+            allowedContentTypes: [.json]
+        ) { result in
+            do {
+                let sourceURL = try result.get()
+                feedbackMessage = String(localized: "allowlists.status.importing")
+                onImport(sourceURL) { message in
+                    feedbackMessage = message
+                }
+            } catch {
+                feedbackMessage = String(format: String(localized: "allowlists.status.import_failed"), error.localizedDescription)
+            }
+        }
+        .sheet(isPresented: $showPasteAllowlistSheet) {
+            NavigationStack {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("allowlists.paste.message")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+
+                    TextEditor(text: $pastedAllowlistJSON)
+                        .font(.system(.body, design: .monospaced))
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                        .padding(8)
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(.separator, lineWidth: 1)
+                                .allowsHitTesting(false)
+                        }
+                }
+                .padding()
+                .navigationTitle("allowlists.paste.title")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("common.cancel") {
+                            showPasteAllowlistSheet = false
+                        }
+                    }
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("allowlists.paste.add") {
+                            let json = pastedAllowlistJSON
+                            pastedAllowlistJSON = ""
+                            showPasteAllowlistSheet = false
+                            feedbackMessage = String(localized: "allowlists.status.pasting")
+                            onPaste(json) { message in
+                                feedbackMessage = message
+                            }
+                        }
+                        .disabled(pastedAllowlistJSON.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    }
+                }
+            }
         }
     }
 

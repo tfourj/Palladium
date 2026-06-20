@@ -5,6 +5,7 @@ struct URLAllowlistSource: Codable, Identifiable, Equatable {
     var urlString: String
     var name: String?
     var isDefault: Bool
+    var localFileName: String?
     var lastRefreshDate: Date?
     var statusMessage: String
 
@@ -13,6 +14,7 @@ struct URLAllowlistSource: Codable, Identifiable, Equatable {
         urlString: String,
         name: String? = nil,
         isDefault: Bool = false,
+        localFileName: String? = nil,
         lastRefreshDate: Date? = nil,
         statusMessage: String = String(localized: "allowlists.status.not_loaded")
     ) {
@@ -20,6 +22,7 @@ struct URLAllowlistSource: Codable, Identifiable, Equatable {
         self.urlString = urlString
         self.name = name
         self.isDefault = isDefault
+        self.localFileName = localFileName
         self.lastRefreshDate = lastRefreshDate
         self.statusMessage = statusMessage
     }
@@ -30,7 +33,11 @@ struct URLAllowlistSource: Codable, Identifiable, Equatable {
     }
 
     var displayURL: String {
-        urlString
+        localFileName ?? urlString
+    }
+
+    var isLocal: Bool {
+        localFileName != nil
     }
 }
 
@@ -103,6 +110,7 @@ enum URLAllowlistManager {
                 urlString: trimmed,
                 name: status?.name ?? source.name,
                 isDefault: false,
+                localFileName: source.localFileName,
                 lastRefreshDate: status?.lastRefreshDate ?? source.lastRefreshDate,
                 statusMessage: status?.statusMessage ?? source.statusMessage
             )
@@ -147,6 +155,78 @@ enum URLAllowlistManager {
         )
         saveSourceStatuses(statuses)
         return refreshed.source
+    }
+
+    static func importLocalSource(from sourceURL: URL) throws -> URLAllowlistSource {
+        guard sourceURL.pathExtension.lowercased() == "json" else {
+            throw URLAllowlistError.invalidLocalFile
+        }
+
+        let shouldStopAccessing = sourceURL.startAccessingSecurityScopedResource()
+        defer {
+            if shouldStopAccessing {
+                sourceURL.stopAccessingSecurityScopedResource()
+            }
+        }
+
+        let data = try Data(contentsOf: sourceURL)
+        let fileName = sourceURL.lastPathComponent
+        let existingSource = loadCustomSources().first {
+            guard let existingFileName = $0.localFileName else { return false }
+            return existingFileName.localizedCaseInsensitiveCompare(fileName) == .orderedSame
+        }
+        let source = existingSource ?? URLAllowlistSource(
+            urlString: "local://\(UUID().uuidString.lowercased())",
+            localFileName: fileName
+        )
+        return try saveLocalSource(data, for: source, replacing: existingSource)
+    }
+
+    static func addPastedSource(_ json: String) throws -> URLAllowlistSource {
+        let data = Data(json.utf8)
+        let source = URLAllowlistSource(
+            urlString: "local://\(UUID().uuidString.lowercased())",
+            localFileName: "Pasted JSON \(UUID().uuidString.prefix(8)).json"
+        )
+        return try saveLocalSource(data, for: source, replacing: nil)
+    }
+
+    private static func saveLocalSource(
+        _ data: Data,
+        for source: URLAllowlistSource,
+        replacing existingSource: URLAllowlistSource?
+    ) throws -> URLAllowlistSource {
+        let document = try decodeDocument(from: data, source: source)
+        let refreshed = sourceWithStatus(
+            source,
+            name: document.name,
+            status: String(format: String(localized: "allowlists.status.loaded"), document.entries.count),
+            refreshedAt: Date()
+        )
+
+        try FileManager.default.createDirectory(at: localAllowlistsDirectoryURL(), withIntermediateDirectories: true)
+        try data.write(to: localFileURL(for: source), options: .atomic)
+
+        var sources = loadCustomSources()
+        if let existingSource {
+            sources.removeAll { $0.id == existingSource.id }
+        }
+        sources.append(refreshed)
+        saveCustomSources(sources)
+
+        var cachedEntries = loadCachedEntries()
+        cachedEntries.removeAll { $0.sourceID == source.id }
+        cachedEntries.append(contentsOf: document.entries)
+        saveCachedEntries(cachedEntries)
+
+        var statuses = loadSourceStatuses()
+        statuses[refreshed.urlString] = URLAllowlistSourceStatus(
+            name: refreshed.name,
+            lastRefreshDate: refreshed.lastRefreshDate,
+            statusMessage: refreshed.statusMessage
+        )
+        saveSourceStatuses(statuses)
+        return refreshed
     }
 
     static func duplicateCustomSource(for urlString: String) throws -> URLAllowlistSource? {
@@ -203,6 +283,10 @@ enum URLAllowlistManager {
         var statuses = loadSourceStatuses()
         statuses.removeValue(forKey: source.urlString)
         saveSourceStatuses(statuses)
+
+        if source.isLocal {
+            try? FileManager.default.removeItem(at: localFileURL(for: source))
+        }
     }
 
     static func refreshAllSources() async -> [URLAllowlistSource] {
@@ -267,6 +351,9 @@ enum URLAllowlistManager {
     }
 
     private static func refreshSource(_ source: URLAllowlistSource) async -> (source: URLAllowlistSource, entries: [URLAllowlistEntry]) {
+        if source.isLocal {
+            return refreshLocalSource(source)
+        }
         guard let url = URL(string: source.urlString) else {
             return (
                 sourceWithStatus(source, status: String(localized: "allowlists.status.invalid_source")),
@@ -306,6 +393,28 @@ enum URLAllowlistManager {
                     entries
                 )
             }
+            let status = cached.isEmpty
+                ? String(format: String(localized: "allowlists.status.failed"), error.localizedDescription)
+                : String(format: String(localized: "allowlists.status.cached"), cached.count)
+            return (sourceWithStatus(source, status: status), cached)
+        }
+    }
+
+    private static func refreshLocalSource(_ source: URLAllowlistSource) -> (source: URLAllowlistSource, entries: [URLAllowlistEntry]) {
+        do {
+            let data = try Data(contentsOf: localFileURL(for: source))
+            let document = try decodeDocument(from: data, source: source)
+            return (
+                sourceWithStatus(
+                    source,
+                    name: document.name,
+                    status: String(format: String(localized: "allowlists.status.loaded"), document.entries.count),
+                    refreshedAt: Date()
+                ),
+                document.entries
+            )
+        } catch {
+            let cached = cachedEntries(for: source)
             let status = cached.isEmpty
                 ? String(format: String(localized: "allowlists.status.failed"), error.localizedDescription)
                 : String(format: String(localized: "allowlists.status.cached"), cached.count)
@@ -394,6 +503,7 @@ enum URLAllowlistManager {
             urlString: source.urlString,
             name: name ?? source.name,
             isDefault: source.isDefault,
+            localFileName: source.localFileName,
             lastRefreshDate: refreshedAt ?? source.lastRefreshDate,
             statusMessage: status
         )
@@ -406,6 +516,7 @@ enum URLAllowlistManager {
                 urlString: $0.urlString,
                 name: $0.name,
                 isDefault: false,
+                localFileName: $0.localFileName,
                 lastRefreshDate: $0.lastRefreshDate,
                 statusMessage: $0.statusMessage
             )
@@ -449,6 +560,21 @@ enum URLAllowlistManager {
             throw URLAllowlistError.invalidSourceURL
         }
     }
+
+    private static func localAllowlistsDirectoryURL() throws -> URL {
+        try FileManager.default.url(
+            for: .documentDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: true
+        )
+        .appendingPathComponent("Allowlists", isDirectory: true)
+    }
+
+    private static func localFileURL(for source: URLAllowlistSource) -> URL {
+        let directory = (try? localAllowlistsDirectoryURL()) ?? URL(fileURLWithPath: NSTemporaryDirectory())
+        return directory.appendingPathComponent("\(source.id.uuidString.lowercased()).json", isDirectory: false)
+    }
 }
 
 private struct URLAllowlistDocument: Codable {
@@ -475,6 +601,7 @@ enum URLAllowlistError: LocalizedError {
     case unsupportedVersion
     case emptyDocument
     case httpStatus(Int)
+    case invalidLocalFile
 
     var errorDescription: String? {
         switch self {
@@ -488,6 +615,8 @@ enum URLAllowlistError: LocalizedError {
             return String(localized: "allowlists.error.empty_document")
         case .httpStatus(let statusCode):
             return String(format: String(localized: "allowlists.error.http_status"), statusCode)
+        case .invalidLocalFile:
+            return String(localized: "allowlists.error.invalid_local_file")
         }
     }
 }

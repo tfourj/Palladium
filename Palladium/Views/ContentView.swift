@@ -304,6 +304,8 @@ struct ContentView: View {
                     onDeleteCookieFile: deleteImportedCookieFile,
                     onRefreshURLAllowlists: refreshURLAllowlists,
                     onAddURLAllowlist: addURLAllowlist,
+                    onImportURLAllowlist: importLocalURLAllowlist,
+                    onPasteURLAllowlist: addPastedURLAllowlist,
                     onRemoveURLAllowlist: removeURLAllowlist
                 )
                 .tabItem {

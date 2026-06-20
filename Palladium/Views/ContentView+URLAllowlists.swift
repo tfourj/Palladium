@@ -29,6 +29,40 @@ extension ContentView {
         }
     }
 
+    func importLocalURLAllowlist(from sourceURL: URL, onComplete: ((_ message: String) -> Void)? = nil) {
+        guard !isRefreshingURLAllowlists else { return }
+        isRefreshingURLAllowlists = true
+        Task { @MainActor in
+            do {
+                let source = try URLAllowlistManager.importLocalSource(from: sourceURL)
+                urlAllowlistSources = URLAllowlistManager.loadSources()
+                onComplete?(String(format: String(localized: "allowlists.status.imported"), source.displayName))
+            } catch {
+                onComplete?(String(format: String(localized: "allowlists.status.import_failed"), error.localizedDescription))
+                alertMessage = error.localizedDescription
+                showAlert = true
+            }
+            isRefreshingURLAllowlists = false
+        }
+    }
+
+    func addPastedURLAllowlist(_ json: String, onComplete: ((_ message: String) -> Void)? = nil) {
+        guard !isRefreshingURLAllowlists else { return }
+        isRefreshingURLAllowlists = true
+        Task { @MainActor in
+            do {
+                let source = try URLAllowlistManager.addPastedSource(json)
+                urlAllowlistSources = URLAllowlistManager.loadSources()
+                onComplete?(String(format: String(localized: "allowlists.status.pasted"), source.displayName))
+            } catch {
+                onComplete?(String(format: String(localized: "allowlists.status.paste_failed"), error.localizedDescription))
+                alertMessage = error.localizedDescription
+                showAlert = true
+            }
+            isRefreshingURLAllowlists = false
+        }
+    }
+
     func addURLAllowlistFromScheme(_ urlString: String) {
         do {
             if let duplicate = try URLAllowlistManager.duplicateCustomSource(for: urlString) {
