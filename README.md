@@ -26,9 +26,9 @@ On-device iOS media downloader powered by `yt-dlp`, `ffmpeg`, and `PythonKit`.
 - Runs Python tooling inside the app
 
 > [!NOTE]
-> **AI-assisted development:** This app was esentially vibecoded (i needed something fast to avoid dealing with youtube bot protection when using my app [Nickel](ttps://github.com/tfourj/Nickel)).
-> While it is actively tested and continuously improved, you may encounter bugs.
-> Feedback for issues is greatly appreciated. Please open an issue report if you find one and we’ll work to fix it.
+> **AI-assisted development:** Palladium is my third attempt at building a `yt-dlp` GUI for iOS. The first two (one built with Toga/BeeWare and another combining BeeWare with SwiftUI) were fully vibecoded prototypes. Palladium was also built heavily with AI assistance, but its code has been reviewed and refined more than previous prototypes. I originally needed it to avoid YouTube bot-protection issues in [Nickel](https://github.com/tfourj/Nickel).
+> While it is actively tested and continuously improved, you may still encounter bugs.
+> Feedback is greatly appreciated. If you find a bug, please open an issue and we’ll work to fix it.
 
 
 ## Download
