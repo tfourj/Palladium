@@ -1,5 +1,10 @@
 # Palladium Changelog
 
+## v1.1.1
+
+- Added automatic package update toggle
+- Moved package manager settings to a dedicated settings page.
+
 ## v1.1.0
 
 - Added a Downloads tab for browsing saved downloads.
