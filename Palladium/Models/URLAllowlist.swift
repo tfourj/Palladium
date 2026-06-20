@@ -179,6 +179,23 @@ enum URLAllowlistManager {
             urlString: "local://\(UUID().uuidString.lowercased())",
             localFileName: fileName
         )
+        return try saveLocalSource(data, for: source, replacing: existingSource)
+    }
+
+    static func addPastedSource(_ json: String) throws -> URLAllowlistSource {
+        let data = Data(json.utf8)
+        let source = URLAllowlistSource(
+            urlString: "local://\(UUID().uuidString.lowercased())",
+            localFileName: "Pasted JSON \(UUID().uuidString.prefix(8)).json"
+        )
+        return try saveLocalSource(data, for: source, replacing: nil)
+    }
+
+    private static func saveLocalSource(
+        _ data: Data,
+        for source: URLAllowlistSource,
+        replacing existingSource: URLAllowlistSource?
+    ) throws -> URLAllowlistSource {
         let document = try decodeDocument(from: data, source: source)
         let refreshed = sourceWithStatus(
             source,

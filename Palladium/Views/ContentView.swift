@@ -305,6 +305,7 @@ struct ContentView: View {
                     onRefreshURLAllowlists: refreshURLAllowlists,
                     onAddURLAllowlist: addURLAllowlist,
                     onImportURLAllowlist: importLocalURLAllowlist,
+                    onPasteURLAllowlist: addPastedURLAllowlist,
                     onRemoveURLAllowlist: removeURLAllowlist
                 )
                 .tabItem {

@@ -257,6 +257,46 @@
         }
       }
     },
+    "allowlists.paste.add" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add"
+          }
+        }
+      }
+    },
+    "allowlists.paste.button" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paste Allowlist JSON"
+          }
+        }
+      }
+    },
+    "allowlists.paste.message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paste a version 1 allowlist JSON document."
+          }
+        }
+      }
+    },
+    "allowlists.paste.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paste Allowlist JSON"
+          }
+        }
+      }
+    },
     "allowlists.last_refresh" : {
       "localizations" : {
         "en" : {
@@ -403,6 +443,36 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Loaded %lld entries."
+          }
+        }
+      }
+    },
+    "allowlists.status.paste_failed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to add pasted allowlist: %@"
+          }
+        }
+      }
+    },
+    "allowlists.status.pasted" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Added pasted allowlist: %@"
+          }
+        }
+      }
+    },
+    "allowlists.status.pasting" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adding pasted allowlist..."
           }
         }
       }
