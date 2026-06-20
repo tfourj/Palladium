@@ -76,6 +76,7 @@ struct SettingsTabView: View {
     let onDeleteCookieFile: (_ cookieFile: ImportedCookieFile) throws -> Void
     let onRefreshURLAllowlists: (_ onComplete: ((_ message: String) -> Void)?) -> Void
     let onAddURLAllowlist: (_ urlString: String, _ onComplete: ((_ message: String) -> Void)?) -> Void
+    let onImportURLAllowlist: (_ sourceURL: URL, _ onComplete: ((_ message: String) -> Void)?) -> Void
     let onRemoveURLAllowlist: (_ source: URLAllowlistSource) -> Void
 
     var body: some View {
@@ -186,6 +187,7 @@ struct SettingsTabView: View {
                         isRefreshing: isRefreshingURLAllowlists,
                         onRefresh: onRefreshURLAllowlists,
                         onAdd: onAddURLAllowlist,
+                        onImport: onImportURLAllowlist,
                         onRemove: onRemoveURLAllowlist
                     )
                 case .appearance:

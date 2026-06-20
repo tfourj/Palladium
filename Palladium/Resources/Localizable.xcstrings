@@ -87,6 +87,16 @@
         }
       }
     },
+    "allowlists.error.invalid_local_file" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a JSON allowlist file."
+          }
+        }
+      }
+    },
     "allowlists.allowed.by" : {
       "localizations" : {
         "en" : {
@@ -237,6 +247,16 @@
         }
       }
     },
+    "allowlists.import.button" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import Local Allowlist"
+          }
+        }
+      }
+    },
     "allowlists.last_refresh" : {
       "localizations" : {
         "en" : {
@@ -333,6 +353,36 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fetching..."
+          }
+        }
+      }
+    },
+    "allowlists.status.import_failed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to import allowlist: %@"
+          }
+        }
+      }
+    },
+    "allowlists.status.imported" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imported allowlist: %@"
+          }
+        }
+      }
+    },
+    "allowlists.status.importing" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importing allowlist..."
           }
         }
       }
