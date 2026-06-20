@@ -53,6 +53,7 @@
 		8256E3AC2F57A8960067DF6E /* ShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		82BF06BE2F5761E800133331 /* Palladium.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Palladium.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		82BF06CD2F5762BC00133331 /* Frameworks/Python.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = Frameworks/Python.xcframework; sourceTree = "<group>"; };
+		82BF06D42F5762DD00133331 /* Version.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Version.xcconfig; sourceTree = "<group>"; };
 		82FD7E012F5B666000E69220 /* FFmpeg.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = FFmpeg.xcframework; path = "Frameworks/SwiftFFmpeg-iOS/FFmpeg.xcframework"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -116,6 +117,7 @@
 		82BF06B52F5761E800133331 = {
 			isa = PBXGroup;
 			children = (
+				82BF06D42F5762DD00133331 /* Version.xcconfig */,
 				82BF06C02F5761E800133331 /* Palladium */,
 				8256E3AD2F57A8970067DF6E /* ShareExtension */,
 				82BF06CC2F5762BC00133331 /* Frameworks */,
@@ -371,11 +373,9 @@
 		};
 		82BF06C72F5761E900133331 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 82BF06D42F5762DD00133331 /* Version.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				APP_BUILD = 1;
-				APP_FINAL = true;
-				APP_VERSION = 1.1.1;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -440,11 +440,9 @@
 		};
 		82BF06C82F5761E900133331 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 82BF06D42F5762DD00133331 /* Version.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				APP_BUILD = 1;
-				APP_FINAL = true;
-				APP_VERSION = 1.1.1;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;

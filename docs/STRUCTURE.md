@@ -11,6 +11,7 @@ Palladium/
 ├── Palladium/               Main iOS app target
 ├── Palladium.xcodeproj/     Xcode project and Swift Package resolution
 ├── ShareExtension/          iOS share extension target
+├── Version.xcconfig         Shared app version, build, and release-status settings
 ├── privacy-manifests/       Privacy manifests copied into the Python runtime
 ├── scripts/                 Build and validation helper scripts
 ├── Frameworks/              Local, untracked Python and FFmpeg dependencies
@@ -28,6 +29,7 @@ Palladium/
 | `.github/workflows/build_ipa.yml` | GitHub Actions workflow that builds the IPA. |
 | `.gitignore` | Files and local dependencies excluded from Git. |
 | `Palladium.xcodeproj/project.pbxproj` | Targets, build phases, build settings, and file references for Xcode. |
+| `Version.xcconfig` | Single source for the app version, build number, and final-build flag. |
 | `Palladium.xcodeproj/project.xcworkspace/contents.xcworkspacedata` | Workspace definition. |
 | `Palladium.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved` | Pinned Swift Package dependencies. |
 | `build_ipa.sh` | Builds and exports an IPA outside Xcode. |
