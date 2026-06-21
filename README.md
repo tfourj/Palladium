@@ -42,7 +42,9 @@ On-device iOS media downloader powered by `yt-dlp`, `ffmpeg`, and `PythonKit`.
 
 Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.
 
-Build instructions: [docs/BUILD.md](docs/BUILD.md). See [docs/STRUCTURE.md](docs/STRUCTURE.md) for a project map.
+Build instructions: [docs/BUILD.md](docs/BUILD.md).
+
+Other documentation: [docs/ALLOWLISTS.md](docs/ALLOWLISTS.md) for custom URL allowlists and [docs/STRUCTURE.md](docs/STRUCTURE.md) for a project map.
 
 ## Credits & Acknowledgments
 
