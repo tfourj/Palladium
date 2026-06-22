@@ -106,6 +106,10 @@ extension ContentView {
             if let availableVersions = outcome.availableVersions {
                 self.availablePackageVersions = availableVersions
             }
+            if outcome.restartRequired {
+                alertMessage = String(localized: "settings.advanced.restart_required")
+                showAlert = true
+            }
             self.hasLoadedPackageStatus = true
             Self.logger.info("package flow finished with status: \(outcome.statusText, privacy: .public)")
 

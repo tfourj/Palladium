@@ -41,6 +41,14 @@ PLAYLIST_PROGRESS_PREFIX = "[palladium][playlist-progress] "
 
 def invalidate_runtime_package_modules():
     prefixes = ("yt_dlp", "yt_dlp_plugins")
+    webkit_jsi_loaded = any(
+        name == "yt_dlp_plugins.webkit_jsi" or name.startswith("yt_dlp_plugins.webkit_jsi.")
+        for name in sys.modules
+    )
+    if webkit_jsi_loaded:
+        print("[palladium] restart required to refresh loaded webkit jsi runtime")
+        return True
+
     stale_modules = [
         name
         for name in sys.modules
@@ -52,6 +60,7 @@ def invalidate_runtime_package_modules():
 
     importlib.invalidate_caches()
     print(f"[palladium] invalidated {len(stale_modules)} cached yt-dlp runtime module(s)")
+    return False
 
 
 class PlaylistProgressCollector:
@@ -794,6 +803,7 @@ def run_package_maintenance(action, custom_versions_json=None, live_log_fd_overr
     available_versions = {}
     versions = {}
     cancelled = False
+    restart_required = False
     install_target = os.environ.get("PALLADIUM_PYTHON_PACKAGES")
     cancel_file_path = os.environ.get("PALLADIUM_CANCEL_FILE", "").strip()
     live_log_stream = open_live_log_stream(live_log_fd_override)
@@ -883,7 +893,7 @@ def run_package_maintenance(action, custom_versions_json=None, live_log_fd_overr
                                 pip_exit_code = 0
                             else:
                                 pip_attempted = True
-                                invalidate_runtime_package_modules()
+                                restart_required = invalidate_runtime_package_modules() or restart_required
                                 if install_target:
                                     stale_removed = 0
                                     for package_name in cleanup_packages:
@@ -942,5 +952,6 @@ def run_package_maintenance(action, custom_versions_json=None, live_log_fd_overr
         "updates_summary": updates_summary,
         "versions": versions,
         "available_versions": available_versions,
+        "restart_required": restart_required,
         "output": output.getvalue(),
     })

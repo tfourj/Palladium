@@ -2507,6 +2507,16 @@
         }
       }
     },
+    "settings.advanced.restart_required" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restart Palladium to apply the WebKit JSI patch setting safely."
+          }
+        }
+      }
+    },
     "settings.advanced.title" : {
       "localizations" : {
         "en" : {
