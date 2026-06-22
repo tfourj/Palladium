@@ -74,6 +74,7 @@ struct ContentView: View {
     static let autoUpdatePackagesOnLaunchDefaultsKey = "palladium.autoUpdatePackagesOnLaunch"
     static let packageSourceModeDefaultsKey = "palladium.packageSourceMode"
     static let customPackageSpecsDefaultsKey = "palladium.customPackageSpecs"
+    static let disableWebKitJSIPatchDefaultsKey = "palladium.disableWebKitJSIPatch"
     static let defaultLinkHistoryLimit = 10
     static let maxLinkHistoryLimit = 50
 
@@ -129,6 +130,7 @@ struct ContentView: View {
     @State var autoUpdatePackagesOnLaunch: Bool
     @State var packageSourceMode: PackageSourceMode
     @State var customPackageSpecsText: String
+    @State var disableWebKitJSIPatch: Bool
     @State var storageSummary: StorageManagementSummary = .empty
     @StateObject var consoleLogStore: ConsoleLogStore
     @State var completedDownloadResult: CompletedDownloadResult?
@@ -201,6 +203,7 @@ struct ContentView: View {
         _autoUpdatePackagesOnLaunch = State(initialValue: Self.loadAutoUpdatePackagesOnLaunch())
         _packageSourceMode = State(initialValue: Self.loadPackageSourceMode())
         _customPackageSpecsText = State(initialValue: Self.loadCustomPackageSpecsText())
+        _disableWebKitJSIPatch = State(initialValue: Self.loadDisableWebKitJSIPatch())
         _consoleLogStore = StateObject(wrappedValue: ConsoleLogStore())
     }
 
@@ -276,6 +279,7 @@ struct ContentView: View {
                     storageSummary: storageSummary,
                     packageSourceMode: $packageSourceMode,
                     customPackageSpecsText: $customPackageSpecsText,
+                    disableWebKitJSIPatch: $disableWebKitJSIPatch,
                     packageStatusText: packageStatusText,
                     versionsText: versionsText,
                     updatesSummaryText: packageUpdatesSummaryText,
@@ -442,6 +446,9 @@ struct ContentView: View {
             persistPreferences()
         }
         .onChange(of: customPackageSpecsText, initial: false) {
+            persistPreferences()
+        }
+        .onChange(of: disableWebKitJSIPatch, initial: false) {
             persistPreferences()
         }
         .sheet(item: $sharePayload) { payload in

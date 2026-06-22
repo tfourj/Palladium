@@ -17,6 +17,7 @@ struct SettingsTabView: View {
         case notifications
         case storage
         case packages
+        case advanced
         case about
     }
 
@@ -48,6 +49,7 @@ struct SettingsTabView: View {
     let storageSummary: StorageManagementSummary
     @Binding var packageSourceMode: PackageSourceMode
     @Binding var customPackageSpecsText: String
+    @Binding var disableWebKitJSIPatch: Bool
     let packageStatusText: String
     let versionsText: String
     let updatesSummaryText: String
@@ -113,6 +115,15 @@ struct SettingsTabView: View {
 
                     NavigationLink(value: SettingsRoute.packages) {
                         packagesSettingsRow()
+                    }
+
+                    NavigationLink(value: SettingsRoute.advanced) {
+                        settingsRow(
+                            title: String(localized: "settings.advanced.title"),
+                            subtitle: String(localized: "settings.advanced.subtitle"),
+                            icon: "gearshape.2.fill",
+                            color: .gray
+                        )
                     }
                 }
 
@@ -254,6 +265,11 @@ struct SettingsTabView: View {
                         onCustomUpdatePackages: onCustomUpdatePackages,
                         onFetchPackageVersions: onFetchPackageVersions,
                         onAppear: onOpenPackageManager
+                    )
+                case .advanced:
+                    AdvancedSettingsView(
+                        disableWebKitJSIPatch: $disableWebKitJSIPatch,
+                        isRunning: isRunning || isPackageRunning
                     )
                 case .about:
                     SettingsAboutView()

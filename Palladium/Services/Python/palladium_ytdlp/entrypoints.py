@@ -545,7 +545,7 @@ def run_yt_dlp_flow(
                 )
 
             if package_source.get("skip_webkit_patch"):
-                print("[palladium] skipping webkit patch for custom package source")
+                print("[palladium] skipping webkit patch by configuration")
             else:
                 raise_if_cancel_requested(cancel_file_path, "[palladium] cancellation requested before webkit patch")
                 ensure_safe_webkit_jsi_runtime(install_target)
@@ -885,7 +885,7 @@ def run_package_maintenance(action, custom_versions_json=None, live_log_fd_overr
                 print(f"[palladium] post-update updates summary: {updates_summary}")
 
             if package_source.get("skip_webkit_patch"):
-                print("[palladium] skipping webkit patch for custom package source")
+                print("[palladium] skipping webkit patch by configuration")
             else:
                 raise_if_cancel_requested(cancel_file_path, "[palladium] package action cancelled before webkit patch")
                 ensure_safe_webkit_jsi_runtime(install_target)

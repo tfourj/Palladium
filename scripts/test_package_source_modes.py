@@ -73,6 +73,14 @@ class PackageSourceModeTests(unittest.TestCase):
         self.assertTrue(custom_source["skip_webkit_patch"])
         self.assertFalse(stable_source["skip_webkit_patch"])
 
+    def test_explicit_setting_skips_webkit_patch(self):
+        source = parse_package_source(json.dumps({
+            "mode": "stable",
+            "disable_webkit_jsi_patch": True,
+        }))
+
+        self.assertTrue(source["skip_webkit_patch"])
+
 
 if __name__ == "__main__":
     unittest.main()

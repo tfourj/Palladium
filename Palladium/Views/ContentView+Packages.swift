@@ -164,7 +164,8 @@ extension ContentView {
         let specs = customPackageSpecs()
         let payload: [String: Any] = [
             "mode": packageSourceMode.rawValue,
-            "custom_specs": specs
+            "custom_specs": specs,
+            "disable_webkit_jsi_patch": disableWebKitJSIPatch
         ]
         guard let data = try? JSONSerialization.data(withJSONObject: payload),
               let text = String(data: data, encoding: .utf8) else {
