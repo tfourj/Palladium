@@ -1,4 +1,5 @@
 import contextlib
+import importlib
 import json
 import os
 import re
@@ -36,6 +37,21 @@ from .shared import TRACKED_PACKAGES, TailBuffer, Tee, open_live_log_stream
 from .webkit_jsi import ensure_safe_webkit_jsi_runtime
 
 PLAYLIST_PROGRESS_PREFIX = "[palladium][playlist-progress] "
+
+
+def invalidate_runtime_package_modules():
+    prefixes = ("yt_dlp", "yt_dlp_plugins")
+    stale_modules = [
+        name
+        for name in sys.modules
+        if any(name == prefix or name.startswith(f"{prefix}.") for prefix in prefixes)
+    ]
+
+    for name in stale_modules:
+        sys.modules.pop(name, None)
+
+    importlib.invalidate_caches()
+    print(f"[palladium] invalidated {len(stale_modules)} cached yt-dlp runtime module(s)")
 
 
 class PlaylistProgressCollector:
@@ -867,6 +883,7 @@ def run_package_maintenance(action, custom_versions_json=None, live_log_fd_overr
                                 pip_exit_code = 0
                             else:
                                 pip_attempted = True
+                                invalidate_runtime_package_modules()
                                 if install_target:
                                     stale_removed = 0
                                     for package_name in cleanup_packages:
