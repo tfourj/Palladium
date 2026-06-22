@@ -239,9 +239,8 @@ extension ContentView {
 
         var backgroundTaskID = UIBackgroundTaskIdentifier.invalid
         backgroundTaskID = UIApplication.shared.beginBackgroundTask(withName: "Palladium download") {
-            PythonFlowRunner.interruptActiveFlow()
             Task { @MainActor in
-                appendConsoleText("[palladium] background time expired; stopping download\n")
+                appendConsoleText("[palladium] background time expired; pausing download until the app returns\n")
                 if backgroundTaskID != .invalid {
                     UIApplication.shared.endBackgroundTask(backgroundTaskID)
                     backgroundTaskID = .invalid
