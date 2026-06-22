@@ -25,7 +25,7 @@ extension ContentView {
         isAutomaticallyUpdatingPackages = isAutomaticUpdate
         syncIdleTimerDisabled()
         switch action {
-        case "update":
+        case "update", "reinstall":
             packageStatusText = "updating"
         case "index_versions":
             packageStatusText = "indexing"
@@ -134,6 +134,15 @@ extension ContentView {
             return
         }
         runPackageFlow(action: "update")
+    }
+
+    func reinstallPackages() {
+        if packageSourceMode == .custom && customPackageSpecs().isEmpty {
+            alertMessage = String(localized: "packages.source.custom_specs.empty")
+            showAlert = true
+            return
+        }
+        runPackageFlow(action: "reinstall")
     }
 
     func updatePackagesWithCustomVersions(_ ytDlpVersion: String?, _ webkitJSIVersion: String?, _ pipVersion: String?) {

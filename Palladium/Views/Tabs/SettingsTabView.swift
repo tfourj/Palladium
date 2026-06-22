@@ -62,6 +62,7 @@ struct SettingsTabView: View {
     let onRefreshVersions: () -> Void
     let onCancelPackages: () -> Void
     let onUpdatePackages: () -> Void
+    let onReinstallPackages: () -> Void
     let onCustomUpdatePackages: (_ ytDlpVersion: String?, _ webkitJSIVersion: String?, _ pipVersion: String?) -> Void
     let onFetchPackageVersions: () -> Void
     let onOpenPackageManager: () -> Void
@@ -269,7 +270,8 @@ struct SettingsTabView: View {
                 case .advanced:
                     AdvancedSettingsView(
                         disableWebKitJSIPatch: $disableWebKitJSIPatch,
-                        isRunning: isRunning || isPackageRunning
+                        isRunning: isRunning || isPackageRunning,
+                        onReinstallPackages: onReinstallPackages
                     )
                 case .about:
                     SettingsAboutView()

@@ -2477,6 +2477,36 @@
         }
       }
     },
+    "settings.advanced.reinstall" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reinstall packages"
+          }
+        }
+      }
+    },
+    "settings.advanced.reinstall_prompt.message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reinstall yt-dlp and WebKit JSI now so the installed runtime uses this setting."
+          }
+        }
+      }
+    },
+    "settings.advanced.reinstall_prompt.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reinstall packages?"
+          }
+        }
+      }
+    },
     "settings.advanced.title" : {
       "localizations" : {
         "en" : {

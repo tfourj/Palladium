@@ -830,8 +830,14 @@ def run_package_maintenance(action, custom_versions_json=None, live_log_fd_overr
             if custom_versions:
                 print(f"[palladium] custom package versions requested: {custom_versions}")
 
-            if action == "update":
-                if updates_available or bool(custom_versions) or package_source.get("mode") == "custom":
+            if action in ("update", "reinstall"):
+                should_install = (
+                    action == "reinstall"
+                    or updates_available
+                    or bool(custom_versions)
+                    or package_source.get("mode") == "custom"
+                )
+                if should_install:
                     raise_if_cancel_requested(cancel_file_path, "[palladium] package action cancelled before pip startup")
                     pip_main = ensure_pip_entrypoint(install_target)
                     if pip_main is not None:
@@ -842,12 +848,19 @@ def run_package_maintenance(action, custom_versions_json=None, live_log_fd_overr
                                 pip_main=pip_main,
                                 allow_prereleases=bool(package_source.get("allow_prereleases")),
                             )
-                            packages, cleanup_packages = build_package_install_plan(
-                                installed_versions,
-                                indexed_versions,
-                                custom_versions=custom_versions,
-                                package_source=package_source,
-                            )
+                            if action == "reinstall":
+                                if package_source.get("mode") == "custom":
+                                    packages = list(package_source.get("custom_specs") or [])
+                                else:
+                                    packages = ["yt-dlp", "yt-dlp-apple-webkit-jsi"]
+                                cleanup_packages = ["yt-dlp", "yt-dlp-apple-webkit-jsi"]
+                            else:
+                                packages, cleanup_packages = build_package_install_plan(
+                                    installed_versions,
+                                    indexed_versions,
+                                    custom_versions=custom_versions,
+                                    package_source=package_source,
+                                )
 
                             if not packages:
                                 print("[palladium] no package installs required")
