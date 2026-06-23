@@ -1,10 +1,12 @@
 import contextlib
+import io
 import json
 import os
 import re
 import runpy
 import sys
 import traceback
+import urllib.parse
 
 from .args import (
     build_preset_args,
@@ -36,6 +38,14 @@ from .shared import TRACKED_PACKAGES, TailBuffer, Tee, open_live_log_stream
 from .webkit_jsi import ensure_safe_webkit_jsi_runtime
 
 PLAYLIST_PROGRESS_PREFIX = "[palladium][playlist-progress] "
+GALLERY_PROGRESS_PREFIX = "[palladium][gallery-progress]"
+
+
+class GalleryDLOutputCapture(io.StringIO):
+    """String output capture compatible with gallery-dl's stream setup."""
+
+    def reconfigure(self, **_options):
+        return None
 
 
 class PlaylistProgressCollector:
@@ -321,6 +331,203 @@ def without_thumbnail_download_args(download_behavior_args):
 def extract_last_error_line(output):
     lines = [line.strip() for line in str(output).splitlines() if line.strip().startswith("ERROR:")]
     return lines[-1] if lines else None
+
+
+def ensure_gallery_dl_installed(install_target, package_source):
+    installed, version, source = is_package_installed("gallery-dl", install_target=install_target)
+    if installed:
+        print(f"[palladium] gallery-dl already installed ({version} via {source})")
+        return False, 0
+
+    print("[palladium] gallery-dl package missing")
+    pip_main = ensure_pip_entrypoint(install_target)
+    if pip_main is None:
+        return True, 1
+
+    packages = ["gallery-dl"]
+    pip_args = build_pip_install_args(
+        packages,
+        install_target=install_target,
+        allow_prereleases=bool(package_source.get("allow_prereleases")),
+    )
+    result = pip_main(pip_args)
+    exit_code = 0 if result is None else int(result)
+    print(f"[palladium] gallery-dl pip exit code: {exit_code}")
+    return True, exit_code
+
+
+def gallery_dl_args(url, cookie_file_path=None, destination=None, selection_range=None, resolve=False, report_progress=False):
+    args = ["gallery-dl", "--config-ignore", "--no-colors"]
+    if cookie_file_path:
+        if os.path.isfile(cookie_file_path):
+            args.extend(["--cookies", cookie_file_path])
+        else:
+            print(f"[palladium] cookie file missing, ignoring: {cookie_file_path}")
+    if resolve:
+        args.append("--resolve-urls")
+    if destination:
+        args.extend(["--destination", destination])
+    if selection_range:
+        args.extend(["--range", selection_range])
+    if report_progress:
+        args.extend(["--Print", f"after:{GALLERY_PROGRESS_PREFIX}"])
+    args.append(url)
+    return args
+
+
+def gallery_item_title(url, index):
+    try:
+        path = urllib.parse.unquote(urllib.parse.urlparse(url).path)
+        name = os.path.basename(path)
+        if name:
+            return name
+    except Exception:
+        pass
+    return f"Image {index}"
+
+
+def run_gallery_dl_resolver(download_url_override=None, cookie_file_path_override=None, live_log_fd_override=None, package_source_json_override=None):
+    output = TailBuffer()
+    console_stdout = sys.__stdout__ if sys.__stdout__ is not None else None
+    console_stderr = sys.__stderr__ if sys.__stderr__ is not None else None
+    live_log_stream = open_live_log_stream(live_log_fd_override)
+    install_target = os.environ.get("PALLADIUM_PYTHON_PACKAGES")
+    package_source = parse_package_source(package_source_json_override)
+    url = str(download_url_override or "").strip()
+    cookie_file_path = str(cookie_file_path_override or "").strip()
+    argv_backup = sys.argv[:]
+    items = []
+    pip_attempted = False
+    pip_exit_code = None
+    success = False
+
+    with contextlib.redirect_stdout(Tee(output, console_stdout, live_log_stream)), contextlib.redirect_stderr(Tee(output, console_stderr, live_log_stream)):
+        try:
+            if install_target:
+                os.makedirs(install_target, exist_ok=True)
+                if install_target not in sys.path:
+                    sys.path.insert(0, install_target)
+            if not url:
+                print("[palladium] gallery-dl resolver received no URL")
+            else:
+                pip_attempted, pip_exit_code = ensure_gallery_dl_installed(install_target, package_source)
+                if pip_exit_code == 0:
+                    captured = GalleryDLOutputCapture()
+                    sys.argv = gallery_dl_args(url, cookie_file_path=cookie_file_path, resolve=True)
+                    try:
+                        with contextlib.redirect_stdout(captured):
+                            runpy.run_module("gallery_dl", run_name="__main__", alter_sys=True)
+                    except SystemExit as exc:
+                        if exc.code not in (None, 0):
+                            raise RuntimeError(f"gallery-dl resolver exited with {exc.code}")
+
+                    seen = set()
+                    for line in captured.getvalue().splitlines():
+                        candidate = line.strip()
+                        if not candidate.startswith(("http://", "https://")) or candidate in seen:
+                            continue
+                        seen.add(candidate)
+                        items.append({
+                            "index": len(items) + 1,
+                            "url": candidate,
+                            "title": gallery_item_title(candidate, len(items) + 1),
+                        })
+                    success = bool(items)
+                    print(f"[palladium] gallery-dl resolved {len(items)} image item(s)")
+        except Exception:
+            print("[palladium] gallery-dl resolution failed")
+            traceback.print_exc()
+        finally:
+            sys.argv = argv_backup
+            if live_log_stream is not None:
+                live_log_stream.flush()
+
+    return json.dumps({
+        "success": success,
+        "pip_attempted": pip_attempted,
+        "pip_exit_code": pip_exit_code,
+        "items": items,
+        "output": output.getvalue(),
+    })
+
+
+def run_gallery_dl_flow(download_url_override=None, selection_range_override=None, cookie_file_path_override=None, run_output_dir_override=None, live_log_fd_override=None, package_source_json_override=None):
+    output = TailBuffer()
+    console_stdout = sys.__stdout__ if sys.__stdout__ is not None else None
+    console_stderr = sys.__stderr__ if sys.__stderr__ is not None else None
+    live_log_stream = open_live_log_stream(live_log_fd_override)
+    install_target = os.environ.get("PALLADIUM_PYTHON_PACKAGES")
+    url = str(download_url_override or "").strip()
+    selection_range = str(selection_range_override or "").strip()
+    cookie_file_path = str(cookie_file_path_override or "").strip()
+    run_output_dir = str(run_output_dir_override or "").strip()
+    package_source = parse_package_source(package_source_json_override)
+    argv_backup = sys.argv[:]
+    pip_attempted = False
+    pip_exit_code = None
+    exit_code = 1
+    cancelled = False
+    downloaded_paths = []
+    primary_downloaded_path = None
+
+    with contextlib.redirect_stdout(Tee(output, console_stdout, live_log_stream)), contextlib.redirect_stderr(Tee(output, console_stderr, live_log_stream)):
+        try:
+            if install_target:
+                os.makedirs(install_target, exist_ok=True)
+                if install_target not in sys.path:
+                    sys.path.insert(0, install_target)
+            if run_output_dir:
+                os.makedirs(run_output_dir, exist_ok=True)
+                cleanup_temp_download_files(run_output_dir)
+            pip_attempted, pip_exit_code = ensure_gallery_dl_installed(install_target, package_source)
+            if pip_exit_code == 0 and url and selection_range:
+                sys.argv = gallery_dl_args(
+                    url,
+                    cookie_file_path,
+                    run_output_dir,
+                    selection_range,
+                    report_progress=True,
+                )
+                print(f"[palladium] running gallery-dl for selected range: {selection_range}")
+                try:
+                    runpy.run_module("gallery_dl", run_name="__main__", alter_sys=True)
+                    exit_code = 0
+                except KeyboardInterrupt:
+                    cancelled = True
+                    exit_code = 130
+                except SystemExit as exc:
+                    exit_code = 0 if exc.code in (None, 0) else int(exc.code)
+            else:
+                print("[palladium] gallery-dl download missing URL or selected images")
+
+            if not cancelled and run_output_dir:
+                downloaded_paths, primary_downloaded_path = detect_downloaded_files(run_output_dir)
+                if downloaded_paths and exit_code != 0:
+                    exit_code = 0
+        except KeyboardInterrupt:
+            cancelled = True
+            exit_code = 130
+        except Exception:
+            print("[palladium] gallery-dl download failed")
+            traceback.print_exc()
+        finally:
+            sys.argv = argv_backup
+            if live_log_stream is not None:
+                live_log_stream.flush()
+
+    success = pip_exit_code in (None, 0) and exit_code == 0 and bool(downloaded_paths) and not cancelled
+    return json.dumps({
+        "pip_attempted": pip_attempted,
+        "pip_exit_code": pip_exit_code,
+        "yt_exit_code": exit_code,
+        "cancelled": cancelled,
+        "success": success,
+        "downloaded_paths": downloaded_paths,
+        "primary_downloaded_path": primary_downloaded_path,
+        "downloaded_path": primary_downloaded_path,
+        "output": output.getvalue(),
+        "result_kind": "cancelled" if cancelled else ("success" if success else "error"),
+    })
 
 
 def run_retry_without_thumbnails(
