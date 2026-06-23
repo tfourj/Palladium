@@ -3,11 +3,40 @@ import PythonKit
 import Darwin
 
 struct GalleryItem: Identifiable, Hashable, Sendable {
+    enum MediaType: String, Sendable {
+        case image
+        case audio
+        case file
+    }
+
     let index: Int
     let url: String
     let title: String
+    let mediaType: MediaType
 
     var id: Int { index }
+
+    var mediaLabel: String {
+        switch mediaType {
+        case .image:
+            return "Image"
+        case .audio:
+            return "Audio"
+        case .file:
+            return "File"
+        }
+    }
+
+    var placeholderIconName: String {
+        switch mediaType {
+        case .image:
+            return "photo"
+        case .audio:
+            return "music.note"
+        case .file:
+            return "doc"
+        }
+    }
 }
 
 struct GalleryResolution: Sendable {
@@ -294,7 +323,9 @@ enum PythonFlowRunner {
             guard let index = item["index"] as? Int,
                   let url = item["url"] as? String,
                   let title = item["title"] as? String else { return nil }
-            return GalleryItem(index: index, url: url, title: title)
+            let mediaTypeValue = item["media_type"] as? String ?? "image"
+            let mediaType = GalleryItem.MediaType(rawValue: mediaTypeValue) ?? .file
+            return GalleryItem(index: index, url: url, title: title, mediaType: mediaType)
         }
         return GalleryResolution(
             items: items,

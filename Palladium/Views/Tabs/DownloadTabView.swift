@@ -306,18 +306,34 @@ struct DownloadTabView: View {
                             VStack(alignment: .leading, spacing: 6) {
                                 ZStack {
                                     Color.secondary.opacity(0.15)
-                                    AsyncImage(url: URL(string: item.url)) { image in
-                                        image
-                                            .resizable()
-                                            .scaledToFit()
-                                            .padding(4)
-                                    } placeholder: {
-                                        ProgressView()
+                                    if item.mediaType == .image {
+                                        AsyncImage(url: URL(string: item.url)) { image in
+                                            image
+                                                .resizable()
+                                                .scaledToFit()
+                                                .padding(4)
+                                        } placeholder: {
+                                            ProgressView()
+                                        }
+                                    } else {
+                                        VStack(spacing: 8) {
+                                            Image(systemName: item.placeholderIconName)
+                                                .font(.system(size: 34, weight: .semibold))
+                                            Text(item.mediaLabel)
+                                                .font(.caption)
+                                                .fontWeight(.semibold)
+                                        }
+                                        .foregroundStyle(.secondary)
                                     }
                                 }
                                 .frame(maxWidth: .infinity)
                                 .aspectRatio(1, contentMode: .fit)
                                 .clipShape(RoundedRectangle(cornerRadius: 8))
+
+                                Label(item.mediaLabel, systemImage: item.placeholderIconName)
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(1)
 
                                 Text(item.title)
                                     .font(.caption2)
@@ -342,7 +358,7 @@ struct DownloadTabView: View {
                 .padding(.horizontal, 16)
                 .padding(.vertical)
             }
-            .navigationTitle("Select Images")
+            .navigationTitle(galleryPickerTitle)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Cancel") { showGalleryPicker = false }
@@ -357,7 +373,7 @@ struct DownloadTabView: View {
             .safeAreaInset(edge: .bottom) {
                 VStack(spacing: 0) {
                     Divider()
-                    Button("Download \(selectedGalleryItemIndices.count) Image\(selectedGalleryItemIndices.count == 1 ? "" : "s")") {
+                    Button(galleryDownloadButtonTitle) {
                         showGalleryPicker = false
                         onDownloadGallerySelection()
                     }
@@ -370,6 +386,46 @@ struct DownloadTabView: View {
                 .background(Color(uiColor: .systemBackground))
             }
         }
+    }
+
+    private var galleryPickerTitle: String {
+        switch galleryVisibleMediaType {
+        case .some(.image):
+            return "Select Images"
+        case .some(.audio):
+            return "Select Audio"
+        case .some(.file):
+            return "Select Files"
+        case nil:
+            return "Select Items"
+        }
+    }
+
+    private var galleryDownloadButtonTitle: String {
+        let count = selectedGalleryItemIndices.count
+        switch gallerySelectedMediaType {
+        case .some(.image):
+            return "Download \(count) Image\(count == 1 ? "" : "s")"
+        case .some(.audio):
+            return "Download \(count) Audio"
+        case .some(.file):
+            return "Download \(count) File\(count == 1 ? "" : "s")"
+        case nil:
+            return "Download \(count) Item\(count == 1 ? "" : "s")"
+        }
+    }
+
+    private var galleryVisibleMediaType: GalleryItem.MediaType? {
+        commonMediaType(in: galleryItems)
+    }
+
+    private var gallerySelectedMediaType: GalleryItem.MediaType? {
+        commonMediaType(in: galleryItems.filter { selectedGalleryItemIndices.contains($0.index) })
+    }
+
+    private func commonMediaType(in items: [GalleryItem]) -> GalleryItem.MediaType? {
+        guard let first = items.first?.mediaType else { return nil }
+        return items.allSatisfy { $0.mediaType == first } ? first : nil
     }
 
     private func pasteOrClearURL() {

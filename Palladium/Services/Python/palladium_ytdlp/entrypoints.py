@@ -426,7 +426,51 @@ def gallery_dl_args(url, cookie_file_path=None, destination=None, selection_rang
     return args
 
 
-def gallery_item_title(url, index):
+GALLERY_AUDIO_EXTENSIONS = {
+    ".aac",
+    ".aif",
+    ".aiff",
+    ".alac",
+    ".flac",
+    ".m4a",
+    ".mp3",
+    ".oga",
+    ".ogg",
+    ".opus",
+    ".wav",
+    ".weba",
+    ".wma",
+}
+
+GALLERY_IMAGE_EXTENSIONS = {
+    ".avif",
+    ".bmp",
+    ".gif",
+    ".heic",
+    ".heif",
+    ".jpeg",
+    ".jpg",
+    ".png",
+    ".tif",
+    ".tiff",
+    ".webp",
+}
+
+
+def gallery_item_media_type(url):
+    try:
+        path = urllib.parse.unquote(urllib.parse.urlparse(url).path)
+        extension = os.path.splitext(path)[1].lower()
+    except Exception:
+        extension = ""
+    if extension in GALLERY_AUDIO_EXTENSIONS:
+        return "audio"
+    if extension in GALLERY_IMAGE_EXTENSIONS:
+        return "image"
+    return "file"
+
+
+def gallery_item_title(url, index, media_type="image"):
     try:
         path = urllib.parse.unquote(urllib.parse.urlparse(url).path)
         name = os.path.basename(path)
@@ -434,6 +478,10 @@ def gallery_item_title(url, index):
             return name
     except Exception:
         pass
+    if media_type == "audio":
+        return f"Audio {index}"
+    if media_type == "file":
+        return f"File {index}"
     return f"Image {index}"
 
 
@@ -492,13 +540,15 @@ def run_gallery_dl_resolver(download_url_override=None, cookie_file_path_overrid
                             if not candidate.startswith(("http://", "https://")) or candidate in seen:
                                 continue
                             seen.add(candidate)
+                            media_type = gallery_item_media_type(candidate)
                             items.append({
                                 "index": len(items) + 1,
                                 "url": candidate,
-                                "title": gallery_item_title(candidate, len(items) + 1),
+                                "title": gallery_item_title(candidate, len(items) + 1, media_type),
+                                "media_type": media_type,
                             })
                         success = bool(items)
-                        print(f"[palladium] gallery-dl resolved {len(items)} image item(s)")
+                        print(f"[palladium] gallery-dl resolved {len(items)} item(s)")
         except Exception:
             print("[palladium] gallery-dl resolution failed")
             traceback.print_exc()

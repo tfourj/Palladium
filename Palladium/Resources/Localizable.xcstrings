@@ -1047,6 +1047,16 @@
         }
       }
     },
+    "gallery.error.no_items_found" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No supported items were found for this URL."
+          }
+        }
+      }
+    },
     "download.fallback_title" : {
       "localizations" : {
         "en" : {

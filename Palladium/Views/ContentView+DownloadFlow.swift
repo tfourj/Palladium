@@ -479,9 +479,9 @@ extension ContentView {
         isRunning = true
         syncIdleTimerDisabled()
         statusText = "running"
-        progressText = "Resolving images…"
+        progressText = "Resolving items..."
         downloadCancelRequested = false
-        appendConsoleText("[palladium] resolving images with gallery-dl\n")
+        appendConsoleText("[palladium] resolving items with gallery-dl\n")
         let cookieFilePath = useCookies ? resolvedSelectedCookieFilePath() : nil
         let task = Task {
             let resolution = await PythonFlowRunner.resolveGallery(
@@ -520,7 +520,7 @@ extension ContentView {
     }
 
     func galleryResolutionErrorText(for resolution: GalleryResolution) -> String {
-        resolution.errorMessage ?? String(localized: "gallery.error.no_images_found")
+        resolution.errorMessage ?? String(localized: "gallery.error.no_items_found")
     }
 
     func gallerySelectionRange(_ indices: Set<Int>) -> String {
