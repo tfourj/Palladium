@@ -1,6 +1,7 @@
 import contextlib
 import io
 import json
+import logging
 import os
 import re
 import runpy
@@ -46,6 +47,34 @@ class GalleryDLOutputCapture(io.StringIO):
 
     def reconfigure(self, **_options):
         return None
+
+
+def reset_gallery_dl_runtime():
+    """Discard gallery-dl state and log handlers from a previous in-process run."""
+    loggers = [logging.getLogger()]
+    loggers.extend(
+        logger
+        for logger in logging.Logger.manager.loggerDict.values()
+        if isinstance(logger, logging.Logger)
+    )
+    for logger in loggers:
+        for handler in list(logger.handlers):
+            if not isinstance(getattr(handler, "stream", None), (Tee, GalleryDLOutputCapture)):
+                continue
+            logger.removeHandler(handler)
+            handler.close()
+
+    for module_name in list(sys.modules):
+        if module_name == "gallery_dl" or module_name.startswith("gallery_dl."):
+            del sys.modules[module_name]
+
+
+def run_gallery_dl_module():
+    reset_gallery_dl_runtime()
+    try:
+        runpy.run_module("gallery_dl", run_name="__main__", alter_sys=True)
+    finally:
+        reset_gallery_dl_runtime()
 
 
 class PlaylistProgressCollector:
@@ -416,7 +445,7 @@ def run_gallery_dl_resolver(download_url_override=None, cookie_file_path_overrid
                     sys.argv = gallery_dl_args(url, cookie_file_path=cookie_file_path, resolve=True)
                     try:
                         with contextlib.redirect_stdout(captured):
-                            runpy.run_module("gallery_dl", run_name="__main__", alter_sys=True)
+                            run_gallery_dl_module()
                     except SystemExit as exc:
                         if exc.code not in (None, 0):
                             raise RuntimeError(f"gallery-dl resolver exited with {exc.code}")
@@ -490,7 +519,7 @@ def run_gallery_dl_flow(download_url_override=None, selection_range_override=Non
                 )
                 print(f"[palladium] running gallery-dl for selected range: {selection_range}")
                 try:
-                    runpy.run_module("gallery_dl", run_name="__main__", alter_sys=True)
+                    run_gallery_dl_module()
                     exit_code = 0
                 except KeyboardInterrupt:
                     cancelled = True

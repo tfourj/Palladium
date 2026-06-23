@@ -354,14 +354,19 @@ struct DownloadTabView: View {
                 }
             }
             .safeAreaInset(edge: .bottom) {
-                Button("Download \(selectedGalleryItemIndices.count) Image\(selectedGalleryItemIndices.count == 1 ? "" : "s")") {
-                    showGalleryPicker = false
-                    onDownloadGallerySelection()
+                VStack(spacing: 0) {
+                    Divider()
+                    Button("Download \(selectedGalleryItemIndices.count) Image\(selectedGalleryItemIndices.count == 1 ? "" : "s")") {
+                        showGalleryPicker = false
+                        onDownloadGallerySelection()
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.blue)
+                    .disabled(selectedGalleryItemIndices.isEmpty)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
                 }
-                .buttonStyle(.borderedProminent)
-                .disabled(selectedGalleryItemIndices.isEmpty)
-                .padding()
-                .background(.bar)
+                .background(Color(uiColor: .systemBackground))
             }
         }
     }
