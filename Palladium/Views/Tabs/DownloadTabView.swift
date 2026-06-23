@@ -287,7 +287,13 @@ struct DownloadTabView: View {
     private var galleryPickerSheet: some View {
         NavigationStack {
             ScrollView {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 104), spacing: 12)], spacing: 12) {
+                LazyVGrid(
+                    columns: [
+                        GridItem(.flexible(), spacing: 14),
+                        GridItem(.flexible(), spacing: 14)
+                    ],
+                    spacing: 14
+                ) {
                     ForEach(galleryItems) { item in
                         Button {
                             if selectedGalleryItemIndices.contains(item.index) {
@@ -302,16 +308,18 @@ struct DownloadTabView: View {
                                 } placeholder: {
                                     ZStack { Color.secondary.opacity(0.15); ProgressView() }
                                 }
-                                .frame(height: 104)
                                 .frame(maxWidth: .infinity)
+                                .aspectRatio(1, contentMode: .fit)
                                 .clipShape(RoundedRectangle(cornerRadius: 8))
 
                                 Text(item.title)
                                     .font(.caption2)
-                                    .lineLimit(2)
+                                    .lineLimit(1)
                                     .frame(maxWidth: .infinity, alignment: .leading)
                             }
                             .padding(6)
+                            .background(cardBackground)
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
                             .overlay(alignment: .topTrailing) {
                                 Image(systemName: selectedGalleryItemIndices.contains(item.index) ? "checkmark.circle.fill" : "circle")
                                     .font(.title3)
@@ -323,7 +331,8 @@ struct DownloadTabView: View {
                         .buttonStyle(.plain)
                     }
                 }
-                .padding()
+                .padding(.horizontal, 16)
+                .padding(.vertical)
             }
             .navigationTitle("Select Images")
             .toolbar {

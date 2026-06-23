@@ -144,7 +144,7 @@ extension ContentView {
 
     var shouldOfferPhotosAction: Bool {
         guard let result = completedDownloadResult else { return false }
-        return !result.isCollection
+        return !result.items.isEmpty
     }
 
     var downloadCompleteSummaryText: String {
