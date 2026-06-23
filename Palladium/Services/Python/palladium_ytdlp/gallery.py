@@ -87,17 +87,30 @@ GALLERY_IMAGE_EXTENSIONS = {
     ".webp",
 }
 
+GALLERY_AUDIO_URL_HINTS = (
+    "audio_mpeg",
+    "audio/mp",
+    "mime_type=audio",
+    "mime_type%3daudio",
+    "music",
+)
+
 
 def gallery_item_media_type(url):
     try:
-        path = urllib.parse.unquote(urllib.parse.urlparse(url).path)
+        parsed = urllib.parse.urlparse(url)
+        path = urllib.parse.unquote(parsed.path)
         extension = os.path.splitext(path)[1].lower()
+        decoded_url = urllib.parse.unquote(url).lower()
     except Exception:
         extension = ""
+        decoded_url = str(url).lower()
     if extension in GALLERY_AUDIO_EXTENSIONS:
         return "audio"
     if extension in GALLERY_IMAGE_EXTENSIONS:
         return "image"
+    if any(hint in decoded_url for hint in GALLERY_AUDIO_URL_HINTS):
+        return "audio"
     return "file"
 
 
