@@ -28,6 +28,11 @@ struct DownloadTabView: View {
     let onSelectHistoryEntry: (LinkHistoryEntry) -> Void
     let onDeleteHistoryEntry: (LinkHistoryEntry) -> Void
     let onCopyHistoryLink: (String) -> Void
+    let galleryItems: [GalleryItem]
+    @Binding var selectedGalleryItemIndices: Set<Int>
+    @Binding var showGalleryPicker: Bool
+    let isResolvingGallery: Bool
+    let onDownloadGallerySelection: () -> Void
     @State private var showHistorySheet = false
     @State private var showDownloadOptions = false
 
@@ -179,19 +184,21 @@ struct DownloadTabView: View {
 
                         if showDownloadOptions {
                             VStack(spacing: 8) {
-                                downloadOptionToggle(
-                                    title: String(localized: "download.options.playlist.title"),
-                                    subtitle: String(localized: "download.options.playlist.help"),
-                                    isOn: $downloadPlaylist
-                                )
+                                if selectedPreset != .images {
+                                    downloadOptionToggle(
+                                        title: String(localized: "download.options.playlist.title"),
+                                        subtitle: String(localized: "download.options.playlist.help"),
+                                        isOn: $downloadPlaylist
+                                    )
 
-                                subtitleDownloadOptionRow
+                                    subtitleDownloadOptionRow
 
-                                downloadOptionToggle(
-                                    title: String(localized: "download.options.thumbnail.title"),
-                                    subtitle: String(localized: "download.options.thumbnail.help"),
-                                    isOn: $embedThumbnail
-                                )
+                                    downloadOptionToggle(
+                                        title: String(localized: "download.options.thumbnail.title"),
+                                        subtitle: String(localized: "download.options.thumbnail.help"),
+                                        isOn: $embedThumbnail
+                                    )
+                                }
 
                                 cookieSelectionRow
                             }
@@ -266,10 +273,79 @@ struct DownloadTabView: View {
         .sheet(isPresented: $showHistorySheet) {
             historySheet
         }
+        .sheet(isPresented: $showGalleryPicker) {
+            galleryPickerSheet
+        }
         .onChange(of: isRunning) { _, running in
             guard running, showDownloadOptions else { return }
             withAnimation(.easeInOut(duration: 0.16)) {
                 showDownloadOptions = false
+            }
+        }
+    }
+
+    private var galleryPickerSheet: some View {
+        NavigationStack {
+            ScrollView {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 104), spacing: 12)], spacing: 12) {
+                    ForEach(galleryItems) { item in
+                        Button {
+                            if selectedGalleryItemIndices.contains(item.index) {
+                                selectedGalleryItemIndices.remove(item.index)
+                            } else {
+                                selectedGalleryItemIndices.insert(item.index)
+                            }
+                        } label: {
+                            VStack(alignment: .leading, spacing: 6) {
+                                AsyncImage(url: URL(string: item.url)) { image in
+                                    image.resizable().scaledToFill()
+                                } placeholder: {
+                                    ZStack { Color.secondary.opacity(0.15); ProgressView() }
+                                }
+                                .frame(height: 104)
+                                .frame(maxWidth: .infinity)
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
+
+                                Text(item.title)
+                                    .font(.caption2)
+                                    .lineLimit(2)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            }
+                            .padding(6)
+                            .overlay(alignment: .topTrailing) {
+                                Image(systemName: selectedGalleryItemIndices.contains(item.index) ? "checkmark.circle.fill" : "circle")
+                                    .font(.title3)
+                                    .foregroundStyle(selectedGalleryItemIndices.contains(item.index) ? .blue : .secondary)
+                                    .padding(5)
+                            }
+                            .overlay(RoundedRectangle(cornerRadius: 10).stroke(selectedGalleryItemIndices.contains(item.index) ? Color.blue : .clear, lineWidth: 2))
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding()
+            }
+            .navigationTitle("Select Images")
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel") { showGalleryPicker = false }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(selectedGalleryItemIndices.count == galleryItems.count ? "Deselect All" : "Select All") {
+                        selectedGalleryItemIndices = selectedGalleryItemIndices.count == galleryItems.count
+                            ? [] : Set(galleryItems.map(\.index))
+                    }
+                }
+            }
+            .safeAreaInset(edge: .bottom) {
+                Button("Download \(selectedGalleryItemIndices.count) Image\(selectedGalleryItemIndices.count == 1 ? "" : "s")") {
+                    showGalleryPicker = false
+                    onDownloadGallerySelection()
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(selectedGalleryItemIndices.isEmpty)
+                .padding()
+                .background(.bar)
             }
         }
     }
@@ -787,6 +863,8 @@ struct DownloadTabView: View {
             return .indigo
         case .autoVideo:
             return .blue
+        case .images:
+            return .purple
         }
     }
 }

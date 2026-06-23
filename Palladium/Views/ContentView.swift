@@ -151,12 +151,18 @@ struct ContentView: View {
     @State var ffmpegProgressDurationSeconds: Double?
     @State var pendingDownloadProgressLine = ""
     @State var isInstallingPackagesDuringDownload = false
+    @State var galleryDownloadExpectedCount = 0
+    @State var galleryDownloadCompletedCount = 0
     @State var pendingConsoleChunks = ""
     @State var isConsoleFlushScheduled = false
     @State var keyboardDismissTapInstalled = false
     @State var showShareSheetDownloadPicker = false
     @State var shareSheetURL = ""
     @State var lastConsumedShortcutRequestID: UUID?
+    @State var galleryItems: [GalleryItem] = []
+    @State var selectedGalleryItemIndices = Set<Int>()
+    @State var showGalleryPicker = false
+    @State var isResolvingGallery = false
 
     init() {
         let rememberPreset = Self.loadRememberSelectedPreset()
@@ -230,7 +236,12 @@ struct ContentView: View {
                     historyEntries: linkHistoryEntries,
                     onSelectHistoryEntry: handleHistoryEntrySelection,
                     onDeleteHistoryEntry: removeHistoryEntry,
-                    onCopyHistoryLink: copyHistoryLink
+                    onCopyHistoryLink: copyHistoryLink,
+                    galleryItems: galleryItems,
+                    selectedGalleryItemIndices: $selectedGalleryItemIndices,
+                    showGalleryPicker: $showGalleryPicker,
+                    isResolvingGallery: isResolvingGallery,
+                    onDownloadGallerySelection: { runDownloadFlow(gallerySelectionOverride: selectedGalleryItemIndices) }
                 )
                 .tabItem {
                     Label(String(localized: "tab.download"), systemImage: "arrow.down.circle")
