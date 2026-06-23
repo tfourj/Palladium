@@ -357,7 +357,7 @@ def ensure_gallery_dl_installed(install_target, package_source):
 
 
 def gallery_dl_args(url, cookie_file_path=None, destination=None, selection_range=None, resolve=False, report_progress=False):
-    args = ["gallery-dl", "--config-ignore", "--no-colors"]
+    args = ["gallery-dl", "--config-ignore", "--no-colors", "--verbose"]
     if cookie_file_path:
         if os.path.isfile(cookie_file_path):
             args.extend(["--cookies", cookie_file_path])
