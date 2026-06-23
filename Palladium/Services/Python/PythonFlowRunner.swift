@@ -2,6 +2,20 @@ import Foundation
 import PythonKit
 import Darwin
 
+struct GalleryItem: Identifiable, Hashable, Sendable {
+    let index: Int
+    let url: String
+    let title: String
+
+    var id: Int { index }
+}
+
+struct GalleryResolution: Sendable {
+    let items: [GalleryItem]
+    let outputText: String
+    let success: Bool
+}
+
 enum PythonFlowRunner {
     private static var insertedScriptDirectories = Set<String>()
 
@@ -42,6 +56,52 @@ enum PythonFlowRunner {
                         liveLogArgument,
                         packageSourceJSON
                     ]
+                )
+                payload = String(result) ?? ""
+            } catch {
+                payload = fallbackPythonErrorPayload(error)
+            }
+            return decodeDownloadPayload(payload)
+        }
+    }
+
+    static func resolveGallery(
+        url: String,
+        cookieFilePath: String?,
+        packageSourceJSON: String,
+        liveLogFD: Int32?
+    ) async -> GalleryResolution {
+        await runOnPythonThread {
+            do {
+                let module = try loadYtDlpModule()
+                let function = try pythonMember(module, named: "run_gallery_dl_resolver")
+                let liveLogArgument: PythonObject = liveLogFD.map { PythonObject(Int($0)) } ?? Python.None
+                let result = try function.throwing.dynamicallyCall(
+                    withArguments: [url, cookieFilePath ?? "", liveLogArgument, packageSourceJSON]
+                )
+                return decodeGalleryResolution(String(result) ?? "")
+            } catch {
+                return GalleryResolution(items: [], outputText: String(describing: error), success: false)
+            }
+        }
+    }
+
+    static func executeGalleryDownloadFlow(
+        url: String,
+        selectionRange: String,
+        cookieFilePath: String?,
+        runOutputDir: String,
+        packageSourceJSON: String,
+        liveLogFD: Int32?
+    ) async -> PythonFlowOutcome {
+        await runOnPythonThread {
+            let payload: String
+            do {
+                let module = try loadYtDlpModule()
+                let function = try pythonMember(module, named: "run_gallery_dl_flow")
+                let liveLogArgument: PythonObject = liveLogFD.map { PythonObject(Int($0)) } ?? Python.None
+                let result = try function.throwing.dynamicallyCall(
+                    withArguments: [url, selectionRange, cookieFilePath ?? "", runOutputDir, liveLogArgument, packageSourceJSON]
                 )
                 payload = String(result) ?? ""
             } catch {
@@ -222,6 +282,24 @@ enum PythonFlowRunner {
         )
     }
 
+    private static func decodeGalleryResolution(_ payload: String) -> GalleryResolution {
+        guard let data = payload.data(using: .utf8),
+              let result = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] else {
+            return GalleryResolution(items: [], outputText: payload, success: false)
+        }
+        let items = ((result["items"] as? [[String: Any]]) ?? []).compactMap { item -> GalleryItem? in
+            guard let index = item["index"] as? Int,
+                  let url = item["url"] as? String,
+                  let title = item["title"] as? String else { return nil }
+            return GalleryItem(index: index, url: url, title: title)
+        }
+        return GalleryResolution(
+            items: items,
+            outputText: result["output"] as? String ?? "",
+            success: result["success"] as? Bool ?? false
+        )
+    }
+
     private static func decodePackagePayload(_ payload: String) -> PythonFlowOutcome {
         guard let data = payload.data(using: .utf8),
               let result = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] else {
@@ -294,16 +372,16 @@ enum PythonFlowRunner {
         )
     }
 
-    private static func runOnPythonThread(
-        _ work: @escaping @Sendable () -> PythonFlowOutcome
-    ) async -> PythonFlowOutcome {
+    private static func runOnPythonThread<T: Sendable>(
+        _ work: @escaping @Sendable () -> T
+    ) async -> T {
         await PythonExecutor.shared.run(work)
     }
 
     private static func normalizedVersions(from value: Any?) -> [String: String] {
         guard let raw = value as? [String: Any] else { return [:] }
         var result: [String: String] = [:]
-        for key in ["yt-dlp", "yt-dlp-apple-webkit-jsi", "pip"] {
+        for key in ["yt-dlp", "yt-dlp-apple-webkit-jsi", "gallery-dl", "pip"] {
             guard let item = raw[key] else { continue }
             let versionText = String(describing: item).trimmingCharacters(in: .whitespacesAndNewlines)
             if !versionText.isEmpty {
@@ -316,7 +394,7 @@ enum PythonFlowRunner {
     private static func normalizedAvailableVersions(from value: Any?) -> [String: [String]] {
         guard let raw = value as? [String: Any] else { return [:] }
         var result: [String: [String]] = [:]
-        for key in ["yt-dlp", "yt-dlp-apple-webkit-jsi", "pip"] {
+        for key in ["yt-dlp", "yt-dlp-apple-webkit-jsi", "gallery-dl", "pip"] {
             guard let list = raw[key] as? [Any] else { continue }
             let values = list.map { String(describing: $0).trimmingCharacters(in: .whitespacesAndNewlines) }
                 .filter { !$0.isEmpty }
