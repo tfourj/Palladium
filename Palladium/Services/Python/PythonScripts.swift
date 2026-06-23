@@ -8,9 +8,13 @@ enum PythonScripts {
         "palladium_ytdlp/entrypoints.py",
         "palladium_ytdlp/ffmpeg_bridge.py",
         "palladium_ytdlp/files.py",
+        "palladium_ytdlp/gallery.py",
+        "palladium_ytdlp/maintenance.py",
         "palladium_ytdlp/packages.py",
+        "palladium_ytdlp/runtime.py",
         "palladium_ytdlp/shared.py",
         "palladium_ytdlp/webkit_jsi.py",
+        "palladium_ytdlp/ytdlp.py",
     ]
 
     static let ytDlpScriptURL = stagePythonScripts().appendingPathComponent("yt_dlp_flow.py")

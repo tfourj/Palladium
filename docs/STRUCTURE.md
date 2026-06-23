@@ -101,12 +101,16 @@ Palladium/
 | `Services/Python/yt_dlp_flow.py` | Python flow that invokes yt-dlp for downloads. |
 | `Services/Python/palladium_ytdlp/__init__.py` | Python package marker and exports. |
 | `Services/Python/palladium_ytdlp/args.py` | Builds yt-dlp command arguments. |
-| `Services/Python/palladium_ytdlp/entrypoints.py` | Python entry points for yt-dlp and gallery-dl downloads, gallery resolution, and package maintenance. |
+| `Services/Python/palladium_ytdlp/entrypoints.py` | Stable public Python entry point facade used by Swift. |
 | `Services/Python/palladium_ytdlp/ffmpeg_bridge.py` | Connects Python download work to FFmpeg. |
 | `Services/Python/palladium_ytdlp/files.py` | Download file and path helpers. |
+| `Services/Python/palladium_ytdlp/gallery.py` | gallery-dl installation, resolution, and download flows. |
+| `Services/Python/palladium_ytdlp/maintenance.py` | Python runtime package maintenance flow. |
 | `Services/Python/palladium_ytdlp/packages.py` | Python package installation and source helpers. |
+| `Services/Python/palladium_ytdlp/runtime.py` | Runtime reset, module invalidation, and cancellation helpers. |
 | `Services/Python/palladium_ytdlp/shared.py` | Shared Python helpers and constants. |
 | `Services/Python/palladium_ytdlp/webkit_jsi.py` | WebKit JavaScript integration used by yt-dlp. |
+| `Services/Python/palladium_ytdlp/ytdlp.py` | yt-dlp download flow and playlist progress tracking. |
 
 ### Resources
 
