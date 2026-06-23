@@ -3,6 +3,7 @@ name: Build Palladium .ipa (Unsigned)
 on:
   push:
     branches: [main]
+    tags: ["*"]
     paths:
       - ".github/workflows/build_ipa.yml"
       - "Frameworks/**"
