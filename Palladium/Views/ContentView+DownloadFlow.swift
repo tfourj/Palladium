@@ -635,6 +635,10 @@ extension ContentView {
         if isPackageRunning {
             let presetToUse = shareSheetDownloadMode == .ask ? nil : shareSheetDownloadMode.preset ?? .autoVideo
             queuePendingSharedDownload(sharedLink, preset: presetToUse)
+            if shareSheetDownloadMode == .ask {
+                shareSheetURL = sharedLink
+                showShareSheetDownloadPicker = true
+            }
             return
         }
 
