@@ -50,6 +50,16 @@ class PackageSourceModeTests(unittest.TestCase):
         self.assertNotIn("--pre", args)
         self.assertIn("yt-dlp", args)
 
+    def test_gallery_dl_is_managed_with_other_runtime_packages(self):
+        packages, cleanup = build_package_install_plan(
+            {"gallery-dl": "1.0"},
+            {"gallery-dl": ["2.0"]},
+            package_source=parse_package_source(json.dumps({"mode": "stable"})),
+        )
+
+        self.assertEqual(packages, ["gallery-dl==2.0"])
+        self.assertEqual(cleanup, ["gallery-dl"])
+
     def test_custom_specs_pass_through_without_rewriting(self):
         source = parse_package_source(json.dumps({
             "mode": "custom",
@@ -64,7 +74,7 @@ class PackageSourceModeTests(unittest.TestCase):
             "yt-dlp==2026.1",
             "yt-dlp-apple-webkit-jsi @ https://example.com/webkit.whl",
         ])
-        self.assertEqual(cleanup, ["yt-dlp", "yt-dlp-apple-webkit-jsi"])
+        self.assertEqual(cleanup, ["yt-dlp", "yt-dlp-apple-webkit-jsi", "gallery-dl"])
 
     def test_custom_source_skips_webkit_patch(self):
         custom_source = parse_package_source(json.dumps({"mode": "custom"}))

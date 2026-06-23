@@ -165,6 +165,8 @@ def package_marker_paths(package_name):
     candidates = [import_name, f"{import_name}.py"]
     if normalized_name == "yt-dlp-apple-webkit-jsi":
         candidates.append(WEBKIT_JSI_API_PACKAGE_RELATIVE_PATH)
+    if normalized_name == "gallery-dl":
+        candidates.append("gallery_dl")
     return tuple(candidates)
 
 

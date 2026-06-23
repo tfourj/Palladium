@@ -23,6 +23,7 @@ enum PackageSourceDefaults {
     static let customSpecs = """
     yt-dlp
     yt-dlp-apple-webkit-jsi
+    gallery-dl
     pip
     """
 }
