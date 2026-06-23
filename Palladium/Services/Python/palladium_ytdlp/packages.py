@@ -368,7 +368,7 @@ def parse_package_source(source_json=None):
     source["mode"] = mode
     source["custom_specs"] = specs
     source["allow_prereleases"] = mode == "nightly"
-    source["skip_webkit_patch"] = mode == "custom"
+    source["skip_webkit_patch"] = mode == "custom" or bool(parsed.get("disable_webkit_jsi_patch"))
     return source
 
 

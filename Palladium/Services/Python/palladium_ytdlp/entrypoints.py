@@ -1,5 +1,6 @@
 import contextlib
 import io
+import importlib
 import json
 import logging
 import os
@@ -74,6 +75,30 @@ def run_gallery_dl_module():
         runpy.run_module("gallery_dl", run_name="__main__", alter_sys=True)
     finally:
         reset_gallery_dl_runtime()
+
+
+def invalidate_runtime_package_modules():
+    prefixes = ("yt_dlp", "yt_dlp_plugins")
+    webkit_jsi_loaded = any(
+        name == "yt_dlp_plugins.webkit_jsi" or name.startswith("yt_dlp_plugins.webkit_jsi.")
+        for name in sys.modules
+    )
+    if webkit_jsi_loaded:
+        print("[palladium] restart required to refresh loaded webkit jsi runtime")
+        return True
+
+    stale_modules = [
+        name
+        for name in sys.modules
+        if any(name == prefix or name.startswith(f"{prefix}.") for prefix in prefixes)
+    ]
+
+    for name in stale_modules:
+        sys.modules.pop(name, None)
+
+    importlib.invalidate_caches()
+    print(f"[palladium] invalidated {len(stale_modules)} cached yt-dlp runtime module(s)")
+    return False
 
 
 class PlaylistProgressCollector:
@@ -796,7 +821,7 @@ def run_yt_dlp_flow(
                 )
 
             if package_source.get("skip_webkit_patch"):
-                print("[palladium] skipping webkit patch for custom package source")
+                print("[palladium] skipping webkit patch by configuration")
             else:
                 raise_if_cancel_requested(cancel_file_path, "[palladium] cancellation requested before webkit patch")
                 ensure_safe_webkit_jsi_runtime(install_target)
@@ -1029,6 +1054,7 @@ def run_package_maintenance(action, custom_versions_json=None, live_log_fd_overr
     available_versions = {}
     versions = {}
     cancelled = False
+    restart_required = False
     install_target = os.environ.get("PALLADIUM_PYTHON_PACKAGES")
     cancel_file_path = os.environ.get("PALLADIUM_CANCEL_FILE", "").strip()
     live_log_stream = open_live_log_stream(live_log_fd_override)
@@ -1081,8 +1107,14 @@ def run_package_maintenance(action, custom_versions_json=None, live_log_fd_overr
             if custom_versions:
                 print(f"[palladium] custom package versions requested: {custom_versions}")
 
-            if action == "update":
-                if updates_available or bool(custom_versions) or package_source.get("mode") == "custom":
+            if action in ("update", "reinstall"):
+                should_install = (
+                    action == "reinstall"
+                    or updates_available
+                    or bool(custom_versions)
+                    or package_source.get("mode") == "custom"
+                )
+                if should_install:
                     raise_if_cancel_requested(cancel_file_path, "[palladium] package action cancelled before pip startup")
                     pip_main = ensure_pip_entrypoint(install_target)
                     if pip_main is not None:
@@ -1093,18 +1125,26 @@ def run_package_maintenance(action, custom_versions_json=None, live_log_fd_overr
                                 pip_main=pip_main,
                                 allow_prereleases=bool(package_source.get("allow_prereleases")),
                             )
-                            packages, cleanup_packages = build_package_install_plan(
-                                installed_versions,
-                                indexed_versions,
-                                custom_versions=custom_versions,
-                                package_source=package_source,
-                            )
+                            if action == "reinstall":
+                                if package_source.get("mode") == "custom":
+                                    packages = list(package_source.get("custom_specs") or [])
+                                else:
+                                    packages = ["yt-dlp", "yt-dlp-apple-webkit-jsi"]
+                                cleanup_packages = ["yt-dlp", "yt-dlp-apple-webkit-jsi"]
+                            else:
+                                packages, cleanup_packages = build_package_install_plan(
+                                    installed_versions,
+                                    indexed_versions,
+                                    custom_versions=custom_versions,
+                                    package_source=package_source,
+                                )
 
                             if not packages:
                                 print("[palladium] no package installs required")
                                 pip_exit_code = 0
                             else:
                                 pip_attempted = True
+                                restart_required = invalidate_runtime_package_modules() or restart_required
                                 if install_target:
                                     stale_removed = 0
                                     for package_name in cleanup_packages:
@@ -1136,7 +1176,7 @@ def run_package_maintenance(action, custom_versions_json=None, live_log_fd_overr
                 print(f"[palladium] post-update updates summary: {updates_summary}")
 
             if package_source.get("skip_webkit_patch"):
-                print("[palladium] skipping webkit patch for custom package source")
+                print("[palladium] skipping webkit patch by configuration")
             else:
                 raise_if_cancel_requested(cancel_file_path, "[palladium] package action cancelled before webkit patch")
                 ensure_safe_webkit_jsi_runtime(install_target)
@@ -1164,5 +1204,6 @@ def run_package_maintenance(action, custom_versions_json=None, live_log_fd_overr
         "updates_summary": updates_summary,
         "versions": versions,
         "available_versions": available_versions,
+        "restart_required": restart_required,
         "output": output.getvalue(),
     })

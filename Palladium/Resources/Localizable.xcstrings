@@ -2505,6 +2505,86 @@
         }
       }
     },
+    "settings.advanced.disable_webkit_jsi_patch" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disable WebKit JSI patch"
+          }
+        }
+      }
+    },
+    "settings.advanced.disable_webkit_jsi_patch.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prevents Palladium from modifying the yt-dlp-apple-webkit-jsi runtime after installation or update."
+          }
+        }
+      }
+    },
+    "settings.advanced.subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Runtime compatibility controls"
+          }
+        }
+      }
+    },
+    "settings.advanced.reinstall" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reinstall packages"
+          }
+        }
+      }
+    },
+    "settings.advanced.reinstall_prompt.message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reinstall yt-dlp and WebKit JSI now so the installed runtime uses this setting."
+          }
+        }
+      }
+    },
+    "settings.advanced.reinstall_prompt.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reinstall packages?"
+          }
+        }
+      }
+    },
+    "settings.advanced.restart_required" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restart Palladium to apply the WebKit JSI patch setting safely."
+          }
+        }
+      }
+    },
+    "settings.advanced.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Advanced"
+          }
+        }
+      }
+    },
     "settings.after_download.subtitle" : {
       "localizations" : {
         "en" : {

@@ -72,6 +72,7 @@ Palladium/
 | `Views/Tabs/ConsoleTabView.swift` | In-app log console. |
 | `Views/Tabs/SettingsTabView.swift` | Settings tab container and navigation. |
 | `Views/Tabs/Settings/AfterDownloadSettingsView.swift` | Post-download settings screen. |
+| `Views/Tabs/Settings/AdvancedSettingsView.swift` | Advanced runtime settings screen. |
 | `Views/Tabs/Settings/AppearanceSettingsView.swift` | Appearance settings screen. |
 | `Views/Tabs/Settings/CookiesSettingsView.swift` | Cookie settings screen. |
 | `Views/Tabs/Settings/DownloadArgumentsSettingsView.swift` | Custom yt-dlp argument settings screen. |

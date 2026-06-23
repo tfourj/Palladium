@@ -242,7 +242,8 @@ enum PythonFlowRunner {
                 ytDlpExitCode: nil,
                 updatesAvailable: nil,
                 updatesSummary: nil,
-                availableVersions: nil
+                availableVersions: nil,
+                restartRequired: false
             )
         }
 
@@ -279,7 +280,8 @@ enum PythonFlowRunner {
             ytDlpExitCode: ytExitCode,
             updatesAvailable: nil,
             updatesSummary: nil,
-            availableVersions: nil
+            availableVersions: nil,
+            restartRequired: false
         )
     }
 
@@ -323,7 +325,8 @@ enum PythonFlowRunner {
                 ytDlpExitCode: nil,
                 updatesAvailable: nil,
                 updatesSummary: nil,
-                availableVersions: nil
+                availableVersions: nil,
+                restartRequired: false
             )
         }
 
@@ -333,6 +336,7 @@ enum PythonFlowRunner {
         let cancelled = result["cancelled"] as? Bool ?? false
         let updatesAvailable = result["updates_available"] as? Bool ?? false
         let updatesSummary = result["updates_summary"] as? String ?? "Not checked yet."
+        let restartRequired = result["restart_required"] as? Bool ?? false
         let output = result["output"] as? String ?? ""
         let versions = normalizedVersions(from: result["versions"])
         let availableVersions = normalizedAvailableVersions(from: result["available_versions"])
@@ -371,7 +375,8 @@ enum PythonFlowRunner {
             ytDlpExitCode: nil,
             updatesAvailable: updatesAvailable,
             updatesSummary: updatesSummary,
-            availableVersions: availableVersions
+            availableVersions: availableVersions,
+            restartRequired: restartRequired
         )
     }
 
@@ -481,6 +486,7 @@ struct PythonFlowOutcome: Sendable {
     let updatesAvailable: Bool?
     let updatesSummary: String?
     let availableVersions: [String: [String]]?
+    let restartRequired: Bool
 }
 
 struct PlaylistProgressSnapshot: Sendable {

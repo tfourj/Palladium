@@ -65,6 +65,7 @@ extension ContentView {
         defaults.set(autoUpdatePackagesOnLaunch, forKey: Self.autoUpdatePackagesOnLaunchDefaultsKey)
         defaults.set(packageSourceMode.rawValue, forKey: Self.packageSourceModeDefaultsKey)
         defaults.set(customPackageSpecsText, forKey: Self.customPackageSpecsDefaultsKey)
+        defaults.set(disableWebKitJSIPatch, forKey: Self.disableWebKitJSIPatchDefaultsKey)
     }
 
     static func loadSelectedPreset(rememberSelection: Bool) -> DownloadPreset {
@@ -348,5 +349,9 @@ extension ContentView {
             return PackageSourceDefaults.customSpecs
         }
         return value
+    }
+
+    static func loadDisableWebKitJSIPatch() -> Bool {
+        UserDefaults.standard.bool(forKey: disableWebKitJSIPatchDefaultsKey)
     }
 }

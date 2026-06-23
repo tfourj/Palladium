@@ -25,7 +25,7 @@ extension ContentView {
         isAutomaticallyUpdatingPackages = isAutomaticUpdate
         syncIdleTimerDisabled()
         switch action {
-        case "update":
+        case "update", "reinstall":
             packageStatusText = "updating"
         case "index_versions":
             packageStatusText = "indexing"
@@ -106,6 +106,10 @@ extension ContentView {
             if let availableVersions = outcome.availableVersions {
                 self.availablePackageVersions = availableVersions
             }
+            if outcome.restartRequired {
+                alertMessage = String(localized: "settings.advanced.restart_required")
+                showAlert = true
+            }
             self.hasLoadedPackageStatus = true
             Self.logger.info("package flow finished with status: \(outcome.statusText, privacy: .public)")
 
@@ -134,6 +138,15 @@ extension ContentView {
             return
         }
         runPackageFlow(action: "update")
+    }
+
+    func reinstallPackages() {
+        if packageSourceMode == .custom && customPackageSpecs().isEmpty {
+            alertMessage = String(localized: "packages.source.custom_specs.empty")
+            showAlert = true
+            return
+        }
+        runPackageFlow(action: "reinstall")
     }
 
     func updatePackagesWithCustomVersions(
@@ -172,7 +185,8 @@ extension ContentView {
         let specs = customPackageSpecs()
         let payload: [String: Any] = [
             "mode": packageSourceMode.rawValue,
-            "custom_specs": specs
+            "custom_specs": specs,
+            "disable_webkit_jsi_patch": disableWebKitJSIPatch
         ]
         guard let data = try? JSONSerialization.data(withJSONObject: payload),
               let text = String(data: data, encoding: .utf8) else {
