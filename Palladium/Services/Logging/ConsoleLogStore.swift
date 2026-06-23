@@ -152,7 +152,9 @@ final class ConsoleLogStore: ObservableObject {
 
         if line.contains("[download]")
             || line.contains("[Merger]")
-            || line.contains("[ExtractAudio]") {
+            || line.contains("[ExtractAudio]")
+            || line.contains("[palladium][gallery-progress]")
+            || lower.contains("gallery-dl") {
             return .download
         }
 
