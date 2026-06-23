@@ -19,7 +19,7 @@ extension ContentView {
         updateWhenAvailable: Bool = false,
         isAutomaticUpdate: Bool = false
     ) {
-        guard !isRunning, !isPackageRunning else { return }
+        guard !isRunning, !isPackageRunning, !isCheckingDownloadAllowlist, !isResolvingGallery else { return }
 
         isPackageRunning = true
         isAutomaticallyUpdatingPackages = isAutomaticUpdate
@@ -114,6 +114,10 @@ extension ContentView {
             Self.logger.info("package flow finished with status: \(outcome.statusText, privacy: .public)")
 
             if action == "check", updateWhenAvailable, updatesAvailable {
+                guard !isRunning, !isCheckingDownloadAllowlist, !isResolvingGallery else {
+                    appendConsoleText("[palladium] automatic package update skipped because a download is starting\n")
+                    return
+                }
                 runPackageFlow(action: "update", isAutomaticUpdate: true)
             }
 

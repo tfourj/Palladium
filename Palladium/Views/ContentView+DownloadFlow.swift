@@ -127,6 +127,10 @@ extension ContentView {
     func startDownloadFromSharedURL(_ sharedLink: String, preset: DownloadPreset) {
         selectedTab = .download
         urlText = sharedLink
+        guard !isPackageRunning else {
+            appendConsoleText("[palladium] shared-link download received while package task is running\n")
+            return
+        }
         appendConsoleText("[palladium] starting shared-link download preset=\(preset.rawValue)\n")
         runDownloadFlow(urlOverride: sharedLink, presetOverride: preset)
     }
@@ -438,7 +442,7 @@ extension ContentView {
     }
 
     func resolveGallerySelection(url: String) {
-        guard !isResolvingGallery, !isRunning else { return }
+        guard !isResolvingGallery, !isRunning, !isPackageRunning else { return }
         isResolvingGallery = true
         isRunning = true
         syncIdleTimerDisabled()
@@ -591,8 +595,8 @@ extension ContentView {
         urlText = sharedLink
         appendConsoleText("[palladium] app opened via url scheme. link: \(sharedLink)\n")
 
-        if isRunning {
-            appendConsoleText("[palladium] download already running, queued link in input field only\n")
+        if isRunning || isPackageRunning {
+            appendConsoleText("[palladium] download or package task already running, queued link in input field only\n")
             return
         }
 
