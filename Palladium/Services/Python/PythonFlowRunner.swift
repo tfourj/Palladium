@@ -14,6 +14,7 @@ struct GalleryResolution: Sendable {
     let items: [GalleryItem]
     let outputText: String
     let success: Bool
+    let errorMessage: String?
 }
 
 enum PythonFlowRunner {
@@ -81,7 +82,7 @@ enum PythonFlowRunner {
                 )
                 return decodeGalleryResolution(String(result) ?? "")
             } catch {
-                return GalleryResolution(items: [], outputText: String(describing: error), success: false)
+                return GalleryResolution(items: [], outputText: String(describing: error), success: false, errorMessage: nil)
             }
         }
     }
@@ -285,7 +286,7 @@ enum PythonFlowRunner {
     private static func decodeGalleryResolution(_ payload: String) -> GalleryResolution {
         guard let data = payload.data(using: .utf8),
               let result = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] else {
-            return GalleryResolution(items: [], outputText: payload, success: false)
+            return GalleryResolution(items: [], outputText: payload, success: false, errorMessage: nil)
         }
         let items = ((result["items"] as? [[String: Any]]) ?? []).compactMap { item -> GalleryItem? in
             guard let index = item["index"] as? Int,
@@ -296,7 +297,8 @@ enum PythonFlowRunner {
         return GalleryResolution(
             items: items,
             outputText: result["output"] as? String ?? "",
-            success: result["success"] as? Bool ?? false
+            success: result["success"] as? Bool ?? false,
+            errorMessage: result["error_message"] as? String
         )
     }
 

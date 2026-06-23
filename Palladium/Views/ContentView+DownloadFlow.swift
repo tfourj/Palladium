@@ -455,11 +455,15 @@ extension ContentView {
                     showGalleryPicker = true
                     progressText = String(localized: "download.prompt.idle")
                 } else {
-                    downloadErrorText = resolution.outputText.isEmpty ? "No images were found for this URL." : resolution.outputText
+                    downloadErrorText = galleryResolutionErrorText(for: resolution)
                     progressText = String(localized: "download.status.failed")
                 }
             }
         }
+    }
+
+    func galleryResolutionErrorText(for resolution: GalleryResolution) -> String {
+        resolution.errorMessage ?? String(localized: "gallery.error.no_images_found")
     }
 
     func gallerySelectionRange(_ indices: Set<Int>) -> String {

@@ -1037,6 +1037,16 @@
         }
       }
     },
+    "gallery.error.no_images_found" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No images were found for this URL."
+          }
+        }
+      }
+    },
     "download.fallback_title" : {
       "localizations" : {
         "en" : {

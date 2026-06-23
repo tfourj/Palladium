@@ -415,6 +415,15 @@ def gallery_item_title(url, index):
     return f"Image {index}"
 
 
+def gallery_resolution_error_message(output):
+    """Return gallery-dl's last user-facing error line without diagnostic noise."""
+    for line in reversed(output.splitlines()):
+        match = re.match(r"^\[[^\]]+\]\[error\]\s+(.+)$", line.strip(), re.IGNORECASE)
+        if match:
+            return match.group(1)
+    return None
+
+
 def run_gallery_dl_resolver(download_url_override=None, cookie_file_path_override=None, live_log_fd_override=None, package_source_json_override=None):
     output = TailBuffer()
     console_stdout = sys.__stdout__ if sys.__stdout__ is not None else None
@@ -429,6 +438,8 @@ def run_gallery_dl_resolver(download_url_override=None, cookie_file_path_overrid
     pip_attempted = False
     pip_exit_code = None
     success = False
+    captured_output = ""
+    gallery_dl_exit_code = None
 
     with contextlib.redirect_stdout(Tee(output, console_stdout, live_log_stream)), contextlib.redirect_stderr(Tee(output, console_stderr, live_log_stream)):
         try:
@@ -448,21 +459,24 @@ def run_gallery_dl_resolver(download_url_override=None, cookie_file_path_overrid
                             run_gallery_dl_module()
                     except SystemExit as exc:
                         if exc.code not in (None, 0):
-                            raise RuntimeError(f"gallery-dl resolver exited with {exc.code}")
+                            gallery_dl_exit_code = exc.code
+                    finally:
+                        captured_output = captured.getvalue()
 
-                    seen = set()
-                    for line in captured.getvalue().splitlines():
-                        candidate = line.strip()
-                        if not candidate.startswith(("http://", "https://")) or candidate in seen:
-                            continue
-                        seen.add(candidate)
-                        items.append({
-                            "index": len(items) + 1,
-                            "url": candidate,
-                            "title": gallery_item_title(candidate, len(items) + 1),
-                        })
-                    success = bool(items)
-                    print(f"[palladium] gallery-dl resolved {len(items)} image item(s)")
+                    if gallery_dl_exit_code is None:
+                        seen = set()
+                        for line in captured_output.splitlines():
+                            candidate = line.strip()
+                            if not candidate.startswith(("http://", "https://")) or candidate in seen:
+                                continue
+                            seen.add(candidate)
+                            items.append({
+                                "index": len(items) + 1,
+                                "url": candidate,
+                                "title": gallery_item_title(candidate, len(items) + 1),
+                            })
+                        success = bool(items)
+                        print(f"[palladium] gallery-dl resolved {len(items)} image item(s)")
         except Exception:
             print("[palladium] gallery-dl resolution failed")
             traceback.print_exc()
@@ -471,12 +485,17 @@ def run_gallery_dl_resolver(download_url_override=None, cookie_file_path_overrid
             if live_log_stream is not None:
                 live_log_stream.flush()
 
+    error_message = None
+    if not success:
+        error_message = gallery_resolution_error_message("\n".join((captured_output, output.getvalue())))
+
     return json.dumps({
         "success": success,
         "pip_attempted": pip_attempted,
         "pip_exit_code": pip_exit_code,
         "items": items,
         "output": output.getvalue(),
+        "error_message": error_message,
     })
 
 
