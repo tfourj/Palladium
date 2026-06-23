@@ -4,6 +4,7 @@ struct DownloadModesSettingsView: View {
     @Binding var selectedPreset: DownloadPreset
     @Binding var rememberSelectedPreset: Bool
     @Binding var shareSheetDownloadMode: ShareSheetDownloadMode
+    @Binding var showCustomDownloadOption: Bool
 
     let isRunning: Bool
 
@@ -11,7 +12,7 @@ struct DownloadModesSettingsView: View {
         Form {
             Section {
                 Picker("settings.ui.modes.normal", selection: $selectedPreset) {
-                    ForEach(DownloadPreset.allCases) { preset in
+                    ForEach(DownloadPreset.pickerCases(showCustomOption: showCustomDownloadOption)) { preset in
                         Text(preset.title).tag(preset)
                     }
                 }
@@ -19,6 +20,9 @@ struct DownloadModesSettingsView: View {
                 .disabled(isRunning)
 
                 Toggle("settings.ui.modes.remember", isOn: $rememberSelectedPreset)
+                    .disabled(isRunning)
+
+                Toggle("settings.download_modes.show_custom", isOn: $showCustomDownloadOption)
                     .disabled(isRunning)
             } header: {
                 Text("settings.download_modes.main_section")
@@ -28,7 +32,7 @@ struct DownloadModesSettingsView: View {
 
             Section {
                 Picker("settings.ui.modes.share_sheet", selection: $shareSheetDownloadMode) {
-                    ForEach(ShareSheetDownloadMode.allCases) { mode in
+                    ForEach(ShareSheetDownloadMode.pickerCases(showCustomOption: showCustomDownloadOption)) { mode in
                         Text(mode.title).tag(mode)
                     }
                 }

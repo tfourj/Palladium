@@ -35,6 +35,7 @@ extension ContentView {
             defaults.removeObject(forKey: Self.presetDefaultsKey)
         }
         defaults.set(customArgsText, forKey: Self.customArgsDefaultsKey)
+        defaults.set(showCustomDownloadOption, forKey: Self.showCustomDownloadOptionDefaultsKey)
         defaults.set(extraArgsText, forKey: Self.extraArgsDefaultsKey)
         defaults.set(afterDownloadBehavior.rawValue, forKey: Self.afterDownloadBehaviorDefaultsKey)
         defaults.removeObject(forKey: Self.askUserAfterDownloadDefaultsKey)
@@ -97,6 +98,10 @@ extension ContentView {
 
     static func loadCustomArgs() -> String {
         UserDefaults.standard.string(forKey: customArgsDefaultsKey) ?? ""
+    }
+
+    static func loadShowCustomDownloadOption() -> Bool {
+        UserDefaults.standard.bool(forKey: showCustomDownloadOptionDefaultsKey)
     }
 
     static func loadExtraArgs() -> String {
@@ -308,7 +313,7 @@ extension ContentView {
     }
 
     static func loadCachedPackageVersionsText() -> String {
-        let fallback = "yt-dlp: unknown\nyt-dlp-apple-webkit-jsi: unknown"
+        let fallback = "yt-dlp: unknown\nyt-dlp-apple-webkit-jsi: unknown\ngallery-dl: unknown"
         guard let value = UserDefaults.standard.string(forKey: packageVersionsTextDefaultsKey),
               !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             return fallback

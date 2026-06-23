@@ -17,13 +17,14 @@ struct PackagesSettingsView: View {
     let onRefreshVersions: () -> Void
     let onCancel: () -> Void
     let onUpdatePackages: () -> Void
-    let onCustomUpdatePackages: (_ ytDlpVersion: String?, _ webkitJSIVersion: String?, _ pipVersion: String?) -> Void
+    let onCustomUpdatePackages: (_ ytDlpVersion: String?, _ webkitJSIVersion: String?, _ galleryDLVersion: String?, _ pipVersion: String?) -> Void
     let onFetchPackageVersions: () -> Void
     let onAppear: () -> Void
 
     @State private var showCustomVersionSheet = false
     @State private var ytDlpSelectedVersion = Self.latestSelectionToken
     @State private var webkitJSISelectedVersion = Self.latestSelectionToken
+    @State private var galleryDLSelectedVersion = Self.latestSelectionToken
     @State private var pipSelectedVersion = Self.latestSelectionToken
 
     var body: some View {
@@ -136,6 +137,11 @@ struct PackagesSettingsView: View {
                         selection: $webkitJSISelectedVersion
                     )
                     packageVersionPicker(
+                        title: "gallery-dl",
+                        packageName: "gallery-dl",
+                        selection: $galleryDLSelectedVersion
+                    )
+                    packageVersionPicker(
                         title: "pip",
                         packageName: "pip",
                         selection: $pipSelectedVersion
@@ -179,12 +185,14 @@ struct PackagesSettingsView: View {
                     Button("common.apply") {
                         let ytDlp = normalizeSelection(ytDlpSelectedVersion)
                         let webkit = normalizeSelection(webkitJSISelectedVersion)
+                        let galleryDL = normalizeSelection(galleryDLSelectedVersion)
                         let pip = normalizeSelection(pipSelectedVersion)
-                        onCustomUpdatePackages(ytDlp, webkit, pip)
+                        onCustomUpdatePackages(ytDlp, webkit, galleryDL, pip)
                         showCustomVersionSheet = false
                     }
                     .disabled(normalizeSelection(ytDlpSelectedVersion) == nil &&
                               normalizeSelection(webkitJSISelectedVersion) == nil &&
+                              normalizeSelection(galleryDLSelectedVersion) == nil &&
                               normalizeSelection(pipSelectedVersion) == nil)
                 }
             }
@@ -195,6 +203,7 @@ struct PackagesSettingsView: View {
     private func prepareCustomVersionEditor() {
         ytDlpSelectedVersion = Self.latestSelectionToken
         webkitJSISelectedVersion = Self.latestSelectionToken
+        galleryDLSelectedVersion = Self.latestSelectionToken
         pipSelectedVersion = Self.latestSelectionToken
     }
 

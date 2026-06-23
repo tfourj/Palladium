@@ -144,7 +144,7 @@ extension ContentView {
 
     var shouldOfferPhotosAction: Bool {
         guard let result = completedDownloadResult else { return false }
-        return !result.isCollection
+        return !result.items.isEmpty
     }
 
     var downloadCompleteSummaryText: String {
@@ -246,6 +246,48 @@ extension ContentView {
             } catch {
                 await MainActor.run {
                     reopenDownloadActionAfterAlert = true
+                    alertMessage = String(format: String(localized: "photos.error.save"), error.localizedDescription)
+                    showAlert = true
+                }
+            }
+        }
+    }
+
+    func saveDownloadedFilesToPhotos(_ urls: [URL]) {
+        Task {
+            var compatible: [(URL, PhotosMediaType)] = []
+            for url in urls {
+                let state = await evaluatePhotosCompatibility(for: url)
+                if case .compatible(let mediaType) = state {
+                    compatible.append((url, mediaType))
+                }
+            }
+            guard !compatible.isEmpty else {
+                await MainActor.run {
+                    reopenDownloadActionAfterAlert = true
+                    alertMessage = String(localized: "photos.error.single_only")
+                    showAlert = true
+                }
+                return
+            }
+            let permission = await PHPhotoLibrary.requestAuthorization(for: .addOnly)
+            guard permission == .authorized || permission == .limited else { return }
+            do {
+                try await PHPhotoLibrary.shared().performChanges {
+                    for (url, mediaType) in compatible {
+                        switch mediaType {
+                        case .image:
+                            PHAssetChangeRequest.creationRequestForAssetFromImage(atFileURL: url)
+                        case .video:
+                            PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: url)
+                        }
+                    }
+                }
+                await MainActor.run {
+                    showTemporaryToast(String(localized: "photos.toast.saved"))
+                }
+            } catch {
+                await MainActor.run {
                     alertMessage = String(format: String(localized: "photos.error.save"), error.localizedDescription)
                     showAlert = true
                 }
@@ -378,6 +420,10 @@ extension ContentView {
     func handlePostDownloadAction(_ action: PostDownloadAction, for result: CompletedDownloadResult) {
         switch action {
         case .saveToPhotos:
+            if result.isCollection {
+                saveDownloadedFilesToPhotos(result.items)
+                return
+            }
             guard let fileURL = result.photosCandidateURL else {
                 reopenDownloadActionAfterAlert = true
                 alertMessage = String(localized: "photos.error.single_only")

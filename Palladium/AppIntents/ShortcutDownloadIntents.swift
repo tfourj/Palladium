@@ -5,6 +5,7 @@ enum ShortcutDownloadPreset: String, Codable, CaseIterable, AppEnum {
     case video
     case audio
     case mute
+    case images
     case custom
 
     static var typeDisplayRepresentation: TypeDisplayRepresentation {
@@ -16,6 +17,7 @@ enum ShortcutDownloadPreset: String, Codable, CaseIterable, AppEnum {
             .video: DisplayRepresentation(title: LocalizedStringResource("download.preset.video")),
             .audio: DisplayRepresentation(title: LocalizedStringResource("download.preset.audio")),
             .mute: DisplayRepresentation(title: LocalizedStringResource("download.preset.mute")),
+            .images: DisplayRepresentation(title: LocalizedStringResource("download.preset.images")),
             .custom: DisplayRepresentation(title: LocalizedStringResource("common.custom"))
         ]
     }
@@ -28,6 +30,8 @@ enum ShortcutDownloadPreset: String, Codable, CaseIterable, AppEnum {
             return .audio
         case .mute:
             return .mute
+        case .images:
+            return .images
         case .custom:
             return .custom
         }

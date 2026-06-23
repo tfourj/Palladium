@@ -7,6 +7,7 @@ struct DownloadTabView: View {
     @Binding var statusText: String
     @Binding var urlText: String
     @Binding var selectedPreset: DownloadPreset
+    @Binding var showCustomDownloadOption: Bool
     @Binding var downloadPlaylist: Bool
     @Binding var downloadSubtitles: Bool
     @Binding var embedThumbnail: Bool
@@ -28,6 +29,11 @@ struct DownloadTabView: View {
     let onSelectHistoryEntry: (LinkHistoryEntry) -> Void
     let onDeleteHistoryEntry: (LinkHistoryEntry) -> Void
     let onCopyHistoryLink: (String) -> Void
+    let galleryItems: [GalleryItem]
+    @Binding var selectedGalleryItemIndices: Set<Int>
+    @Binding var showGalleryPicker: Bool
+    let isResolvingGallery: Bool
+    let onDownloadGallerySelection: () -> Void
     @State private var showHistorySheet = false
     @State private var showDownloadOptions = false
 
@@ -134,7 +140,7 @@ struct DownloadTabView: View {
 
                 VStack(spacing: 10) {
                     Picker("download.preset.title", selection: $selectedPreset) {
-                        ForEach(DownloadPreset.allCases) { preset in
+                        ForEach(DownloadPreset.pickerCases(showCustomOption: showCustomDownloadOption)) { preset in
                             Text(preset.title).tag(preset)
                         }
                     }
@@ -179,19 +185,21 @@ struct DownloadTabView: View {
 
                         if showDownloadOptions {
                             VStack(spacing: 8) {
-                                downloadOptionToggle(
-                                    title: String(localized: "download.options.playlist.title"),
-                                    subtitle: String(localized: "download.options.playlist.help"),
-                                    isOn: $downloadPlaylist
-                                )
+                                if selectedPreset != .images {
+                                    downloadOptionToggle(
+                                        title: String(localized: "download.options.playlist.title"),
+                                        subtitle: String(localized: "download.options.playlist.help"),
+                                        isOn: $downloadPlaylist
+                                    )
 
-                                subtitleDownloadOptionRow
+                                    subtitleDownloadOptionRow
 
-                                downloadOptionToggle(
-                                    title: String(localized: "download.options.thumbnail.title"),
-                                    subtitle: String(localized: "download.options.thumbnail.help"),
-                                    isOn: $embedThumbnail
-                                )
+                                    downloadOptionToggle(
+                                        title: String(localized: "download.options.thumbnail.title"),
+                                        subtitle: String(localized: "download.options.thumbnail.help"),
+                                        isOn: $embedThumbnail
+                                    )
+                                }
 
                                 cookieSelectionRow
                             }
@@ -266,12 +274,158 @@ struct DownloadTabView: View {
         .sheet(isPresented: $showHistorySheet) {
             historySheet
         }
+        .sheet(isPresented: $showGalleryPicker) {
+            galleryPickerSheet
+        }
         .onChange(of: isRunning) { _, running in
             guard running, showDownloadOptions else { return }
             withAnimation(.easeInOut(duration: 0.16)) {
                 showDownloadOptions = false
             }
         }
+    }
+
+    private var galleryPickerSheet: some View {
+        NavigationStack {
+            ScrollView {
+                LazyVGrid(
+                    columns: [
+                        GridItem(.flexible(), spacing: 14),
+                        GridItem(.flexible(), spacing: 14)
+                    ],
+                    spacing: 14
+                ) {
+                    ForEach(galleryItems) { item in
+                        Button {
+                            if selectedGalleryItemIndices.contains(item.index) {
+                                selectedGalleryItemIndices.remove(item.index)
+                            } else {
+                                selectedGalleryItemIndices.insert(item.index)
+                            }
+                        } label: {
+                            VStack(alignment: .leading, spacing: 6) {
+                                ZStack {
+                                    Color.secondary.opacity(0.15)
+                                    if item.mediaType == .image {
+                                        AsyncImage(url: URL(string: item.url)) { image in
+                                            image
+                                                .resizable()
+                                                .scaledToFit()
+                                                .padding(4)
+                                        } placeholder: {
+                                            ProgressView()
+                                        }
+                                    } else {
+                                        VStack(spacing: 8) {
+                                            Image(systemName: item.placeholderIconName)
+                                                .font(.system(size: 34, weight: .semibold))
+                                            Text(item.mediaLabel)
+                                                .font(.caption)
+                                                .fontWeight(.semibold)
+                                        }
+                                        .foregroundStyle(.secondary)
+                                    }
+                                }
+                                .frame(maxWidth: .infinity)
+                                .aspectRatio(1, contentMode: .fit)
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
+
+                                Label(item.mediaLabel, systemImage: item.placeholderIconName)
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(1)
+
+                                Text(item.title)
+                                    .font(.caption2)
+                                    .lineLimit(1)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .frame(height: 16, alignment: .leading)
+                            }
+                            .padding(6)
+                            .background(cardBackground)
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                            .overlay(alignment: .topTrailing) {
+                                Image(systemName: selectedGalleryItemIndices.contains(item.index) ? "checkmark.circle.fill" : "circle")
+                                    .font(.title3)
+                                    .foregroundStyle(selectedGalleryItemIndices.contains(item.index) ? .blue : .secondary)
+                                    .padding(5)
+                            }
+                            .overlay(RoundedRectangle(cornerRadius: 10).stroke(selectedGalleryItemIndices.contains(item.index) ? Color.blue : .clear, lineWidth: 2))
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical)
+            }
+            .navigationTitle(galleryPickerTitle)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel") { showGalleryPicker = false }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(selectedGalleryItemIndices.count == galleryItems.count ? "Deselect All" : "Select All") {
+                        selectedGalleryItemIndices = selectedGalleryItemIndices.count == galleryItems.count
+                            ? [] : Set(galleryItems.map(\.index))
+                    }
+                }
+            }
+            .safeAreaInset(edge: .bottom) {
+                VStack(spacing: 0) {
+                    Divider()
+                    Button(galleryDownloadButtonTitle) {
+                        showGalleryPicker = false
+                        onDownloadGallerySelection()
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.blue)
+                    .disabled(selectedGalleryItemIndices.isEmpty)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                }
+                .background(Color(uiColor: .systemBackground))
+            }
+        }
+    }
+
+    private var galleryPickerTitle: String {
+        switch galleryVisibleMediaType {
+        case .some(.image):
+            return "Select Images"
+        case .some(.audio):
+            return "Select Audio"
+        case .some(.file):
+            return "Select Files"
+        case nil:
+            return "Select Items"
+        }
+    }
+
+    private var galleryDownloadButtonTitle: String {
+        let count = selectedGalleryItemIndices.count
+        switch gallerySelectedMediaType {
+        case .some(.image):
+            return "Download \(count) Image\(count == 1 ? "" : "s")"
+        case .some(.audio):
+            return "Download \(count) Audio"
+        case .some(.file):
+            return "Download \(count) File\(count == 1 ? "" : "s")"
+        case nil:
+            return "Download \(count) Item\(count == 1 ? "" : "s")"
+        }
+    }
+
+    private var galleryVisibleMediaType: GalleryItem.MediaType? {
+        commonMediaType(in: galleryItems)
+    }
+
+    private var gallerySelectedMediaType: GalleryItem.MediaType? {
+        commonMediaType(in: galleryItems.filter { selectedGalleryItemIndices.contains($0.index) })
+    }
+
+    private func commonMediaType(in items: [GalleryItem]) -> GalleryItem.MediaType? {
+        guard let first = items.first?.mediaType else { return nil }
+        return items.allSatisfy { $0.mediaType == first } ? first : nil
     }
 
     private func pasteOrClearURL() {
@@ -787,6 +941,8 @@ struct DownloadTabView: View {
             return .indigo
         case .autoVideo:
             return .blue
+        case .images:
+            return .purple
         }
     }
 }

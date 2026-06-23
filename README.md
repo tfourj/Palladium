@@ -4,7 +4,7 @@
 
 # Palladium
 
-On-device iOS media downloader powered by `yt-dlp`, `ffmpeg`, and `PythonKit`.
+On-device iOS media downloader powered by `yt-dlp`, `gallery-dl`, `ffmpeg`, and `PythonKit`.
 
 </div>
 
@@ -22,7 +22,7 @@ On-device iOS media downloader powered by `yt-dlp`, `ffmpeg`, and `PythonKit`.
 ## What It Does
 
 - Downloads media directly on iPhone and iPad
-- Uses `yt-dlp` for extraction and `ffmpeg` for processing
+- Uses `yt-dlp` for media extraction, `gallery-dl` for images, and `ffmpeg` for processing
 - Runs Python tooling inside the app
 
 > [!NOTE]
@@ -50,6 +50,7 @@ Other documentation: [docs/ALLOWLISTS.md](docs/ALLOWLISTS.md) for custom URL all
 
 
 - [`yt-dlp`](https://github.com/yt-dlp/yt-dlp)
+- [`gallery-dl`](https://github.com/mikf/gallery-dl)
 - [`yt-dlp-apple-webkit-jsi`](https://github.com/grqz/yt-dlp-apple-webkit-jsi)
 - [`ffmpeg`](https://ffmpeg.org/)
 - [`PythonKit`](https://github.com/pvieito/PythonKit)

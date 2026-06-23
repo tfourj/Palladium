@@ -1,9 +1,9 @@
 import os
 
 MAX_CAPTURED_OUTPUT_CHARS = 250000
-TRACKED_PACKAGES = ("yt-dlp", "yt-dlp-apple-webkit-jsi", "pip")
+TRACKED_PACKAGES = ("yt-dlp", "yt-dlp-apple-webkit-jsi", "gallery-dl", "pip")
 DISPLAY_PACKAGES = TRACKED_PACKAGES
-CLEANUP_PACKAGES = ("yt-dlp", "yt-dlp-apple-webkit-jsi")
+CLEANUP_PACKAGES = ("yt-dlp", "yt-dlp-apple-webkit-jsi", "gallery-dl")
 WEBKIT_JSI_API_PACKAGE_RELATIVE_PATH = os.path.join(
     "yt_dlp_plugins", "webkit_jsi", "lib", "api.py"
 )
@@ -90,6 +90,10 @@ class Tee:
                 except Exception:
                     if stream in self.streams:
                         self.streams.remove(stream)
+
+    def reconfigure(self, **_options):
+        """Support tools that configure standard streams while output is being mirrored."""
+        return None
 
 
 def open_live_log_stream(live_fd_value):

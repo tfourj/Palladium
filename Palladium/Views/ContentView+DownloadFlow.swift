@@ -35,13 +35,6 @@ extension ContentView {
                     preset: .autoVideo
                 )
                 shareSheetModeButton(
-                    title: String(localized: "download.mode.audio.title"),
-                    subtitle: String(localized: "download.mode.audio.help"),
-                    icon: "music.note",
-                    color: .green,
-                    preset: .audio
-                )
-                shareSheetModeButton(
                     title: String(localized: "download.mode.mute.title"),
                     subtitle: String(localized: "download.mode.mute.help"),
                     icon: "speaker.slash",
@@ -49,12 +42,28 @@ extension ContentView {
                     preset: .mute
                 )
                 shareSheetModeButton(
-                    title: String(localized: "common.custom"),
-                    subtitle: String(localized: "download.mode.custom.help"),
-                    icon: "slider.horizontal.3",
-                    color: .indigo,
-                    preset: .custom
+                    title: String(localized: "download.mode.audio.title"),
+                    subtitle: String(localized: "download.mode.audio.help"),
+                    icon: "music.note",
+                    color: .green,
+                    preset: .audio
                 )
+                shareSheetModeButton(
+                    title: String(localized: "download.preset.images"),
+                    subtitle: "Download pictures with gallery-dl",
+                    icon: "photo.on.rectangle",
+                    color: .purple,
+                    preset: .images
+                )
+                if showCustomDownloadOption {
+                    shareSheetModeButton(
+                        title: String(localized: "common.custom"),
+                        subtitle: String(localized: "download.mode.custom.help"),
+                        icon: "slider.horizontal.3",
+                        color: .indigo,
+                        preset: .custom
+                    )
+                }
             }
             .padding(.horizontal)
 
@@ -118,8 +127,44 @@ extension ContentView {
     func startDownloadFromSharedURL(_ sharedLink: String, preset: DownloadPreset) {
         selectedTab = .download
         urlText = sharedLink
+        guard !isPackageRunning else {
+            queuePendingSharedDownload(sharedLink, preset: preset)
+            return
+        }
         appendConsoleText("[palladium] starting shared-link download preset=\(preset.rawValue)\n")
         runDownloadFlow(urlOverride: sharedLink, presetOverride: preset)
+    }
+
+    func queuePendingSharedDownload(_ sharedLink: String, preset: DownloadPreset?) {
+        let trimmedLink = sharedLink.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedLink.isEmpty else { return }
+
+        pendingSharedDownloadURL = trimmedLink
+        pendingSharedDownloadPreset = preset
+        urlText = trimmedLink
+        appendConsoleText("[palladium] shared-link download queued until package task finishes\n")
+    }
+
+    func consumePendingSharedDownloadIfNeeded() {
+        guard !isPackageRunning, !isRunning, !isCheckingDownloadAllowlist else { return }
+
+        let sharedLink = pendingSharedDownloadURL.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !sharedLink.isEmpty else { return }
+
+        let preset = pendingSharedDownloadPreset
+        pendingSharedDownloadURL = ""
+        pendingSharedDownloadPreset = nil
+
+        selectedTab = .download
+        urlText = sharedLink
+        appendConsoleText("[palladium] starting queued shared-link download\n")
+
+        if let preset {
+            startDownloadFromSharedURL(sharedLink, preset: preset)
+        } else {
+            shareSheetURL = sharedLink
+            showShareSheetDownloadPicker = true
+        }
     }
 
     func handlePastedURL(_ pastedURL: String) {
@@ -136,7 +181,8 @@ extension ContentView {
         urlOverride: String? = nil,
         presetOverride: DownloadPreset? = nil,
         afterDownloadOverride: AfterDownloadBehavior? = nil,
-        allowlistChecked: Bool = false
+        allowlistChecked: Bool = false,
+        gallerySelectionOverride: Set<Int>? = nil
     ) {
         guard !isRunning, !isPackageRunning, !isCheckingDownloadAllowlist else { return }
         let targetURL = (urlOverride ?? urlText).trimmingCharacters(in: .whitespacesAndNewlines)
@@ -164,11 +210,19 @@ extension ContentView {
                     urlOverride: targetURL,
                     presetOverride: presetOverride,
                     afterDownloadOverride: afterDownloadOverride,
-                    allowlistChecked: true
+                    allowlistChecked: true,
+                    gallerySelectionOverride: gallerySelectionOverride
                 )
             }
             return
         }
+
+        let selectedDownloadPreset = presetOverride ?? selectedPreset
+        if selectedDownloadPreset == .images, gallerySelectionOverride == nil {
+            resolveGallerySelection(url: targetURL)
+            return
+        }
+        guard selectedDownloadPreset != .images || !(gallerySelectionOverride ?? []).isEmpty else { return }
 
         consoleLogStore.clearAll()
         downloadErrorText = nil
@@ -202,12 +256,18 @@ extension ContentView {
         ffmpegProgressDurationSeconds = nil
         pendingDownloadProgressLine = ""
         isInstallingPackagesDuringDownload = false
+        galleryDownloadExpectedCount = selectedDownloadPreset == .images ? gallerySelectionOverride?.count ?? 0 : 0
+        galleryDownloadCompletedCount = 0
+        galleryDownloadOutputDirectory = selectedDownloadPreset == .images ? runOutputURL.path : nil
+        galleryDownloadedOutputPaths = []
 
         let logPipe = Pipe()
         let readHandle = logPipe.fileHandleForReading
         let writeFD = logPipe.fileHandleForWriting.fileDescriptor
         let liveLogFD: Int32? = writeFD
-        let presetAtStart = (presetOverride ?? selectedPreset).pythonValue
+        let presetAtStart = selectedDownloadPreset.pythonValue
+        let gallerySelectionRangeAtStart = gallerySelectionOverride.map(gallerySelectionRange)
+        let gallerySelectionCountAtStart = gallerySelectionOverride?.count ?? 0
         let extraArgsAtStart = extraArgsText.trimmingCharacters(in: .whitespacesAndNewlines)
         let presetArgsJSONAtStart = buildPresetArgumentsJSON()
         let afterDownloadBehaviorAtStart = afterDownloadOverride ?? afterDownloadBehavior
@@ -250,23 +310,38 @@ extension ContentView {
         if backgroundTaskID != .invalid {
             appendConsoleText("[palladium] background download time requested\n")
         }
+        if selectedDownloadPreset == .images {
+            appendConsoleText("[palladium] gallery-dl download started for \(gallerySelectionCountAtStart) image(s)\n")
+        }
 
         let task = Task {
-            let outcome = await PythonFlowRunner.executeDownloadFlow(
-                url: targetURL,
-                preset: presetAtStart,
-                presetArgsJSON: presetArgsJSONAtStart,
-                extraArgs: extraArgsAtStart,
-                downloadPlaylist: downloadPlaylistAtStart,
-                downloadSubtitles: downloadSubtitlesAtStart,
-                embedThumbnail: embedThumbnailAtStart,
-                autoRetryFailedDownloads: autoRetryFailedDownloadsAtStart,
-                subtitleLanguagePattern: subtitleLanguagePatternAtStart,
-                cookieFilePath: cookieFilePathAtStart,
-                runOutputDir: runOutputURL.path,
-                packageSourceJSON: buildPackageSourceJSON(),
-                liveLogFD: liveLogFD
-            )
+            let outcome: PythonFlowOutcome
+            if selectedDownloadPreset == .images, let gallerySelectionRangeAtStart {
+                outcome = await PythonFlowRunner.executeGalleryDownloadFlow(
+                    url: targetURL,
+                    selectionRange: gallerySelectionRangeAtStart,
+                    cookieFilePath: cookieFilePathAtStart,
+                    runOutputDir: runOutputURL.path,
+                    packageSourceJSON: buildPackageSourceJSON(),
+                    liveLogFD: liveLogFD
+                )
+            } else {
+                outcome = await PythonFlowRunner.executeDownloadFlow(
+                    url: targetURL,
+                    preset: presetAtStart,
+                    presetArgsJSON: presetArgsJSONAtStart,
+                    extraArgs: extraArgsAtStart,
+                    downloadPlaylist: downloadPlaylistAtStart,
+                    downloadSubtitles: downloadSubtitlesAtStart,
+                    embedThumbnail: embedThumbnailAtStart,
+                    autoRetryFailedDownloads: autoRetryFailedDownloadsAtStart,
+                    subtitleLanguagePattern: subtitleLanguagePatternAtStart,
+                    cookieFilePath: cookieFilePathAtStart,
+                    runOutputDir: runOutputURL.path,
+                    packageSourceJSON: buildPackageSourceJSON(),
+                    liveLogFD: liveLogFD
+                )
+            }
 
             FFmpegBridgeControl.setLiveLogFD(nil)
             unsetenv("PALLADIUM_CANCEL_FILE")
@@ -301,6 +376,10 @@ extension ContentView {
             ffmpegProgressDurationSeconds = nil
             pendingDownloadProgressLine = ""
             isInstallingPackagesDuringDownload = false
+            galleryDownloadExpectedCount = 0
+            galleryDownloadCompletedCount = 0
+            galleryDownloadOutputDirectory = nil
+            galleryDownloadedOutputPaths = []
 
             if restoreDownloadDefaults {
                 downloadPlaylist = defaultDownloadPlaylist
@@ -367,7 +446,9 @@ extension ContentView {
 
                 let needsPhotosCompatibilityCheck = afterDownloadBehaviorAtStart == .ask
                     || afterDownloadBehaviorAtStart.postDownloadAction == .saveToPhotos
-                if needsPhotosCompatibilityCheck, let photosCandidateURL = result.photosCandidateURL {
+                if needsPhotosCompatibilityCheck, result.isCollection {
+                    completedPhotosCompatibility = .compatible(.image)
+                } else if needsPhotosCompatibilityCheck, let photosCandidateURL = result.photosCandidateURL {
                     completedPhotosCompatibility = .checking
                     completedPhotosCompatibility = await evaluatePhotosCompatibility(for: photosCandidateURL)
                 } else {
@@ -390,6 +471,60 @@ extension ContentView {
             }
         }
         currentDownloadTask = task
+    }
+
+    func resolveGallerySelection(url: String) {
+        guard !isResolvingGallery, !isRunning, !isPackageRunning else { return }
+        isResolvingGallery = true
+        isRunning = true
+        syncIdleTimerDisabled()
+        statusText = "running"
+        progressText = "Resolving items..."
+        downloadCancelRequested = false
+        appendConsoleText("[palladium] resolving items with gallery-dl\n")
+        let cookieFilePath = useCookies ? resolvedSelectedCookieFilePath() : nil
+        let task = Task {
+            let resolution = await PythonFlowRunner.resolveGallery(
+                url: url,
+                cookieFilePath: cookieFilePath,
+                packageSourceJSON: buildPackageSourceJSON(),
+                liveLogFD: nil
+            )
+            await MainActor.run {
+                isResolvingGallery = false
+                isRunning = false
+                syncIdleTimerDisabled()
+                currentDownloadTask = nil
+                let cancelWasRequested = downloadCancelRequested
+                downloadCancelRequested = false
+                if !resolution.outputText.isEmpty {
+                    appendConsoleText(resolution.outputText.hasSuffix("\n") ? resolution.outputText : resolution.outputText + "\n")
+                }
+                if cancelWasRequested {
+                    statusText = "cancelled"
+                    progressText = String(localized: "download.status.cancelled")
+                } else if resolution.success {
+                    galleryItems = resolution.items
+                    selectedGalleryItemIndices = []
+                    showGalleryPicker = true
+                    statusText = "idle"
+                    progressText = String(localized: "download.prompt.idle")
+                } else {
+                    downloadErrorText = galleryResolutionErrorText(for: resolution)
+                    statusText = "error"
+                    progressText = String(localized: "download.status.failed")
+                }
+            }
+        }
+        currentDownloadTask = task
+    }
+
+    func galleryResolutionErrorText(for resolution: GalleryResolution) -> String {
+        resolution.errorMessage ?? String(localized: "gallery.error.no_items_found")
+    }
+
+    func gallerySelectionRange(_ indices: Set<Int>) -> String {
+        indices.sorted().map(String.init).joined(separator: ",")
     }
 
     func consumePendingShortcutDownloadRequestIfNeeded() {
@@ -497,6 +632,16 @@ extension ContentView {
             return
         }
 
+        if isPackageRunning {
+            let presetToUse = shareSheetDownloadMode == .ask ? nil : shareSheetDownloadMode.preset ?? .autoVideo
+            queuePendingSharedDownload(sharedLink, preset: presetToUse)
+            if shareSheetDownloadMode == .ask {
+                shareSheetURL = sharedLink
+                showShareSheetDownloadPicker = true
+            }
+            return
+        }
+
         if shareSheetDownloadMode == .ask {
             shareSheetURL = sharedLink
             showShareSheetDownloadPicker = true
@@ -546,6 +691,14 @@ extension ContentView {
             return
         }
 
+        if handleGalleryProgressMarkerLine(trimmed) {
+            return
+        }
+
+        if handleGalleryDownloadOutputLine(trimmed) {
+            return
+        }
+
         if handlePackageInstallProgressLine(trimmed) {
             return
         }
@@ -592,6 +745,35 @@ extension ContentView {
             isInstallingPackagesDuringDownload = false
             progressText = String(localized: "download.status.running")
             lastDownloadProgressPercent = nil
+        }
+    }
+
+    private func handleGalleryProgressMarkerLine(_ line: String) -> Bool {
+        guard line.hasPrefix("[palladium][gallery-progress]") else { return false }
+
+        recordGalleryDownloadCompletion(identifier: line)
+        return true
+    }
+
+    private func handleGalleryDownloadOutputLine(_ line: String) -> Bool {
+        guard let outputDirectory = galleryDownloadOutputDirectory,
+              line.hasPrefix(outputDirectory + "/") else {
+            return false
+        }
+
+        recordGalleryDownloadCompletion(identifier: line)
+        return true
+    }
+
+    private func recordGalleryDownloadCompletion(identifier: String) {
+        guard galleryDownloadedOutputPaths.insert(identifier).inserted else { return }
+
+        galleryDownloadCompletedCount += 1
+        if galleryDownloadExpectedCount > 0 {
+            let completed = min(galleryDownloadCompletedCount, galleryDownloadExpectedCount)
+            progressText = "Downloading Gallery \(completed) of \(galleryDownloadExpectedCount)"
+        } else {
+            progressText = "Downloading Gallery"
         }
     }
 

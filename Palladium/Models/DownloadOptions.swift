@@ -4,16 +4,22 @@ enum DownloadPreset: String, Codable, CaseIterable, Identifiable {
     case autoVideo = "auto_video"
     case mute = "mute"
     case audio = "audio"
+    case images = "images"
     case custom = "custom"
 
     var id: String { rawValue }
     var pythonValue: String { rawValue }
+
+    static func pickerCases(showCustomOption: Bool) -> [DownloadPreset] {
+        showCustomOption ? allCases : allCases.filter { $0 != .custom }
+    }
 
     var title: String {
         switch self {
         case .autoVideo: return String(localized: "download.preset.video")
         case .mute: return String(localized: "download.preset.mute")
         case .audio: return String(localized: "download.preset.audio")
+        case .images: return String(localized: "download.preset.images")
         case .custom: return String(localized: "common.custom")
         }
     }
@@ -26,6 +32,8 @@ enum DownloadPreset: String, Codable, CaseIterable, Identifiable {
             return "-f bv/bestvideo --merge-output-format mp4 --remux-video mp4 -S vcodec:h264,lang,quality,res,fps,hdr:12"
         case .audio:
             return "-f ba[acodec^=mp3]/ba/b -x --audio-format mp3"
+        case .images:
+            return ""
         case .custom:
             return ""
         }
@@ -102,8 +110,13 @@ enum ShareSheetDownloadMode: String, Codable, CaseIterable, Identifiable {
     case audio
     case mute
     case custom
+    case images
 
     var id: String { rawValue }
+
+    static func pickerCases(showCustomOption: Bool) -> [ShareSheetDownloadMode] {
+        showCustomOption ? allCases : allCases.filter { $0 != .custom }
+    }
 
     var title: String {
         switch self {
@@ -112,6 +125,7 @@ enum ShareSheetDownloadMode: String, Codable, CaseIterable, Identifiable {
         case .audio: return String(localized: "download.preset.audio")
         case .mute: return String(localized: "download.preset.mute")
         case .custom: return String(localized: "common.custom")
+        case .images: return String(localized: "download.preset.images")
         }
     }
 
@@ -127,6 +141,8 @@ enum ShareSheetDownloadMode: String, Codable, CaseIterable, Identifiable {
             return .mute
         case .custom:
             return .custom
+        case .images:
+            return .images
         }
     }
 }
