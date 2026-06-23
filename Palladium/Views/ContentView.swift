@@ -155,6 +155,8 @@ struct ContentView: View {
     @State var isInstallingPackagesDuringDownload = false
     @State var galleryDownloadExpectedCount = 0
     @State var galleryDownloadCompletedCount = 0
+    @State var galleryDownloadOutputDirectory: String?
+    @State var galleryDownloadedOutputPaths = Set<String>()
     @State var pendingConsoleChunks = ""
     @State var isConsoleFlushScheduled = false
     @State var keyboardDismissTapInstalled = false

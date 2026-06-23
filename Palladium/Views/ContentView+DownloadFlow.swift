@@ -222,6 +222,8 @@ extension ContentView {
         isInstallingPackagesDuringDownload = false
         galleryDownloadExpectedCount = selectedDownloadPreset == .images ? gallerySelectionOverride?.count ?? 0 : 0
         galleryDownloadCompletedCount = 0
+        galleryDownloadOutputDirectory = selectedDownloadPreset == .images ? runOutputURL.path : nil
+        galleryDownloadedOutputPaths = []
 
         let logPipe = Pipe()
         let readHandle = logPipe.fileHandleForReading
@@ -340,6 +342,8 @@ extension ContentView {
             isInstallingPackagesDuringDownload = false
             galleryDownloadExpectedCount = 0
             galleryDownloadCompletedCount = 0
+            galleryDownloadOutputDirectory = nil
+            galleryDownloadedOutputPaths = []
 
             if restoreDownloadDefaults {
                 downloadPlaylist = defaultDownloadPlaylist
@@ -436,10 +440,14 @@ extension ContentView {
     func resolveGallerySelection(url: String) {
         guard !isResolvingGallery, !isRunning else { return }
         isResolvingGallery = true
+        isRunning = true
+        syncIdleTimerDisabled()
+        statusText = "running"
         progressText = "Resolving images…"
+        downloadCancelRequested = false
         appendConsoleText("[palladium] resolving images with gallery-dl\n")
         let cookieFilePath = useCookies ? resolvedSelectedCookieFilePath() : nil
-        Task {
+        let task = Task {
             let resolution = await PythonFlowRunner.resolveGallery(
                 url: url,
                 cookieFilePath: cookieFilePath,
@@ -448,20 +456,31 @@ extension ContentView {
             )
             await MainActor.run {
                 isResolvingGallery = false
+                isRunning = false
+                syncIdleTimerDisabled()
+                currentDownloadTask = nil
+                let cancelWasRequested = downloadCancelRequested
+                downloadCancelRequested = false
                 if !resolution.outputText.isEmpty {
                     appendConsoleText(resolution.outputText.hasSuffix("\n") ? resolution.outputText : resolution.outputText + "\n")
                 }
-                if resolution.success {
+                if cancelWasRequested {
+                    statusText = "cancelled"
+                    progressText = String(localized: "download.status.cancelled")
+                } else if resolution.success {
                     galleryItems = resolution.items
                     selectedGalleryItemIndices = []
                     showGalleryPicker = true
+                    statusText = "idle"
                     progressText = String(localized: "download.prompt.idle")
                 } else {
                     downloadErrorText = galleryResolutionErrorText(for: resolution)
+                    statusText = "error"
                     progressText = String(localized: "download.status.failed")
                 }
             }
         }
+        currentDownloadTask = task
     }
 
     func galleryResolutionErrorText(for resolution: GalleryResolution) -> String {
@@ -630,6 +649,10 @@ extension ContentView {
             return
         }
 
+        if handleGalleryDownloadOutputLine(trimmed) {
+            return
+        }
+
         if handlePackageInstallProgressLine(trimmed) {
             return
         }
@@ -682,14 +705,30 @@ extension ContentView {
     private func handleGalleryProgressMarkerLine(_ line: String) -> Bool {
         guard line.hasPrefix("[palladium][gallery-progress]") else { return false }
 
+        recordGalleryDownloadCompletion(identifier: line)
+        return true
+    }
+
+    private func handleGalleryDownloadOutputLine(_ line: String) -> Bool {
+        guard let outputDirectory = galleryDownloadOutputDirectory,
+              line.hasPrefix(outputDirectory + "/") else {
+            return false
+        }
+
+        recordGalleryDownloadCompletion(identifier: line)
+        return true
+    }
+
+    private func recordGalleryDownloadCompletion(identifier: String) {
+        guard galleryDownloadedOutputPaths.insert(identifier).inserted else { return }
+
         galleryDownloadCompletedCount += 1
         if galleryDownloadExpectedCount > 0 {
             let completed = min(galleryDownloadCompletedCount, galleryDownloadExpectedCount)
-            progressText = "Downloading images \(completed) of \(galleryDownloadExpectedCount)"
+            progressText = "Downloading Gallery \(completed) of \(galleryDownloadExpectedCount)"
         } else {
-            progressText = "Downloading images"
+            progressText = "Downloading Gallery"
         }
-        return true
     }
 
     private func handlePackageInstallProgressLine(_ line: String) -> Bool {

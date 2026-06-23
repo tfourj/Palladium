@@ -39,7 +39,6 @@ from .shared import TRACKED_PACKAGES, TailBuffer, Tee, open_live_log_stream
 from .webkit_jsi import ensure_safe_webkit_jsi_runtime
 
 PLAYLIST_PROGRESS_PREFIX = "[palladium][playlist-progress] "
-GALLERY_PROGRESS_PREFIX = "[palladium][gallery-progress]"
 
 
 class GalleryDLOutputCapture(io.StringIO):
@@ -385,7 +384,7 @@ def ensure_gallery_dl_installed(install_target, package_source):
     return True, exit_code
 
 
-def gallery_dl_args(url, cookie_file_path=None, destination=None, selection_range=None, resolve=False, report_progress=False):
+def gallery_dl_args(url, cookie_file_path=None, destination=None, selection_range=None, resolve=False):
     args = ["gallery-dl", "--config-ignore", "--no-colors", "--verbose"]
     if cookie_file_path:
         if os.path.isfile(cookie_file_path):
@@ -398,8 +397,6 @@ def gallery_dl_args(url, cookie_file_path=None, destination=None, selection_rang
         args.extend(["--destination", destination])
     if selection_range:
         args.extend(["--range", selection_range])
-    if report_progress:
-        args.extend(["--Print", f"after:{GALLERY_PROGRESS_PREFIX}"])
     args.append(url)
     return args
 
@@ -534,7 +531,6 @@ def run_gallery_dl_flow(download_url_override=None, selection_range_override=Non
                     cookie_file_path,
                     run_output_dir,
                     selection_range,
-                    report_progress=True,
                 )
                 print(f"[palladium] running gallery-dl for selected range: {selection_range}")
                 try:
