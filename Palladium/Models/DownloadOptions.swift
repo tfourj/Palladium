@@ -10,6 +10,10 @@ enum DownloadPreset: String, Codable, CaseIterable, Identifiable {
     var id: String { rawValue }
     var pythonValue: String { rawValue }
 
+    static func pickerCases(showCustomOption: Bool) -> [DownloadPreset] {
+        showCustomOption ? allCases : allCases.filter { $0 != .custom }
+    }
+
     var title: String {
         switch self {
         case .autoVideo: return String(localized: "download.preset.video")
@@ -109,6 +113,10 @@ enum ShareSheetDownloadMode: String, Codable, CaseIterable, Identifiable {
     case images
 
     var id: String { rawValue }
+
+    static func pickerCases(showCustomOption: Bool) -> [ShareSheetDownloadMode] {
+        showCustomOption ? allCases : allCases.filter { $0 != .custom }
+    }
 
     var title: String {
         switch self {

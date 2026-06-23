@@ -42,6 +42,7 @@ struct ContentView: View {
 
     static let presetDefaultsKey = "palladium.selectedPreset"
     static let customArgsDefaultsKey = "palladium.customArgs"
+    static let showCustomDownloadOptionDefaultsKey = "palladium.showCustomDownloadOption"
     static let extraArgsDefaultsKey = "palladium.extraArgs"
     static let afterDownloadBehaviorDefaultsKey = "palladium.afterDownloadBehavior"
     static let askUserAfterDownloadDefaultsKey = "palladium.askUserAfterDownload"
@@ -86,6 +87,7 @@ struct ContentView: View {
     @State var downloadErrorText: String?
     @State var selectedPreset: DownloadPreset
     @State var customArgsText: String
+    @State var showCustomDownloadOption: Bool
     @State var extraArgsText: String
     @State var afterDownloadBehavior: AfterDownloadBehavior
     @State var notificationsEnabled: Bool
@@ -166,15 +168,19 @@ struct ContentView: View {
 
     init() {
         let rememberPreset = Self.loadRememberSelectedPreset()
+        let showCustomDownloadOption = Self.loadShowCustomDownloadOption()
+        let selectedPreset = Self.loadSelectedPreset(rememberSelection: rememberPreset)
+        let shareSheetDownloadMode = Self.loadShareSheetDownloadMode()
         _urlText = State(initialValue: Self.isDebuggerAttached() ? "https://www.youtube.com/watch?v=jNQXAC9IVRw" : "")
-        _selectedPreset = State(initialValue: Self.loadSelectedPreset(rememberSelection: rememberPreset))
+        _selectedPreset = State(initialValue: showCustomDownloadOption || selectedPreset != .custom ? selectedPreset : .autoVideo)
         _customArgsText = State(initialValue: Self.loadCustomArgs())
+        _showCustomDownloadOption = State(initialValue: showCustomDownloadOption)
         _extraArgsText = State(initialValue: Self.loadExtraArgs())
         _afterDownloadBehavior = State(initialValue: Self.loadAfterDownloadBehavior())
         _notificationsEnabled = State(initialValue: Self.loadNotificationsEnabled())
         _rememberSelectedPreset = State(initialValue: rememberPreset)
         _autoDownloadOnPaste = State(initialValue: Self.loadAutoDownloadOnPaste())
-        _shareSheetDownloadMode = State(initialValue: Self.loadShareSheetDownloadMode())
+        _shareSheetDownloadMode = State(initialValue: showCustomDownloadOption || shareSheetDownloadMode != .custom ? shareSheetDownloadMode : .ask)
         let restoreDefaults = Self.loadRestoreDownloadDefaults()
         let defPlaylist = Self.loadDefaultDownloadPlaylist()
         let defSubtitles = Self.loadDefaultDownloadSubtitles()
@@ -217,6 +223,7 @@ struct ContentView: View {
                     statusText: $statusText,
                     urlText: $urlText,
                     selectedPreset: $selectedPreset,
+                    showCustomDownloadOption: $showCustomDownloadOption,
                     downloadPlaylist: $downloadPlaylist,
                     downloadSubtitles: $downloadSubtitles,
                     embedThumbnail: $embedThumbnail,
@@ -271,6 +278,7 @@ struct ContentView: View {
                     autoDownloadOnPaste: $autoDownloadOnPaste,
                     autoRetryFailedDownloads: $autoRetryFailedDownloads,
                     detailedProgressEnabled: $detailedProgressEnabled,
+                    showCustomDownloadOption: $showCustomDownloadOption,
                     shareSheetDownloadMode: $shareSheetDownloadMode,
                     linkHistoryEnabled: $linkHistoryEnabled,
                     linkHistoryLimit: $linkHistoryLimit,
@@ -360,6 +368,17 @@ struct ContentView: View {
             persistPreferences()
         }
         .onChange(of: extraArgsText, initial: false) {
+            persistPreferences()
+        }
+        .onChange(of: showCustomDownloadOption, initial: false) {
+            if !showCustomDownloadOption {
+                if selectedPreset == .custom {
+                    selectedPreset = .autoVideo
+                }
+                if shareSheetDownloadMode == .custom {
+                    shareSheetDownloadMode = .ask
+                }
+            }
             persistPreferences()
         }
         .onChange(of: afterDownloadBehavior, initial: false) {

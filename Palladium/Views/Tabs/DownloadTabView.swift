@@ -7,6 +7,7 @@ struct DownloadTabView: View {
     @Binding var statusText: String
     @Binding var urlText: String
     @Binding var selectedPreset: DownloadPreset
+    @Binding var showCustomDownloadOption: Bool
     @Binding var downloadPlaylist: Bool
     @Binding var downloadSubtitles: Bool
     @Binding var embedThumbnail: Bool
@@ -139,7 +140,7 @@ struct DownloadTabView: View {
 
                 VStack(spacing: 10) {
                     Picker("download.preset.title", selection: $selectedPreset) {
-                        ForEach(DownloadPreset.allCases) { preset in
+                        ForEach(DownloadPreset.pickerCases(showCustomOption: showCustomDownloadOption)) { preset in
                             Text(preset.title).tag(preset)
                         }
                     }

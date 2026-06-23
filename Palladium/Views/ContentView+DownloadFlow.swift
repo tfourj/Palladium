@@ -35,18 +35,18 @@ extension ContentView {
                     preset: .autoVideo
                 )
                 shareSheetModeButton(
-                    title: String(localized: "download.mode.audio.title"),
-                    subtitle: String(localized: "download.mode.audio.help"),
-                    icon: "music.note",
-                    color: .green,
-                    preset: .audio
-                )
-                shareSheetModeButton(
                     title: String(localized: "download.mode.mute.title"),
                     subtitle: String(localized: "download.mode.mute.help"),
                     icon: "speaker.slash",
                     color: .orange,
                     preset: .mute
+                )
+                shareSheetModeButton(
+                    title: String(localized: "download.mode.audio.title"),
+                    subtitle: String(localized: "download.mode.audio.help"),
+                    icon: "music.note",
+                    color: .green,
+                    preset: .audio
                 )
                 shareSheetModeButton(
                     title: String(localized: "download.preset.images"),
@@ -55,13 +55,15 @@ extension ContentView {
                     color: .purple,
                     preset: .images
                 )
-                shareSheetModeButton(
-                    title: String(localized: "common.custom"),
-                    subtitle: String(localized: "download.mode.custom.help"),
-                    icon: "slider.horizontal.3",
-                    color: .indigo,
-                    preset: .custom
-                )
+                if showCustomDownloadOption {
+                    shareSheetModeButton(
+                        title: String(localized: "common.custom"),
+                        subtitle: String(localized: "download.mode.custom.help"),
+                        icon: "slider.horizontal.3",
+                        color: .indigo,
+                        preset: .custom
+                    )
+                }
             }
             .padding(.horizontal)
 

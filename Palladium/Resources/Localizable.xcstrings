@@ -1422,7 +1422,17 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Images"
+            "value" : "Gallery"
+          }
+        }
+      }
+    },
+    "settings.download_modes.show_custom" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Custom download option"
           }
         }
       }
