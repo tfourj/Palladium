@@ -60,7 +60,7 @@ struct SettingsTabView: View {
     let onRefreshVersions: () -> Void
     let onCancelPackages: () -> Void
     let onUpdatePackages: () -> Void
-    let onCustomUpdatePackages: (_ ytDlpVersion: String?, _ webkitJSIVersion: String?, _ pipVersion: String?) -> Void
+    let onCustomUpdatePackages: (_ ytDlpVersion: String?, _ webkitJSIVersion: String?, _ galleryDLVersion: String?, _ pipVersion: String?) -> Void
     let onFetchPackageVersions: () -> Void
     let onOpenPackageManager: () -> Void
     let onRefreshStorage: () -> Void

@@ -136,7 +136,12 @@ extension ContentView {
         runPackageFlow(action: "update")
     }
 
-    func updatePackagesWithCustomVersions(_ ytDlpVersion: String?, _ webkitJSIVersion: String?, _ pipVersion: String?) {
+    func updatePackagesWithCustomVersions(
+        _ ytDlpVersion: String?,
+        _ webkitJSIVersion: String?,
+        _ galleryDLVersion: String?,
+        _ pipVersion: String?
+    ) {
         guard packageSourceMode != .custom else { return }
         var customVersions: [String: String] = [:]
         if let ytDlpVersion {
@@ -144,6 +149,9 @@ extension ContentView {
         }
         if let webkitJSIVersion {
             customVersions["yt-dlp-apple-webkit-jsi"] = webkitJSIVersion
+        }
+        if let galleryDLVersion {
+            customVersions["gallery-dl"] = galleryDLVersion
         }
         if let pipVersion {
             customVersions["pip"] = pipVersion

@@ -348,7 +348,8 @@ enum PythonFlowRunner {
 
         var versionLines = [
             "yt-dlp: \(versions["yt-dlp"] ?? "not installed")",
-            "yt-dlp-apple-webkit-jsi: \(versions["yt-dlp-apple-webkit-jsi"] ?? "not installed")"
+            "yt-dlp-apple-webkit-jsi: \(versions["yt-dlp-apple-webkit-jsi"] ?? "not installed")",
+            "gallery-dl: \(versions["gallery-dl"] ?? "not installed")"
         ]
         if let pipVersion = versions["pip"],
            !pipVersion.isEmpty,
