@@ -303,10 +303,16 @@ struct DownloadTabView: View {
                             }
                         } label: {
                             VStack(alignment: .leading, spacing: 6) {
-                                AsyncImage(url: URL(string: item.url)) { image in
-                                    image.resizable().scaledToFill()
-                                } placeholder: {
-                                    ZStack { Color.secondary.opacity(0.15); ProgressView() }
+                                ZStack {
+                                    Color.secondary.opacity(0.15)
+                                    AsyncImage(url: URL(string: item.url)) { image in
+                                        image
+                                            .resizable()
+                                            .scaledToFit()
+                                            .padding(4)
+                                    } placeholder: {
+                                        ProgressView()
+                                    }
                                 }
                                 .frame(maxWidth: .infinity)
                                 .aspectRatio(1, contentMode: .fit)
@@ -316,6 +322,7 @@ struct DownloadTabView: View {
                                     .font(.caption2)
                                     .lineLimit(1)
                                     .frame(maxWidth: .infinity, alignment: .leading)
+                                    .frame(height: 16, alignment: .leading)
                             }
                             .padding(6)
                             .background(cardBackground)
