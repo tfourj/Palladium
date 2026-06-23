@@ -128,11 +128,43 @@ extension ContentView {
         selectedTab = .download
         urlText = sharedLink
         guard !isPackageRunning else {
-            appendConsoleText("[palladium] shared-link download received while package task is running\n")
+            queuePendingSharedDownload(sharedLink, preset: preset)
             return
         }
         appendConsoleText("[palladium] starting shared-link download preset=\(preset.rawValue)\n")
         runDownloadFlow(urlOverride: sharedLink, presetOverride: preset)
+    }
+
+    func queuePendingSharedDownload(_ sharedLink: String, preset: DownloadPreset?) {
+        let trimmedLink = sharedLink.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedLink.isEmpty else { return }
+
+        pendingSharedDownloadURL = trimmedLink
+        pendingSharedDownloadPreset = preset
+        urlText = trimmedLink
+        appendConsoleText("[palladium] shared-link download queued until package task finishes\n")
+    }
+
+    func consumePendingSharedDownloadIfNeeded() {
+        guard !isPackageRunning, !isRunning, !isCheckingDownloadAllowlist else { return }
+
+        let sharedLink = pendingSharedDownloadURL.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !sharedLink.isEmpty else { return }
+
+        let preset = pendingSharedDownloadPreset
+        pendingSharedDownloadURL = ""
+        pendingSharedDownloadPreset = nil
+
+        selectedTab = .download
+        urlText = sharedLink
+        appendConsoleText("[palladium] starting queued shared-link download\n")
+
+        if let preset {
+            startDownloadFromSharedURL(sharedLink, preset: preset)
+        } else {
+            shareSheetURL = sharedLink
+            showShareSheetDownloadPicker = true
+        }
     }
 
     func handlePastedURL(_ pastedURL: String) {
@@ -595,8 +627,14 @@ extension ContentView {
         urlText = sharedLink
         appendConsoleText("[palladium] app opened via url scheme. link: \(sharedLink)\n")
 
-        if isRunning || isPackageRunning {
-            appendConsoleText("[palladium] download or package task already running, queued link in input field only\n")
+        if isRunning {
+            appendConsoleText("[palladium] download already running, queued link in input field only\n")
+            return
+        }
+
+        if isPackageRunning {
+            let presetToUse = shareSheetDownloadMode == .ask ? nil : shareSheetDownloadMode.preset ?? .autoVideo
+            queuePendingSharedDownload(sharedLink, preset: presetToUse)
             return
         }
 

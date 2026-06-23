@@ -164,6 +164,8 @@ struct ContentView: View {
     @State var keyboardDismissTapInstalled = false
     @State var showShareSheetDownloadPicker = false
     @State var shareSheetURL = ""
+    @State var pendingSharedDownloadURL = ""
+    @State var pendingSharedDownloadPreset: DownloadPreset?
     @State var lastConsumedShortcutRequestID: UUID?
     @State var galleryItems: [GalleryItem] = []
     @State var selectedGalleryItemIndices = Set<Int>()
@@ -539,6 +541,7 @@ struct ContentView: View {
         }
         .onChange(of: isPackageRunning, initial: true) { _, _ in
             syncIdleTimerDisabled()
+            consumePendingSharedDownloadIfNeeded()
         }
         .onChange(of: scenePhase, initial: true) { _, newPhase in
             guard newPhase == .active else { return }
