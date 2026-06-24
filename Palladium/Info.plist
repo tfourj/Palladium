@@ -6,6 +6,8 @@
 	<false/>
 	<key>APP_FINAL</key>
 	<string>$(APP_FINAL)</string>
+	<key>GIT_COMMIT_ID</key>
+	<string></string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

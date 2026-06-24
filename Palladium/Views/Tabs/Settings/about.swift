@@ -10,13 +10,13 @@ struct SettingsAboutView: View {
     
     private var appVersion: String {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
-        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "Unknown"
+        let commitID = Bundle.main.infoDictionary?["GIT_COMMIT_ID"] as? String ?? "Unknown"
         let rawFinalValue = Bundle.main.object(forInfoDictionaryKey: "APP_FINAL")
-        let normalizedFinalValue = String(describing: rawFinalValue ?? "")
+        let normalizedFinalValue = String(describing: rawFinalValue ?? false)
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .lowercased()
-        let isFinal = normalizedFinalValue == "true"
-        return isFinal ? "v\(version)" : "v\(version)-b\(build)"
+        let isFinal = normalizedFinalValue == "true" || normalizedFinalValue == "1"
+        return isFinal ? "v\(version)" : "v\(version) (\(commitID))"
     }
 
     var body: some View {

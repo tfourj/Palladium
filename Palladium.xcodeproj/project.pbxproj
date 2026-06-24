@@ -178,6 +178,7 @@
 				82BF06D72F57630001333331 /* Install Python Runtime */,
 				82BF06D02F5762BC00133331 /* Embed Frameworks */,
 				8256E3B72F57A8970067DF6E /* Embed Foundation Extensions */,
+				82BF06D82F5CA10001333331 /* Update Build Metadata */,
 			);
 			buildRules = (
 			);
@@ -274,6 +275,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "sh \"$PROJECT_DIR/scripts/install_python_runtime.sh\"\n";
+		};
+		82BF06D82F5CA10001333331 /* Update Build Metadata */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(PROJECT_DIR)/.git/HEAD",
+				"$(TARGET_BUILD_DIR)/$(INFOPLIST_PATH)",
+			);
+			name = "Update Build Metadata";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/build_metadata.stamp",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "sh \"$PROJECT_DIR/scripts/update_build_metadata.sh\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
