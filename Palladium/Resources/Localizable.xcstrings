@@ -2760,6 +2760,46 @@
         }
       }
     },
+    "settings.download_modes.customize_options" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Customize Options"
+          }
+        }
+      }
+    },
+    "settings.download_modes.customize_options.footer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drag to reorder. Turn an option off to hide it from the download pickers. At least one option must stay visible."
+          }
+        }
+      }
+    },
+    "settings.download_modes.customize_options.subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reorder and show or hide download modes"
+          }
+        }
+      }
+    },
+    "settings.download_modes.customize_options.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Customize Options"
+          }
+        }
+      }
+    },
     "settings.download_modes.main_help" : {
       "localizations" : {
         "en" : {
@@ -2796,16 +2836,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Share Sheet"
-          }
-        }
-      }
-    },
-    "settings.download_modes.show_custom" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show Custom download option"
           }
         }
       }
