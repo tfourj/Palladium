@@ -19,6 +19,12 @@ On-device iOS media downloader powered by `yt-dlp`, `gallery-dl`, `ffmpeg`, and 
   </a>
 </div>
 
+> [!TIP]
+> **This URL is not allowed by the configured download allowlists.**
+>
+> To allow downloads from any URL, visit [getpalladium.app/allowlist](https://getpalladium.app/allowlist) and click **Add to Palladium**.<br>
+> To craft allowlists manually, see [docs/ALLOWLISTS](docs/ALLOWLISTS.md) or [#12](https://github.com/tfourj/Palladium/issues/12) for more information.
+
 ## What It Does
 
 - Downloads media directly on iPhone and iPad
@@ -26,8 +32,8 @@ On-device iOS media downloader powered by `yt-dlp`, `gallery-dl`, `ffmpeg`, and 
 - Runs Python tooling inside the app
 
 > [!NOTE]
-> **AI-assisted development:** Palladium is my third attempt at building a `yt-dlp` GUI for iOS. The first two (one built with Toga/BeeWare and another combining BeeWare with SwiftUI) were fully vibecoded prototypes. Palladium was also built heavily with AI assistance, but its code has been reviewed and refined more than previous prototypes. I originally needed it to avoid YouTube bot-protection issues in [Nickel](https://github.com/tfourj/Nickel).
-> While it is actively tested and continuously improved, you may still encounter bugs.
+> **AI-assisted development:** Palladium is my third attempt at building a `yt-dlp` GUI for iOS. The first two (one built with Toga/BeeWare and another combining BeeWare with SwiftUI) were fully vibecoded prototypes. Palladium was also built heavily with AI assistance, but its code has been reviewed and refined more than previous prototypes. I originally needed it to avoid YouTube bot-protection issues in [Nickel](https://github.com/tfourj/Nickel).<br>
+> While it is actively tested and continuously improved, you may still encounter bugs.<br>
 > Feedback is greatly appreciated. If you find a bug, please open an issue and we’ll work to fix it.
 
 
