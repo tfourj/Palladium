@@ -35,16 +35,31 @@ def has_pip_in_target(install_target):
     return False
 
 
-def prewarm_index_command_modules():
+def disable_pip_import_audit_hook():
+    """Stop pip from installing its post-install import-audit hook.
+
+    pip 26.1 installs a permanent, process-global audit hook during `pip install`
+    that warns (and, from pip 26.3, raises) on the first import of any non-stdlib
+    module once an install has started. That check assumes pip's normal
+    one-command-per-process CLI usage. Palladium drives pip inside a single
+    long-lived interpreter and deliberately imports freshly installed packages
+    (yt-dlp and its dependencies, pip's own index command) right after installing
+    them, so the hook only ever produces false positives here. Setting pip's own
+    idempotency flag makes `_prevent_further_imports` treat the hook as already
+    installed and skip adding it. Must run before any pip install in the process.
+    """
     try:
-        import pip._internal.commands.index  # noqa: F401
+        import pip._internal.commands.install as pip_install
+        pip_install._IMPORT_AUDIT_HOOK_INSTALLED = True
     except Exception:
         pass
+
 
 def ensure_pip_entrypoint(install_target=None):
     pip_main = None
     try:
         from pip._internal.cli.main import main as pip_main
+        disable_pip_import_audit_hook()
         return pip_main
     except ModuleNotFoundError:
         print("[palladium] pip module missing, loading ensurepip bundle")
@@ -59,6 +74,7 @@ def ensure_pip_entrypoint(install_target=None):
             if pip_wheel_str not in sys.path:
                 sys.path.insert(0, pip_wheel_str)
             from pip._internal.cli.main import main as pip_main
+            disable_pip_import_audit_hook()
             print("[palladium] pip loaded from ensurepip bundled wheel")
 
             if install_target and not has_pip_in_target(install_target):
@@ -76,7 +92,6 @@ def ensure_pip_entrypoint(install_target=None):
                         "--upgrade",
                         pip_wheel_str,
                     ]
-                    prewarm_index_command_modules()
                     pip_result = pip_main(bootstrap_args)
                     pip_exit = 0 if pip_result is None else int(pip_result)
                     if pip_exit == 0:
