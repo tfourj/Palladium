@@ -26,6 +26,10 @@ extension ContentView {
         return subtitleLanguagePattern
     }
 
+    var visibleDownloadPresets: [DownloadPreset] {
+        DownloadOptions.visiblePresets(from: downloadPresetSettings)
+    }
+
     func persistPreferences() {
         let defaults = UserDefaults.standard
         defaults.set(rememberSelectedPreset, forKey: Self.rememberSelectedPresetDefaultsKey)
@@ -35,7 +39,9 @@ extension ContentView {
             defaults.removeObject(forKey: Self.presetDefaultsKey)
         }
         defaults.set(customArgsText, forKey: Self.customArgsDefaultsKey)
-        defaults.set(showCustomDownloadOption, forKey: Self.showCustomDownloadOptionDefaultsKey)
+        if let data = try? JSONEncoder().encode(downloadPresetSettings) {
+            defaults.set(data, forKey: Self.downloadPresetSettingsDefaultsKey)
+        }
         defaults.set(extraArgsText, forKey: Self.extraArgsDefaultsKey)
         defaults.set(afterDownloadBehavior.rawValue, forKey: Self.afterDownloadBehaviorDefaultsKey)
         defaults.removeObject(forKey: Self.askUserAfterDownloadDefaultsKey)
@@ -100,8 +106,33 @@ extension ContentView {
         UserDefaults.standard.string(forKey: customArgsDefaultsKey) ?? ""
     }
 
-    static func loadShowCustomDownloadOption() -> Bool {
-        UserDefaults.standard.bool(forKey: showCustomDownloadOptionDefaultsKey)
+    static func loadDownloadPresetSettings() -> [DownloadPresetSetting] {
+        if let data = UserDefaults.standard.data(forKey: downloadPresetSettingsDefaultsKey),
+           let decoded = try? JSONDecoder().decode([DownloadPresetSetting].self, from: data) {
+            // Reconcile against the current set of presets: keep stored order, drop unknown
+            // entries, and append any preset that was added in a newer app version.
+            var reconciled = decoded.filter { stored in
+                DownloadPreset.allCases.contains(stored.preset)
+            }
+            for preset in DownloadPreset.allCases where !reconciled.contains(where: { $0.preset == preset }) {
+                reconciled.append(DownloadPresetSetting(preset: preset, isVisible: preset != .custom))
+            }
+            return reconciled
+        }
+
+        // Migration: honor the legacy "show custom" toggle on first launch.
+        let showCustom = UserDefaults.standard.bool(forKey: showCustomDownloadOptionDefaultsKey)
+        return DownloadPreset.defaultSettings.map { setting in
+            setting.preset == .custom ? DownloadPresetSetting(preset: .custom, isVisible: showCustom) : setting
+        }
+    }
+
+    static func clampShareSheetMode(
+        _ mode: ShareSheetDownloadMode,
+        visiblePresets: [DownloadPreset]
+    ) -> ShareSheetDownloadMode {
+        guard let preset = mode.preset else { return mode }
+        return visiblePresets.contains(preset) ? mode : .ask
     }
 
     static func loadExtraArgs() -> String {

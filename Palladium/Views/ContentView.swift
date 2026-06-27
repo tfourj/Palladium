@@ -43,6 +43,7 @@ struct ContentView: View {
     static let presetDefaultsKey = "palladium.selectedPreset"
     static let customArgsDefaultsKey = "palladium.customArgs"
     static let showCustomDownloadOptionDefaultsKey = "palladium.showCustomDownloadOption"
+    static let downloadPresetSettingsDefaultsKey = "palladium.downloadPresetSettings"
     static let extraArgsDefaultsKey = "palladium.extraArgs"
     static let afterDownloadBehaviorDefaultsKey = "palladium.afterDownloadBehavior"
     static let askUserAfterDownloadDefaultsKey = "palladium.askUserAfterDownload"
@@ -88,7 +89,7 @@ struct ContentView: View {
     @State var downloadErrorText: String?
     @State var selectedPreset: DownloadPreset
     @State var customArgsText: String
-    @State var showCustomDownloadOption: Bool
+    @State var downloadPresetSettings: [DownloadPresetSetting]
     @State var extraArgsText: String
     @State var afterDownloadBehavior: AfterDownloadBehavior
     @State var notificationsEnabled: Bool
@@ -174,19 +175,20 @@ struct ContentView: View {
 
     init() {
         let rememberPreset = Self.loadRememberSelectedPreset()
-        let showCustomDownloadOption = Self.loadShowCustomDownloadOption()
+        let downloadPresetSettings = Self.loadDownloadPresetSettings()
+        let visiblePresets = DownloadOptions.visiblePresets(from: downloadPresetSettings)
         let selectedPreset = Self.loadSelectedPreset(rememberSelection: rememberPreset)
         let shareSheetDownloadMode = Self.loadShareSheetDownloadMode()
         _urlText = State(initialValue: Self.isDebuggerAttached() ? "https://www.youtube.com/watch?v=jNQXAC9IVRw" : "")
-        _selectedPreset = State(initialValue: showCustomDownloadOption || selectedPreset != .custom ? selectedPreset : .autoVideo)
+        _selectedPreset = State(initialValue: visiblePresets.contains(selectedPreset) ? selectedPreset : (visiblePresets.first ?? .autoVideo))
         _customArgsText = State(initialValue: Self.loadCustomArgs())
-        _showCustomDownloadOption = State(initialValue: showCustomDownloadOption)
+        _downloadPresetSettings = State(initialValue: downloadPresetSettings)
         _extraArgsText = State(initialValue: Self.loadExtraArgs())
         _afterDownloadBehavior = State(initialValue: Self.loadAfterDownloadBehavior())
         _notificationsEnabled = State(initialValue: Self.loadNotificationsEnabled())
         _rememberSelectedPreset = State(initialValue: rememberPreset)
         _autoDownloadOnPaste = State(initialValue: Self.loadAutoDownloadOnPaste())
-        _shareSheetDownloadMode = State(initialValue: showCustomDownloadOption || shareSheetDownloadMode != .custom ? shareSheetDownloadMode : .ask)
+        _shareSheetDownloadMode = State(initialValue: Self.clampShareSheetMode(shareSheetDownloadMode, visiblePresets: visiblePresets))
         let restoreDefaults = Self.loadRestoreDownloadDefaults()
         let defPlaylist = Self.loadDefaultDownloadPlaylist()
         let defSubtitles = Self.loadDefaultDownloadSubtitles()
@@ -230,7 +232,7 @@ struct ContentView: View {
                     statusText: $statusText,
                     urlText: $urlText,
                     selectedPreset: $selectedPreset,
-                    showCustomDownloadOption: $showCustomDownloadOption,
+                    visibleDownloadPresets: visibleDownloadPresets,
                     downloadPlaylist: $downloadPlaylist,
                     downloadSubtitles: $downloadSubtitles,
                     embedThumbnail: $embedThumbnail,
@@ -285,7 +287,7 @@ struct ContentView: View {
                     autoDownloadOnPaste: $autoDownloadOnPaste,
                     autoRetryFailedDownloads: $autoRetryFailedDownloads,
                     detailedProgressEnabled: $detailedProgressEnabled,
-                    showCustomDownloadOption: $showCustomDownloadOption,
+                    downloadPresetSettings: $downloadPresetSettings,
                     shareSheetDownloadMode: $shareSheetDownloadMode,
                     linkHistoryEnabled: $linkHistoryEnabled,
                     linkHistoryLimit: $linkHistoryLimit,
@@ -379,14 +381,13 @@ struct ContentView: View {
         .onChange(of: extraArgsText, initial: false) {
             persistPreferences()
         }
-        .onChange(of: showCustomDownloadOption, initial: false) {
-            if !showCustomDownloadOption {
-                if selectedPreset == .custom {
-                    selectedPreset = .autoVideo
-                }
-                if shareSheetDownloadMode == .custom {
-                    shareSheetDownloadMode = .ask
-                }
+        .onChange(of: downloadPresetSettings, initial: false) {
+            let visiblePresets = DownloadOptions.visiblePresets(from: downloadPresetSettings)
+            if !visiblePresets.contains(selectedPreset) {
+                selectedPreset = visiblePresets.first ?? .autoVideo
+            }
+            if let mode = shareSheetDownloadMode.preset, !visiblePresets.contains(mode) {
+                shareSheetDownloadMode = .ask
             }
             persistPreferences()
         }

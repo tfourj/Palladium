@@ -10,8 +10,18 @@ enum DownloadPreset: String, Codable, CaseIterable, Identifiable {
     var id: String { rawValue }
     var pythonValue: String { rawValue }
 
-    static func pickerCases(showCustomOption: Bool) -> [DownloadPreset] {
-        showCustomOption ? allCases : allCases.filter { $0 != .custom }
+    var shareSheetMode: ShareSheetDownloadMode {
+        switch self {
+        case .autoVideo: return .autoVideo
+        case .mute: return .mute
+        case .audio: return .audio
+        case .images: return .images
+        case .custom: return .custom
+        }
+    }
+
+    static var defaultSettings: [DownloadPresetSetting] {
+        allCases.map { DownloadPresetSetting(preset: $0, isVisible: $0 != .custom) }
     }
 
     var title: String {
@@ -37,6 +47,24 @@ enum DownloadPreset: String, Codable, CaseIterable, Identifiable {
         case .custom:
             return ""
         }
+    }
+}
+
+struct DownloadPresetSetting: Codable, Identifiable, Equatable {
+    let preset: DownloadPreset
+    var isVisible: Bool
+
+    var id: String { preset.rawValue }
+}
+
+enum DownloadOptions {
+    static func visiblePresets(from settings: [DownloadPresetSetting]) -> [DownloadPreset] {
+        let visible = settings.filter { $0.isVisible }.map { $0.preset }
+        return visible.isEmpty ? [.autoVideo] : visible
+    }
+
+    static func visibleShareSheetModes(from settings: [DownloadPresetSetting]) -> [ShareSheetDownloadMode] {
+        [.ask] + visiblePresets(from: settings).map { $0.shareSheetMode }
     }
 }
 
@@ -113,10 +141,6 @@ enum ShareSheetDownloadMode: String, Codable, CaseIterable, Identifiable {
     case images
 
     var id: String { rawValue }
-
-    static func pickerCases(showCustomOption: Bool) -> [ShareSheetDownloadMode] {
-        showCustomOption ? allCases : allCases.filter { $0 != .custom }
-    }
 
     var title: String {
         switch self {
