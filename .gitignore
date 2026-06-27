@@ -6,3 +6,4 @@ nc_*.md
 /Frameworks
 .DS_Store
 /Palladium.xcodeproj/project.xcworkspace/xcuserdata
+/Palladium/Services/Python/palladium_ytdlp/__pycache__

@@ -35,6 +35,12 @@ def has_pip_in_target(install_target):
     return False
 
 
+def prewarm_index_command_modules():
+    try:
+        import pip._internal.commands.index  # noqa: F401
+    except Exception:
+        pass
+
 def ensure_pip_entrypoint(install_target=None):
     pip_main = None
     try:
@@ -70,6 +76,7 @@ def ensure_pip_entrypoint(install_target=None):
                         "--upgrade",
                         pip_wheel_str,
                     ]
+                    prewarm_index_command_modules()
                     pip_result = pip_main(bootstrap_args)
                     pip_exit = 0 if pip_result is None else int(pip_result)
                     if pip_exit == 0:
