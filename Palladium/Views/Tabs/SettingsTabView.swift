@@ -32,7 +32,7 @@ struct SettingsTabView: View {
     @Binding var autoDownloadOnPaste: Bool
     @Binding var autoRetryFailedDownloads: Bool
     @Binding var detailedProgressEnabled: Bool
-    @Binding var showCustomDownloadOption: Bool
+    @Binding var downloadPresetSettings: [DownloadPresetSetting]
     @Binding var shareSheetDownloadMode: ShareSheetDownloadMode
     @Binding var linkHistoryEnabled: Bool
     @Binding var linkHistoryLimit: Int
@@ -165,7 +165,7 @@ struct SettingsTabView: View {
                         selectedPreset: $selectedPreset,
                         rememberSelectedPreset: $rememberSelectedPreset,
                         shareSheetDownloadMode: $shareSheetDownloadMode,
-                        showCustomDownloadOption: $showCustomDownloadOption,
+                        downloadPresetSettings: $downloadPresetSettings,
                         isRunning: isRunning
                     )
                 case .downloadOptions:

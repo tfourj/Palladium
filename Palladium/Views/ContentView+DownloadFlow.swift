@@ -27,41 +27,14 @@ extension ContentView {
                 .padding(.horizontal)
 
             VStack(spacing: 14) {
-                shareSheetModeButton(
-                    title: String(localized: "download.preset.video"),
-                    subtitle: String(localized: "download.mode.video.help"),
-                    icon: "wand.and.stars",
-                    color: .blue,
-                    preset: .autoVideo
-                )
-                shareSheetModeButton(
-                    title: String(localized: "download.mode.mute.title"),
-                    subtitle: String(localized: "download.mode.mute.help"),
-                    icon: "speaker.slash",
-                    color: .orange,
-                    preset: .mute
-                )
-                shareSheetModeButton(
-                    title: String(localized: "download.mode.audio.title"),
-                    subtitle: String(localized: "download.mode.audio.help"),
-                    icon: "music.note",
-                    color: .green,
-                    preset: .audio
-                )
-                shareSheetModeButton(
-                    title: String(localized: "download.preset.images"),
-                    subtitle: "Download pictures with gallery-dl",
-                    icon: "photo.on.rectangle",
-                    color: .purple,
-                    preset: .images
-                )
-                if showCustomDownloadOption {
+                ForEach(visibleDownloadPresets) { preset in
+                    let meta = shareSheetModeMetadata(for: preset)
                     shareSheetModeButton(
-                        title: String(localized: "common.custom"),
-                        subtitle: String(localized: "download.mode.custom.help"),
-                        icon: "slider.horizontal.3",
-                        color: .indigo,
-                        preset: .custom
+                        title: meta.title,
+                        subtitle: meta.subtitle,
+                        icon: meta.icon,
+                        color: meta.color,
+                        preset: preset
                     )
                 }
             }
@@ -83,6 +56,33 @@ extension ContentView {
             .padding(.bottom)
         }
         .padding()
+    }
+
+    func shareSheetModeMetadata(
+        for preset: DownloadPreset
+    ) -> (title: String, subtitle: String, icon: String, color: Color) {
+        switch preset {
+        case .autoVideo:
+            return (String(localized: "download.preset.video"),
+                    String(localized: "download.mode.video.help"),
+                    "wand.and.stars", .blue)
+        case .mute:
+            return (String(localized: "download.mode.mute.title"),
+                    String(localized: "download.mode.mute.help"),
+                    "speaker.slash", .orange)
+        case .audio:
+            return (String(localized: "download.mode.audio.title"),
+                    String(localized: "download.mode.audio.help"),
+                    "music.note", .green)
+        case .images:
+            return (String(localized: "download.preset.images"),
+                    "Download pictures with gallery-dl",
+                    "photo.on.rectangle", .purple)
+        case .custom:
+            return (String(localized: "common.custom"),
+                    String(localized: "download.mode.custom.help"),
+                    "slider.horizontal.3", .indigo)
+        }
     }
 
     func shareSheetModeButton(
