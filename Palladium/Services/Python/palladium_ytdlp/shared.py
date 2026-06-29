@@ -1,9 +1,9 @@
 import os
 
 MAX_CAPTURED_OUTPUT_CHARS = 250000
-TRACKED_PACKAGES = ("yt-dlp", "yt-dlp-apple-webkit-jsi", "gallery-dl", "pip")
+TRACKED_PACKAGES = ("yt-dlp", "yt-dlp-apple-webkit-jsi", "curl-cffi", "gallery-dl", "pip")
 DISPLAY_PACKAGES = TRACKED_PACKAGES
-CLEANUP_PACKAGES = ("yt-dlp", "yt-dlp-apple-webkit-jsi", "gallery-dl")
+CLEANUP_PACKAGES = ("yt-dlp", "yt-dlp-apple-webkit-jsi", "curl-cffi", "gallery-dl")
 WEBKIT_JSI_API_PACKAGE_RELATIVE_PATH = os.path.join(
     "yt_dlp_plugins", "webkit_jsi", "lib", "api.py"
 )

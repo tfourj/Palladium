@@ -162,6 +162,7 @@ def run_package_maintenance(action, custom_versions_json=None, live_log_fd_overr
             versions = collect_versions(install_target=install_target)
             print(f"[palladium] yt-dlp version: {versions.get('yt-dlp')}")
             print(f"[palladium] yt-dlp-apple-webkit-jsi version: {versions.get('yt-dlp-apple-webkit-jsi')}")
+            print(f"[palladium] curl-cffi version: {versions.get('curl-cffi')}")
             print(f"[palladium] gallery-dl version: {versions.get('gallery-dl')}")
             print(f"[palladium] pip version: {versions.get('pip')}")
 

@@ -22,11 +22,13 @@ class PackageSourceModeTests(unittest.TestCase):
             {
                 "yt-dlp": "1.0",
                 "yt-dlp-apple-webkit-jsi": "1.0",
+                "curl-cffi": "1.0",
                 "pip": "1.0",
             },
             {
                 "yt-dlp": ["2.0"],
                 "yt-dlp-apple-webkit-jsi": ["1.0"],
+                "curl-cffi": ["1.0"],
                 "pip": ["1.0"],
             },
             package_source=parse_package_source(json.dumps({"mode": "stable"})),
@@ -63,6 +65,16 @@ class PackageSourceModeTests(unittest.TestCase):
         self.assertEqual(packages, ["gallery-dl==2.0"])
         self.assertEqual(cleanup, ["gallery-dl"])
 
+    def test_curl_cffi_is_managed_with_other_runtime_packages(self):
+        packages, cleanup = build_package_install_plan(
+            {"curl-cffi": "1.0"},
+            {"curl-cffi": ["2.0"]},
+            package_source=parse_package_source(json.dumps({"mode": "stable"})),
+        )
+
+        self.assertEqual(packages, ["curl-cffi==2.0"])
+        self.assertEqual(cleanup, ["curl-cffi"])
+
     def test_gallery_audio_urls_with_tiktok_hints_are_classified_as_audio(self):
         self.assertEqual(
             gallery_item_media_type("https://sf16-ies-music-va.tiktokcdn.com/obj/tos-useast2a-v-2774/music-file"),
@@ -82,6 +94,7 @@ class PackageSourceModeTests(unittest.TestCase):
             "custom_specs": [
                 "yt-dlp==2026.1",
                 "yt-dlp-apple-webkit-jsi @ https://example.com/webkit.whl",
+                "curl-cffi==1.0",
             ],
         }))
         packages, cleanup = build_package_install_plan({}, {}, package_source=source)
@@ -89,8 +102,9 @@ class PackageSourceModeTests(unittest.TestCase):
         self.assertEqual(packages, [
             "yt-dlp==2026.1",
             "yt-dlp-apple-webkit-jsi @ https://example.com/webkit.whl",
+            "curl-cffi==1.0",
         ])
-        self.assertEqual(cleanup, ["yt-dlp", "yt-dlp-apple-webkit-jsi", "gallery-dl"])
+        self.assertEqual(cleanup, ["yt-dlp", "yt-dlp-apple-webkit-jsi", "curl-cffi", "gallery-dl"])
 
     def test_custom_source_skips_webkit_patch(self):
         custom_source = parse_package_source(json.dumps({"mode": "custom"}))
