@@ -786,7 +786,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Import a Netscape cookie file from Files to make it available in downloads."
+            "value" : "Import or paste Netscape cookies to make them available in downloads."
           }
         }
       }
@@ -806,7 +806,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The selected file does not look like Netscape cookies format."
+            "value" : "The selected cookie content does not look like Netscape cookies format."
           }
         }
       }
@@ -851,6 +851,46 @@
         }
       }
     },
+    "cookies.paste.add" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Cookies"
+          }
+        }
+      }
+    },
+    "cookies.paste.button" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paste Cookie Text"
+          }
+        }
+      }
+    },
+    "cookies.paste.message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paste Netscape cookie text below. Palladium will normalize it before saving."
+          }
+        }
+      }
+    },
+    "cookies.paste.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paste Cookies"
+          }
+        }
+      }
+    },
     "cookies.path.documents" : {
       "localizations" : {
         "en" : {
@@ -886,7 +926,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Imported files are copied into Palladium storage so yt-dlp can reuse them later."
+            "value" : "Cookie files are copied into Palladium storage so yt-dlp can reuse them later."
           }
         }
       }
