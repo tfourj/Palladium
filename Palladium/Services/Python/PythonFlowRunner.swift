@@ -384,6 +384,7 @@ enum PythonFlowRunner {
         var versionLines = [
             "yt-dlp: \(versions["yt-dlp"] ?? "not installed")",
             "yt-dlp-apple-webkit-jsi: \(versions["yt-dlp-apple-webkit-jsi"] ?? "not installed")",
+            "curl-cffi: \(versions["curl-cffi"] ?? "not installed")",
             "gallery-dl: \(versions["gallery-dl"] ?? "not installed")"
         ]
         if let pipVersion = versions["pip"],
@@ -420,7 +421,7 @@ enum PythonFlowRunner {
     private static func normalizedVersions(from value: Any?) -> [String: String] {
         guard let raw = value as? [String: Any] else { return [:] }
         var result: [String: String] = [:]
-        for key in ["yt-dlp", "yt-dlp-apple-webkit-jsi", "gallery-dl", "pip"] {
+        for key in ["yt-dlp", "yt-dlp-apple-webkit-jsi", "curl-cffi", "gallery-dl", "pip"] {
             guard let item = raw[key] else { continue }
             let versionText = String(describing: item).trimmingCharacters(in: .whitespacesAndNewlines)
             if !versionText.isEmpty {
@@ -433,7 +434,7 @@ enum PythonFlowRunner {
     private static func normalizedAvailableVersions(from value: Any?) -> [String: [String]] {
         guard let raw = value as? [String: Any] else { return [:] }
         var result: [String: [String]] = [:]
-        for key in ["yt-dlp", "yt-dlp-apple-webkit-jsi", "gallery-dl", "pip"] {
+        for key in ["yt-dlp", "yt-dlp-apple-webkit-jsi", "curl-cffi", "gallery-dl", "pip"] {
             guard let list = raw[key] as? [Any] else { continue }
             let values = list.map { String(describing: $0).trimmingCharacters(in: .whitespacesAndNewlines) }
                 .filter { !$0.isEmpty }

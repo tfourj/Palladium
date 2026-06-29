@@ -344,7 +344,12 @@ extension ContentView {
     }
 
     static func loadCachedPackageVersionsText() -> String {
-        let fallback = "yt-dlp: unknown\nyt-dlp-apple-webkit-jsi: unknown\ngallery-dl: unknown"
+        let fallback = [
+            "yt-dlp: unknown",
+            "yt-dlp-apple-webkit-jsi: unknown",
+            "curl-cffi: unknown",
+            "gallery-dl: unknown"
+        ].joined(separator: "\n")
         guard let value = UserDefaults.standard.string(forKey: packageVersionsTextDefaultsKey),
               !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             return fallback

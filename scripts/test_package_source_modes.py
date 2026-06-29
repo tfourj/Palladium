@@ -12,6 +12,7 @@ from palladium_ytdlp.packages import (  # noqa: E402
     build_pip_install_args,
     parse_package_source,
 )
+from palladium_ytdlp.shared import YTDLP_RUNTIME_PACKAGES  # noqa: E402
 from palladium_ytdlp.entrypoints import invalidate_runtime_package_modules  # noqa: E402
 from palladium_ytdlp.gallery import gallery_item_media_type  # noqa: E402
 
@@ -74,6 +75,9 @@ class PackageSourceModeTests(unittest.TestCase):
 
         self.assertEqual(packages, ["curl-cffi==2.0"])
         self.assertEqual(cleanup, ["curl-cffi"])
+
+    def test_curl_cffi_is_required_for_yt_dlp_runtime(self):
+        self.assertIn("curl-cffi", YTDLP_RUNTIME_PACKAGES)
 
     def test_gallery_audio_urls_with_tiktok_hints_are_classified_as_audio(self):
         self.assertEqual(

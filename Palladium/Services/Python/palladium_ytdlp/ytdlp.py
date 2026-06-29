@@ -29,7 +29,7 @@ from .packages import (
     parse_package_source,
 )
 from .runtime import raise_if_cancel_requested
-from .shared import TailBuffer, Tee, open_live_log_stream
+from .shared import TailBuffer, Tee, YTDLP_RUNTIME_PACKAGES, open_live_log_stream
 from .webkit_jsi import ensure_safe_webkit_jsi_runtime
 
 
@@ -467,44 +467,28 @@ def run_yt_dlp_flow(
                 os.makedirs(cache_dir, exist_ok=True)
                 print(f"[palladium] cache target: {cache_dir}")
 
-            needs_yt_dlp_install = False
-            needs_webkit_jsi_install = False
+            missing_runtime_packages = []
+            for package_name in YTDLP_RUNTIME_PACKAGES:
+                print(f"[palladium] checking {package_name} package metadata")
+                installed, version, source = is_package_installed(
+                    package_name,
+                    install_target=install_target,
+                )
+                if installed:
+                    print(f"[palladium] {package_name} already installed ({version} via {source})")
+                else:
+                    missing_runtime_packages.append(package_name)
+                    print(f"[palladium] {package_name} package missing")
 
-            print("[palladium] checking yt-dlp package metadata")
-            yt_dlp_installed, yt_dlp_version, yt_dlp_source = is_package_installed(
-                "yt-dlp",
-                install_target=install_target,
-            )
-            if yt_dlp_installed:
-                print(f"[palladium] yt-dlp already installed ({yt_dlp_version} via {yt_dlp_source})")
-            else:
-                needs_yt_dlp_install = True
-                print("[palladium] yt-dlp package missing")
-
-            print("[palladium] checking yt-dlp-apple-webkit-jsi package metadata")
-            webkit_jsi_installed, webkit_jsi_version, webkit_jsi_source = is_package_installed(
-                "yt-dlp-apple-webkit-jsi",
-                install_target=install_target,
-            )
-            if webkit_jsi_installed:
-                print(f"[palladium] yt-dlp-apple-webkit-jsi already installed ({webkit_jsi_version} via {webkit_jsi_source})")
-            else:
-                needs_webkit_jsi_install = True
-                print("[palladium] yt-dlp-apple-webkit-jsi missing")
-
-            if needs_yt_dlp_install or needs_webkit_jsi_install:
+            if missing_runtime_packages:
                 raise_if_cancel_requested(cancel_file_path, "[palladium] cancellation requested before pip install")
                 pip_attempted = True
                 pip_main = ensure_pip_entrypoint(install_target)
                 if pip_main is not None:
-                    packages = []
                     if package_source.get("mode") == "custom":
                         packages = list(package_source.get("custom_specs") or [])
                     else:
-                        if needs_yt_dlp_install:
-                            packages.append("yt-dlp")
-                        if needs_webkit_jsi_install:
-                            packages.append("yt-dlp-apple-webkit-jsi")
+                        packages = list(missing_runtime_packages)
 
                     try:
                         raise_if_cancel_requested(cancel_file_path, "[palladium] cancellation requested before pip install")
@@ -528,11 +512,11 @@ def run_yt_dlp_flow(
                     pip_exit_code = 1
 
                 installed_versions = collect_versions(install_target=install_target, allow_cache_fallback=False)
-                print(f"[palladium] yt-dlp after install: {installed_versions.get('yt-dlp', 'not installed')}")
-                print(
-                    "[palladium] yt-dlp-apple-webkit-jsi after install: "
-                    f"{installed_versions.get('yt-dlp-apple-webkit-jsi', 'not installed')}"
-                )
+                for package_name in YTDLP_RUNTIME_PACKAGES:
+                    print(
+                        f"[palladium] {package_name} after install: "
+                        f"{installed_versions.get(package_name, 'not installed')}"
+                    )
 
             if package_source.get("skip_webkit_patch"):
                 print("[palladium] skipping webkit patch by configuration")
