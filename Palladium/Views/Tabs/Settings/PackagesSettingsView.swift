@@ -11,6 +11,7 @@ struct PackagesSettingsView: View {
     let versionsText: String
     let updatesSummaryText: String
     let updatesAvailable: Bool
+    let runtimePackagesMissing: Bool
     let availablePackageVersions: [String: [String]]
     let isLoadingPackageVersions: Bool
     let isRunning: Bool
@@ -126,7 +127,7 @@ struct PackagesSettingsView: View {
 
     private var canRequestPackageUpdate: Bool {
         guard !isRunning else { return false }
-        return updatesAvailable || packageSourceMode == .custom
+        return updatesAvailable || runtimePackagesMissing || packageSourceMode == .custom
     }
 
     private var customVersionSheet: some View {

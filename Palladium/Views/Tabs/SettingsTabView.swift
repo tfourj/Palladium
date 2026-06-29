@@ -55,6 +55,7 @@ struct SettingsTabView: View {
     let versionsText: String
     let updatesSummaryText: String
     let updatesAvailable: Bool
+    let runtimePackagesMissing: Bool
     let availablePackageVersions: [String: [String]]
     let isLoadingPackageVersions: Bool
     let isRunning: Bool
@@ -267,6 +268,7 @@ struct SettingsTabView: View {
                         versionsText: versionsText,
                         updatesSummaryText: updatesSummaryText,
                         updatesAvailable: updatesAvailable,
+                        runtimePackagesMissing: runtimePackagesMissing,
                         availablePackageVersions: availablePackageVersions,
                         isLoadingPackageVersions: isLoadingPackageVersions,
                         isRunning: isPackageRunning,

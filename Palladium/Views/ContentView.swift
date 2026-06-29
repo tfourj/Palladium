@@ -123,6 +123,7 @@ struct ContentView: View {
     @State var packageStatusText = "idle"
     @State var versionsText: String
     @State var packageUpdatesAvailable = false
+    @State var runtimePackagesMissing = false
     @State var packageUpdatesSummaryText = String(localized: "packages.summary.idle")
     @State var availablePackageVersions: [String: [String]] = [:]
     @State var isLoadingPackageVersions = false
@@ -309,6 +310,7 @@ struct ContentView: View {
                     versionsText: versionsText,
                     updatesSummaryText: packageUpdatesSummaryText,
                     updatesAvailable: packageUpdatesAvailable,
+                    runtimePackagesMissing: runtimePackagesMissing,
                     availablePackageVersions: availablePackageVersions,
                     isLoadingPackageVersions: isLoadingPackageVersions,
                     isRunning: isRunning,

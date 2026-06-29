@@ -95,6 +95,9 @@ extension ContentView {
                 self.versionsText = versionsText
                 persistPackageVersionsText(versionsText)
             }
+            if let runtimePackagesMissing = outcome.runtimePackagesMissing {
+                self.runtimePackagesMissing = runtimePackagesMissing
+            }
             let updatesAvailable = outcome.updatesAvailable ?? false
             if outcome.updatesAvailable != nil {
                 self.packageUpdatesAvailable = updatesAvailable

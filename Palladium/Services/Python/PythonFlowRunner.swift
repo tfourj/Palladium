@@ -272,6 +272,7 @@ enum PythonFlowRunner {
                 updatesAvailable: nil,
                 updatesSummary: nil,
                 availableVersions: nil,
+                runtimePackagesMissing: nil,
                 restartRequired: false
             )
         }
@@ -310,6 +311,7 @@ enum PythonFlowRunner {
             updatesAvailable: nil,
             updatesSummary: nil,
             availableVersions: nil,
+            runtimePackagesMissing: nil,
             restartRequired: false
         )
     }
@@ -357,6 +359,7 @@ enum PythonFlowRunner {
                 updatesAvailable: nil,
                 updatesSummary: nil,
                 availableVersions: nil,
+                runtimePackagesMissing: nil,
                 restartRequired: false
             )
         }
@@ -370,6 +373,7 @@ enum PythonFlowRunner {
         let restartRequired = result["restart_required"] as? Bool ?? false
         let output = result["output"] as? String ?? ""
         let versions = normalizedVersions(from: result["versions"])
+        let runtimePackagesMissing = hasMissingRuntimePackages(in: versions)
         let availableVersions = normalizedAvailableVersions(from: result["available_versions"])
 
         let summary = """
@@ -408,6 +412,7 @@ enum PythonFlowRunner {
             updatesAvailable: updatesAvailable,
             updatesSummary: updatesSummary,
             availableVersions: availableVersions,
+            runtimePackagesMissing: runtimePackagesMissing,
             restartRequired: restartRequired
         )
     }
@@ -429,6 +434,16 @@ enum PythonFlowRunner {
             }
         }
         return result
+    }
+
+    private static func hasMissingRuntimePackages(in versions: [String: String]) -> Bool {
+        for key in ["yt-dlp", "yt-dlp-apple-webkit-jsi", "curl-cffi", "gallery-dl"] {
+            let versionText = versions[key]?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() ?? ""
+            if versionText.isEmpty || versionText == "not installed" || versionText == "unknown" {
+                return true
+            }
+        }
+        return false
     }
 
     private static func normalizedAvailableVersions(from value: Any?) -> [String: [String]] {
@@ -518,6 +533,7 @@ struct PythonFlowOutcome: Sendable {
     let updatesAvailable: Bool?
     let updatesSummary: String?
     let availableVersions: [String: [String]]?
+    let runtimePackagesMissing: Bool?
     let restartRequired: Bool
 }
 
