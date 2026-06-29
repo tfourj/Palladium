@@ -277,6 +277,13 @@ def filter_installable_packages(package_names):
     ]
 
 
+def display_version(package_name, version):
+    version_text = str(version or "").strip()
+    if version_text and is_bundled_runtime_package(package_name):
+        return f"{version_text} (bundled)"
+    return version_text
+
+
 def installed_version(package_name, install_target=None):
     bundled_version = bundled_package_version(package_name)
     if bundled_version:
@@ -370,7 +377,7 @@ def collect_versions(install_target=None, allow_cache_fallback=True):
     for package_name in DISPLAY_PACKAGES:
         resolved_version = installed_version(package_name, install_target)
         if resolved_version:
-            versions[package_name] = resolved_version
+            versions[package_name] = display_version(package_name, resolved_version)
             continue
 
         if package_name in TRACKED_PACKAGES:

@@ -13,6 +13,7 @@ from palladium_ytdlp.packages import (  # noqa: E402
     build_package_install_plan,
     build_package_update_lines,
     build_pip_install_args,
+    collect_versions,
     parse_package_source,
 )
 from palladium_ytdlp.shared import YTDLP_RUNTIME_PACKAGES  # noqa: E402
@@ -139,6 +140,20 @@ class PackageSourceModeTests(unittest.TestCase):
         self.assertEqual(packages, [])
         self.assertEqual(cleanup, [])
         self.assertEqual(lines, [])
+
+    def test_bundled_curl_cffi_version_is_labeled(self):
+        previous = os.environ.get("PALLADIUM_BUNDLED_PYTHON_PACKAGES")
+        try:
+            with self.with_bundled_curl_cffi("0.15.1b2") as bundled:
+                os.environ["PALLADIUM_BUNDLED_PYTHON_PACKAGES"] = bundled
+                versions = collect_versions(allow_cache_fallback=False)
+        finally:
+            if previous is None:
+                os.environ.pop("PALLADIUM_BUNDLED_PYTHON_PACKAGES", None)
+            else:
+                os.environ["PALLADIUM_BUNDLED_PYTHON_PACKAGES"] = previous
+
+        self.assertEqual(versions["curl-cffi"], "0.15.1b2 (bundled)")
 
     def test_gallery_audio_urls_with_tiktok_hints_are_classified_as_audio(self):
         self.assertEqual(

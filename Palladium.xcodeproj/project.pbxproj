@@ -692,13 +692,13 @@
 			package = 82BF06D12F5762DD00133331 /* XCRemoteSwiftPackageReference "PythonKit" */;
 			productName = PythonKit;
 		};
-		82FD7E052F5B673000E69220 /* SwiftFFmpeg */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = SwiftFFmpeg;
-		};
 		82CFC0032F70000100CFF001 /* SwiftCurlCffiIOS */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SwiftCurlCffiIOS;
+		};
+		82FD7E052F5B673000E69220 /* SwiftFFmpeg */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SwiftFFmpeg;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
