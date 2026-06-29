@@ -109,10 +109,19 @@ class PackageSourceModeTests(unittest.TestCase):
         self.assertEqual(packages, ["curl-cffi==2.0"])
         self.assertEqual(cleanup, ["curl-cffi"])
 
-    def test_missing_curl_cffi_is_reported_as_available_update(self):
+    def test_missing_curl_cffi_is_not_reported_as_available_update_by_default(self):
         lines = build_package_update_lines(
             {"curl-cffi": "not installed"},
             {"curl-cffi": ["2.0"]},
+        )
+
+        self.assertEqual(lines, [])
+
+    def test_missing_curl_cffi_can_be_reported_as_available_update(self):
+        lines = build_package_update_lines(
+            {"curl-cffi": "not installed"},
+            {"curl-cffi": ["2.0"]},
+            include_missing=True,
         )
 
         self.assertEqual(lines, ["curl-cffi: not installed -> 2.0"])

@@ -63,7 +63,11 @@ def run_package_maintenance(action, custom_versions_json=None, live_log_fd_overr
                 )
                 print("[palladium] fetched package index versions")
             else:
-                updates_available, updates_summary = check_package_updates(install_target, package_source=package_source)
+                updates_available, updates_summary = check_package_updates(
+                    install_target,
+                    package_source=package_source,
+                    include_missing=action in ("update", "reinstall"),
+                )
                 print(f"[palladium] updates available: {updates_available}")
                 print(f"[palladium] updates summary: {updates_summary}")
 
@@ -86,12 +90,7 @@ def run_package_maintenance(action, custom_versions_json=None, live_log_fd_overr
                 print(f"[palladium] custom package versions requested: {custom_versions}")
 
             if action in ("update", "reinstall"):
-                should_install = (
-                    action == "reinstall"
-                    or updates_available
-                    or bool(custom_versions)
-                    or package_source.get("mode") == "custom"
-                )
+                should_install = True
                 if should_install:
                     raise_if_cancel_requested(cancel_file_path, "[palladium] package action cancelled before pip startup")
                     pip_main = ensure_pip_entrypoint(install_target)
@@ -149,7 +148,11 @@ def run_package_maintenance(action, custom_versions_json=None, live_log_fd_overr
                     print("[palladium] no updates available; skipping update")
 
                 raise_if_cancel_requested(cancel_file_path, "[palladium] package action cancelled before post-update check")
-                updates_available, updates_summary = check_package_updates(install_target, package_source=package_source)
+                updates_available, updates_summary = check_package_updates(
+                    install_target,
+                    package_source=package_source,
+                    include_missing=True,
+                )
                 print(f"[palladium] post-update updates available: {updates_available}")
                 print(f"[palladium] post-update updates summary: {updates_summary}")
 

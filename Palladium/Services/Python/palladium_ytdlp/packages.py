@@ -57,7 +57,7 @@ def disable_pip_import_audit_hook():
         pass
 
 
-def ensure_pip_entrypoint(install_target=None):
+def ensure_pip_entrypoint(install_target=None, install_target_pip=True):
     pip_main = None
     try:
         from pip._internal.cli.main import main as pip_main
@@ -79,7 +79,7 @@ def ensure_pip_entrypoint(install_target=None):
             disable_pip_import_audit_hook()
             print("[palladium] pip loaded from ensurepip bundled wheel")
 
-            if install_target and not has_pip_in_target(install_target):
+            if install_target and install_target_pip and not has_pip_in_target(install_target):
                 try:
                     os.makedirs(install_target, exist_ok=True)
                     bootstrap_args = [
@@ -461,7 +461,28 @@ def latest_index_version(indexed_versions, package_name):
     return ""
 
 
-def build_package_update_lines(installed_versions, indexed_versions):
+def missing_installable_runtime_packages(installed_versions):
+    missing_packages = []
+    for package_name in YTDLP_RUNTIME_PACKAGES:
+        if is_bundled_runtime_package(package_name):
+            continue
+
+        current_version = normalized_version_text(installed_versions.get(package_name))
+        if not current_version or current_version in ("not installed", "unknown"):
+            missing_packages.append(package_name)
+
+    return missing_packages
+
+
+def missing_runtime_packages_summary(missing_packages):
+    packages_text = ", ".join(missing_packages)
+    return (
+        f"Required packages are not installed: {packages_text}. "
+        "Install them by starting a download or tapping Update Packages."
+    )
+
+
+def build_package_update_lines(installed_versions, indexed_versions, include_missing=False):
     lines = []
     for package_name in TRACKED_PACKAGES:
         if is_bundled_runtime_package(package_name):
@@ -470,7 +491,7 @@ def build_package_update_lines(installed_versions, indexed_versions):
         current_version = normalized_version_text(installed_versions.get(package_name))
         latest_version = latest_index_version(indexed_versions, package_name)
         if not current_version or current_version in ("not installed", "unknown"):
-            if latest_version and package_name in YTDLP_RUNTIME_PACKAGES:
+            if include_missing and latest_version and package_name in YTDLP_RUNTIME_PACKAGES:
                 lines.append(f"{package_name}: not installed -> {latest_version}")
             continue
 
@@ -532,27 +553,42 @@ def build_package_install_plan(installed_versions, indexed_versions, custom_vers
     return packages, cleanup_packages
 
 
-def check_package_updates(install_target=None, package_source=None):
+def check_package_updates(install_target=None, package_source=None, include_missing=False):
     package_source = package_source or parse_package_source()
     if package_source.get("mode") == "custom":
         if package_source.get("custom_specs"):
             return True, "Custom packages will be installed on update."
         return False, "Add custom package requirements before updating."
 
-    pip_main = ensure_pip_entrypoint(install_target)
+    installed_versions = collect_versions(install_target=install_target, allow_cache_fallback=False)
+    missing_runtime_packages = missing_installable_runtime_packages(installed_versions)
+    installable_runtime_packages = filter_installable_packages(YTDLP_RUNTIME_PACKAGES)
+    if (
+        missing_runtime_packages
+        and len(missing_runtime_packages) == len(installable_runtime_packages)
+        and not include_missing
+    ):
+        return False, missing_runtime_packages_summary(missing_runtime_packages)
+
+    pip_main = ensure_pip_entrypoint(install_target, install_target_pip=False)
     if pip_main is None:
         return False, "Unable to check updates (pip unavailable)."
 
     try:
-        installed_versions = collect_versions(install_target=install_target, allow_cache_fallback=False)
         indexed_versions = fetch_package_index_versions(
             install_target=install_target,
             pip_main=pip_main,
             allow_prereleases=bool(package_source.get("allow_prereleases")),
         )
-        update_lines = build_package_update_lines(installed_versions, indexed_versions)
+        update_lines = build_package_update_lines(
+            installed_versions,
+            indexed_versions,
+            include_missing=include_missing,
+        )
         if update_lines:
             return True, "\n".join(update_lines)
+        if missing_runtime_packages and not include_missing:
+            return False, missing_runtime_packages_summary(missing_runtime_packages)
         if indexed_versions:
             return False, "All packages are up to date."
 
