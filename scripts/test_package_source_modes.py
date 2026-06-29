@@ -9,6 +9,7 @@ sys.path.insert(0, str(ROOT / "Palladium" / "Services" / "Python"))
 
 from palladium_ytdlp.packages import (  # noqa: E402
     build_package_install_plan,
+    build_package_update_lines,
     build_pip_install_args,
     parse_package_source,
 )
@@ -78,6 +79,28 @@ class PackageSourceModeTests(unittest.TestCase):
 
     def test_curl_cffi_is_required_for_yt_dlp_runtime(self):
         self.assertIn("curl-cffi", YTDLP_RUNTIME_PACKAGES)
+
+    def test_missing_curl_cffi_is_installed_from_index(self):
+        packages, cleanup = build_package_install_plan(
+            {
+                "yt-dlp": "1.0",
+                "yt-dlp-apple-webkit-jsi": "1.0",
+                "curl-cffi": "not installed",
+            },
+            {"curl-cffi": ["2.0"]},
+            package_source=parse_package_source(json.dumps({"mode": "stable"})),
+        )
+
+        self.assertEqual(packages, ["curl-cffi==2.0"])
+        self.assertEqual(cleanup, ["curl-cffi"])
+
+    def test_missing_curl_cffi_is_reported_as_available_update(self):
+        lines = build_package_update_lines(
+            {"curl-cffi": "not installed"},
+            {"curl-cffi": ["2.0"]},
+        )
+
+        self.assertEqual(lines, ["curl-cffi: not installed -> 2.0"])
 
     def test_gallery_audio_urls_with_tiktok_hints_are_classified_as_audio(self):
         self.assertEqual(

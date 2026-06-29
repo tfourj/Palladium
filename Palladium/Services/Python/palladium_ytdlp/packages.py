@@ -13,6 +13,7 @@ from .shared import (
     DISPLAY_PACKAGES,
     TRACKED_PACKAGES,
     WEBKIT_JSI_API_PACKAGE_RELATIVE_PATH,
+    YTDLP_RUNTIME_PACKAGES,
 )
 
 
@@ -425,10 +426,12 @@ def build_package_update_lines(installed_versions, indexed_versions):
     lines = []
     for package_name in TRACKED_PACKAGES:
         current_version = normalized_version_text(installed_versions.get(package_name))
+        latest_version = latest_index_version(indexed_versions, package_name)
         if not current_version or current_version in ("not installed", "unknown"):
+            if latest_version and package_name in YTDLP_RUNTIME_PACKAGES:
+                lines.append(f"{package_name}: not installed -> {latest_version}")
             continue
 
-        latest_version = latest_index_version(indexed_versions, package_name)
         if latest_version and latest_version != current_version:
             lines.append(f"{package_name}: {current_version} -> {latest_version}")
     return lines
@@ -464,10 +467,14 @@ def build_package_install_plan(installed_versions, indexed_versions, custom_vers
 
     for package_name in TRACKED_PACKAGES:
         current_version = normalized_version_text(installed_versions.get(package_name))
+        latest_version = latest_index_version(indexed_versions, package_name)
         if not current_version or current_version in ("not installed", "unknown"):
+            if latest_version and package_name in YTDLP_RUNTIME_PACKAGES:
+                packages.append(f"{package_name}=={latest_version}")
+                if package_name in CLEANUP_PACKAGES:
+                    cleanup_packages.append(package_name)
             continue
 
-        latest_version = latest_index_version(indexed_versions, package_name)
         if latest_version and latest_version != current_version:
             packages.append(f"{package_name}=={latest_version}")
             if package_name in CLEANUP_PACKAGES:
