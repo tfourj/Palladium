@@ -63,6 +63,7 @@ Other documentation: [docs/ALLOWLISTS.md](docs/ALLOWLISTS.md) for custom URL all
 - [`python-apple-support`](https://github.com/beeware/Python-Apple-support)
 - [`LAME`](https://lame.sourceforge.io/)
 - [`SwiftFFmpeg-iOS`](https://github.com/tfourj/SwiftFFmpeg-iOS)
+- [`SwiftCurlCffi-iOS`](https://github.com/tfourj/SwiftCurlCffi-iOS)
 
 ## License
 
