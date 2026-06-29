@@ -50,6 +50,17 @@ extension ContentView {
             let files = try listImportedCookieFiles()
             importedCookieFiles = files
             if let match = files.first(where: { $0.fileName == trimmedSelection }) {
+                do {
+                    try normalizeImportedCookieFileIfNeeded(at: match.fileURL)
+                } catch {
+                    appendConsoleText(
+                        "[palladium] selected cookie file is invalid: \(error.localizedDescription)\n",
+                        source: .app
+                    )
+                    selectedCookieFileName = ""
+                    refreshImportedCookieFiles()
+                    return nil
+                }
                 return match.fileURL.path
             }
         } catch {
@@ -96,10 +107,13 @@ extension ContentView {
     }
 
     private func validatedNetscapeCookiesText(from data: Data) throws -> String {
+        try normalizedNetscapeCookiesText(from: decodedCookieText(from: data))
+    }
+
+    private func decodedCookieText(from data: Data) throws -> String {
         let text = String(data: data, encoding: .utf8)
             ?? String(data: data, encoding: .ascii)
             ?? String(data: data, encoding: .isoLatin1)
-
         guard let text else {
             throw NSError(
                 domain: "PalladiumCookies",
@@ -107,29 +121,139 @@ extension ContentView {
                 userInfo: [NSLocalizedDescriptionKey: String(localized: "cookies.error.unreadable")]
             )
         }
+        return text
+    }
 
-        let normalizedLines = text
-            .replacingOccurrences(of: "\r\n", with: "\n")
-            .replacingOccurrences(of: "\r", with: "\n")
+    private func normalizeImportedCookieFileIfNeeded(at fileURL: URL) throws {
+        let data = try Data(contentsOf: fileURL)
+        let originalText = try decodedCookieText(from: data)
+        let normalizedText = try normalizedNetscapeCookiesText(from: originalText)
+        guard normalizedText != normalizedLineEndings(for: originalText) else { return }
+        try normalizedText.write(to: fileURL, atomically: true, encoding: .utf8)
+        appendConsoleText(
+            "[palladium] normalized selected cookie file: \(fileURL.lastPathComponent)\n",
+            source: .app
+        )
+        refreshImportedCookieFiles()
+    }
+
+    private func normalizedNetscapeCookiesText(from text: String) throws -> String {
+        let normalizedLines = normalizedLineEndings(for: text)
             .split(separator: "\n", omittingEmptySubsequences: false)
             .map { String($0) }
 
-        let hasHeader = normalizedLines.contains { $0.trimmingCharacters(in: .whitespacesAndNewlines) == "# Netscape HTTP Cookie File" }
-        let hasCookieRecord = normalizedLines.contains { line in
-            let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
-            guard !trimmed.isEmpty, !trimmed.hasPrefix("#") else { return false }
-            return trimmed.split(separator: "\t").count >= 7
+        var outputLines = ["# Netscape HTTP Cookie File"]
+        var foundCookieRecord = false
+
+        for line in normalizedLines {
+            if shouldSkipCookieLine(line) {
+                continue
+            }
+
+            guard let record = normalizedNetscapeCookieRecord(from: line) else {
+                throw invalidCookieFormatError()
+            }
+
+            outputLines.append(record)
+            foundCookieRecord = true
         }
 
-        guard hasHeader || hasCookieRecord else {
-            throw NSError(
-                domain: "PalladiumCookies",
-                code: 2,
-                userInfo: [NSLocalizedDescriptionKey: String(localized: "cookies.error.invalid_format")]
+        guard foundCookieRecord else {
+            throw invalidCookieFormatError()
+        }
+
+        return outputLines.joined(separator: "\n") + "\n"
+    }
+
+    private func normalizedLineEndings(for text: String) -> String {
+        text
+            .replacingOccurrences(of: "\r\n", with: "\n")
+            .replacingOccurrences(of: "\r", with: "\n")
+    }
+
+    private func shouldSkipCookieLine(_ line: String) -> Bool {
+        let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.isEmpty {
+            return true
+        }
+        if isCookieFileHeader(trimmed) {
+            return true
+        }
+        return trimmed.hasPrefix("#") && !trimmed.hasPrefix("#HttpOnly_")
+    }
+
+    private func isCookieFileHeader(_ line: String) -> Bool {
+        line == "# Netscape HTTP Cookie File" || line == "# HTTP Cookie File"
+    }
+
+    private func normalizedNetscapeCookieRecord(from line: String) -> String? {
+        let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+        let rawFields: [String]
+
+        if line.contains("\t") {
+            rawFields = line
+                .split(separator: "\t", omittingEmptySubsequences: false)
+                .map { String($0) }
+        } else {
+            let splitFields = trimmed.split(
+                maxSplits: 6,
+                omittingEmptySubsequences: true,
+                whereSeparator: isCookieFieldSeparator
             )
+            rawFields = splitFields.map { String($0) }
         }
 
-        return normalizedLines.joined(separator: "\n")
+        guard rawFields.count == 7 else { return nil }
+
+        let domain = rawFields[0].trimmingCharacters(in: .whitespaces)
+        let includeSubdomains = normalizedCookieBoolean(rawFields[1])
+        let path = rawFields[2].trimmingCharacters(in: .whitespaces)
+        let secure = normalizedCookieBoolean(rawFields[3])
+        let expiration = rawFields[4].trimmingCharacters(in: .whitespaces)
+        let name = rawFields[5].trimmingCharacters(in: .whitespaces)
+        let value = rawFields[6]
+
+        guard !domain.isEmpty,
+              let includeSubdomains,
+              !path.isEmpty,
+              let secure,
+              Int64(expiration) != nil,
+              !name.isEmpty else {
+            return nil
+        }
+
+        return [
+            domain,
+            includeSubdomains,
+            path,
+            secure,
+            expiration,
+            name,
+            value,
+        ].joined(separator: "\t")
+    }
+
+    private func isCookieFieldSeparator(_ character: Character) -> Bool {
+        character.unicodeScalars.allSatisfy { CharacterSet.whitespaces.contains($0) }
+    }
+
+    private func normalizedCookieBoolean(_ rawValue: String) -> String? {
+        switch rawValue.trimmingCharacters(in: .whitespaces).uppercased() {
+        case "TRUE":
+            return "TRUE"
+        case "FALSE":
+            return "FALSE"
+        default:
+            return nil
+        }
+    }
+
+    private func invalidCookieFormatError() -> NSError {
+        NSError(
+            domain: "PalladiumCookies",
+            code: 2,
+            userInfo: [NSLocalizedDescriptionKey: String(localized: "cookies.error.invalid_format")]
+        )
     }
 
     private func sanitizedCookieFileName(from rawValue: String) -> String {
