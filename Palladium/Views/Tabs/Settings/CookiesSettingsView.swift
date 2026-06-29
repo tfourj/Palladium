@@ -7,9 +7,12 @@ struct CookiesSettingsView: View {
     let isBusy: Bool
     let onRefresh: () -> Void
     let onImport: (_ sourceURL: URL) throws -> Void
+    let onPaste: (_ rawText: String) throws -> Void
     let onDelete: (_ cookieFile: ImportedCookieFile) throws -> Void
 
     @State private var showFileImporter = false
+    @State private var showPasteCookiesSheet = false
+    @State private var pastedCookiesText = ""
     @State private var errorMessage: String?
 
     var body: some View {
@@ -22,6 +25,14 @@ struct CookiesSettingsView: View {
 
                 Button("cookies.import.button") {
                     showFileImporter = true
+                }
+                .disabled(isBusy)
+
+                Button {
+                    pastedCookiesText = ""
+                    showPasteCookiesSheet = true
+                } label: {
+                    Label("cookies.paste.button", systemImage: "doc.on.clipboard")
                 }
                 .disabled(isBusy)
 
@@ -93,6 +104,49 @@ struct CookiesSettingsView: View {
                 try onImport(url)
             } catch {
                 errorMessage = error.localizedDescription
+            }
+        }
+        .sheet(isPresented: $showPasteCookiesSheet) {
+            NavigationStack {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("cookies.paste.message")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+
+                    TextEditor(text: $pastedCookiesText)
+                        .font(.system(.body, design: .monospaced))
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                        .padding(8)
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(.separator, lineWidth: 1)
+                                .allowsHitTesting(false)
+                        }
+                }
+                .padding()
+                .navigationTitle("cookies.paste.title")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("common.cancel") {
+                            showPasteCookiesSheet = false
+                        }
+                    }
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("cookies.paste.add") {
+                            let rawText = pastedCookiesText
+                            pastedCookiesText = ""
+                            showPasteCookiesSheet = false
+                            do {
+                                try onPaste(rawText)
+                            } catch {
+                                errorMessage = error.localizedDescription
+                            }
+                        }
+                        .disabled(pastedCookiesText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    }
+                }
             }
         }
         .alert(String(localized: "common.result"), isPresented: Binding(

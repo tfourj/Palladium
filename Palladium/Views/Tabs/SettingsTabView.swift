@@ -77,6 +77,7 @@ struct SettingsTabView: View {
     let onOpenStorageManager: () -> Void
     let onRefreshCookieFiles: () -> Void
     let onImportCookieFile: (_ sourceURL: URL) throws -> Void
+    let onPasteCookieFile: (_ rawText: String) throws -> Void
     let onDeleteCookieFile: (_ cookieFile: ImportedCookieFile) throws -> Void
     let onRefreshURLAllowlists: (_ onComplete: ((_ message: String) -> Void)?) -> Void
     let onAddURLAllowlist: (_ urlString: String, _ onComplete: ((_ message: String) -> Void)?) -> Void
@@ -247,6 +248,7 @@ struct SettingsTabView: View {
                         isBusy: isRunning || isPackageRunning,
                         onRefresh: onRefreshCookieFiles,
                         onImport: onImportCookieFile,
+                        onPaste: onPasteCookieFile,
                         onDelete: onDeleteCookieFile
                     )
                 case .packages:

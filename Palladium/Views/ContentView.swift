@@ -331,6 +331,7 @@ struct ContentView: View {
                     onOpenStorageManager: refreshStorageSummary,
                     onRefreshCookieFiles: refreshImportedCookieFiles,
                     onImportCookieFile: importCookieFile,
+                    onPasteCookieFile: pasteCookieFile,
                     onDeleteCookieFile: deleteImportedCookieFile,
                     onRefreshURLAllowlists: refreshURLAllowlists,
                     onAddURLAllowlist: addURLAllowlist,

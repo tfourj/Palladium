@@ -14,7 +14,10 @@ extension ContentView {
                 selectedCookieFileName = ""
             }
         } catch {
-            appendConsoleText("[palladium] failed to refresh cookies list: \(error.localizedDescription)\n", source: .app)
+            appendConsoleText(
+                "[palladium] failed to refresh cookies list: \(error.localizedDescription)\n",
+                source: .app
+            )
         }
     }
 
@@ -28,11 +31,12 @@ extension ContentView {
 
         let data = try Data(contentsOf: sourceURL)
         let validatedText = try validatedNetscapeCookiesText(from: data)
-        let destinationURL = try uniqueCookieDestinationURL(for: sanitizedCookieFileName(from: sourceURL.lastPathComponent))
-        try FileManager.default.createDirectory(at: try cookiesDirectoryURL(), withIntermediateDirectories: true)
-        try validatedText.write(to: destinationURL, atomically: true, encoding: .utf8)
-        refreshImportedCookieFiles()
-        showTemporaryToast(String(format: String(localized: "cookies.toast.imported"), destinationURL.lastPathComponent))
+        try saveCookieText(validatedText, preferredFileName: sourceURL.lastPathComponent)
+    }
+
+    func pasteCookieFile(from rawText: String) throws {
+        let validatedText = try normalizedNetscapeCookiesText(from: rawText)
+        try saveCookieText(validatedText, preferredFileName: "pasted-cookies.txt")
     }
 
     func deleteImportedCookieFile(_ cookieFile: ImportedCookieFile) throws {
@@ -64,7 +68,10 @@ extension ContentView {
                 return match.fileURL.path
             }
         } catch {
-            appendConsoleText("[palladium] failed to resolve selected cookie file: \(error.localizedDescription)\n", source: .app)
+            appendConsoleText(
+                "[palladium] failed to resolve selected cookie file: \(error.localizedDescription)\n",
+                source: .app
+            )
         }
         appendConsoleText("[palladium] selected cookie file missing, clearing selection\n", source: .app)
         selectedCookieFileName = ""
@@ -79,6 +86,16 @@ extension ContentView {
         UserDefaults.standard.string(forKey: selectedCookieFileNameDefaultsKey) ?? ""
     }
 
+    private func saveCookieText(_ text: String, preferredFileName: String) throws {
+        let destinationURL = try uniqueCookieDestinationURL(for: sanitizedCookieFileName(from: preferredFileName))
+        try FileManager.default.createDirectory(at: try cookiesDirectoryURL(), withIntermediateDirectories: true)
+        try text.write(to: destinationURL, atomically: true, encoding: .utf8)
+        refreshImportedCookieFiles()
+        showTemporaryToast(
+            String(format: String(localized: "cookies.toast.imported"), destinationURL.lastPathComponent)
+        )
+    }
+
     private func listImportedCookieFiles() throws -> [ImportedCookieFile] {
         let cookiesURL = try cookiesDirectoryURL()
         try FileManager.default.createDirectory(at: cookiesURL, withIntermediateDirectories: true)
@@ -89,7 +106,9 @@ extension ContentView {
         )
 
         return try contents.compactMap { fileURL in
-            let values = try fileURL.resourceValues(forKeys: [.isRegularFileKey, .contentModificationDateKey, .fileSizeKey])
+            let values = try fileURL.resourceValues(
+                forKeys: [.isRegularFileKey, .contentModificationDateKey, .fileSizeKey]
+            )
             guard values.isRegularFile == true else { return nil }
             return ImportedCookieFile(
                 fileName: fileURL.lastPathComponent,
