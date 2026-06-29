@@ -1,11 +1,11 @@
 import os
 
 MAX_CAPTURED_OUTPUT_CHARS = 250000
-YTDLP_RUNTIME_PACKAGES = ("yt-dlp", "yt-dlp-apple-webkit-jsi", "curl-cffi")
+YTDLP_RUNTIME_PACKAGES = ("yt-dlp", "yt-dlp-apple-webkit-jsi", "curl-cffi", "gallery-dl")
 BUNDLED_RUNTIME_PACKAGES = ("curl-cffi",)
-TRACKED_PACKAGES = YTDLP_RUNTIME_PACKAGES + ("gallery-dl", "pip")
+TRACKED_PACKAGES = YTDLP_RUNTIME_PACKAGES + ("pip",)
 DISPLAY_PACKAGES = TRACKED_PACKAGES
-CLEANUP_PACKAGES = YTDLP_RUNTIME_PACKAGES + ("gallery-dl",)
+CLEANUP_PACKAGES = YTDLP_RUNTIME_PACKAGES
 WEBKIT_JSI_API_PACKAGE_RELATIVE_PATH = os.path.join(
     "yt_dlp_plugins", "webkit_jsi", "lib", "api.py"
 )

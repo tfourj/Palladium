@@ -95,6 +95,9 @@ class PackageSourceModeTests(unittest.TestCase):
     def test_curl_cffi_is_required_for_yt_dlp_runtime(self):
         self.assertIn("curl-cffi", YTDLP_RUNTIME_PACKAGES)
 
+    def test_gallery_dl_is_required_for_yt_dlp_runtime(self):
+        self.assertIn("gallery-dl", YTDLP_RUNTIME_PACKAGES)
+
     def test_missing_curl_cffi_is_installed_from_index(self):
         packages, cleanup = build_package_install_plan(
             {
@@ -108,6 +111,21 @@ class PackageSourceModeTests(unittest.TestCase):
 
         self.assertEqual(packages, ["curl-cffi==2.0"])
         self.assertEqual(cleanup, ["curl-cffi"])
+
+    def test_missing_gallery_dl_is_installed_from_index(self):
+        packages, cleanup = build_package_install_plan(
+            {
+                "yt-dlp": "1.0",
+                "yt-dlp-apple-webkit-jsi": "1.0",
+                "curl-cffi": "1.0",
+                "gallery-dl": "not installed",
+            },
+            {"gallery-dl": ["2.0"]},
+            package_source=parse_package_source(json.dumps({"mode": "stable"})),
+        )
+
+        self.assertEqual(packages, ["gallery-dl==2.0"])
+        self.assertEqual(cleanup, ["gallery-dl"])
 
     def test_missing_curl_cffi_is_not_reported_as_available_update_by_default(self):
         lines = build_package_update_lines(
