@@ -61,7 +61,15 @@ Frameworks/SwiftFFmpeg-iOS/FFmpeg.xcframework
 
 ## curl-cffi
 
-- Build `SwiftCurlCffi-iOS` yourself from the sibling repo
+- CI downloads `SwiftCurlCffi-iOS.zip` from the latest
+  [tfourj/SwiftCurlCffi-iOS release](https://github.com/tfourj/SwiftCurlCffi-iOS/releases)
+- For local builds, download and unzip that release asset into:
+
+```text
+Frameworks/SwiftCurlCffi-iOS
+```
+
+- Or build `SwiftCurlCffi-iOS` yourself from the sibling repo
 - Install `cmake` and `ninja` first if they are missing
 - Build and copy it into Palladium:
 

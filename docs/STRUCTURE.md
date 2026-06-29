@@ -26,7 +26,7 @@ Palladium/
 | Path | Purpose |
 | --- | --- |
 | `.github/FUNDING.yml` | GitHub Sponsors configuration. |
-| `.github/workflows/build_ipa.yml` | GitHub Actions workflow that builds the IPA. |
+| `.github/workflows/build_ipa.yml` | GitHub Actions workflow that downloads local dependencies and builds the IPA. |
 | `.gitignore` | Files and local dependencies excluded from Git. |
 | `Palladium.xcodeproj/project.pbxproj` | Targets, build phases, build settings, and file references for Xcode. |
 | `Version.xcconfig` | Single source for the app version, build number, and final-build flag. |

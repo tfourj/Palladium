@@ -107,6 +107,54 @@ jobs:
         echo "✅ Installed SwiftFFmpeg-iOS:"
         ls -la "$TARGET_DIR"
 
+    - name: Download SwiftCurlCffi-iOS
+      uses: robinraju/release-downloader@v1
+      with:
+        repository: tfourj/SwiftCurlCffi-iOS
+        latest: true
+        fileName: SwiftCurlCffi-iOS.zip
+        out-file-path: swiftcurlcffi-download
+        extract: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Install SwiftCurlCffi-iOS
+      run: |
+        set -euo pipefail
+
+        TMP_DIR=$(mktemp -d)
+        FRAMEWORKS_DIR="$GITHUB_WORKSPACE/Frameworks"
+        TARGET_DIR="$FRAMEWORKS_DIR/SwiftCurlCffi-iOS"
+        EXTRACT_DIR="$TMP_DIR/extracted"
+        mkdir -p "$FRAMEWORKS_DIR"
+        mkdir -p "$EXTRACT_DIR"
+        cp -R "$GITHUB_WORKSPACE/swiftcurlcffi-download/." "$EXTRACT_DIR"
+
+        SOURCE_DIR=""
+        if [ -d "$EXTRACT_DIR/SwiftCurlCffi-iOS" ]; then
+          SOURCE_DIR="$EXTRACT_DIR/SwiftCurlCffi-iOS"
+        else
+          SOURCE_DIR=$(find "$EXTRACT_DIR" -maxdepth 2 -type f -name "Package.swift" -exec dirname {} \; | head -n 1)
+        fi
+
+        if [ -z "$SOURCE_DIR" ] || [ ! -d "$SOURCE_DIR" ]; then
+          echo "❌ Could not locate extracted SwiftCurlCffi-iOS folder."
+          find "$EXTRACT_DIR" -maxdepth 3 -print
+          exit 1
+        fi
+
+        rm -rf "$TARGET_DIR"
+        cp -R "$SOURCE_DIR" "$TARGET_DIR"
+
+        PAYLOAD_PATH="$TARGET_DIR/Sources/SwiftCurlCffiIOS/Resources/curl_cffi_ios_payload.zip"
+        if [ ! -f "$PAYLOAD_PATH" ]; then
+          echo "❌ SwiftCurlCffi-iOS payload zip missing: $PAYLOAD_PATH"
+          find "$TARGET_DIR" -maxdepth 5 -print
+          exit 1
+        fi
+
+        echo "✅ Installed SwiftCurlCffi-iOS:"
+        ls -la "$TARGET_DIR"
+
     - name: Set up Xcode 26.2
       uses: maxim-lobanov/setup-xcode@v1
       with:
