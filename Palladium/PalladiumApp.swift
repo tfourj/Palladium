@@ -27,6 +27,7 @@ private enum PythonRuntimeBootstrap {
         let bundle = Bundle.main
         let pythonRoot = bundle.bundleURL.appendingPathComponent("python")
         let libRoot = pythonRoot.appendingPathComponent("lib")
+        let bundledPackagesPath = bundle.bundleURL.appendingPathComponent("python-packages").path
         let writablePackagesPath = makeWritablePackagesPath()
         let writableDownloadsPath = makeWritableDownloadsPath()
         let writableCachePath = makeWritableCachePath()
@@ -44,8 +45,13 @@ private enum PythonRuntimeBootstrap {
             .path
 
         var pythonPathComponents = [stdlibPath, dynloadPath]
+        if FileManager.default.fileExists(atPath: bundledPackagesPath) {
+            pythonPathComponents.insert(bundledPackagesPath, at: 0)
+            setenv("PALLADIUM_BUNDLED_PYTHON_PACKAGES", bundledPackagesPath, 1)
+        }
         if let writablePackagesPath {
-            pythonPathComponents.insert(writablePackagesPath, at: 0)
+            let writableInsertIndex = FileManager.default.fileExists(atPath: bundledPackagesPath) ? 1 : 0
+            pythonPathComponents.insert(writablePackagesPath, at: writableInsertIndex)
             setenv("PALLADIUM_PYTHON_PACKAGES", writablePackagesPath, 1)
         }
         if let writableDownloadsPath {

@@ -1,6 +1,8 @@
 import json
+import os
 import pathlib
 import sys
+import tempfile
 import types
 import unittest
 
@@ -19,6 +21,18 @@ from palladium_ytdlp.gallery import gallery_item_media_type  # noqa: E402
 
 
 class PackageSourceModeTests(unittest.TestCase):
+    def with_bundled_curl_cffi(self, version):
+        temp_dir = tempfile.TemporaryDirectory()
+        root = pathlib.Path(temp_dir.name)
+        (root / "curl_cffi").mkdir()
+        dist_info = root / f"curl_cffi-{version}.dist-info"
+        dist_info.mkdir()
+        (dist_info / "METADATA").write_text(
+            f"Metadata-Version: 2.1\nName: curl-cffi\nVersion: {version}\n",
+            encoding="utf-8",
+        )
+        return temp_dir
+
     def test_stable_install_plan_pins_latest_index_version(self):
         packages, cleanup = build_package_install_plan(
             {
@@ -101,6 +115,30 @@ class PackageSourceModeTests(unittest.TestCase):
         )
 
         self.assertEqual(lines, ["curl-cffi: not installed -> 2.0"])
+
+    def test_bundled_curl_cffi_is_not_updated_by_pip(self):
+        previous = os.environ.get("PALLADIUM_BUNDLED_PYTHON_PACKAGES")
+        try:
+            with self.with_bundled_curl_cffi("0.15.1b2") as bundled:
+                os.environ["PALLADIUM_BUNDLED_PYTHON_PACKAGES"] = bundled
+                packages, cleanup = build_package_install_plan(
+                    {"curl-cffi": "0.15.1b2"},
+                    {"curl-cffi": ["0.16.0"]},
+                    package_source=parse_package_source(json.dumps({"mode": "stable"})),
+                )
+                lines = build_package_update_lines(
+                    {"curl-cffi": "0.15.1b2"},
+                    {"curl-cffi": ["0.16.0"]},
+                )
+        finally:
+            if previous is None:
+                os.environ.pop("PALLADIUM_BUNDLED_PYTHON_PACKAGES", None)
+            else:
+                os.environ["PALLADIUM_BUNDLED_PYTHON_PACKAGES"] = previous
+
+        self.assertEqual(packages, [])
+        self.assertEqual(cleanup, [])
+        self.assertEqual(lines, [])
 
     def test_gallery_audio_urls_with_tiktok_hints_are_classified_as_audio(self):
         self.assertEqual(

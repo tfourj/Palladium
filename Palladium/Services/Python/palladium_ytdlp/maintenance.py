@@ -12,6 +12,7 @@ from .packages import (
     collect_versions,
     ensure_pip_entrypoint,
     fetch_package_index_versions,
+    filter_installable_packages,
     parse_package_source,
 )
 from .runtime import invalidate_runtime_package_modules, raise_if_cancel_requested
@@ -106,7 +107,7 @@ def run_package_maintenance(action, custom_versions_json=None, live_log_fd_overr
                                 if package_source.get("mode") == "custom":
                                     packages = list(package_source.get("custom_specs") or [])
                                 else:
-                                    packages = list(YTDLP_RUNTIME_PACKAGES)
+                                    packages = filter_installable_packages(YTDLP_RUNTIME_PACKAGES)
                                 cleanup_packages = list(YTDLP_RUNTIME_PACKAGES)
                             else:
                                 packages, cleanup_packages = build_package_install_plan(

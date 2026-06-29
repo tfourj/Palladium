@@ -11,6 +11,7 @@
 		82BF06CE2F5762BC00133331 /* Frameworks/Python.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82BF06CD2F5762BC00133331 /* Frameworks/Python.xcframework */; };
 		82BF06CF2F5762BC00133331 /* Frameworks/Python.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 82BF06CD2F5762BC00133331 /* Frameworks/Python.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		82BF06D32F5762DD00133331 /* PythonKit in Frameworks */ = {isa = PBXBuildFile; productRef = 82BF06D22F5762DD00133331 /* PythonKit */; };
+		82CFC0012F70000100CFF001 /* SwiftCurlCffiIOS in Frameworks */ = {isa = PBXBuildFile; productRef = 82CFC0032F70000100CFF001 /* SwiftCurlCffiIOS */; };
 		82FD7E062F5B673000E69220 /* SwiftFFmpeg in Frameworks */ = {isa = PBXBuildFile; productRef = 82FD7E052F5B673000E69220 /* SwiftFFmpeg */; };
 /* End PBXBuildFile section */
 
@@ -107,6 +108,7 @@
 			files = (
 				82BF06CE2F5762BC00133331 /* Frameworks/Python.xcframework in Frameworks */,
 				82FD7E062F5B673000E69220 /* SwiftFFmpeg in Frameworks */,
+				82CFC0012F70000100CFF001 /* SwiftCurlCffiIOS in Frameworks */,
 				82BF06D32F5762DD00133331 /* PythonKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -192,6 +194,7 @@
 			packageProductDependencies = (
 				82BF06D22F5762DD00133331 /* PythonKit */,
 				82FD7E052F5B673000E69220 /* SwiftFFmpeg */,
+				82CFC0032F70000100CFF001 /* SwiftCurlCffiIOS */,
 			);
 			productName = Palladium;
 			productReference = 82BF06BE2F5761E800133331 /* Palladium.app */;
@@ -227,6 +230,7 @@
 			packageReferences = (
 				82BF06D12F5762DD00133331 /* XCRemoteSwiftPackageReference "PythonKit" */,
 				82FD7E042F5B673000E69220 /* XCLocalSwiftPackageReference "Frameworks/SwiftFFmpeg-iOS" */,
+				82CFC0022F70000100CFF001 /* XCLocalSwiftPackageReference "Frameworks/SwiftCurlCffi-iOS" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 82BF06BF2F5761E800133331 /* Products */;
@@ -661,6 +665,10 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
+		82CFC0022F70000100CFF001 /* XCLocalSwiftPackageReference "Frameworks/SwiftCurlCffi-iOS" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "Frameworks/SwiftCurlCffi-iOS";
+		};
 		82FD7E042F5B673000E69220 /* XCLocalSwiftPackageReference "Frameworks/SwiftFFmpeg-iOS" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = "Frameworks/SwiftFFmpeg-iOS";
@@ -687,6 +695,10 @@
 		82FD7E052F5B673000E69220 /* SwiftFFmpeg */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SwiftFFmpeg;
+		};
+		82CFC0032F70000100CFF001 /* SwiftCurlCffiIOS */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SwiftCurlCffiIOS;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
