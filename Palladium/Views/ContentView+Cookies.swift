@@ -207,36 +207,52 @@ extension ContentView {
 
     private func normalizedNetscapeCookieRecord(from line: String) -> String? {
         let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
-        let rawFields: [String]
+        var rawFields: [String]
 
         if line.contains("\t") {
             rawFields = line
                 .split(separator: "\t", omittingEmptySubsequences: false)
                 .map { String($0) }
         } else {
-            let splitFields = trimmed.split(
-                maxSplits: 6,
-                omittingEmptySubsequences: true,
-                whereSeparator: isCookieFieldSeparator
-            )
-            rawFields = splitFields.map { String($0) }
+            // Whitespace-separated fallback for files whose tabs were flattened
+            // to spaces. Keep the first six columns, then rejoin any remainder as
+            // the value so it does not pick up leading separator runs.
+            let tokens = trimmed
+                .split(omittingEmptySubsequences: true, whereSeparator: isCookieFieldSeparator)
+                .map { String($0) }
+            if tokens.count > 6 {
+                rawFields = Array(tokens.prefix(6)) + [tokens[6...].joined(separator: " ")]
+            } else {
+                rawFields = tokens
+            }
+        }
+
+        // Some exporters omit the trailing value column for cookies that have no
+        // value, leaving only six fields. Treat the missing value as empty.
+        if rawFields.count == 6 {
+            rawFields.append("")
         }
 
         guard rawFields.count == 7 else { return nil }
 
         let domain = rawFields[0].trimmingCharacters(in: .whitespaces)
-        let includeSubdomains = normalizedCookieBoolean(rawFields[1])
+        // Python's cookiejar asserts that the include-subdomains flag matches
+        // whether the domain starts with a dot, and rejects the whole file
+        // otherwise. Derive the flag from the domain instead of trusting the
+        // exported column, which browsers frequently get wrong.
+        let includeSubdomains = cookieDomainIncludesSubdomains(domain) ? "TRUE" : "FALSE"
+        let hasRecognizableFlag = normalizedCookieBoolean(rawFields[1]) != nil
         let path = rawFields[2].trimmingCharacters(in: .whitespaces)
         let secure = normalizedCookieBoolean(rawFields[3])
-        let expiration = rawFields[4].trimmingCharacters(in: .whitespaces)
+        let expiration = normalizedCookieExpiration(rawFields[4])
         let name = rawFields[5].trimmingCharacters(in: .whitespaces)
         let value = rawFields[6]
 
         guard !domain.isEmpty,
-              let includeSubdomains,
+              hasRecognizableFlag,
               !path.isEmpty,
               let secure,
-              Int64(expiration) != nil,
+              let expiration,
               !name.isEmpty else {
             return nil
         }
@@ -250,6 +266,30 @@ extension ContentView {
             name,
             value,
         ].joined(separator: "\t")
+    }
+
+    private func cookieDomainIncludesSubdomains(_ domain: String) -> Bool {
+        let httpOnlyPrefix = "#HttpOnly_"
+        let bareDomain = domain.hasPrefix(httpOnlyPrefix)
+            ? String(domain.dropFirst(httpOnlyPrefix.count))
+            : domain
+        return bareDomain.hasPrefix(".")
+    }
+
+    private func normalizedCookieExpiration(_ rawValue: String) -> String? {
+        let trimmed = rawValue.trimmingCharacters(in: .whitespaces)
+        // Session cookies are sometimes written with an empty expiration column.
+        if trimmed.isEmpty {
+            return "0"
+        }
+        if let intValue = Int64(trimmed) {
+            return String(intValue)
+        }
+        // Some exporters write a floating point timestamp; truncate to whole seconds.
+        if let doubleValue = Double(trimmed), doubleValue.isFinite {
+            return String(Int64(doubleValue))
+        }
+        return nil
     }
 
     private func isCookieFieldSeparator(_ character: Character) -> Bool {
