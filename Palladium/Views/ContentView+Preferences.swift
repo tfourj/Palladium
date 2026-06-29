@@ -203,7 +203,7 @@ extension ContentView {
 
     static func loadDetailedProgressEnabled() -> Bool {
         if UserDefaults.standard.object(forKey: detailedProgressEnabledDefaultsKey) == nil {
-            return false
+            return true
         }
         return UserDefaults.standard.bool(forKey: detailedProgressEnabledDefaultsKey)
     }
