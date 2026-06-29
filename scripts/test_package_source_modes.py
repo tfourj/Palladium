@@ -1,6 +1,8 @@
 import json
+import os
 import pathlib
 import sys
+import tempfile
 import types
 import unittest
 
@@ -9,24 +11,41 @@ sys.path.insert(0, str(ROOT / "Palladium" / "Services" / "Python"))
 
 from palladium_ytdlp.packages import (  # noqa: E402
     build_package_install_plan,
+    build_package_update_lines,
     build_pip_install_args,
+    collect_versions,
     parse_package_source,
 )
+from palladium_ytdlp.shared import YTDLP_RUNTIME_PACKAGES  # noqa: E402
 from palladium_ytdlp.entrypoints import invalidate_runtime_package_modules  # noqa: E402
 from palladium_ytdlp.gallery import gallery_item_media_type  # noqa: E402
 
 
 class PackageSourceModeTests(unittest.TestCase):
+    def with_bundled_curl_cffi(self, version):
+        temp_dir = tempfile.TemporaryDirectory()
+        root = pathlib.Path(temp_dir.name)
+        (root / "curl_cffi").mkdir()
+        dist_info = root / f"curl_cffi-{version}.dist-info"
+        dist_info.mkdir()
+        (dist_info / "METADATA").write_text(
+            f"Metadata-Version: 2.1\nName: curl-cffi\nVersion: {version}\n",
+            encoding="utf-8",
+        )
+        return temp_dir
+
     def test_stable_install_plan_pins_latest_index_version(self):
         packages, cleanup = build_package_install_plan(
             {
                 "yt-dlp": "1.0",
                 "yt-dlp-apple-webkit-jsi": "1.0",
+                "curl-cffi": "1.0",
                 "pip": "1.0",
             },
             {
                 "yt-dlp": ["2.0"],
                 "yt-dlp-apple-webkit-jsi": ["1.0"],
+                "curl-cffi": ["1.0"],
                 "pip": ["1.0"],
             },
             package_source=parse_package_source(json.dumps({"mode": "stable"})),
@@ -63,6 +82,79 @@ class PackageSourceModeTests(unittest.TestCase):
         self.assertEqual(packages, ["gallery-dl==2.0"])
         self.assertEqual(cleanup, ["gallery-dl"])
 
+    def test_curl_cffi_is_managed_with_other_runtime_packages(self):
+        packages, cleanup = build_package_install_plan(
+            {"curl-cffi": "1.0"},
+            {"curl-cffi": ["2.0"]},
+            package_source=parse_package_source(json.dumps({"mode": "stable"})),
+        )
+
+        self.assertEqual(packages, ["curl-cffi==2.0"])
+        self.assertEqual(cleanup, ["curl-cffi"])
+
+    def test_curl_cffi_is_required_for_yt_dlp_runtime(self):
+        self.assertIn("curl-cffi", YTDLP_RUNTIME_PACKAGES)
+
+    def test_missing_curl_cffi_is_installed_from_index(self):
+        packages, cleanup = build_package_install_plan(
+            {
+                "yt-dlp": "1.0",
+                "yt-dlp-apple-webkit-jsi": "1.0",
+                "curl-cffi": "not installed",
+            },
+            {"curl-cffi": ["2.0"]},
+            package_source=parse_package_source(json.dumps({"mode": "stable"})),
+        )
+
+        self.assertEqual(packages, ["curl-cffi==2.0"])
+        self.assertEqual(cleanup, ["curl-cffi"])
+
+    def test_missing_curl_cffi_is_reported_as_available_update(self):
+        lines = build_package_update_lines(
+            {"curl-cffi": "not installed"},
+            {"curl-cffi": ["2.0"]},
+        )
+
+        self.assertEqual(lines, ["curl-cffi: not installed -> 2.0"])
+
+    def test_bundled_curl_cffi_is_not_updated_by_pip(self):
+        previous = os.environ.get("PALLADIUM_BUNDLED_PYTHON_PACKAGES")
+        try:
+            with self.with_bundled_curl_cffi("0.15.1b2") as bundled:
+                os.environ["PALLADIUM_BUNDLED_PYTHON_PACKAGES"] = bundled
+                packages, cleanup = build_package_install_plan(
+                    {"curl-cffi": "0.15.1b2"},
+                    {"curl-cffi": ["0.16.0"]},
+                    package_source=parse_package_source(json.dumps({"mode": "stable"})),
+                )
+                lines = build_package_update_lines(
+                    {"curl-cffi": "0.15.1b2"},
+                    {"curl-cffi": ["0.16.0"]},
+                )
+        finally:
+            if previous is None:
+                os.environ.pop("PALLADIUM_BUNDLED_PYTHON_PACKAGES", None)
+            else:
+                os.environ["PALLADIUM_BUNDLED_PYTHON_PACKAGES"] = previous
+
+        self.assertEqual(packages, [])
+        self.assertEqual(cleanup, [])
+        self.assertEqual(lines, [])
+
+    def test_bundled_curl_cffi_version_is_labeled(self):
+        previous = os.environ.get("PALLADIUM_BUNDLED_PYTHON_PACKAGES")
+        try:
+            with self.with_bundled_curl_cffi("0.15.1b2") as bundled:
+                os.environ["PALLADIUM_BUNDLED_PYTHON_PACKAGES"] = bundled
+                versions = collect_versions(allow_cache_fallback=False)
+        finally:
+            if previous is None:
+                os.environ.pop("PALLADIUM_BUNDLED_PYTHON_PACKAGES", None)
+            else:
+                os.environ["PALLADIUM_BUNDLED_PYTHON_PACKAGES"] = previous
+
+        self.assertEqual(versions["curl-cffi"], "0.15.1b2 (bundled)")
+
     def test_gallery_audio_urls_with_tiktok_hints_are_classified_as_audio(self):
         self.assertEqual(
             gallery_item_media_type("https://sf16-ies-music-va.tiktokcdn.com/obj/tos-useast2a-v-2774/music-file"),
@@ -82,6 +174,7 @@ class PackageSourceModeTests(unittest.TestCase):
             "custom_specs": [
                 "yt-dlp==2026.1",
                 "yt-dlp-apple-webkit-jsi @ https://example.com/webkit.whl",
+                "curl-cffi==1.0",
             ],
         }))
         packages, cleanup = build_package_install_plan({}, {}, package_source=source)
@@ -89,8 +182,9 @@ class PackageSourceModeTests(unittest.TestCase):
         self.assertEqual(packages, [
             "yt-dlp==2026.1",
             "yt-dlp-apple-webkit-jsi @ https://example.com/webkit.whl",
+            "curl-cffi==1.0",
         ])
-        self.assertEqual(cleanup, ["yt-dlp", "yt-dlp-apple-webkit-jsi", "gallery-dl"])
+        self.assertEqual(cleanup, ["yt-dlp", "yt-dlp-apple-webkit-jsi", "curl-cffi", "gallery-dl"])
 
     def test_custom_source_skips_webkit_patch(self):
         custom_source = parse_package_source(json.dumps({"mode": "custom"}))

@@ -1,9 +1,11 @@
 import os
 
 MAX_CAPTURED_OUTPUT_CHARS = 250000
-TRACKED_PACKAGES = ("yt-dlp", "yt-dlp-apple-webkit-jsi", "gallery-dl", "pip")
+YTDLP_RUNTIME_PACKAGES = ("yt-dlp", "yt-dlp-apple-webkit-jsi", "curl-cffi")
+BUNDLED_RUNTIME_PACKAGES = ("curl-cffi",)
+TRACKED_PACKAGES = YTDLP_RUNTIME_PACKAGES + ("gallery-dl", "pip")
 DISPLAY_PACKAGES = TRACKED_PACKAGES
-CLEANUP_PACKAGES = ("yt-dlp", "yt-dlp-apple-webkit-jsi", "gallery-dl")
+CLEANUP_PACKAGES = YTDLP_RUNTIME_PACKAGES + ("gallery-dl",)
 WEBKIT_JSI_API_PACKAGE_RELATIVE_PATH = os.path.join(
     "yt_dlp_plugins", "webkit_jsi", "lib", "api.py"
 )
@@ -90,6 +92,19 @@ class Tee:
                 except Exception:
                     if stream in self.streams:
                         self.streams.remove(stream)
+
+    def isatty(self):
+        for stream in list(self.streams):
+            checker = getattr(stream, "isatty", None)
+            if checker is None:
+                continue
+            try:
+                if checker():
+                    return True
+            except Exception:
+                if stream in self.streams:
+                    self.streams.remove(stream)
+        return False
 
     def reconfigure(self, **_options):
         """Support tools that configure standard streams while output is being mirrored."""

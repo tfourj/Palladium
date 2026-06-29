@@ -64,7 +64,13 @@ struct SettingsTabView: View {
     let onCancelPackages: () -> Void
     let onUpdatePackages: () -> Void
     let onReinstallPackages: () -> Void
-    let onCustomUpdatePackages: (_ ytDlpVersion: String?, _ webkitJSIVersion: String?, _ galleryDLVersion: String?, _ pipVersion: String?) -> Void
+    let onCustomUpdatePackages: (
+        _ ytDlpVersion: String?,
+        _ webkitJSIVersion: String?,
+        _ curlCFFIVersion: String?,
+        _ galleryDLVersion: String?,
+        _ pipVersion: String?
+    ) -> Void
     let onFetchPackageVersions: () -> Void
     let onOpenPackageManager: () -> Void
     let onRefreshStorage: () -> Void

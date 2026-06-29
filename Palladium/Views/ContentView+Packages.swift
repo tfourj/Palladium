@@ -156,6 +156,7 @@ extension ContentView {
     func updatePackagesWithCustomVersions(
         _ ytDlpVersion: String?,
         _ webkitJSIVersion: String?,
+        _ curlCFFIVersion: String?,
         _ galleryDLVersion: String?,
         _ pipVersion: String?
     ) {
@@ -166,6 +167,9 @@ extension ContentView {
         }
         if let webkitJSIVersion {
             customVersions["yt-dlp-apple-webkit-jsi"] = webkitJSIVersion
+        }
+        if let curlCFFIVersion {
+            customVersions["curl-cffi"] = curlCFFIVersion
         }
         if let galleryDLVersion {
             customVersions["gallery-dl"] = galleryDLVersion

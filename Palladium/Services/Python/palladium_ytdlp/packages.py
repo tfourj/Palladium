@@ -9,10 +9,12 @@ import traceback
 import importlib.metadata as importlib_metadata
 
 from .shared import (
+    BUNDLED_RUNTIME_PACKAGES,
     CLEANUP_PACKAGES,
     DISPLAY_PACKAGES,
     TRACKED_PACKAGES,
     WEBKIT_JSI_API_PACKAGE_RELATIVE_PATH,
+    YTDLP_RUNTIME_PACKAGES,
 )
 
 
@@ -248,7 +250,45 @@ def version_from_install_target(package_name, install_target):
     return candidates[0][1]
 
 
+def bundled_packages_path():
+    path = os.environ.get("PALLADIUM_BUNDLED_PYTHON_PACKAGES", "").strip()
+    if path and os.path.isdir(path):
+        return path
+    return None
+
+
+def bundled_package_version(package_name):
+    if canonical_package_name(package_name) not in {
+        canonical_package_name(name) for name in BUNDLED_RUNTIME_PACKAGES
+    }:
+        return None
+
+    return version_from_install_target(package_name, bundled_packages_path())
+
+
+def is_bundled_runtime_package(package_name):
+    return bundled_package_version(package_name) is not None
+
+
+def filter_installable_packages(package_names):
+    return [
+        package_name for package_name in package_names
+        if not is_bundled_runtime_package(package_name)
+    ]
+
+
+def display_version(package_name, version):
+    version_text = str(version or "").strip()
+    if version_text and is_bundled_runtime_package(package_name):
+        return f"{version_text} (bundled)"
+    return version_text
+
+
 def installed_version(package_name, install_target=None):
+    bundled_version = bundled_package_version(package_name)
+    if bundled_version:
+        return bundled_version
+
     target_version = version_from_install_target(package_name, install_target)
     if target_version:
         return target_version
@@ -337,7 +377,7 @@ def collect_versions(install_target=None, allow_cache_fallback=True):
     for package_name in DISPLAY_PACKAGES:
         resolved_version = installed_version(package_name, install_target)
         if resolved_version:
-            versions[package_name] = resolved_version
+            versions[package_name] = display_version(package_name, resolved_version)
             continue
 
         if package_name in TRACKED_PACKAGES:
@@ -424,11 +464,16 @@ def latest_index_version(indexed_versions, package_name):
 def build_package_update_lines(installed_versions, indexed_versions):
     lines = []
     for package_name in TRACKED_PACKAGES:
-        current_version = normalized_version_text(installed_versions.get(package_name))
-        if not current_version or current_version in ("not installed", "unknown"):
+        if is_bundled_runtime_package(package_name):
             continue
 
+        current_version = normalized_version_text(installed_versions.get(package_name))
         latest_version = latest_index_version(indexed_versions, package_name)
+        if not current_version or current_version in ("not installed", "unknown"):
+            if latest_version and package_name in YTDLP_RUNTIME_PACKAGES:
+                lines.append(f"{package_name}: not installed -> {latest_version}")
+            continue
+
         if latest_version and latest_version != current_version:
             lines.append(f"{package_name}: {current_version} -> {latest_version}")
     return lines
@@ -452,6 +497,10 @@ def build_package_install_plan(installed_versions, indexed_versions, custom_vers
             if not requested_version:
                 continue
 
+            if is_bundled_runtime_package(package_name):
+                print(f"[palladium] skipping {package_name}; bundled in app")
+                continue
+
             current_version = normalized_version_text(installed_versions.get(package_name))
             if requested_version == current_version:
                 print(f"[palladium] skipping {package_name}; already on requested version {requested_version}")
@@ -463,11 +512,18 @@ def build_package_install_plan(installed_versions, indexed_versions, custom_vers
         return packages, cleanup_packages
 
     for package_name in TRACKED_PACKAGES:
-        current_version = normalized_version_text(installed_versions.get(package_name))
-        if not current_version or current_version in ("not installed", "unknown"):
+        if is_bundled_runtime_package(package_name):
             continue
 
+        current_version = normalized_version_text(installed_versions.get(package_name))
         latest_version = latest_index_version(indexed_versions, package_name)
+        if not current_version or current_version in ("not installed", "unknown"):
+            if latest_version and package_name in YTDLP_RUNTIME_PACKAGES:
+                packages.append(f"{package_name}=={latest_version}")
+                if package_name in CLEANUP_PACKAGES:
+                    cleanup_packages.append(package_name)
+            continue
+
         if latest_version and latest_version != current_version:
             packages.append(f"{package_name}=={latest_version}")
             if package_name in CLEANUP_PACKAGES:
@@ -606,6 +662,10 @@ def fetch_package_index_versions(install_target=None, pip_main=None, allow_prere
 
     resolved = {}
     for package_name in TRACKED_PACKAGES:
+        if is_bundled_runtime_package(package_name):
+            print(f"[palladium] skipping index versions for bundled {package_name}")
+            continue
+
         try:
             capture = io.StringIO()
             pip_args = [

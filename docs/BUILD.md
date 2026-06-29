@@ -13,6 +13,7 @@ Palladium/
   Frameworks/
     Python.xcframework
     SwiftFFmpeg-iOS/
+    SwiftCurlCffi-iOS/
 ```
 
 ## Python
@@ -58,11 +59,38 @@ cd Frameworks/SwiftFFmpeg-iOS
 Frameworks/SwiftFFmpeg-iOS/FFmpeg.xcframework
 ```
 
+## curl-cffi
+
+- CI downloads `SwiftCurlCffi-iOS.zip` from the latest
+  [tfourj/SwiftCurlCffi-iOS release](https://github.com/tfourj/SwiftCurlCffi-iOS/releases)
+- For local builds, download and unzip that release asset into:
+
+```text
+Frameworks/SwiftCurlCffi-iOS
+```
+
+- Or build `SwiftCurlCffi-iOS` yourself from the sibling repo
+- Install `cmake` and `ninja` first if they are missing
+- Build and copy it into Palladium:
+
+```bash
+cd ../SwiftCurlCffi-iOS
+./scripts/build-all.sh
+./scripts/export-to-palladium.sh ../Palladium
+```
+
+- After export, this must exist:
+
+```text
+Frameworks/SwiftCurlCffi-iOS/Sources/SwiftCurlCffiIOS/Resources/curl_cffi_ios_payload.zip
+```
+
 ## Build In Xcode
 
 - Open `Palladium.xcodeproj`
 - Check that `PythonKit` resolves
 - Check that local package `Frameworks/SwiftFFmpeg-iOS` resolves
+- Check that local package `Frameworks/SwiftCurlCffi-iOS` resolves
 - Select scheme `Palladium`
 - Set your signing team in Signing & Capabilities
 - Choose an iPhone or Generic iOS Device

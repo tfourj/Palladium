@@ -14,7 +14,7 @@ Palladium/
 ├── Version.xcconfig         Shared app version, build, and release-status settings
 ├── privacy-manifests/       Privacy manifests copied into the Python runtime
 ├── scripts/                 Build and validation helper scripts
-├── Frameworks/              Local, untracked Python and FFmpeg dependencies
+├── Frameworks/              Local, untracked Python, FFmpeg, and curl-cffi dependencies
 ├── build_ipa.sh             Command-line IPA build script
 ├── CHANGELOG.md             Release history
 ├── LICENSE                  GPLv3 license text
@@ -26,7 +26,7 @@ Palladium/
 | Path | Purpose |
 | --- | --- |
 | `.github/FUNDING.yml` | GitHub Sponsors configuration. |
-| `.github/workflows/build_ipa.yml` | GitHub Actions workflow that builds the IPA. |
+| `.github/workflows/build_ipa.yml` | GitHub Actions workflow that downloads local dependencies and builds the IPA. |
 | `.gitignore` | Files and local dependencies excluded from Git. |
 | `Palladium.xcodeproj/project.pbxproj` | Targets, build phases, build settings, and file references for Xcode. |
 | `Version.xcconfig` | Single source for the app version, build number, and final-build flag. |
@@ -149,6 +149,7 @@ Palladium/
 | `LICENSE` | GPLv3 terms. |
 | `Frameworks/Python.xcframework` | Locally installed Python runtime; required to build and intentionally untracked. |
 | `Frameworks/SwiftFFmpeg-iOS` | Locally installed SwiftFFmpeg package and FFmpeg framework; required to build and intentionally untracked. |
+| `Frameworks/SwiftCurlCffi-iOS` | Locally installed Swift package containing the iOS curl-cffi payload; required to build and intentionally untracked. |
 
 ## Typical Change Locations
 
