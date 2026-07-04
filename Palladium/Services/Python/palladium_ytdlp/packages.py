@@ -5,7 +5,9 @@ import os
 import re
 import shutil
 import sys
+import tempfile
 import traceback
+import zipfile
 import importlib.metadata as importlib_metadata
 
 from .shared import (
@@ -257,6 +259,22 @@ def bundled_packages_path():
     return None
 
 
+def manual_payload_packages_path():
+    path = os.environ.get("PALLADIUM_MANUAL_PAYLOAD_PACKAGES", "").strip()
+    if path and os.path.isdir(path):
+        return path
+    return None
+
+
+def manual_payload_package_version(package_name):
+    if canonical_package_name(package_name) not in {
+        canonical_package_name(name) for name in BUNDLED_RUNTIME_PACKAGES
+    }:
+        return None
+
+    return version_from_install_target(package_name, manual_payload_packages_path())
+
+
 def bundled_package_version(package_name):
     if canonical_package_name(package_name) not in {
         canonical_package_name(name) for name in BUNDLED_RUNTIME_PACKAGES
@@ -266,8 +284,16 @@ def bundled_package_version(package_name):
     return version_from_install_target(package_name, bundled_packages_path())
 
 
+def bundled_runtime_package_source(package_name):
+    if manual_payload_package_version(package_name) is not None:
+        return "payload"
+    if bundled_package_version(package_name) is not None:
+        return "bundled"
+    return None
+
+
 def is_bundled_runtime_package(package_name):
-    return bundled_package_version(package_name) is not None
+    return bundled_runtime_package_source(package_name) is not None
 
 
 def filter_installable_packages(package_names):
@@ -279,12 +305,19 @@ def filter_installable_packages(package_names):
 
 def display_version(package_name, version):
     version_text = str(version or "").strip()
-    if version_text and is_bundled_runtime_package(package_name):
+    package_source = bundled_runtime_package_source(package_name)
+    if version_text and package_source == "payload":
+        return f"{version_text} (payload)"
+    if version_text and package_source == "bundled":
         return f"{version_text} (bundled)"
     return version_text
 
 
 def installed_version(package_name, install_target=None):
+    manual_payload_version = manual_payload_package_version(package_name)
+    if manual_payload_version:
+        return manual_payload_version
+
     bundled_version = bundled_package_version(package_name)
     if bundled_version:
         return bundled_version
@@ -324,6 +357,7 @@ def matches_distribution_entry(entry_stem, package_name):
         normalized_stem == normalized_name
         or safe_stem == safe_name
         or safe_stem.startswith(f"{safe_name}-")
+        or re.match(rf"^{re.escape(safe_name)}_[0-9]", safe_stem) is not None
     )
 
 
@@ -369,6 +403,138 @@ def cleanup_target_package(install_target, package_name):
         traceback.print_exc()
 
     return removed
+
+
+def safe_extract_zip(zip_path, extract_root):
+    with zipfile.ZipFile(zip_path) as archive:
+        for member in archive.infolist():
+            member_name = str(member.filename or "")
+            if not member_name or member_name.startswith(("/", "\\")):
+                raise ValueError(f"Unsafe payload zip entry: {member_name}")
+
+            normalized_name = os.path.normpath(member_name)
+            if normalized_name == "." or normalized_name.startswith("..") or os.path.isabs(normalized_name):
+                raise ValueError(f"Unsafe payload zip entry: {member_name}")
+
+            target_path = os.path.abspath(os.path.join(extract_root, normalized_name))
+            extract_root_abs = os.path.abspath(extract_root)
+            if target_path != extract_root_abs and not target_path.startswith(extract_root_abs + os.sep):
+                raise ValueError(f"Unsafe payload zip entry: {member_name}")
+
+        archive.extractall(extract_root)
+
+
+def preferred_payload_site_packages_names():
+    names = []
+    configured_name = os.environ.get("PALLADIUM_PAYLOAD_SITE_PACKAGES", "").strip()
+    if configured_name:
+        names.append(configured_name)
+
+    names.extend([
+        "site-packages",
+        "site-packages-iphoneos",
+        "site-packages-iphonesimulator",
+    ])
+    return tuple(dict.fromkeys(names))
+
+
+def detect_bundled_payload_packages(package_dir):
+    detected = []
+    for package_name in BUNDLED_RUNTIME_PACKAGES:
+        if version_from_install_target(package_name, package_dir):
+            detected.append(package_name)
+    return detected
+
+
+def candidate_payload_package_dirs(extract_root):
+    yielded = set()
+
+    def yield_if_needed(path):
+        normalized_path = os.path.abspath(path)
+        if normalized_path in yielded or not os.path.isdir(normalized_path):
+            return []
+        yielded.add(normalized_path)
+        return [normalized_path]
+
+    candidates = []
+    for directory_name in preferred_payload_site_packages_names():
+        candidates.extend(yield_if_needed(os.path.join(extract_root, directory_name)))
+        try:
+            for child_name in os.listdir(extract_root):
+                child_path = os.path.join(extract_root, child_name)
+                candidates.extend(yield_if_needed(os.path.join(child_path, directory_name)))
+        except Exception:
+            pass
+
+    candidates.extend(yield_if_needed(extract_root))
+    try:
+        for child_name in os.listdir(extract_root):
+            child_path = os.path.join(extract_root, child_name)
+            candidates.extend(yield_if_needed(child_path))
+    except Exception:
+        pass
+
+    return candidates
+
+
+def find_payload_package_dir(extract_root):
+    for candidate_dir in candidate_payload_package_dirs(extract_root):
+        detected_packages = detect_bundled_payload_packages(candidate_dir)
+        if detected_packages:
+            return candidate_dir, detected_packages
+
+    raise ValueError(
+        "Payload ZIP does not contain a supported bundled runtime package "
+        f"({', '.join(BUNDLED_RUNTIME_PACKAGES)})."
+    )
+
+
+def copy_payload_package_contents(source_dir, install_target):
+    os.makedirs(install_target, exist_ok=True)
+    copied = 0
+    for entry_name in os.listdir(source_dir):
+        source_path = os.path.join(source_dir, entry_name)
+        target_path = os.path.join(install_target, entry_name)
+        if os.path.isdir(source_path):
+            if os.path.exists(target_path) and not os.path.isdir(target_path):
+                os.remove(target_path)
+            shutil.copytree(source_path, target_path, dirs_exist_ok=True)
+        else:
+            if os.path.isdir(target_path):
+                shutil.rmtree(target_path)
+            shutil.copy2(source_path, target_path)
+        copied += 1
+    return copied
+
+
+def install_payload_zip(payload_zip_path, install_target):
+    payload_path = str(payload_zip_path or "").strip()
+    if not payload_path:
+        raise ValueError("Payload ZIP path is missing.")
+    if not os.path.isfile(payload_path):
+        raise ValueError(f"Payload ZIP not found: {payload_path}")
+    if not zipfile.is_zipfile(payload_path):
+        raise ValueError("Payload file is not a valid ZIP archive.")
+    if not install_target:
+        raise ValueError("Manual payload install target is unavailable.")
+
+    temp_root = tempfile.mkdtemp(prefix="palladium-payload-")
+    try:
+        safe_extract_zip(payload_path, temp_root)
+        package_dir, detected_packages = find_payload_package_dir(temp_root)
+
+        removed = 0
+        for package_name in detected_packages:
+            removed += cleanup_target_package(install_target, package_name)
+        copied = copy_payload_package_contents(package_dir, install_target)
+
+        print(f"[palladium] installed payload packages: {', '.join(detected_packages)}")
+        print(f"[palladium] payload source package directory: {package_dir}")
+        print(f"[palladium] removed stale payload package entries: {removed}")
+        print(f"[palladium] copied payload package entries: {copied}")
+        return detected_packages
+    finally:
+        shutil.rmtree(temp_root, ignore_errors=True)
 
 
 def collect_versions(install_target=None, allow_cache_fallback=True):

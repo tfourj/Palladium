@@ -28,6 +28,7 @@ private enum PythonRuntimeBootstrap {
         let pythonRoot = bundle.bundleURL.appendingPathComponent("python")
         let libRoot = pythonRoot.appendingPathComponent("lib")
         let bundledPackagesPath = bundle.bundleURL.appendingPathComponent("python-packages").path
+        let manualPayloadPackagesPath = makeManualPayloadPackagesPath()
         let writablePackagesPath = makeWritablePackagesPath()
         let writableDownloadsPath = makeWritableDownloadsPath()
         let writableCachePath = makeWritableCachePath()
@@ -44,16 +45,20 @@ private enum PythonRuntimeBootstrap {
             .appendingPathComponent("lib-dynload")
             .path
 
-        var pythonPathComponents = [stdlibPath, dynloadPath]
+        var packagePathComponents: [String] = []
+        if let manualPayloadPackagesPath {
+            packagePathComponents.append(manualPayloadPackagesPath)
+            setenv("PALLADIUM_MANUAL_PAYLOAD_PACKAGES", manualPayloadPackagesPath, 1)
+        }
         if FileManager.default.fileExists(atPath: bundledPackagesPath) {
-            pythonPathComponents.insert(bundledPackagesPath, at: 0)
+            packagePathComponents.append(bundledPackagesPath)
             setenv("PALLADIUM_BUNDLED_PYTHON_PACKAGES", bundledPackagesPath, 1)
         }
         if let writablePackagesPath {
-            let writableInsertIndex = FileManager.default.fileExists(atPath: bundledPackagesPath) ? 1 : 0
-            pythonPathComponents.insert(writablePackagesPath, at: writableInsertIndex)
+            packagePathComponents.append(writablePackagesPath)
             setenv("PALLADIUM_PYTHON_PACKAGES", writablePackagesPath, 1)
         }
+        let pythonPathComponents = packagePathComponents + [stdlibPath, dynloadPath]
         if let writableDownloadsPath {
             setenv("PALLADIUM_DOWNLOADS", writableDownloadsPath, 1)
         }
@@ -67,6 +72,30 @@ private enum PythonRuntimeBootstrap {
 
         setenv("PYTHONHOME", pythonRoot.path, 1)
         setenv("PYTHONPATH", pythonPathComponents.joined(separator: ":"), 1)
+#if targetEnvironment(simulator)
+        setenv("PALLADIUM_PAYLOAD_SITE_PACKAGES", "site-packages-iphonesimulator", 1)
+#else
+        setenv("PALLADIUM_PAYLOAD_SITE_PACKAGES", "site-packages-iphoneos", 1)
+#endif
+    }
+
+    private static func makeManualPayloadPackagesPath() -> String? {
+        do {
+            let appSupport = try FileManager.default.url(
+                for: .applicationSupportDirectory,
+                in: .userDomainMask,
+                appropriateFor: nil,
+                create: true
+            )
+            let packagesDir = appSupport.appendingPathComponent("manual-payload-packages", isDirectory: true)
+            try FileManager.default.createDirectory(
+                at: packagesDir,
+                withIntermediateDirectories: true
+            )
+            return packagesDir.path
+        } catch {
+            return nil
+        }
     }
 
     private static func makeWritablePackagesPath() -> String? {
