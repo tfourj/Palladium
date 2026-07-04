@@ -1905,6 +1905,46 @@
         }
       }
     },
+    "packages.payload.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Installs a supported iOS payload ZIP for bundled runtime packages."
+          }
+        }
+      }
+    },
+    "packages.payload.import" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import Payload ZIP"
+          }
+        }
+      }
+    },
+    "packages.payload.import_failed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to import payload ZIP: %@"
+          }
+        }
+      }
+    },
+    "packages.payload.import_failed.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Payload ZIP Import Failed"
+          }
+        }
+      }
+    },
     "packages.reload_versions" : {
       "localizations" : {
         "en" : {
@@ -2081,6 +2121,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Checking versions..."
+          }
+        }
+      }
+    },
+    "packages.status.installing" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Installing payload ZIP..."
           }
         }
       }
