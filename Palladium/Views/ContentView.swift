@@ -535,7 +535,7 @@ struct ContentView: View {
             refreshImportedCookieFiles()
             consumePendingShortcutDownloadRequestIfNeeded()
             if checkPackageUpdatesOnLaunch {
-                runPackageFlow(action: "check", updateWhenAvailable: autoUpdatePackagesOnLaunch)
+                runPackageFlow(action: .check, updateWhenAvailable: autoUpdatePackagesOnLaunch)
             }
         }
         .onDisappear {

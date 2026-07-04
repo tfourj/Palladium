@@ -14,7 +14,7 @@ extension ContentView {
     }
 
     func runPackageFlow(
-        action: String,
+        action: PackageAction,
         customVersions: [String: String]? = nil,
         payloadZipPath: String? = nil,
         temporaryPayloadZipURL: URL? = nil,
@@ -26,17 +26,8 @@ extension ContentView {
         isPackageRunning = true
         isAutomaticallyUpdatingPackages = isAutomaticUpdate
         syncIdleTimerDisabled()
-        switch action {
-        case "install_payload_zip":
-            packageStatusText = "installing"
-        case "update", "reinstall":
-            packageStatusText = "updating"
-        case "index_versions":
-            packageStatusText = "indexing"
-            isLoadingPackageVersions = true
-        default:
-            packageStatusText = "checking"
-        }
+        packageStatusText = action.initialStatusText
+        isLoadingPackageVersions = action == .indexVersions
 
         let logPipe = Pipe()
         let readHandle = logPipe.fileHandleForReading
@@ -109,7 +100,6 @@ extension ContentView {
             let updatesAvailable = outcome.updatesAvailable ?? false
             if outcome.updatesAvailable != nil {
                 self.packageUpdatesAvailable = updatesAvailable
-                self.packageUpdatesAvailable = updatesAvailable
             }
             if let updatesSummary = outcome.updatesSummary {
                 self.packageUpdatesSummaryText = updatesSummary
@@ -124,12 +114,12 @@ extension ContentView {
             self.hasLoadedPackageStatus = true
             Self.logger.info("package flow finished with status: \(outcome.statusText, privacy: .public)")
 
-            if action == "check", updateWhenAvailable, updatesAvailable {
+            if action == .check, updateWhenAvailable, updatesAvailable {
                 guard !isRunning, !isCheckingDownloadAllowlist, !isResolvingGallery else {
                     appendConsoleText("[palladium] automatic package update skipped because a download is starting\n")
                     return
                 }
-                runPackageFlow(action: "update", isAutomaticUpdate: true)
+                runPackageFlow(action: .update, isAutomaticUpdate: true)
             }
 
 
@@ -138,12 +128,12 @@ extension ContentView {
     }
 
     func refreshPackageVersions() {
-        runPackageFlow(action: "check")
+        runPackageFlow(action: .check)
     }
 
     func loadPackageStatusIfNeeded() {
         guard !hasLoadedPackageStatus else { return }
-        runPackageFlow(action: "check")
+        runPackageFlow(action: .check)
     }
 
     func updatePackages() {
@@ -152,7 +142,7 @@ extension ContentView {
             showAlert = true
             return
         }
-        runPackageFlow(action: "update")
+        runPackageFlow(action: .update)
     }
 
     func reinstallPackages() {
@@ -161,35 +151,13 @@ extension ContentView {
             showAlert = true
             return
         }
-        runPackageFlow(action: "reinstall")
+        runPackageFlow(action: .reinstall)
     }
 
-    func updatePackagesWithCustomVersions(
-        _ ytDlpVersion: String?,
-        _ webkitJSIVersion: String?,
-        _ curlCFFIVersion: String?,
-        _ galleryDLVersion: String?,
-        _ pipVersion: String?
-    ) {
+    func updatePackagesWithCustomVersions(_ customVersions: [String: String]) {
         guard packageSourceMode != .custom else { return }
-        var customVersions: [String: String] = [:]
-        if let ytDlpVersion {
-            customVersions["yt-dlp"] = ytDlpVersion
-        }
-        if let webkitJSIVersion {
-            customVersions["yt-dlp-apple-webkit-jsi"] = webkitJSIVersion
-        }
-        if let curlCFFIVersion {
-            customVersions["curl-cffi"] = curlCFFIVersion
-        }
-        if let galleryDLVersion {
-            customVersions["gallery-dl"] = galleryDLVersion
-        }
-        if let pipVersion {
-            customVersions["pip"] = pipVersion
-        }
         guard !customVersions.isEmpty else { return }
-        runPackageFlow(action: "update", customVersions: customVersions)
+        runPackageFlow(action: .update, customVersions: customVersions)
     }
 
     func installPackagePayloadZip(from sourceURL: URL) {
@@ -198,7 +166,7 @@ extension ContentView {
         do {
             let temporaryPayloadZipURL = try copyPayloadZipToTemporaryStorage(from: sourceURL)
             runPackageFlow(
-                action: "install_payload_zip",
+                action: .installPayloadZip,
                 payloadZipPath: temporaryPayloadZipURL.path,
                 temporaryPayloadZipURL: temporaryPayloadZipURL
             )
@@ -212,7 +180,7 @@ extension ContentView {
     }
 
     func fetchPackageIndexVersions() {
-        runPackageFlow(action: "index_versions")
+        runPackageFlow(action: .indexVersions)
     }
 
     func persistPackageVersionsText(_ text: String) {
