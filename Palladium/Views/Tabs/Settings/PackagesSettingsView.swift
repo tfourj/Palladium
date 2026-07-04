@@ -2,6 +2,13 @@ import SwiftUI
 
 struct PackagesSettingsView: View {
     private static let latestSelectionToken = "__latest__"
+    private static let customUpdatePackageNames = [
+        "yt-dlp",
+        "yt-dlp-apple-webkit-jsi",
+        "curl-cffi",
+        "gallery-dl",
+        "pip"
+    ]
 
     let packageStatusText: String
     @Binding var checkPackageUpdatesOnLaunch: Bool
@@ -19,22 +26,12 @@ struct PackagesSettingsView: View {
     let onCancel: () -> Void
     let onUpdatePackages: () -> Void
     let onInstallPayloadZip: (_ sourceURL: URL) -> Void
-    let onCustomUpdatePackages: (
-        _ ytDlpVersion: String?,
-        _ webkitJSIVersion: String?,
-        _ curlCFFIVersion: String?,
-        _ galleryDLVersion: String?,
-        _ pipVersion: String?
-    ) -> Void
+    let onCustomUpdatePackages: (_ versions: [String: String]) -> Void
     let onFetchPackageVersions: () -> Void
     let onAppear: () -> Void
 
     @State private var showCustomVersionSheet = false
-    @State private var ytDlpSelectedVersion = Self.latestSelectionToken
-    @State private var webkitJSISelectedVersion = Self.latestSelectionToken
-    @State private var curlCFFISelectedVersion = Self.latestSelectionToken
-    @State private var galleryDLSelectedVersion = Self.latestSelectionToken
-    @State private var pipSelectedVersion = Self.latestSelectionToken
+    @State private var selectedPackageVersions: [String: String] = [:]
 
     var body: some View {
         Form {
@@ -136,31 +133,13 @@ struct PackagesSettingsView: View {
         NavigationStack {
             Form {
                 Section("packages.custom_update.targets") {
-                    packageVersionPicker(
-                        title: "yt-dlp",
-                        packageName: "yt-dlp",
-                        selection: $ytDlpSelectedVersion
-                    )
-                    packageVersionPicker(
-                        title: "yt-dlp-apple-webkit-jsi",
-                        packageName: "yt-dlp-apple-webkit-jsi",
-                        selection: $webkitJSISelectedVersion
-                    )
-                    packageVersionPicker(
-                        title: "curl-cffi",
-                        packageName: "curl-cffi",
-                        selection: $curlCFFISelectedVersion
-                    )
-                    packageVersionPicker(
-                        title: "gallery-dl",
-                        packageName: "gallery-dl",
-                        selection: $galleryDLSelectedVersion
-                    )
-                    packageVersionPicker(
-                        title: "pip",
-                        packageName: "pip",
-                        selection: $pipSelectedVersion
-                    )
+                    ForEach(Self.customUpdatePackageNames, id: \.self) { packageName in
+                        packageVersionPicker(
+                            title: packageName,
+                            packageName: packageName,
+                            selection: selectedVersionBinding(for: packageName)
+                        )
+                    }
                 }
 
                 Section("packages.custom_update.source") {
@@ -198,19 +177,10 @@ struct PackagesSettingsView: View {
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("common.apply") {
-                        let ytDlp = normalizeSelection(ytDlpSelectedVersion)
-                        let webkit = normalizeSelection(webkitJSISelectedVersion)
-                        let curlCFFI = normalizeSelection(curlCFFISelectedVersion)
-                        let galleryDL = normalizeSelection(galleryDLSelectedVersion)
-                        let pip = normalizeSelection(pipSelectedVersion)
-                        onCustomUpdatePackages(ytDlp, webkit, curlCFFI, galleryDL, pip)
+                        onCustomUpdatePackages(selectedCustomVersions())
                         showCustomVersionSheet = false
                     }
-                    .disabled(normalizeSelection(ytDlpSelectedVersion) == nil &&
-                              normalizeSelection(webkitJSISelectedVersion) == nil &&
-                              normalizeSelection(curlCFFISelectedVersion) == nil &&
-                              normalizeSelection(galleryDLSelectedVersion) == nil &&
-                              normalizeSelection(pipSelectedVersion) == nil)
+                    .disabled(selectedCustomVersions().isEmpty)
                 }
             }
         }
@@ -218,11 +188,7 @@ struct PackagesSettingsView: View {
     }
 
     private func prepareCustomVersionEditor() {
-        ytDlpSelectedVersion = Self.latestSelectionToken
-        webkitJSISelectedVersion = Self.latestSelectionToken
-        curlCFFISelectedVersion = Self.latestSelectionToken
-        galleryDLSelectedVersion = Self.latestSelectionToken
-        pipSelectedVersion = Self.latestSelectionToken
+        selectedPackageVersions = [:]
     }
 
     private func installedVersion(for packageName: String) -> String? {
@@ -247,6 +213,24 @@ struct PackagesSettingsView: View {
             return nil
         }
         return trimmed
+    }
+
+    private func selectedVersionBinding(for packageName: String) -> Binding<String> {
+        Binding(
+            get: { selectedPackageVersions[packageName] ?? Self.latestSelectionToken },
+            set: { selectedPackageVersions[packageName] = $0 }
+        )
+    }
+
+    private func selectedCustomVersions() -> [String: String] {
+        var versions: [String: String] = [:]
+        for packageName in Self.customUpdatePackageNames {
+            let selection = selectedPackageVersions[packageName] ?? Self.latestSelectionToken
+            if let version = normalizeSelection(selection) {
+                versions[packageName] = version
+            }
+        }
+        return versions
     }
 
     @ViewBuilder

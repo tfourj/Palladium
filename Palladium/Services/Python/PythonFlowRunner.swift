@@ -142,7 +142,7 @@ enum PythonFlowRunner {
     }
 
     static func executePackageFlow(
-        action: String,
+        action: PackageAction,
         customVersions: [String: String]? = nil,
         packageSourceJSON: String,
         payloadZipPath: String? = nil,
@@ -166,7 +166,7 @@ enum PythonFlowRunner {
                 let payloadZipPathArgument = payloadZipPath ?? ""
                 let result = try function.throwing.dynamicallyCall(
                     withArguments: [
-                        action,
+                        action.rawValue,
                         customVersionsJSON,
                         liveLogArgument,
                         packageSourceJSON,
