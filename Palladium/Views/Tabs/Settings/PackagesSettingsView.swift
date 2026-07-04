@@ -18,6 +18,7 @@ struct PackagesSettingsView: View {
     let onRefreshVersions: () -> Void
     let onCancel: () -> Void
     let onUpdatePackages: () -> Void
+    let onInstallPayloadZip: (_ sourceURL: URL) -> Void
     let onCustomUpdatePackages: (
         _ ytDlpVersion: String?,
         _ webkitJSIVersion: String?,
@@ -44,7 +45,8 @@ struct PackagesSettingsView: View {
                         autoUpdatePackagesOnLaunch: $autoUpdatePackagesOnLaunch,
                         packageSourceMode: $packageSourceMode,
                         customPackageSpecsText: $customPackageSpecsText,
-                        isRunning: isRunning
+                        isRunning: isRunning,
+                        onInstallPayloadZip: onInstallPayloadZip
                     )
                 } label: {
                     Label("settings.packages.manager.title", systemImage: "gearshape")
@@ -287,6 +289,9 @@ struct PackagesSettingsView: View {
     private var progressStatusMessage: String {
         if packageStatusText == "updating" {
             return String(localized: "packages.status.updating")
+        }
+        if packageStatusText == "installing" {
+            return String(localized: "packages.status.installing")
         }
         if packageStatusText == "indexing" {
             return String(localized: "packages.status.loading_index")

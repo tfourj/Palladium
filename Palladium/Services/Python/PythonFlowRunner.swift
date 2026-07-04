@@ -145,6 +145,7 @@ enum PythonFlowRunner {
         action: String,
         customVersions: [String: String]? = nil,
         packageSourceJSON: String,
+        payloadZipPath: String? = nil,
         liveLogFD: Int32?
     ) async -> PythonFlowOutcome {
         await runOnPythonThread {
@@ -162,8 +163,15 @@ enum PythonFlowRunner {
                 let module = try loadYtDlpModule()
                 let function = try pythonMember(module, named: "run_package_maintenance")
                 let liveLogArgument: PythonObject = liveLogFD.map { PythonObject(Int($0)) } ?? Python.None
+                let payloadZipPathArgument = payloadZipPath ?? ""
                 let result = try function.throwing.dynamicallyCall(
-                    withArguments: [action, customVersionsJSON, liveLogArgument, packageSourceJSON]
+                    withArguments: [
+                        action,
+                        customVersionsJSON,
+                        liveLogArgument,
+                        packageSourceJSON,
+                        payloadZipPathArgument
+                    ]
                 )
                 payload = String(result) ?? ""
             } catch {

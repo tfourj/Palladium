@@ -16,6 +16,8 @@ extension ContentView {
     func runPackageFlow(
         action: String,
         customVersions: [String: String]? = nil,
+        payloadZipPath: String? = nil,
+        temporaryPayloadZipURL: URL? = nil,
         updateWhenAvailable: Bool = false,
         isAutomaticUpdate: Bool = false
     ) {
@@ -25,6 +27,8 @@ extension ContentView {
         isAutomaticallyUpdatingPackages = isAutomaticUpdate
         syncIdleTimerDisabled()
         switch action {
+        case "install_payload_zip":
+            packageStatusText = "installing"
         case "update", "reinstall":
             packageStatusText = "updating"
         case "index_versions":
@@ -64,8 +68,12 @@ extension ContentView {
                 action: action,
                 customVersions: customVersions,
                 packageSourceJSON: buildPackageSourceJSON(),
+                payloadZipPath: payloadZipPath,
                 liveLogFD: liveLogFD
             )
+            if let temporaryPayloadZipURL {
+                try? FileManager.default.removeItem(at: temporaryPayloadZipURL)
+            }
 
             FFmpegBridgeControl.setLiveLogFD(nil)
             unsetenv("PALLADIUM_CANCEL_FILE")
@@ -184,6 +192,25 @@ extension ContentView {
         runPackageFlow(action: "update", customVersions: customVersions)
     }
 
+    func installPackagePayloadZip(from sourceURL: URL) {
+        guard !isRunning, !isPackageRunning, !isCheckingDownloadAllowlist, !isResolvingGallery else { return }
+
+        do {
+            let temporaryPayloadZipURL = try copyPayloadZipToTemporaryStorage(from: sourceURL)
+            runPackageFlow(
+                action: "install_payload_zip",
+                payloadZipPath: temporaryPayloadZipURL.path,
+                temporaryPayloadZipURL: temporaryPayloadZipURL
+            )
+        } catch {
+            alertMessage = String(
+                format: String(localized: "packages.payload.import_failed"),
+                error.localizedDescription
+            )
+            showAlert = true
+        }
+    }
+
     func fetchPackageIndexVersions() {
         runPackageFlow(action: "index_versions")
     }
@@ -211,5 +238,29 @@ extension ContentView {
             .components(separatedBy: .newlines)
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty && !$0.hasPrefix("#") }
+    }
+
+    private func copyPayloadZipToTemporaryStorage(from sourceURL: URL) throws -> URL {
+        let didAccessSecurityScopedResource = sourceURL.startAccessingSecurityScopedResource()
+        defer {
+            if didAccessSecurityScopedResource {
+                sourceURL.stopAccessingSecurityScopedResource()
+            }
+        }
+
+        let importDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("PalladiumPayloadImports", isDirectory: true)
+        try FileManager.default.createDirectory(
+            at: importDirectory,
+            withIntermediateDirectories: true
+        )
+
+        let fileName = sourceURL.lastPathComponent.isEmpty ? "payload.zip" : sourceURL.lastPathComponent
+        let destinationURL = importDirectory.appendingPathComponent("\(UUID().uuidString)-\(fileName)")
+        if FileManager.default.fileExists(atPath: destinationURL.path) {
+            try FileManager.default.removeItem(at: destinationURL)
+        }
+        try FileManager.default.copyItem(at: sourceURL, to: destinationURL)
+        return destinationURL
     }
 }

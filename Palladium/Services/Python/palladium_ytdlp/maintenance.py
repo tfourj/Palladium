@@ -13,6 +13,7 @@ from .packages import (
     ensure_pip_entrypoint,
     fetch_package_index_versions,
     filter_installable_packages,
+    install_payload_zip,
     parse_package_source,
 )
 from .runtime import invalidate_runtime_package_modules, raise_if_cancel_requested
@@ -20,7 +21,13 @@ from .shared import TRACKED_PACKAGES, TailBuffer, Tee, YTDLP_RUNTIME_PACKAGES, o
 from .webkit_jsi import ensure_safe_webkit_jsi_runtime
 
 
-def run_package_maintenance(action, custom_versions_json=None, live_log_fd_override=None, package_source_json_override=None):
+def run_package_maintenance(
+    action,
+    custom_versions_json=None,
+    live_log_fd_override=None,
+    package_source_json_override=None,
+    payload_zip_path_override=None,
+):
     output = TailBuffer()
     console_stdout = sys.__stdout__ if sys.__stdout__ is not None else None
     console_stderr = sys.__stderr__ if sys.__stderr__ is not None else None
@@ -34,12 +41,20 @@ def run_package_maintenance(action, custom_versions_json=None, live_log_fd_overr
     cancelled = False
     restart_required = False
     install_target = os.environ.get("PALLADIUM_PYTHON_PACKAGES")
+    manual_payload_target = os.environ.get("PALLADIUM_MANUAL_PAYLOAD_PACKAGES") or install_target
     cancel_file_path = os.environ.get("PALLADIUM_CANCEL_FILE", "").strip()
     live_log_stream = open_live_log_stream(live_log_fd_override)
     package_source = parse_package_source(package_source_json_override)
+    installed_payload_packages = []
 
     with contextlib.redirect_stdout(Tee(output, console_stdout, live_log_stream)), contextlib.redirect_stderr(Tee(output, console_stderr, live_log_stream)):
         os.environ["PYTHONIOENCODING"] = "utf-8"
+        if manual_payload_target:
+            os.makedirs(manual_payload_target, exist_ok=True)
+            if manual_payload_target not in sys.path:
+                sys.path.insert(0, manual_payload_target)
+            print(f"[palladium] manual payload package target: {manual_payload_target}")
+
         if install_target:
             os.makedirs(install_target, exist_ok=True)
             if install_target not in sys.path:
@@ -54,6 +69,10 @@ def run_package_maintenance(action, custom_versions_json=None, live_log_fd_overr
                 updates_available = False
                 updates_summary = "Skipped update check."
                 print("[palladium] quick version refresh only")
+            elif action == "install_payload_zip":
+                updates_available = False
+                updates_summary = "Installing payload ZIP."
+                print("[palladium] payload ZIP install requested")
             elif action == "index_versions":
                 updates_available = False
                 updates_summary = "Skipped update check."
@@ -88,6 +107,22 @@ def run_package_maintenance(action, custom_versions_json=None, live_log_fd_overr
                     traceback.print_exc()
             if custom_versions:
                 print(f"[palladium] custom package versions requested: {custom_versions}")
+
+            if action == "install_payload_zip":
+                try:
+                    raise_if_cancel_requested(cancel_file_path, "[palladium] package action cancelled before payload install")
+                    restart_required = invalidate_runtime_package_modules() or restart_required
+                    installed_payload_packages = install_payload_zip(payload_zip_path_override, manual_payload_target)
+                    pip_exit_code = 0
+                    updates_summary = (
+                        "Installed payload ZIP for "
+                        f"{', '.join(installed_payload_packages)}."
+                    )
+                except Exception:
+                    pip_exit_code = 1
+                    updates_summary = "Payload ZIP install failed."
+                    print("[palladium] payload ZIP install failed")
+                    traceback.print_exc()
 
             if action in ("update", "reinstall"):
                 should_install = True

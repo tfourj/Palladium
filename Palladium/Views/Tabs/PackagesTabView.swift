@@ -20,7 +20,7 @@ struct PackagesTabView: View {
             if isRunning {
                 HStack(spacing: 8) {
                     ProgressView()
-                    Text(packageStatusText == "updating" ? "packages.status.updating" : "packages.status.checking")
+                    Text(progressStatusMessage)
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }
@@ -58,5 +58,15 @@ struct PackagesTabView: View {
             Spacer(minLength: 0)
         }
         .padding()
+    }
+
+    private var progressStatusMessage: LocalizedStringKey {
+        if packageStatusText == "updating" {
+            return "packages.status.updating"
+        }
+        if packageStatusText == "installing" {
+            return "packages.status.installing"
+        }
+        return "packages.status.checking"
     }
 }

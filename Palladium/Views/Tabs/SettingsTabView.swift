@@ -64,6 +64,7 @@ struct SettingsTabView: View {
     let onRefreshVersions: () -> Void
     let onCancelPackages: () -> Void
     let onUpdatePackages: () -> Void
+    let onInstallPackagePayloadZip: (_ sourceURL: URL) -> Void
     let onReinstallPackages: () -> Void
     let onCustomUpdatePackages: (
         _ ytDlpVersion: String?,
@@ -275,6 +276,7 @@ struct SettingsTabView: View {
                         onRefreshVersions: onRefreshVersions,
                         onCancel: onCancelPackages,
                         onUpdatePackages: onUpdatePackages,
+                        onInstallPayloadZip: onInstallPackagePayloadZip,
                         onCustomUpdatePackages: onCustomUpdatePackages,
                         onFetchPackageVersions: onFetchPackageVersions,
                         onAppear: onOpenPackageManager
