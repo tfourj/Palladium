@@ -34,6 +34,7 @@ Palladium/
 | `Palladium.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved` | Pinned Swift Package dependencies. |
 | `build_ipa.sh` | Builds and exports an IPA outside Xcode. |
 | `scripts/install_python_runtime.sh` | Copies Python runtime files and privacy manifests into the app bundle during builds. |
+| `scripts/python_tests/` | Python unittest modules and shared helpers for package/runtime behavior. |
 | `scripts/update_build_metadata.sh` | Writes Git commit and final-build metadata into the built app Info.plist. |
 | `scripts/test_package_source_modes.py` | Checks Python package-source mode behavior. |
 
