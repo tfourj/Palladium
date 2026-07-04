@@ -319,6 +319,7 @@ struct ContentView: View {
                     onRefreshVersions: refreshPackageVersions,
                     onCancelPackages: cancelPackageFlow,
                     onUpdatePackages: updatePackages,
+                    onInstallPackagePayloadZip: installPackagePayloadZip,
                     onReinstallPackages: reinstallPackages,
                     onCustomUpdatePackages: updatePackagesWithCustomVersions,
                     onFetchPackageVersions: fetchPackageIndexVersions,
