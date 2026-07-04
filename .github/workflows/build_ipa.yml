@@ -25,6 +25,11 @@ jobs:
         fetch-depth: 0
         fetch-tags: true
 
+    - name: Run Python tests
+      run: |
+        PYTHONDONTWRITEBYTECODE=1 python3 -m unittest scripts.test_package_source_modes
+        PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s scripts/python_tests -t .
+
     - name: Download Python Apple Support
       uses: robinraju/release-downloader@v1
       with:
