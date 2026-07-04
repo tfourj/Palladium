@@ -21,6 +21,152 @@ from .shared import TRACKED_PACKAGES, TailBuffer, Tee, YTDLP_RUNTIME_PACKAGES, o
 from .webkit_jsi import ensure_safe_webkit_jsi_runtime
 
 
+ACTION_CHECK = "check"
+ACTION_VERSIONS = "versions"
+ACTION_UPDATE = "update"
+ACTION_REINSTALL = "reinstall"
+ACTION_INDEX_VERSIONS = "index_versions"
+ACTION_INSTALL_PAYLOAD_ZIP = "install_payload_zip"
+PACKAGE_INSTALL_ACTIONS = (ACTION_UPDATE, ACTION_REINSTALL)
+
+
+def ensure_package_path(path, label):
+    if not path:
+        return
+
+    os.makedirs(path, exist_ok=True)
+    if path not in sys.path:
+        sys.path.insert(0, path)
+    print(f"[palladium] {label}: {path}")
+
+
+def parse_custom_versions(custom_versions_json):
+    custom_versions = {}
+    if not custom_versions_json:
+        return custom_versions
+
+    try:
+        parsed_versions = json.loads(custom_versions_json)
+        if isinstance(parsed_versions, dict):
+            for package_name in TRACKED_PACKAGES:
+                raw_value = parsed_versions.get(package_name)
+                if raw_value is None:
+                    continue
+                requested_version = str(raw_value).strip()
+                if requested_version:
+                    custom_versions[package_name] = requested_version
+    except Exception:
+        print("[palladium] failed to parse custom version payload")
+        traceback.print_exc()
+
+    return custom_versions
+
+
+def check_or_fetch_package_updates(action, install_target, package_source):
+    if action == ACTION_VERSIONS:
+        print("[palladium] quick version refresh only")
+        return False, "Skipped update check.", {}
+
+    if action == ACTION_INSTALL_PAYLOAD_ZIP:
+        print("[palladium] payload ZIP install requested")
+        return False, "Installing payload ZIP.", {}
+
+    if action == ACTION_INDEX_VERSIONS:
+        available_versions = fetch_package_index_versions(
+            install_target,
+            allow_prereleases=bool(package_source.get("allow_prereleases")),
+        )
+        print("[palladium] fetched package index versions")
+        return False, "Skipped update check.", available_versions
+
+    updates_available, updates_summary = check_package_updates(
+        install_target,
+        package_source=package_source,
+        include_missing=action in PACKAGE_INSTALL_ACTIONS,
+    )
+    print(f"[palladium] updates available: {updates_available}")
+    print(f"[palladium] updates summary: {updates_summary}")
+    return updates_available, updates_summary, {}
+
+
+def reinstall_package_plan(package_source):
+    if package_source.get("mode") == "custom":
+        packages = list(package_source.get("custom_specs") or [])
+    else:
+        packages = filter_installable_packages(YTDLP_RUNTIME_PACKAGES)
+    return packages, list(YTDLP_RUNTIME_PACKAGES)
+
+
+def install_payload_action(payload_zip_path, manual_payload_target, cancel_file_path):
+    raise_if_cancel_requested(cancel_file_path, "[palladium] package action cancelled before payload install")
+    restart_required = invalidate_runtime_package_modules()
+    installed_packages = install_payload_zip(payload_zip_path, manual_payload_target)
+    return {
+        "pip_exit_code": 0,
+        "restart_required": restart_required,
+        "updates_summary": f"Installed payload ZIP for {', '.join(installed_packages)}.",
+    }
+
+
+def install_package_updates(action, install_target, package_source, custom_versions, cancel_file_path):
+    raise_if_cancel_requested(cancel_file_path, "[palladium] package action cancelled before pip startup")
+    pip_main = ensure_pip_entrypoint(install_target)
+    if pip_main is None:
+        return {
+            "pip_attempted": False,
+            "pip_exit_code": 1,
+            "restart_required": False,
+        }
+
+    installed_versions = collect_versions(install_target=install_target, allow_cache_fallback=False)
+    indexed_versions = fetch_package_index_versions(
+        install_target=install_target,
+        pip_main=pip_main,
+        allow_prereleases=bool(package_source.get("allow_prereleases")),
+    )
+    if action == ACTION_REINSTALL:
+        packages, cleanup_packages = reinstall_package_plan(package_source)
+    else:
+        packages, cleanup_packages = build_package_install_plan(
+            installed_versions,
+            indexed_versions,
+            custom_versions=custom_versions,
+            package_source=package_source,
+        )
+
+    if not packages:
+        print("[palladium] no package installs required")
+        return {
+            "pip_attempted": False,
+            "pip_exit_code": 0,
+            "restart_required": False,
+        }
+
+    restart_required = invalidate_runtime_package_modules()
+    if install_target:
+        stale_removed = 0
+        for package_name in cleanup_packages:
+            raise_if_cancel_requested(cancel_file_path, "[palladium] package action cancelled during cleanup")
+            stale_removed += cleanup_target_package(install_target, package_name)
+        print(f"[palladium] removed stale target package entries: {stale_removed}")
+
+    raise_if_cancel_requested(cancel_file_path, "[palladium] package action cancelled before pip install")
+    pip_args = build_pip_install_args(
+        packages,
+        install_target=install_target,
+        allow_prereleases=bool(package_source.get("allow_prereleases")),
+        upgrade=True,
+    )
+    pip_result = pip_main(pip_args)
+    pip_exit_code = 0 if pip_result is None else int(pip_result)
+    print(f"[palladium] pip exit code: {pip_exit_code}")
+    return {
+        "pip_attempted": True,
+        "pip_exit_code": pip_exit_code,
+        "restart_required": restart_required,
+    }
+
+
 def run_package_maintenance(
     action,
     custom_versions_json=None,
@@ -45,142 +191,63 @@ def run_package_maintenance(
     cancel_file_path = os.environ.get("PALLADIUM_CANCEL_FILE", "").strip()
     live_log_stream = open_live_log_stream(live_log_fd_override)
     package_source = parse_package_source(package_source_json_override)
-    installed_payload_packages = []
 
-    with contextlib.redirect_stdout(Tee(output, console_stdout, live_log_stream)), contextlib.redirect_stderr(Tee(output, console_stderr, live_log_stream)):
+    with (
+        contextlib.redirect_stdout(Tee(output, console_stdout, live_log_stream)),
+        contextlib.redirect_stderr(Tee(output, console_stderr, live_log_stream)),
+    ):
         os.environ["PYTHONIOENCODING"] = "utf-8"
-        if manual_payload_target:
-            os.makedirs(manual_payload_target, exist_ok=True)
-            if manual_payload_target not in sys.path:
-                sys.path.insert(0, manual_payload_target)
-            print(f"[palladium] manual payload package target: {manual_payload_target}")
-
-        if install_target:
-            os.makedirs(install_target, exist_ok=True)
-            if install_target not in sys.path:
-                sys.path.insert(0, install_target)
-            print(f"[palladium] package install target: {install_target}")
+        ensure_package_path(install_target, "package install target")
+        if manual_payload_target != install_target:
+            ensure_package_path(manual_payload_target, "manual payload package target")
 
         try:
             raise_if_cancel_requested(cancel_file_path, "[palladium] package action cancelled before start")
             print(f"[palladium] package action: {action}")
             print(f"[palladium] package source: {package_source.get('mode')}")
-            if action == "versions":
-                updates_available = False
-                updates_summary = "Skipped update check."
-                print("[palladium] quick version refresh only")
-            elif action == "install_payload_zip":
-                updates_available = False
-                updates_summary = "Installing payload ZIP."
-                print("[palladium] payload ZIP install requested")
-            elif action == "index_versions":
-                updates_available = False
-                updates_summary = "Skipped update check."
-                available_versions = fetch_package_index_versions(
-                    install_target,
-                    allow_prereleases=bool(package_source.get("allow_prereleases")),
-                )
-                print("[palladium] fetched package index versions")
-            else:
-                updates_available, updates_summary = check_package_updates(
-                    install_target,
-                    package_source=package_source,
-                    include_missing=action in ("update", "reinstall"),
-                )
-                print(f"[palladium] updates available: {updates_available}")
-                print(f"[palladium] updates summary: {updates_summary}")
 
-            custom_versions = {}
-            if custom_versions_json:
-                try:
-                    parsed_versions = json.loads(custom_versions_json)
-                    if isinstance(parsed_versions, dict):
-                        for package_name in TRACKED_PACKAGES:
-                            raw_value = parsed_versions.get(package_name)
-                            if raw_value is None:
-                                continue
-                            requested_version = str(raw_value).strip()
-                            if requested_version:
-                                custom_versions[package_name] = requested_version
-                except Exception:
-                    print("[palladium] failed to parse custom version payload")
-                    traceback.print_exc()
+            updates_available, updates_summary, available_versions = check_or_fetch_package_updates(
+                action,
+                install_target,
+                package_source,
+            )
+
+            custom_versions = parse_custom_versions(custom_versions_json)
             if custom_versions:
                 print(f"[palladium] custom package versions requested: {custom_versions}")
 
-            if action == "install_payload_zip":
+            if action == ACTION_INSTALL_PAYLOAD_ZIP:
                 try:
-                    raise_if_cancel_requested(cancel_file_path, "[palladium] package action cancelled before payload install")
-                    restart_required = invalidate_runtime_package_modules() or restart_required
-                    installed_payload_packages = install_payload_zip(payload_zip_path_override, manual_payload_target)
-                    pip_exit_code = 0
-                    updates_summary = (
-                        "Installed payload ZIP for "
-                        f"{', '.join(installed_payload_packages)}."
+                    result = install_payload_action(
+                        payload_zip_path_override,
+                        manual_payload_target,
+                        cancel_file_path,
                     )
+                    pip_exit_code = result["pip_exit_code"]
+                    restart_required = result["restart_required"] or restart_required
+                    updates_summary = result["updates_summary"]
                 except Exception:
                     pip_exit_code = 1
                     updates_summary = "Payload ZIP install failed."
                     print("[palladium] payload ZIP install failed")
                     traceback.print_exc()
 
-            if action in ("update", "reinstall"):
-                should_install = True
-                if should_install:
-                    raise_if_cancel_requested(cancel_file_path, "[palladium] package action cancelled before pip startup")
-                    pip_main = ensure_pip_entrypoint(install_target)
-                    if pip_main is not None:
-                        try:
-                            installed_versions = collect_versions(install_target=install_target, allow_cache_fallback=False)
-                            indexed_versions = fetch_package_index_versions(
-                                install_target=install_target,
-                                pip_main=pip_main,
-                                allow_prereleases=bool(package_source.get("allow_prereleases")),
-                            )
-                            if action == "reinstall":
-                                if package_source.get("mode") == "custom":
-                                    packages = list(package_source.get("custom_specs") or [])
-                                else:
-                                    packages = filter_installable_packages(YTDLP_RUNTIME_PACKAGES)
-                                cleanup_packages = list(YTDLP_RUNTIME_PACKAGES)
-                            else:
-                                packages, cleanup_packages = build_package_install_plan(
-                                    installed_versions,
-                                    indexed_versions,
-                                    custom_versions=custom_versions,
-                                    package_source=package_source,
-                                )
-
-                            if not packages:
-                                print("[palladium] no package installs required")
-                                pip_exit_code = 0
-                            else:
-                                pip_attempted = True
-                                restart_required = invalidate_runtime_package_modules() or restart_required
-                                if install_target:
-                                    stale_removed = 0
-                                    for package_name in cleanup_packages:
-                                        raise_if_cancel_requested(cancel_file_path, "[palladium] package action cancelled during cleanup")
-                                        stale_removed += cleanup_target_package(install_target, package_name)
-                                    print(f"[palladium] removed stale target package entries: {stale_removed}")
-                                raise_if_cancel_requested(cancel_file_path, "[palladium] package action cancelled before pip install")
-                                pip_args = build_pip_install_args(
-                                    packages,
-                                    install_target=install_target,
-                                    allow_prereleases=bool(package_source.get("allow_prereleases")),
-                                    upgrade=True,
-                                )
-                                pip_result = pip_main(pip_args)
-                                pip_exit_code = 0 if pip_result is None else int(pip_result)
-                                print(f"[palladium] pip exit code: {pip_exit_code}")
-                        except Exception:
-                            pip_exit_code = 1
-                            print("[palladium] pip update failed")
-                            traceback.print_exc()
-                    else:
-                        pip_exit_code = 1
-                else:
-                    print("[palladium] no updates available; skipping update")
+            if action in PACKAGE_INSTALL_ACTIONS:
+                try:
+                    result = install_package_updates(
+                        action,
+                        install_target,
+                        package_source,
+                        custom_versions,
+                        cancel_file_path,
+                    )
+                    pip_attempted = result["pip_attempted"]
+                    pip_exit_code = result["pip_exit_code"]
+                    restart_required = result["restart_required"] or restart_required
+                except Exception:
+                    pip_exit_code = 1
+                    print("[palladium] pip update failed")
+                    traceback.print_exc()
 
                 raise_if_cancel_requested(cancel_file_path, "[palladium] package action cancelled before post-update check")
                 updates_available, updates_summary = check_package_updates(
