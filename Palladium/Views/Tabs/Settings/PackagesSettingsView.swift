@@ -1,5 +1,4 @@
 import SwiftUI
-import UniformTypeIdentifiers
 
 struct PackagesSettingsView: View {
     private static let latestSelectionToken = "__latest__"
@@ -36,9 +35,6 @@ struct PackagesSettingsView: View {
     @State private var curlCFFISelectedVersion = Self.latestSelectionToken
     @State private var galleryDLSelectedVersion = Self.latestSelectionToken
     @State private var pipSelectedVersion = Self.latestSelectionToken
-    @State private var showPayloadZipImporter = false
-    @State private var payloadImportErrorMessage: String?
-    @State private var showPayloadImportError = false
 
     var body: some View {
         Form {
@@ -49,7 +45,8 @@ struct PackagesSettingsView: View {
                         autoUpdatePackagesOnLaunch: $autoUpdatePackagesOnLaunch,
                         packageSourceMode: $packageSourceMode,
                         customPackageSpecsText: $customPackageSpecsText,
-                        isRunning: isRunning
+                        isRunning: isRunning,
+                        onInstallPayloadZip: onInstallPayloadZip
                     )
                 } label: {
                     Label("settings.packages.manager.title", systemImage: "gearshape")
@@ -83,13 +80,6 @@ struct PackagesSettingsView: View {
             }
 
             Section("packages.actions.title") {
-                Button {
-                    showPayloadZipImporter = true
-                } label: {
-                    Label("packages.payload.import", systemImage: "doc.zipper")
-                }
-                .disabled(isRunning)
-
                 if isRunning {
                     Button(action: onCancel) {
                         Text("common.cancel")
@@ -127,31 +117,11 @@ struct PackagesSettingsView: View {
                 Text("packages.update.long_press_help")
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                Text("packages.payload.help")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
             }
         }
         .navigationTitle("settings.packages.title")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear(perform: onAppear)
-        .fileImporter(
-            isPresented: $showPayloadZipImporter,
-            allowedContentTypes: [.zip, .data]
-        ) { result in
-            do {
-                let sourceURL = try result.get()
-                onInstallPayloadZip(sourceURL)
-            } catch {
-                payloadImportErrorMessage = error.localizedDescription
-                showPayloadImportError = true
-            }
-        }
-        .alert("packages.payload.import_failed.title", isPresented: $showPayloadImportError) {
-            Button("common.ok", role: .cancel) {}
-        } message: {
-            Text(payloadImportErrorMessage ?? "")
-        }
         .sheet(isPresented: $showCustomVersionSheet) {
             customVersionSheet
         }

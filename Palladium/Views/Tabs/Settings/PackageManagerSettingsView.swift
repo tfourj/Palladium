@@ -1,4 +1,5 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct PackageManagerSettingsView: View {
     @Binding var checkPackageUpdatesOnLaunch: Bool
@@ -6,8 +7,12 @@ struct PackageManagerSettingsView: View {
     @Binding var packageSourceMode: PackageSourceMode
     @Binding var customPackageSpecsText: String
     let isRunning: Bool
+    let onInstallPayloadZip: (_ sourceURL: URL) -> Void
 
     @State private var showNightlyWarning = false
+    @State private var showPayloadZipImporter = false
+    @State private var payloadImportErrorMessage: String?
+    @State private var showPayloadImportError = false
 
     var body: some View {
         Form {
@@ -48,6 +53,17 @@ struct PackageManagerSettingsView: View {
             }
 
             Section {
+                Button {
+                    showPayloadZipImporter = true
+                } label: {
+                    Label("packages.payload.import", systemImage: "doc.zipper")
+                }
+                .disabled(isRunning)
+            } footer: {
+                Text("packages.payload.help")
+            }
+
+            Section {
                 Toggle("settings.ui.packages.auto_check", isOn: $checkPackageUpdatesOnLaunch)
                     .disabled(isRunning)
 
@@ -64,6 +80,23 @@ struct PackageManagerSettingsView: View {
         }
         .navigationTitle("settings.packages.manager.title")
         .navigationBarTitleDisplayMode(.inline)
+        .fileImporter(
+            isPresented: $showPayloadZipImporter,
+            allowedContentTypes: [.zip, .data]
+        ) { result in
+            do {
+                let sourceURL = try result.get()
+                onInstallPayloadZip(sourceURL)
+            } catch {
+                payloadImportErrorMessage = error.localizedDescription
+                showPayloadImportError = true
+            }
+        }
+        .alert("packages.payload.import_failed.title", isPresented: $showPayloadImportError) {
+            Button("common.ok", role: .cancel) {}
+        } message: {
+            Text(payloadImportErrorMessage ?? "")
+        }
         .alert("packages.source.nightly.warning.title", isPresented: $showNightlyWarning) {
             Button("common.cancel", role: .cancel) {}
             Button("packages.source.nightly.enable") {
