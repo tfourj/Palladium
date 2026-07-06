@@ -5,8 +5,8 @@ import traceback
 from .shared import EJS_MODULE_RELATIVE_PATH
 from .webkit_jsi import ensure_safe_webkit_jsi_runtime
 
-YOUTUBE_PATCH_MODES = ("ejs", "webkit", "both", "off")
-DEFAULT_YOUTUBE_PATCH_MODE = "ejs"
+YOUTUBE_PATCH_MODES = ("webkit", "ejs", "off")
+DEFAULT_YOUTUBE_PATCH_MODE = "webkit"
 
 # Injected into yt-dlp's EJS provider module. The EJS globals shim assigns
 # `globalThis.location`; inside a WKWebView page that assignment triggers a
@@ -128,9 +128,6 @@ def apply_youtube_patches(install_target=None, patch_mode=None):
         return False
 
     print(f"[palladium] applying youtube patches: {mode}")
-    patched = False
-    if mode in ("ejs", "both"):
-        patched = ensure_safe_ejs_runtime(install_target) or patched
-    if mode in ("webkit", "both"):
-        patched = ensure_safe_webkit_jsi_runtime(install_target) or patched
-    return patched
+    if mode == "ejs":
+        return ensure_safe_ejs_runtime(install_target)
+    return ensure_safe_webkit_jsi_runtime(install_target)

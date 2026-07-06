@@ -146,7 +146,7 @@ class PackagePlanningTests(unittest.TestCase):
         stable_source = parse_package_source(json.dumps({"mode": "stable"}))
 
         self.assertEqual(custom_source["patch_mode"], "off")
-        self.assertEqual(stable_source["patch_mode"], "ejs")
+        self.assertEqual(stable_source["patch_mode"], "webkit")
 
     def test_legacy_disable_setting_turns_patches_off(self):
         source = parse_package_source(json.dumps({

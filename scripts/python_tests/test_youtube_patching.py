@@ -107,13 +107,14 @@ class EnsureSafeEJSRuntimeTests(unittest.TestCase):
 
 class YouTubePatchModeParsingTests(unittest.TestCase):
     def test_normalize_falls_back_to_default(self):
-        self.assertEqual(normalize_youtube_patch_mode(None), "ejs")
-        self.assertEqual(normalize_youtube_patch_mode(""), "ejs")
-        self.assertEqual(normalize_youtube_patch_mode("bogus"), "ejs")
-        self.assertEqual(normalize_youtube_patch_mode(" WebKit "), "webkit")
+        self.assertEqual(normalize_youtube_patch_mode(None), "webkit")
+        self.assertEqual(normalize_youtube_patch_mode(""), "webkit")
+        self.assertEqual(normalize_youtube_patch_mode("bogus"), "webkit")
+        self.assertEqual(normalize_youtube_patch_mode("both"), "webkit")
+        self.assertEqual(normalize_youtube_patch_mode(" EJS "), "ejs")
 
     def test_parse_package_source_reads_patch_mode(self):
-        for mode in ("ejs", "webkit", "both", "off"):
+        for mode in ("webkit", "ejs", "off"):
             source = parse_package_source(json.dumps({
                 "mode": "stable",
                 "youtube_patch_mode": mode,
