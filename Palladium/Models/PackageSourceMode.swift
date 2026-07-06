@@ -42,6 +42,14 @@ enum PackageSourceMode: String, CaseIterable, Identifiable {
 }
 
 enum PackageSourceDefaults {
+    static let lockablePackageNames = [
+        "yt-dlp",
+        "yt-dlp-apple-webkit-jsi",
+        "curl-cffi",
+        "gallery-dl",
+        "pip"
+    ]
+
     static let customSpecs = """
     yt-dlp
     yt-dlp-apple-webkit-jsi

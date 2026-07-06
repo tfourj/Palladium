@@ -50,6 +50,7 @@ struct SettingsTabView: View {
     let storageSummary: StorageManagementSummary
     @Binding var packageSourceMode: PackageSourceMode
     @Binding var customPackageSpecsText: String
+    @Binding var lockedPackageVersions: [String: String]
     @Binding var youtubePatchMode: YouTubePatchMode
     let packageStatusText: String
     let versionsText: String
@@ -260,6 +261,7 @@ struct SettingsTabView: View {
                         autoUpdatePackagesOnLaunch: $autoUpdatePackagesOnLaunch,
                         packageSourceMode: $packageSourceMode,
                         customPackageSpecsText: $customPackageSpecsText,
+                        lockedPackageVersions: $lockedPackageVersions,
                         versionsText: versionsText,
                         updatesSummaryText: updatesSummaryText,
                         updatesAvailable: updatesAvailable,

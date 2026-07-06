@@ -568,6 +568,7 @@ def parse_package_source(source_json=None):
     source = {
         "mode": "stable",
         "custom_specs": [],
+        "locked_versions": {},
         "allow_prereleases": False,
         "patch_mode": DEFAULT_YOUTUBE_PATCH_MODE,
     }
@@ -594,6 +595,14 @@ def parse_package_source(source_json=None):
             if spec and not spec.startswith("#"):
                 specs.append(spec)
 
+    locked_versions = {}
+    raw_locked_versions = parsed.get("locked_versions", {})
+    if isinstance(raw_locked_versions, dict):
+        for package_name in TRACKED_PACKAGES:
+            version_text = normalized_version_text(raw_locked_versions.get(package_name))
+            if version_text:
+                locked_versions[package_name] = version_text
+
     patch_mode = normalize_youtube_patch_mode(parsed.get("youtube_patch_mode"))
     if "youtube_patch_mode" not in parsed and parsed.get("disable_webkit_jsi_patch"):
         patch_mode = "off"
@@ -602,6 +611,7 @@ def parse_package_source(source_json=None):
 
     source["mode"] = mode
     source["custom_specs"] = specs
+    source["locked_versions"] = locked_versions
     source["allow_prereleases"] = mode == "nightly"
     source["patch_mode"] = patch_mode
     return source
@@ -634,6 +644,17 @@ def latest_index_version(indexed_versions, package_name):
     return ""
 
 
+def package_target_version(indexed_versions, package_name, package_source=None):
+    package_source = package_source or {}
+    locked_versions = package_source.get("locked_versions") or {}
+    if isinstance(locked_versions, dict):
+        locked_version = normalized_version_text(locked_versions.get(package_name))
+        if locked_version:
+            return locked_version
+
+    return latest_index_version(indexed_versions, package_name)
+
+
 def missing_installable_runtime_packages(installed_versions):
     missing_packages = []
     for package_name in YTDLP_RUNTIME_PACKAGES:
@@ -655,21 +676,22 @@ def missing_runtime_packages_summary(missing_packages):
     )
 
 
-def build_package_update_lines(installed_versions, indexed_versions, include_missing=False):
+def build_package_update_lines(installed_versions, indexed_versions, include_missing=False, package_source=None):
+    package_source = package_source or parse_package_source()
     lines = []
     for package_name in TRACKED_PACKAGES:
         if is_bundled_runtime_package(package_name):
             continue
 
         current_version = normalized_version_text(installed_versions.get(package_name))
-        latest_version = latest_index_version(indexed_versions, package_name)
+        target_version = package_target_version(indexed_versions, package_name, package_source)
         if not current_version or current_version in ("not installed", "unknown"):
-            if include_missing and latest_version and package_name in YTDLP_RUNTIME_PACKAGES:
-                lines.append(f"{package_name}: not installed -> {latest_version}")
+            if include_missing and target_version and package_name in YTDLP_RUNTIME_PACKAGES:
+                lines.append(f"{package_name}: not installed -> {target_version}")
             continue
 
-        if latest_version and latest_version != current_version:
-            lines.append(f"{package_name}: {current_version} -> {latest_version}")
+        if target_version and target_version != current_version:
+            lines.append(f"{package_name}: {current_version} -> {target_version}")
     return lines
 
 
@@ -710,16 +732,16 @@ def build_package_install_plan(installed_versions, indexed_versions, custom_vers
             continue
 
         current_version = normalized_version_text(installed_versions.get(package_name))
-        latest_version = latest_index_version(indexed_versions, package_name)
+        target_version = package_target_version(indexed_versions, package_name, package_source)
         if not current_version or current_version in ("not installed", "unknown"):
-            if latest_version and package_name in YTDLP_RUNTIME_PACKAGES:
-                packages.append(f"{package_name}=={latest_version}")
+            if target_version and package_name in YTDLP_RUNTIME_PACKAGES:
+                packages.append(f"{package_name}=={target_version}")
                 if package_name in CLEANUP_PACKAGES:
                     cleanup_packages.append(package_name)
             continue
 
-        if latest_version and latest_version != current_version:
-            packages.append(f"{package_name}=={latest_version}")
+        if target_version and target_version != current_version:
+            packages.append(f"{package_name}=={target_version}")
             if package_name in CLEANUP_PACKAGES:
                 cleanup_packages.append(package_name)
 
@@ -757,6 +779,7 @@ def check_package_updates(install_target=None, package_source=None, include_miss
             installed_versions,
             indexed_versions,
             include_missing=include_missing,
+            package_source=package_source,
         )
         if update_lines:
             return True, "\n".join(update_lines)
@@ -798,7 +821,16 @@ def check_package_updates(install_target=None, package_source=None, include_miss
             return False, "All packages are up to date."
 
         tracked = {name.lower() for name in TRACKED_PACKAGES}
-        relevant = [item for item in items if str(item.get("name", "")).lower() in tracked]
+        locked = {
+            name.lower()
+            for name, version in (package_source.get("locked_versions") or {}).items()
+            if normalized_version_text(version)
+        }
+        relevant = [
+            item for item in items
+            if str(item.get("name", "")).lower() in tracked
+            and str(item.get("name", "")).lower() not in locked
+        ]
         if not relevant:
             return False, "All packages are up to date."
 

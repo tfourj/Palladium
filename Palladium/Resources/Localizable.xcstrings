@@ -1830,7 +1830,17 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Select a version to pin for update or downgrade. Choose Latest available to skip pinning a package."
+            "value" : "Select a version to update or downgrade. Use the lock button to keep a package on that version during future updates."
+          }
+        }
+      }
+    },
+    "packages.custom_update.lock_package" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lock %@ to selected version"
           }
         }
       }
@@ -1875,6 +1885,16 @@
         }
       }
     },
+    "packages.custom_update.unlock_package" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unlock %@"
+          }
+        }
+      }
+    },
     "packages.installed.title" : {
       "localizations" : {
         "en" : {
@@ -1890,7 +1910,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Latest available"
+            "value" : "Latest"
           }
         }
       }
@@ -1901,6 +1921,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Loading versions..."
+          }
+        }
+      }
+    },
+    "packages.locked_versions.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Locked Versions"
           }
         }
       }

@@ -71,6 +71,12 @@ extension ContentView {
         defaults.set(autoUpdatePackagesOnLaunch, forKey: Self.autoUpdatePackagesOnLaunchDefaultsKey)
         defaults.set(packageSourceMode.rawValue, forKey: Self.packageSourceModeDefaultsKey)
         defaults.set(customPackageSpecsText, forKey: Self.customPackageSpecsDefaultsKey)
+        let normalizedLocks = Self.normalizedLockedPackageVersions(lockedPackageVersions)
+        if normalizedLocks.isEmpty {
+            defaults.removeObject(forKey: Self.lockedPackageVersionsDefaultsKey)
+        } else if let data = try? JSONEncoder().encode(normalizedLocks) {
+            defaults.set(data, forKey: Self.lockedPackageVersionsDefaultsKey)
+        }
         defaults.set(youtubePatchMode.rawValue, forKey: Self.youtubePatchModeDefaultsKey)
     }
 
@@ -385,6 +391,31 @@ extension ContentView {
             return PackageSourceDefaults.customSpecs
         }
         return value
+    }
+
+    static func loadLockedPackageVersions() -> [String: String] {
+        let defaults = UserDefaults.standard
+        if let data = defaults.data(forKey: lockedPackageVersionsDefaultsKey),
+           let decoded = try? JSONDecoder().decode([String: String].self, from: data) {
+            return normalizedLockedPackageVersions(decoded)
+        }
+
+        if let dictionary = defaults.dictionary(forKey: lockedPackageVersionsDefaultsKey) as? [String: String] {
+            return normalizedLockedPackageVersions(dictionary)
+        }
+
+        return [:]
+    }
+
+    static func normalizedLockedPackageVersions(_ versions: [String: String]) -> [String: String] {
+        var normalized: [String: String] = [:]
+        for packageName in PackageSourceDefaults.lockablePackageNames {
+            let version = versions[packageName]?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            if !version.isEmpty {
+                normalized[packageName] = version
+            }
+        }
+        return normalized
     }
 
     static func loadYouTubePatchMode() -> YouTubePatchMode {

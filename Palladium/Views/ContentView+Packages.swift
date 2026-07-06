@@ -192,6 +192,7 @@ extension ContentView {
         let payload: [String: Any] = [
             "mode": packageSourceMode.rawValue,
             "custom_specs": specs,
+            "locked_versions": Self.normalizedLockedPackageVersions(lockedPackageVersions),
             "youtube_patch_mode": youtubePatchMode.rawValue
         ]
         guard let data = try? JSONSerialization.data(withJSONObject: payload),

@@ -33,6 +33,73 @@ class PackagePlanningTests(unittest.TestCase):
         self.assertEqual(packages, ["yt-dlp==2.0"])
         self.assertEqual(cleanup, ["yt-dlp"])
 
+    def test_locked_version_prevents_latest_update(self):
+        source = parse_package_source(json.dumps({
+            "mode": "stable",
+            "locked_versions": {
+                "yt-dlp": "1.0",
+            },
+        }))
+        packages, cleanup = build_package_install_plan(
+            {"yt-dlp": "1.0"},
+            {"yt-dlp": ["2.0"]},
+            package_source=source,
+        )
+        lines = build_package_update_lines(
+            {"yt-dlp": "1.0"},
+            {"yt-dlp": ["2.0"]},
+            package_source=source,
+        )
+
+        self.assertEqual(packages, [])
+        self.assertEqual(cleanup, [])
+        self.assertEqual(lines, [])
+
+    def test_locked_version_downgrades_to_target(self):
+        source = parse_package_source(json.dumps({
+            "mode": "stable",
+            "locked_versions": {
+                "yt-dlp": "1.0",
+            },
+        }))
+        packages, cleanup = build_package_install_plan(
+            {"yt-dlp": "2.0"},
+            {"yt-dlp": ["3.0"]},
+            package_source=source,
+        )
+        lines = build_package_update_lines(
+            {"yt-dlp": "2.0"},
+            {"yt-dlp": ["3.0"]},
+            package_source=source,
+        )
+
+        self.assertEqual(packages, ["yt-dlp==1.0"])
+        self.assertEqual(cleanup, ["yt-dlp"])
+        self.assertEqual(lines, ["yt-dlp: 2.0 -> 1.0"])
+
+    def test_locked_missing_runtime_package_is_installed(self):
+        source = parse_package_source(json.dumps({
+            "mode": "stable",
+            "locked_versions": {
+                "gallery-dl": "1.0",
+            },
+        }))
+        packages, cleanup = build_package_install_plan(
+            {"gallery-dl": "not installed"},
+            {"gallery-dl": ["2.0"]},
+            package_source=source,
+        )
+        lines = build_package_update_lines(
+            {"gallery-dl": "not installed"},
+            {"gallery-dl": ["2.0"]},
+            include_missing=True,
+            package_source=source,
+        )
+
+        self.assertEqual(packages, ["gallery-dl==1.0"])
+        self.assertEqual(cleanup, ["gallery-dl"])
+        self.assertEqual(lines, ["gallery-dl: not installed -> 1.0"])
+
     def test_nightly_install_args_include_prereleases(self):
         args = build_pip_install_args(
             ["yt-dlp==2.0.dev1"],
@@ -155,3 +222,15 @@ class PackagePlanningTests(unittest.TestCase):
         }))
 
         self.assertEqual(source["patch_mode"], "off")
+
+    def test_parse_package_source_reads_locked_versions(self):
+        source = parse_package_source(json.dumps({
+            "mode": "stable",
+            "locked_versions": {
+                "yt-dlp": "1.0",
+                "unknown-package": "2.0",
+                "pip": "",
+            },
+        }))
+
+        self.assertEqual(source["locked_versions"], {"yt-dlp": "1.0"})
