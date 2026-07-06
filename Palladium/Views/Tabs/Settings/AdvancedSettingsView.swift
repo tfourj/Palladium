@@ -20,8 +20,6 @@ struct AdvancedSettingsView: View {
                 .onChange(of: youtubePatchMode) {
                     showReinstallPrompt = true
                 }
-            } footer: {
-                Text("settings.advanced.youtube_patch_mode.help")
             }
         }
         .navigationTitle("settings.advanced.title")
