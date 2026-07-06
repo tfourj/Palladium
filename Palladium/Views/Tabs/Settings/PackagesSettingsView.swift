@@ -139,7 +139,6 @@ struct PackagesSettingsView: View {
                 Section("packages.custom_update.targets") {
                     ForEach(Self.customUpdatePackageNames, id: \.self) { packageName in
                         packageVersionPicker(
-                            title: packageName,
                             packageName: packageName,
                             selection: selectedVersionBinding(for: packageName)
                         )
@@ -249,18 +248,23 @@ struct PackagesSettingsView: View {
 
     @ViewBuilder
     private func packageVersionPicker(
-        title: String,
         packageName: String,
         selection: Binding<String>
     ) -> some View {
         let options = availableVersions(for: packageName)
         HStack(spacing: 10) {
-            Picker(title, selection: selection) {
+            Picker(selection: selection) {
                 Text("packages.latest")
                     .tag(Self.latestSelectionToken)
                 ForEach(options, id: \.self) { version in
                     Text(version).tag(version)
                 }
+            } label: {
+                Text(packageName)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .accessibilityLabel(packageName)
             }
             .pickerStyle(.menu)
             .onChange(of: availablePackageVersions[packageName]?.count ?? 0, initial: false) {
@@ -291,6 +295,9 @@ struct PackagesSettingsView: View {
             HStack(spacing: 12) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(packageName)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                        .accessibilityLabel(packageName)
                     Text(version)
                         .font(.caption.monospaced())
                         .foregroundStyle(.secondary)
