@@ -76,6 +76,7 @@ struct ContentView: View {
     static let autoUpdatePackagesOnLaunchDefaultsKey = "palladium.autoUpdatePackagesOnLaunch"
     static let packageSourceModeDefaultsKey = "palladium.packageSourceMode"
     static let customPackageSpecsDefaultsKey = "palladium.customPackageSpecs"
+    static let lockedPackageVersionsDefaultsKey = "palladium.lockedPackageVersions"
     static let disableWebKitJSIPatchDefaultsKey = "palladium.disableWebKitJSIPatch"
     static let youtubePatchModeDefaultsKey = "palladium.youtubePatchMode"
     static let defaultLinkHistoryLimit = 10
@@ -135,6 +136,7 @@ struct ContentView: View {
     @State var autoUpdatePackagesOnLaunch: Bool
     @State var packageSourceMode: PackageSourceMode
     @State var customPackageSpecsText: String
+    @State var lockedPackageVersions: [String: String]
     @State var youtubePatchMode: YouTubePatchMode
     @State var storageSummary: StorageManagementSummary = .empty
     @StateObject var consoleLogStore: ConsoleLogStore
@@ -223,6 +225,7 @@ struct ContentView: View {
         _autoUpdatePackagesOnLaunch = State(initialValue: Self.loadAutoUpdatePackagesOnLaunch())
         _packageSourceMode = State(initialValue: Self.loadPackageSourceMode())
         _customPackageSpecsText = State(initialValue: Self.loadCustomPackageSpecsText())
+        _lockedPackageVersions = State(initialValue: Self.loadLockedPackageVersions())
         _youtubePatchMode = State(initialValue: Self.loadYouTubePatchMode())
         _consoleLogStore = StateObject(wrappedValue: ConsoleLogStore())
     }
@@ -306,6 +309,7 @@ struct ContentView: View {
                     storageSummary: storageSummary,
                     packageSourceMode: $packageSourceMode,
                     customPackageSpecsText: $customPackageSpecsText,
+                    lockedPackageVersions: $lockedPackageVersions,
                     youtubePatchMode: $youtubePatchMode,
                     packageStatusText: packageStatusText,
                     versionsText: versionsText,
@@ -487,6 +491,9 @@ struct ContentView: View {
             persistPreferences()
         }
         .onChange(of: customPackageSpecsText, initial: false) {
+            persistPreferences()
+        }
+        .onChange(of: lockedPackageVersions, initial: false) {
             persistPreferences()
         }
         .onChange(of: youtubePatchMode, initial: false) {
