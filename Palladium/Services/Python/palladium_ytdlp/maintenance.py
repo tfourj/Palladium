@@ -68,8 +68,8 @@ def check_or_fetch_package_updates(action, install_target, package_source):
         return False, "Skipped update check.", {}
 
     if action == ACTION_INSTALL_PAYLOAD_ZIP:
-        print("[palladium] payload ZIP install requested")
-        return False, "Installing payload ZIP.", {}
+        print("[palladium] payload bundle install requested")
+        return False, "Installing payload bundle.", {}
 
     if action == ACTION_INDEX_VERSIONS:
         available_versions = fetch_package_index_versions(
@@ -104,7 +104,7 @@ def install_payload_action(payload_zip_path, manual_payload_target, cancel_file_
     return {
         "pip_exit_code": 0,
         "restart_required": restart_required,
-        "updates_summary": f"Installed payload ZIP for {', '.join(installed_packages)}.",
+        "updates_summary": f"Installed payload bundle for {', '.join(installed_packages)}.",
     }
 
 
@@ -228,8 +228,8 @@ def run_package_maintenance(
                     updates_summary = result["updates_summary"]
                 except Exception:
                     pip_exit_code = 1
-                    updates_summary = "Payload ZIP install failed."
-                    print("[palladium] payload ZIP install failed")
+                    updates_summary = "Payload bundle install failed."
+                    print("[palladium] payload bundle install failed")
                     traceback.print_exc()
 
             if action in PACKAGE_INSTALL_ACTIONS:

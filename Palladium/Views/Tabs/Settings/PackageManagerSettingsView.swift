@@ -10,7 +10,7 @@ struct PackageManagerSettingsView: View {
     let onInstallPayloadZip: (_ sourceURL: URL) -> Void
 
     @State private var showNightlyWarning = false
-    @State private var showPayloadZipImporter = false
+    @State private var showPayloadBundleImporter = false
     @State private var payloadImportErrorMessage: String?
     @State private var showPayloadImportError = false
 
@@ -54,7 +54,7 @@ struct PackageManagerSettingsView: View {
 
             Section {
                 Button {
-                    showPayloadZipImporter = true
+                    showPayloadBundleImporter = true
                 } label: {
                     Label("packages.payload.import", systemImage: "doc.zipper")
                 }
@@ -81,8 +81,8 @@ struct PackageManagerSettingsView: View {
         .navigationTitle("settings.packages.manager.title")
         .navigationBarTitleDisplayMode(.inline)
         .fileImporter(
-            isPresented: $showPayloadZipImporter,
-            allowedContentTypes: [.zip, .data]
+            isPresented: $showPayloadBundleImporter,
+            allowedContentTypes: payloadBundleContentTypes
         ) { result in
             do {
                 let sourceURL = try result.get()
@@ -105,6 +105,13 @@ struct PackageManagerSettingsView: View {
         } message: {
             Text("packages.source.nightly.warning.message")
         }
+    }
+
+    private var payloadBundleContentTypes: [UTType] {
+        if let wheelContentType = UTType(filenameExtension: "whl") {
+            return [.zip, wheelContentType, .data]
+        }
+        return [.zip, .data]
     }
 
     private var packageSourceSelection: Binding<PackageSourceMode> {

@@ -1940,7 +1940,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Installs a supported iOS payload ZIP for bundled runtime packages."
+            "value" : "Installs a local payload bundle from a ZIP or .whl file."
           }
         }
       }
@@ -1950,7 +1950,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Import Payload ZIP"
+            "value" : "Import Payload Bundle"
           }
         }
       }
@@ -1960,7 +1960,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Failed to import payload ZIP: %@"
+            "value" : "Failed to import payload bundle: %@"
           }
         }
       }
@@ -1970,7 +1970,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Payload ZIP Import Failed"
+            "value" : "Payload Bundle Import Failed"
           }
         }
       }
@@ -2160,7 +2160,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Installing payload ZIP..."
+            "value" : "Installing payload bundle..."
           }
         }
       }
