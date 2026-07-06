@@ -1,5 +1,11 @@
 # Palladium Changelog
 
+## v1.3.0
+- Add support for local bundle package installs
+- Add ability to lock package versions
+- Add contact information to About section
+- Add alternate runtime patching options
+
 ## v1.2.2
 - Fix PIP index deprecation warning
 - Fix cookie file parsing and normalization
