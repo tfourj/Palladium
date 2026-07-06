@@ -8,6 +8,7 @@ from .packages import (
     build_package_install_plan,
     build_pip_install_args,
     check_package_updates,
+    clear_payload_packages,
     cleanup_target_package,
     collect_versions,
     ensure_pip_entrypoint,
@@ -27,6 +28,7 @@ ACTION_UPDATE = "update"
 ACTION_REINSTALL = "reinstall"
 ACTION_INDEX_VERSIONS = "index_versions"
 ACTION_INSTALL_PAYLOAD_ZIP = "install_payload_zip"
+ACTION_RESTORE_PIP_PACKAGES = "restore_pip_packages"
 PACKAGE_INSTALL_ACTIONS = (ACTION_UPDATE, ACTION_REINSTALL)
 
 
@@ -71,6 +73,10 @@ def check_or_fetch_package_updates(action, install_target, package_source):
         print("[palladium] payload bundle install requested")
         return False, "Installing payload bundle.", {}
 
+    if action == ACTION_RESTORE_PIP_PACKAGES:
+        print("[palladium] pip package restore requested")
+        return False, "Restoring pip packages.", {}
+
     if action == ACTION_INDEX_VERSIONS:
         available_versions = fetch_package_index_versions(
             install_target,
@@ -106,6 +112,33 @@ def install_payload_action(payload_zip_path, manual_payload_target, cancel_file_
         "restart_required": restart_required,
         "updates_summary": f"Installed payload bundle for {', '.join(installed_packages)}.",
     }
+
+
+def restore_pip_packages_action(
+    install_target,
+    manual_payload_target,
+    package_source,
+    custom_versions,
+    cancel_file_path,
+):
+    raise_if_cancel_requested(
+        cancel_file_path,
+        "[palladium] package action cancelled before payload cleanup",
+    )
+    restart_required = invalidate_runtime_package_modules()
+    removed_entries = clear_payload_packages(manual_payload_target)
+    print(f"[palladium] removed manual payload entries: {removed_entries}")
+
+    result = install_package_updates(
+        ACTION_REINSTALL,
+        install_target,
+        package_source,
+        custom_versions,
+        cancel_file_path,
+    )
+    result["restart_required"] = result["restart_required"] or restart_required
+    result["updates_summary"] = "Restored pip-managed packages."
+    return result
 
 
 def install_package_updates(action, install_target, package_source, custom_versions, cancel_file_path):
@@ -186,6 +219,8 @@ def run_package_maintenance(
     versions = {}
     cancelled = False
     restart_required = False
+    did_package_install_action = False
+    allow_version_cache_fallback = True
     install_target = os.environ.get("PALLADIUM_PYTHON_PACKAGES")
     manual_payload_target = os.environ.get("PALLADIUM_MANUAL_PAYLOAD_PACKAGES") or install_target
     cancel_file_path = os.environ.get("PALLADIUM_CANCEL_FILE", "").strip()
@@ -216,6 +251,28 @@ def run_package_maintenance(
             if custom_versions:
                 print(f"[palladium] custom package versions requested: {custom_versions}")
 
+            if action == ACTION_RESTORE_PIP_PACKAGES:
+                try:
+                    result = restore_pip_packages_action(
+                        install_target,
+                        manual_payload_target,
+                        package_source,
+                        custom_versions,
+                        cancel_file_path,
+                    )
+                    pip_attempted = result["pip_attempted"]
+                    pip_exit_code = result["pip_exit_code"]
+                    restart_required = result["restart_required"] or restart_required
+                    updates_summary = result["updates_summary"]
+                    did_package_install_action = True
+                    allow_version_cache_fallback = False
+                except Exception:
+                    pip_exit_code = 1
+                    updates_summary = "Pip package restore failed."
+                    allow_version_cache_fallback = False
+                    print("[palladium] pip package restore failed")
+                    traceback.print_exc()
+
             if action == ACTION_INSTALL_PAYLOAD_ZIP:
                 try:
                     result = install_payload_action(
@@ -244,12 +301,17 @@ def run_package_maintenance(
                     pip_attempted = result["pip_attempted"]
                     pip_exit_code = result["pip_exit_code"]
                     restart_required = result["restart_required"] or restart_required
+                    did_package_install_action = True
                 except Exception:
                     pip_exit_code = 1
                     print("[palladium] pip update failed")
                     traceback.print_exc()
 
-                raise_if_cancel_requested(cancel_file_path, "[palladium] package action cancelled before post-update check")
+            if did_package_install_action:
+                raise_if_cancel_requested(
+                    cancel_file_path,
+                    "[palladium] package action cancelled before post-update check",
+                )
                 updates_available, updates_summary = check_package_updates(
                     install_target,
                     package_source=package_source,
@@ -261,8 +323,14 @@ def run_package_maintenance(
             raise_if_cancel_requested(cancel_file_path, "[palladium] package action cancelled before youtube patches")
             apply_youtube_patches(install_target, package_source.get("patch_mode"))
 
-            raise_if_cancel_requested(cancel_file_path, "[palladium] package action cancelled before version collection")
-            versions = collect_versions(install_target=install_target)
+            raise_if_cancel_requested(
+                cancel_file_path,
+                "[palladium] package action cancelled before version collection",
+            )
+            versions = collect_versions(
+                install_target=install_target,
+                allow_cache_fallback=allow_version_cache_fallback,
+            )
             print(f"[palladium] yt-dlp version: {versions.get('yt-dlp')}")
             print(f"[palladium] yt-dlp-apple-webkit-jsi version: {versions.get('yt-dlp-apple-webkit-jsi')}")
             print(f"[palladium] curl-cffi version: {versions.get('curl-cffi')}")
