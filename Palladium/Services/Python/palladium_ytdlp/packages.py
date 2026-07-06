@@ -409,6 +409,33 @@ def cleanup_target_package(install_target, package_name):
     return removed
 
 
+def clear_payload_packages(install_target):
+    if not install_target:
+        raise ValueError("Manual payload install target is unavailable.")
+
+    target_path = os.path.abspath(install_target)
+    if target_path in (os.path.abspath(os.sep), os.path.expanduser("~")):
+        raise ValueError(f"Refusing to clear unsafe payload target: {install_target}")
+
+    os.makedirs(target_path, exist_ok=True)
+    removed = 0
+    for entry_name in os.listdir(target_path):
+        full_path = os.path.join(target_path, entry_name)
+        try:
+            if os.path.islink(full_path) or not os.path.isdir(full_path):
+                os.remove(full_path)
+            else:
+                shutil.rmtree(full_path)
+            removed += 1
+        except FileNotFoundError:
+            continue
+        except Exception:
+            print(f"[palladium] failed to remove payload entry: {entry_name}")
+            traceback.print_exc()
+
+    return removed
+
+
 def safe_relative_path(path, context):
     path_text = str(path or "")
     if not path_text or path_text.startswith(("/", "\\")):

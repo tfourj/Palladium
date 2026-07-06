@@ -11,7 +11,7 @@ from scripts.python_tests.helpers import (
     zip_directory,
 )
 
-from palladium_ytdlp.packages import collect_versions, install_payload_zip  # noqa: E402
+from palladium_ytdlp.packages import clear_payload_packages, collect_versions, install_payload_zip  # noqa: E402
 
 
 class PayloadPackageTests(unittest.TestCase):
@@ -87,6 +87,25 @@ class PayloadPackageTests(unittest.TestCase):
 
         self.assertEqual(installed, ["yt-dlp"])
         self.assertEqual(versions["yt-dlp"], "99.0 (payload)")
+
+    def test_clear_payload_packages_removes_imported_packages(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = pathlib.Path(temp)
+            target = root / "target"
+            wheel_path = root / "yt_dlp-99.0-py3-none-any.whl"
+            write_wheel_package(wheel_path, "yt-dlp", "99.0", modules=["yt_dlp"])
+
+            with temporary_env(PALLADIUM_MANUAL_PAYLOAD_PACKAGES=target):
+                install_payload_zip(wheel_path, target)
+                removed = clear_payload_packages(target)
+                target_exists = target.is_dir()
+                remaining_entries = list(target.iterdir())
+                versions = collect_versions(install_target=str(target), allow_cache_fallback=False)
+
+        self.assertGreater(removed, 0)
+        self.assertTrue(target_exists)
+        self.assertEqual(remaining_entries, [])
+        self.assertEqual(versions["yt-dlp"], "not installed")
 
     def test_payload_zip_rejects_duplicate_wheel_packages(self):
         with tempfile.TemporaryDirectory() as temp:
