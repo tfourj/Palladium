@@ -28,9 +28,9 @@ from .packages import (
     is_package_installed,
     parse_package_source,
 )
+from .patching import apply_youtube_patches
 from .runtime import raise_if_cancel_requested
 from .shared import TailBuffer, Tee, YTDLP_RUNTIME_PACKAGES, open_live_log_stream
-from .webkit_jsi import ensure_safe_webkit_jsi_runtime
 
 
 PLAYLIST_PROGRESS_PREFIX = "[palladium][playlist-progress] "
@@ -518,11 +518,8 @@ def run_yt_dlp_flow(
                         f"{installed_versions.get(package_name, 'not installed')}"
                     )
 
-            if package_source.get("skip_webkit_patch"):
-                print("[palladium] skipping webkit patch by configuration")
-            else:
-                raise_if_cancel_requested(cancel_file_path, "[palladium] cancellation requested before webkit patch")
-                ensure_safe_webkit_jsi_runtime(install_target)
+            raise_if_cancel_requested(cancel_file_path, "[palladium] cancellation requested before youtube patches")
+            apply_youtube_patches(install_target, package_source.get("patch_mode"))
 
             if not download_url:
                 print("[palladium] no URL provided")
