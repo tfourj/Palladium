@@ -2639,22 +2639,12 @@
         }
       }
     },
-    "settings.advanced.youtube_patch_mode.both" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Both"
-          }
-        }
-      }
-    },
     "settings.advanced.youtube_patch_mode.ejs" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "EJS scripts (default)"
+            "value" : "EJS scripts"
           }
         }
       }
@@ -2674,7 +2664,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "WebKit JSI runtime"
+            "value" : "WebKit JSI runtime (default)"
           }
         }
       }
