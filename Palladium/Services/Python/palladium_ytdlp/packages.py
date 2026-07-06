@@ -9,6 +9,7 @@ import tempfile
 import traceback
 import zipfile
 import importlib.metadata as importlib_metadata
+from email.parser import Parser
 
 from .patching import DEFAULT_YOUTUBE_PATCH_MODE, normalize_youtube_patch_mode
 from .shared import (
@@ -269,7 +270,7 @@ def manual_payload_packages_path():
 
 def manual_payload_package_version(package_name):
     if canonical_package_name(package_name) not in {
-        canonical_package_name(name) for name in BUNDLED_RUNTIME_PACKAGES
+        canonical_package_name(name) for name in TRACKED_PACKAGES
     }:
         return None
 
@@ -378,11 +379,13 @@ def cleanup_target_package(install_target, package_name):
             lower_entry = entry.lower()
             should_remove = False
 
-            if lower_entry in {import_name, f"{import_name}.py"}:
-                should_remove = True
-            elif lower_entry.endswith(".dist-info"):
+            if lower_entry.endswith(".dist-info"):
                 stem = lower_entry[:-10]
-                should_remove = matches_distribution_entry(stem, package_name)
+                if matches_distribution_entry(stem, package_name):
+                    removed += cleanup_record_entries(install_target, full_path)
+                    should_remove = True
+            elif lower_entry in {import_name, f"{import_name}.py"}:
+                should_remove = True
             elif lower_entry.endswith(".egg-info"):
                 stem = lower_entry[:-9]
                 should_remove = matches_distribution_entry(stem, package_name)
@@ -406,21 +409,94 @@ def cleanup_target_package(install_target, package_name):
     return removed
 
 
+def safe_relative_path(path, context):
+    path_text = str(path or "")
+    if not path_text or path_text.startswith(("/", "\\")):
+        raise ValueError(f"Unsafe {context} entry: {path_text}")
+
+    normalized_path = os.path.normpath(path_text)
+    if (
+        normalized_path == "."
+        or normalized_path.startswith("..")
+        or os.path.isabs(normalized_path)
+    ):
+        raise ValueError(f"Unsafe {context} entry: {path_text}")
+
+    return normalized_path
+
+
+def is_safe_child_path(root, relative_path):
+    normalized_path = safe_relative_path(relative_path, "payload")
+    root_abs = os.path.abspath(root)
+    target_path = os.path.abspath(os.path.join(root, normalized_path))
+    return target_path == root_abs or target_path.startswith(root_abs + os.sep)
+
+
+def cleanup_empty_parent_dirs(root, start_dir):
+    root_abs = os.path.abspath(root)
+    current = os.path.abspath(start_dir)
+    while current != root_abs and current.startswith(root_abs + os.sep):
+        try:
+            os.rmdir(current)
+        except OSError:
+            return
+        current = os.path.dirname(current)
+
+
+def cleanup_record_entries(install_target, dist_info_path):
+    record_path = os.path.join(dist_info_path, "RECORD")
+    if not os.path.isfile(record_path):
+        return 0
+
+    removed = 0
+    try:
+        with open(record_path, "r", encoding="utf-8", errors="replace") as record_file:
+            lines = list(record_file)
+    except Exception:
+        return 0
+
+    for line in lines:
+        relative_path = line.split(",", 1)[0].strip()
+        if not relative_path:
+            continue
+
+        try:
+            if not is_safe_child_path(install_target, relative_path):
+                continue
+            target_path = os.path.abspath(os.path.join(install_target, relative_path))
+        except ValueError:
+            continue
+
+        if target_path == os.path.abspath(dist_info_path):
+            continue
+        if target_path.startswith(os.path.abspath(dist_info_path) + os.sep):
+            continue
+        if not os.path.exists(target_path):
+            continue
+
+        try:
+            if os.path.isdir(target_path):
+                shutil.rmtree(target_path)
+            else:
+                os.remove(target_path)
+            removed += 1
+            cleanup_empty_parent_dirs(install_target, os.path.dirname(target_path))
+        except Exception:
+            print(f"[palladium] failed to remove stale wheel record entry: {relative_path}")
+            traceback.print_exc()
+
+    return removed
+
+
 def safe_extract_zip(zip_path, extract_root):
     with zipfile.ZipFile(zip_path) as archive:
         for member in archive.infolist():
-            member_name = str(member.filename or "")
-            if not member_name or member_name.startswith(("/", "\\")):
-                raise ValueError(f"Unsafe payload zip entry: {member_name}")
-
-            normalized_name = os.path.normpath(member_name)
-            if normalized_name == "." or normalized_name.startswith("..") or os.path.isabs(normalized_name):
-                raise ValueError(f"Unsafe payload zip entry: {member_name}")
+            normalized_name = safe_relative_path(member.filename, "payload zip")
 
             target_path = os.path.abspath(os.path.join(extract_root, normalized_name))
             extract_root_abs = os.path.abspath(extract_root)
             if target_path != extract_root_abs and not target_path.startswith(extract_root_abs + os.sep):
-                raise ValueError(f"Unsafe payload zip entry: {member_name}")
+                raise ValueError(f"Unsafe payload zip entry: {member.filename}")
 
         archive.extractall(extract_root)
 
@@ -485,7 +561,7 @@ def find_payload_package_dir(extract_root):
             return candidate_dir, detected_packages
 
     raise ValueError(
-        "Payload ZIP does not contain a supported bundled runtime package "
+        "Payload bundle does not contain wheels or a supported bundled runtime package "
         f"({', '.join(BUNDLED_RUNTIME_PACKAGES)})."
     )
 
@@ -508,20 +584,163 @@ def copy_payload_package_contents(source_dir, install_target):
     return copied
 
 
+def wheel_dist_info_dir(member_names):
+    candidates = []
+    for member_name in member_names:
+        normalized_name = safe_relative_path(member_name, "wheel")
+        parts = normalized_name.split(os.sep)
+        if len(parts) < 2:
+            continue
+        if parts[0].lower().endswith(".dist-info") and parts[1] == "METADATA":
+            candidates.append(parts[0])
+
+    candidates = sorted(set(candidates))
+    if len(candidates) != 1:
+        raise ValueError("Wheel payload must contain exactly one dist-info METADATA file.")
+    return candidates[0]
+
+
+def wheel_metadata(archive, dist_info_dir):
+    metadata_path = f"{dist_info_dir}/METADATA"
+    try:
+        metadata_text = archive.read(metadata_path).decode("utf-8", errors="replace")
+    except KeyError:
+        raise ValueError("Wheel payload is missing METADATA.") from None
+
+    metadata = Parser().parsestr(metadata_text)
+    package_name = str(metadata.get("Name", "")).strip()
+    version = str(metadata.get("Version", "")).strip()
+    if not package_name or not version:
+        raise ValueError("Wheel payload metadata must include Name and Version.")
+    return package_name, version
+
+
+def wheel_destination_relative_path(member_name, data_dir):
+    normalized_name = safe_relative_path(member_name, "wheel")
+    parts = normalized_name.split(os.sep)
+    if len(parts) >= 3 and parts[0] == data_dir:
+        scheme = parts[1]
+        if scheme not in ("purelib", "platlib"):
+            return None
+        return os.path.join(*parts[2:])
+    return normalized_name
+
+
+def stage_wheel_contents(wheel_path, stage_dir):
+    if not zipfile.is_zipfile(wheel_path):
+        raise ValueError(f"Payload wheel is not a valid ZIP archive: {os.path.basename(wheel_path)}")
+
+    with zipfile.ZipFile(wheel_path) as archive:
+        members = archive.infolist()
+        member_names = [str(member.filename or "") for member in members]
+        dist_info_dir = wheel_dist_info_dir(member_names)
+        if f"{dist_info_dir}/WHEEL" not in member_names:
+            raise ValueError("Wheel payload is missing WHEEL metadata.")
+
+        package_name, version = wheel_metadata(archive, dist_info_dir)
+        data_dir = dist_info_dir[:-10] + ".data"
+        copied = 0
+        skipped = 0
+
+        for member in members:
+            member_name = str(member.filename or "")
+            destination_relative_path = wheel_destination_relative_path(member_name, data_dir)
+            if member.is_dir() or destination_relative_path in (None, "", "."):
+                if destination_relative_path is None:
+                    skipped += 1
+                continue
+
+            destination_relative_path = safe_relative_path(destination_relative_path, "wheel")
+            destination_path = os.path.abspath(os.path.join(stage_dir, destination_relative_path))
+            stage_dir_abs = os.path.abspath(stage_dir)
+            if destination_path != stage_dir_abs and not destination_path.startswith(stage_dir_abs + os.sep):
+                raise ValueError(f"Unsafe wheel entry: {member_name}")
+
+            os.makedirs(os.path.dirname(destination_path), exist_ok=True)
+            with archive.open(member) as source_file, open(destination_path, "wb") as destination_file:
+                shutil.copyfileobj(source_file, destination_file)
+            copied += 1
+
+    return {
+        "path": wheel_path,
+        "name": package_name,
+        "version": version,
+        "stage_dir": stage_dir,
+        "copied": copied,
+        "skipped": skipped,
+    }
+
+
+def find_payload_wheel_files(extract_root):
+    wheel_paths = []
+    for current_root, _dir_names, file_names in os.walk(extract_root):
+        for file_name in file_names:
+            if file_name.lower().endswith(".whl"):
+                wheel_paths.append(os.path.join(current_root, file_name))
+    return sorted(wheel_paths)
+
+
+def install_payload_wheels(wheel_paths, install_target, temp_root):
+    staged_wheels = []
+    seen_packages = {}
+    stage_root = os.path.join(temp_root, "wheel-staging")
+    os.makedirs(stage_root, exist_ok=True)
+
+    for index, wheel_path in enumerate(wheel_paths):
+        wheel_stage_dir = os.path.join(stage_root, str(index))
+        os.makedirs(wheel_stage_dir, exist_ok=True)
+        wheel_info = stage_wheel_contents(wheel_path, wheel_stage_dir)
+        normalized_name = canonical_package_name(wheel_info["name"])
+        if normalized_name in seen_packages:
+            first_path = os.path.basename(seen_packages[normalized_name])
+            second_path = os.path.basename(wheel_path)
+            raise ValueError(
+                "Payload bundle contains duplicate wheels for "
+                f"{wheel_info['name']}: {first_path}, {second_path}"
+            )
+        seen_packages[normalized_name] = wheel_path
+        staged_wheels.append(wheel_info)
+
+    removed = 0
+    copied = 0
+    skipped = 0
+    installed_packages = []
+    for wheel_info in staged_wheels:
+        package_name = wheel_info["name"]
+        removed += cleanup_target_package(install_target, package_name)
+        copied += copy_payload_package_contents(wheel_info["stage_dir"], install_target)
+        skipped += wheel_info["skipped"]
+        installed_packages.append(package_name)
+
+    print(f"[palladium] installed payload wheel packages: {', '.join(installed_packages)}")
+    print(f"[palladium] removed stale payload package entries: {removed}")
+    print(f"[palladium] copied payload wheel entries: {copied}")
+    if skipped:
+        print(f"[palladium] skipped non-importable wheel data entries: {skipped}")
+    return installed_packages
+
+
 def install_payload_zip(payload_zip_path, install_target):
     payload_path = str(payload_zip_path or "").strip()
     if not payload_path:
-        raise ValueError("Payload ZIP path is missing.")
+        raise ValueError("Payload bundle path is missing.")
     if not os.path.isfile(payload_path):
-        raise ValueError(f"Payload ZIP not found: {payload_path}")
+        raise ValueError(f"Payload bundle not found: {payload_path}")
     if not zipfile.is_zipfile(payload_path):
-        raise ValueError("Payload file is not a valid ZIP archive.")
+        raise ValueError("Payload file is not a valid ZIP-compatible archive.")
     if not install_target:
         raise ValueError("Manual payload install target is unavailable.")
 
     temp_root = tempfile.mkdtemp(prefix="palladium-payload-")
     try:
+        if payload_path.lower().endswith(".whl"):
+            return install_payload_wheels([payload_path], install_target, temp_root)
+
         safe_extract_zip(payload_path, temp_root)
+        wheel_paths = find_payload_wheel_files(temp_root)
+        if wheel_paths:
+            return install_payload_wheels(wheel_paths, install_target, temp_root)
+
         package_dir, detected_packages = find_payload_package_dir(temp_root)
 
         removed = 0
