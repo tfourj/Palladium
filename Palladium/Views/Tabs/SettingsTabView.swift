@@ -50,7 +50,7 @@ struct SettingsTabView: View {
     let storageSummary: StorageManagementSummary
     @Binding var packageSourceMode: PackageSourceMode
     @Binding var customPackageSpecsText: String
-    @Binding var disableWebKitJSIPatch: Bool
+    @Binding var youtubePatchMode: YouTubePatchMode
     let packageStatusText: String
     let versionsText: String
     let updatesSummaryText: String
@@ -277,7 +277,7 @@ struct SettingsTabView: View {
                     )
                 case .advanced:
                     AdvancedSettingsView(
-                        disableWebKitJSIPatch: $disableWebKitJSIPatch,
+                        youtubePatchMode: $youtubePatchMode,
                         isRunning: isRunning || isPackageRunning,
                         onReinstallPackages: onReinstallPackages
                     )
