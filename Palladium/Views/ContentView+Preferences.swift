@@ -396,6 +396,6 @@ extension ContentView {
         if defaults.bool(forKey: disableWebKitJSIPatchDefaultsKey) {
             return .off
         }
-        return .ejs
+        return .webkit
     }
 }
