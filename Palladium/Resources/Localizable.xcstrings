@@ -1975,6 +1975,56 @@
         }
       }
     },
+    "packages.restore_pip" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restore Pip Packages"
+          }
+        }
+      }
+    },
+    "packages.restore_pip.confirm" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restore"
+          }
+        }
+      }
+    },
+    "packages.restore_pip.confirm.message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This removes imported payload packages and reinstalls packages from the configured package source."
+          }
+        }
+      }
+    },
+    "packages.restore_pip.confirm.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restore Pip Packages?"
+          }
+        }
+      }
+    },
+    "packages.restore_pip.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Removes payload-installed packages and reinstalls runtime packages with pip."
+          }
+        }
+      }
+    },
     "packages.reload_versions" : {
       "localizations" : {
         "en" : {
@@ -2181,6 +2231,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Running..."
+          }
+        }
+      }
+    },
+    "packages.status.restoring" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restoring pip packages..."
           }
         }
       }

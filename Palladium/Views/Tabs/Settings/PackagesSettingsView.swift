@@ -21,11 +21,13 @@ struct PackagesSettingsView: View {
     let onCancel: () -> Void
     let onUpdatePackages: () -> Void
     let onInstallPayloadZip: (_ sourceURL: URL) -> Void
+    let onRestorePipPackages: () -> Void
     let onCustomUpdatePackages: (_ versions: [String: String]) -> Void
     let onFetchPackageVersions: () -> Void
     let onAppear: () -> Void
 
     @State private var showCustomVersionSheet = false
+    @State private var showRestorePipConfirmation = false
     @State private var selectedPackageVersions: [String: String] = [:]
     @State private var selectedLockedPackages = Set<String>()
 
@@ -118,6 +120,19 @@ struct PackagesSettingsView: View {
                 Text("packages.update.long_press_help")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+
+                Button(role: .destructive) {
+                    showRestorePipConfirmation = true
+                } label: {
+                    Text("packages.restore_pip")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .disabled(isRunning)
+
+                Text("packages.restore_pip.help")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
         }
         .navigationTitle("settings.packages.title")
@@ -125,6 +140,14 @@ struct PackagesSettingsView: View {
         .onAppear(perform: onAppear)
         .sheet(isPresented: $showCustomVersionSheet) {
             customVersionSheet
+        }
+        .alert("packages.restore_pip.confirm.title", isPresented: $showRestorePipConfirmation) {
+            Button("common.cancel", role: .cancel) {}
+            Button("packages.restore_pip.confirm", role: .destructive) {
+                onRestorePipPackages()
+            }
+        } message: {
+            Text("packages.restore_pip.confirm.message")
         }
     }
 
@@ -397,6 +420,9 @@ struct PackagesSettingsView: View {
         }
         if packageStatusText == "installing" {
             return String(localized: "packages.status.installing")
+        }
+        if packageStatusText == "restoring" {
+            return String(localized: "packages.status.restoring")
         }
         if packageStatusText == "indexing" {
             return String(localized: "packages.status.loading_index")

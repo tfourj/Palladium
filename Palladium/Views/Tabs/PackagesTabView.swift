@@ -67,6 +67,9 @@ struct PackagesTabView: View {
         if packageStatusText == "installing" {
             return "packages.status.installing"
         }
+        if packageStatusText == "restoring" {
+            return "packages.status.restoring"
+        }
         return "packages.status.checking"
     }
 }
