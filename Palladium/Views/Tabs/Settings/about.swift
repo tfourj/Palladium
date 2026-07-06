@@ -5,6 +5,7 @@ struct SettingsAboutView: View {
 
     private let githubURL = URL(string: "https://github.com/TfourJ")
     private let websiteURL = URL(string: "https://getpalladium.app")
+    private let contactURL = URL(string: "https://getpalladium.app/contact")
     private let discordURL = URL(string: "https://discord.tfourj.com")
     private let licenseURL = URL(string: "https://github.com/TfourJ/Palladium/blob/main/LICENSE")
     
@@ -63,6 +64,11 @@ struct SettingsAboutView: View {
                 if let websiteURL {
                     Link(destination: websiteURL) {
                         linkRow("Website")
+                    }
+                }
+                if let contactURL {
+                    Link(destination: contactURL) {
+                        linkRow("Contact")
                     }
                 }
                 if let discordURL {
