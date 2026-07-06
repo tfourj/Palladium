@@ -9,6 +9,9 @@ CLEANUP_PACKAGES = YTDLP_RUNTIME_PACKAGES
 WEBKIT_JSI_API_PACKAGE_RELATIVE_PATH = os.path.join(
     "yt_dlp_plugins", "webkit_jsi", "lib", "api.py"
 )
+EJS_MODULE_RELATIVE_PATH = os.path.join(
+    "yt_dlp", "extractor", "youtube", "jsc", "_builtin", "ejs.py"
+)
 
 
 class TailBuffer:
