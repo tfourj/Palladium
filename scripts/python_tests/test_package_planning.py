@@ -141,17 +141,17 @@ class PackagePlanningTests(unittest.TestCase):
         ])
         self.assertEqual(cleanup, ["yt-dlp", "yt-dlp-apple-webkit-jsi", "curl-cffi", "gallery-dl"])
 
-    def test_custom_source_skips_webkit_patch(self):
+    def test_custom_source_disables_patches(self):
         custom_source = parse_package_source(json.dumps({"mode": "custom"}))
         stable_source = parse_package_source(json.dumps({"mode": "stable"}))
 
-        self.assertTrue(custom_source["skip_webkit_patch"])
-        self.assertFalse(stable_source["skip_webkit_patch"])
+        self.assertEqual(custom_source["patch_mode"], "off")
+        self.assertEqual(stable_source["patch_mode"], "webkit")
 
-    def test_explicit_setting_skips_webkit_patch(self):
+    def test_legacy_disable_setting_turns_patches_off(self):
         source = parse_package_source(json.dumps({
             "mode": "stable",
             "disable_webkit_jsi_patch": True,
         }))
 
-        self.assertTrue(source["skip_webkit_patch"])
+        self.assertEqual(source["patch_mode"], "off")

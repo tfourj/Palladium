@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct AdvancedSettingsView: View {
-    @Binding var disableWebKitJSIPatch: Bool
+    @Binding var youtubePatchMode: YouTubePatchMode
     let isRunning: Bool
     let onReinstallPackages: () -> Void
 
@@ -10,13 +10,16 @@ struct AdvancedSettingsView: View {
     var body: some View {
         Form {
             Section {
-                Toggle("settings.advanced.disable_webkit_jsi_patch", isOn: $disableWebKitJSIPatch)
-                    .disabled(isRunning)
-                    .onChange(of: disableWebKitJSIPatch) {
-                        showReinstallPrompt = true
+                Picker("settings.advanced.youtube_patch_mode", selection: $youtubePatchMode) {
+                    ForEach(YouTubePatchMode.allCases) { mode in
+                        Text(mode.title)
+                            .tag(mode)
                     }
-            } footer: {
-                Text("settings.advanced.disable_webkit_jsi_patch.help")
+                }
+                .disabled(isRunning)
+                .onChange(of: youtubePatchMode) {
+                    showReinstallPrompt = true
+                }
             }
         }
         .navigationTitle("settings.advanced.title")

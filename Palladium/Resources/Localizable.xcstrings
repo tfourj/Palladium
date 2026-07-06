@@ -2569,26 +2569,6 @@
         }
       }
     },
-    "settings.advanced.disable_webkit_jsi_patch" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Disable WebKit JSI patch"
-          }
-        }
-      }
-    },
-    "settings.advanced.disable_webkit_jsi_patch.help" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Prevents Palladium from modifying the yt-dlp-apple-webkit-jsi runtime after installation or update."
-          }
-        }
-      }
-    },
     "settings.advanced.reinstall" : {
       "localizations" : {
         "en" : {
@@ -2604,7 +2584,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reinstall yt-dlp and WebKit JSI now so the installed runtime uses this setting."
+            "value" : "Reinstall the yt-dlp packages now so the installed runtime uses this setting."
           }
         }
       }
@@ -2624,7 +2604,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Restart Palladium to apply the WebKit JSI patch setting safely."
+            "value" : "Restart Palladium to apply the patch setting safely."
           }
         }
       }
@@ -2645,6 +2625,46 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Advanced"
+          }
+        }
+      }
+    },
+    "settings.advanced.youtube_patch_mode" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Patch target"
+          }
+        }
+      }
+    },
+    "settings.advanced.youtube_patch_mode.ejs" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "EJS scripts"
+          }
+        }
+      }
+    },
+    "settings.advanced.youtube_patch_mode.off" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disabled"
+          }
+        }
+      }
+    },
+    "settings.advanced.youtube_patch_mode.webkit" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WebKit JSI runtime (default)"
           }
         }
       }

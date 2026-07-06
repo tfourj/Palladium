@@ -52,6 +52,7 @@ Palladium/
 | `Models/LinkHistory.swift` | Previously used link model and history storage data. |
 | `Models/PackageSourceMode.swift` | Package-source selection model. |
 | `Models/URLAllowlist.swift` | URL allowlist model. |
+| `Models/YouTubePatchMode.swift` | Patch target setting model. |
 
 ### Views
 
@@ -109,6 +110,7 @@ Palladium/
 | `Services/Python/palladium_ytdlp/gallery.py` | gallery-dl installation, resolution, and download flows. |
 | `Services/Python/palladium_ytdlp/maintenance.py` | Python runtime package maintenance flow. |
 | `Services/Python/palladium_ytdlp/packages.py` | Python package installation and source helpers. |
+| `Services/Python/palladium_ytdlp/patching.py` | EJS solver script patcher and patch mode dispatcher. |
 | `Services/Python/palladium_ytdlp/runtime.py` | Runtime reset, module invalidation, and cancellation helpers. |
 | `Services/Python/palladium_ytdlp/shared.py` | Shared Python helpers and constants. |
 | `Services/Python/palladium_ytdlp/webkit_jsi.py` | WebKit JavaScript integration used by yt-dlp. |

@@ -77,6 +77,7 @@ struct ContentView: View {
     static let packageSourceModeDefaultsKey = "palladium.packageSourceMode"
     static let customPackageSpecsDefaultsKey = "palladium.customPackageSpecs"
     static let disableWebKitJSIPatchDefaultsKey = "palladium.disableWebKitJSIPatch"
+    static let youtubePatchModeDefaultsKey = "palladium.youtubePatchMode"
     static let defaultLinkHistoryLimit = 10
     static let maxLinkHistoryLimit = 50
 
@@ -134,7 +135,7 @@ struct ContentView: View {
     @State var autoUpdatePackagesOnLaunch: Bool
     @State var packageSourceMode: PackageSourceMode
     @State var customPackageSpecsText: String
-    @State var disableWebKitJSIPatch: Bool
+    @State var youtubePatchMode: YouTubePatchMode
     @State var storageSummary: StorageManagementSummary = .empty
     @StateObject var consoleLogStore: ConsoleLogStore
     @State var completedDownloadResult: CompletedDownloadResult?
@@ -222,7 +223,7 @@ struct ContentView: View {
         _autoUpdatePackagesOnLaunch = State(initialValue: Self.loadAutoUpdatePackagesOnLaunch())
         _packageSourceMode = State(initialValue: Self.loadPackageSourceMode())
         _customPackageSpecsText = State(initialValue: Self.loadCustomPackageSpecsText())
-        _disableWebKitJSIPatch = State(initialValue: Self.loadDisableWebKitJSIPatch())
+        _youtubePatchMode = State(initialValue: Self.loadYouTubePatchMode())
         _consoleLogStore = StateObject(wrappedValue: ConsoleLogStore())
     }
 
@@ -305,7 +306,7 @@ struct ContentView: View {
                     storageSummary: storageSummary,
                     packageSourceMode: $packageSourceMode,
                     customPackageSpecsText: $customPackageSpecsText,
-                    disableWebKitJSIPatch: $disableWebKitJSIPatch,
+                    youtubePatchMode: $youtubePatchMode,
                     packageStatusText: packageStatusText,
                     versionsText: versionsText,
                     updatesSummaryText: packageUpdatesSummaryText,
@@ -488,7 +489,7 @@ struct ContentView: View {
         .onChange(of: customPackageSpecsText, initial: false) {
             persistPreferences()
         }
-        .onChange(of: disableWebKitJSIPatch, initial: false) {
+        .onChange(of: youtubePatchMode, initial: false) {
             persistPreferences()
         }
         .sheet(item: $sharePayload) { payload in

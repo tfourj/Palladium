@@ -11,6 +11,7 @@ enum PythonScripts {
         "palladium_ytdlp/gallery.py",
         "palladium_ytdlp/maintenance.py",
         "palladium_ytdlp/packages.py",
+        "palladium_ytdlp/patching.py",
         "palladium_ytdlp/runtime.py",
         "palladium_ytdlp/shared.py",
         "palladium_ytdlp/webkit_jsi.py",

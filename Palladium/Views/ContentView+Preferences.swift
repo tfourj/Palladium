@@ -71,7 +71,7 @@ extension ContentView {
         defaults.set(autoUpdatePackagesOnLaunch, forKey: Self.autoUpdatePackagesOnLaunchDefaultsKey)
         defaults.set(packageSourceMode.rawValue, forKey: Self.packageSourceModeDefaultsKey)
         defaults.set(customPackageSpecsText, forKey: Self.customPackageSpecsDefaultsKey)
-        defaults.set(disableWebKitJSIPatch, forKey: Self.disableWebKitJSIPatchDefaultsKey)
+        defaults.set(youtubePatchMode.rawValue, forKey: Self.youtubePatchModeDefaultsKey)
     }
 
     static func loadSelectedPreset(rememberSelection: Bool) -> DownloadPreset {
@@ -387,7 +387,15 @@ extension ContentView {
         return value
     }
 
-    static func loadDisableWebKitJSIPatch() -> Bool {
-        UserDefaults.standard.bool(forKey: disableWebKitJSIPatchDefaultsKey)
+    static func loadYouTubePatchMode() -> YouTubePatchMode {
+        let defaults = UserDefaults.standard
+        if let rawValue = defaults.string(forKey: youtubePatchModeDefaultsKey),
+           let mode = YouTubePatchMode(rawValue: rawValue) {
+            return mode
+        }
+        if defaults.bool(forKey: disableWebKitJSIPatchDefaultsKey) {
+            return .off
+        }
+        return .webkit
     }
 }

@@ -10,6 +10,7 @@ import traceback
 import zipfile
 import importlib.metadata as importlib_metadata
 
+from .patching import DEFAULT_YOUTUBE_PATCH_MODE, normalize_youtube_patch_mode
 from .shared import (
     BUNDLED_RUNTIME_PACKAGES,
     CLEANUP_PACKAGES,
@@ -568,7 +569,7 @@ def parse_package_source(source_json=None):
         "mode": "stable",
         "custom_specs": [],
         "allow_prereleases": False,
-        "skip_webkit_patch": False,
+        "patch_mode": DEFAULT_YOUTUBE_PATCH_MODE,
     }
     if not source_json:
         return source
@@ -593,10 +594,16 @@ def parse_package_source(source_json=None):
             if spec and not spec.startswith("#"):
                 specs.append(spec)
 
+    patch_mode = normalize_youtube_patch_mode(parsed.get("youtube_patch_mode"))
+    if "youtube_patch_mode" not in parsed and parsed.get("disable_webkit_jsi_patch"):
+        patch_mode = "off"
+    if mode == "custom":
+        patch_mode = "off"
+
     source["mode"] = mode
     source["custom_specs"] = specs
     source["allow_prereleases"] = mode == "nightly"
-    source["skip_webkit_patch"] = mode == "custom" or bool(parsed.get("disable_webkit_jsi_patch"))
+    source["patch_mode"] = patch_mode
     return source
 
 

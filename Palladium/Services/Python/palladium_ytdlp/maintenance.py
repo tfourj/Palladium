@@ -16,9 +16,9 @@ from .packages import (
     install_payload_zip,
     parse_package_source,
 )
+from .patching import apply_youtube_patches
 from .runtime import invalidate_runtime_package_modules, raise_if_cancel_requested
 from .shared import TRACKED_PACKAGES, TailBuffer, Tee, YTDLP_RUNTIME_PACKAGES, open_live_log_stream
-from .webkit_jsi import ensure_safe_webkit_jsi_runtime
 
 
 ACTION_CHECK = "check"
@@ -258,11 +258,8 @@ def run_package_maintenance(
                 print(f"[palladium] post-update updates available: {updates_available}")
                 print(f"[palladium] post-update updates summary: {updates_summary}")
 
-            if package_source.get("skip_webkit_patch"):
-                print("[palladium] skipping webkit patch by configuration")
-            else:
-                raise_if_cancel_requested(cancel_file_path, "[palladium] package action cancelled before webkit patch")
-                ensure_safe_webkit_jsi_runtime(install_target)
+            raise_if_cancel_requested(cancel_file_path, "[palladium] package action cancelled before youtube patches")
+            apply_youtube_patches(install_target, package_source.get("patch_mode"))
 
             raise_if_cancel_requested(cancel_file_path, "[palladium] package action cancelled before version collection")
             versions = collect_versions(install_target=install_target)
