@@ -154,6 +154,15 @@ extension ContentView {
         runPackageFlow(action: .reinstall)
     }
 
+    func restorePipPackages() {
+        if packageSourceMode == .custom && customPackageSpecs().isEmpty {
+            alertMessage = String(localized: "packages.source.custom_specs.empty")
+            showAlert = true
+            return
+        }
+        runPackageFlow(action: .restorePipPackages)
+    }
+
     func updatePackagesWithCustomVersions(_ customVersions: [String: String]) {
         guard packageSourceMode != .custom else { return }
         guard !customVersions.isEmpty else { return }
@@ -224,7 +233,7 @@ extension ContentView {
             withIntermediateDirectories: true
         )
 
-        let fileName = sourceURL.lastPathComponent.isEmpty ? "payload.zip" : sourceURL.lastPathComponent
+        let fileName = sourceURL.lastPathComponent.isEmpty ? "payload.bundle" : sourceURL.lastPathComponent
         let destinationURL = importDirectory.appendingPathComponent("\(UUID().uuidString)-\(fileName)")
         if FileManager.default.fileExists(atPath: destinationURL.path) {
             try FileManager.default.removeItem(at: destinationURL)

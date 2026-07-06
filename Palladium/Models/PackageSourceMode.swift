@@ -7,11 +7,14 @@ enum PackageAction: String {
     case reinstall
     case indexVersions = "index_versions"
     case installPayloadZip = "install_payload_zip"
+    case restorePipPackages = "restore_pip_packages"
 
     var initialStatusText: String {
         switch self {
         case .installPayloadZip:
             return "installing"
+        case .restorePipPackages:
+            return "restoring"
         case .update, .reinstall:
             return "updating"
         case .indexVersions:

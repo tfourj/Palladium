@@ -1940,7 +1940,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Installs a supported iOS payload ZIP for bundled runtime packages."
+            "value" : "Installs a local payload bundle from a ZIP or .whl file."
           }
         }
       }
@@ -1950,7 +1950,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Import Payload ZIP"
+            "value" : "Import Payload Bundle"
           }
         }
       }
@@ -1960,7 +1960,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Failed to import payload ZIP: %@"
+            "value" : "Failed to import payload bundle: %@"
           }
         }
       }
@@ -1970,7 +1970,57 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Payload ZIP Import Failed"
+            "value" : "Payload Bundle Import Failed"
+          }
+        }
+      }
+    },
+    "packages.restore_pip" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restore Pip Packages"
+          }
+        }
+      }
+    },
+    "packages.restore_pip.confirm" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restore"
+          }
+        }
+      }
+    },
+    "packages.restore_pip.confirm.message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This removes imported payload packages and reinstalls packages from the configured package source."
+          }
+        }
+      }
+    },
+    "packages.restore_pip.confirm.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restore Pip Packages?"
+          }
+        }
+      }
+    },
+    "packages.restore_pip.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Removes payload-installed packages and reinstalls runtime packages with pip."
           }
         }
       }
@@ -2160,7 +2210,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Installing payload ZIP..."
+            "value" : "Installing payload bundle..."
           }
         }
       }
@@ -2181,6 +2231,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Running..."
+          }
+        }
+      }
+    },
+    "packages.status.restoring" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restoring pip packages..."
           }
         }
       }
