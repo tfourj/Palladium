@@ -587,6 +587,22 @@ private extension ContentView {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
+
+                if let packageNames = automaticPackageUpdatePackageNamesText {
+                    Text(
+                        String(
+                            format: String(localized: "packages.auto_update.packages"),
+                            packageNames
+                        )
+                    )
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.85)
+                    .truncationMode(.tail)
+                    .frame(maxWidth: .infinity)
+                }
             }
             .padding(24)
             .frame(maxWidth: 280)
@@ -597,6 +613,49 @@ private extension ContentView {
         }
         .contentShape(Rectangle())
         .accessibilityIdentifier("automaticPackageUpdateOverlay")
+    }
+
+    var automaticPackageUpdatePackageNamesText: String? {
+        let updatePackageNames = packageUpdatesSummaryText
+            .components(separatedBy: .newlines)
+            .compactMap { updateLinePackageName($0) }
+
+        let packageNames: [String]
+        if packageSourceMode == .custom {
+            packageNames = customPackageSpecs().compactMap { customSpecPackageName($0) }
+        } else {
+            packageNames = updatePackageNames
+        }
+
+        var seenPackageNames = Set<String>()
+        let uniqueNames = packageNames.filter { seenPackageNames.insert($0).inserted }
+        guard !uniqueNames.isEmpty else { return nil }
+        return uniqueNames.joined(separator: ", ")
+    }
+
+    func updateLinePackageName(_ line: String) -> String? {
+        let prefix = line.split(separator: ":", maxSplits: 1).first
+            .map(String.init)?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let prefix, PackageSourceDefaults.lockablePackageNames.contains(prefix) else {
+            return nil
+        }
+        return prefix
+    }
+
+    func customSpecPackageName(_ spec: String) -> String? {
+        let trimmed = spec.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return nil }
+
+        var nameEnd = trimmed.endIndex
+        for delimiter in ["==", ">=", "<=", "~=", "!=", ">", "<", " @ ", "[", ";"] {
+            if let range = trimmed.range(of: delimiter), range.lowerBound < nameEnd {
+                nameEnd = range.lowerBound
+            }
+        }
+
+        let name = trimmed[..<nameEnd].trimmingCharacters(in: .whitespacesAndNewlines)
+        return name.isEmpty ? nil : String(name)
     }
 }
 
