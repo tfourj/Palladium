@@ -1805,6 +1805,16 @@
         }
       }
     },
+    "packages.auto_update.packages" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Updating: %@"
+          }
+        }
+      }
+    },
     "packages.auto_update.title" : {
       "localizations" : {
         "en" : {
