@@ -77,6 +77,14 @@ struct SettingsTabView: View {
         }
     }
 
+    private struct SearchableControlGroup: Identifiable {
+        let route: SettingsRoute
+        let title: String
+        let settings: [SearchableControlSetting]
+
+        var id: SettingsRoute { route }
+    }
+
     @State private var searchText = ""
     @State private var showPatchReinstallPrompt = false
     @State private var showNightlyPackageWarning = false
@@ -206,9 +214,9 @@ struct SettingsTabView: View {
                 ContentUnavailableView.search(text: searchText)
             }
 
-            if !filteredControlSettings.isEmpty {
-                Section("settings.search.controls.section") {
-                    ForEach(filteredControlSettings) { setting in
+            ForEach(filteredControlGroups) { group in
+                Section(group.title) {
+                    ForEach(group.settings) { setting in
                         searchableControlRow(for: setting)
                     }
                 }
@@ -402,6 +410,74 @@ struct SettingsTabView: View {
 
     private var filteredControlSettings: [SearchableControlSetting] {
         searchableControlSettings.filter { $0.matches(searchText) }
+    }
+
+    private var filteredControlGroups: [SearchableControlGroup] {
+        searchableControlMenuOrder.compactMap { route in
+            let settings = filteredControlSettings.filter { menu(for: $0.control) == route }
+            guard !settings.isEmpty else { return nil }
+            return SearchableControlGroup(
+                route: route,
+                title: setting(for: route).title,
+                settings: settings
+            )
+        }
+    }
+
+    private var searchableControlMenuOrder: [SettingsRoute] {
+        [
+            .appearance,
+            .downloadsTab,
+            .history,
+            .notifications,
+            .downloadModes,
+            .customizeDownloadOptions,
+            .downloadOptions,
+            .afterDownload,
+            .downloadBehavior,
+            .downloadArguments,
+            .cookies,
+            .packageManager,
+            .advanced
+        ]
+    }
+
+    private func menu(for control: SearchableControl) -> SettingsRoute {
+        switch control {
+        case .appearance:
+            return .appearance
+        case .showTemporaryDownloads:
+            return .downloadsTab
+        case .historyEnabled, .historyLimit:
+            return .history
+        case .notificationsEnabled:
+            return .notifications
+        case .normalDownloadMode, .shareSheetDownloadMode, .rememberDownloadMode:
+            return .downloadModes
+        case .presetVisibility:
+            return .customizeDownloadOptions
+        case .defaultPlaylist,
+             .defaultSubtitles,
+             .defaultThumbnail,
+             .defaultCookies,
+             .restoreDownloadDefaults:
+            return .downloadOptions
+        case .afterDownload:
+            return .afterDownload
+        case .autoDownloadOnPaste, .retryFailedDownloads, .detailedProgress:
+            return .downloadBehavior
+        case .customArguments, .globalArguments:
+            return .downloadArguments
+        case .selectedCookieFile:
+            return .cookies
+        case .packageSource,
+             .customPackageSpecs,
+             .packageUpdateChecks,
+             .automaticPackageUpdates:
+            return .packageManager
+        case .youtubePatchMode:
+            return .advanced
+        }
     }
 
     private var searchableControlSettings: [SearchableControlSetting] {
