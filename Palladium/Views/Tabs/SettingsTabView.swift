@@ -33,42 +33,13 @@ struct SettingsTabView: View {
         var id: SettingsRoute { route }
     }
 
-    private enum SearchableControl: Hashable {
-        case appearance
-        case showTemporaryDownloads
-        case historyEnabled
-        case historyLimit
-        case notificationsEnabled
-        case normalDownloadMode
-        case shareSheetDownloadMode
-        case rememberDownloadMode
-        case presetVisibility(String)
-        case defaultPlaylist
-        case defaultSubtitles
-        case defaultThumbnail
-        case defaultCookies
-        case restoreDownloadDefaults
-        case afterDownload
-        case autoDownloadOnPaste
-        case retryFailedDownloads
-        case detailedProgress
-        case customArguments
-        case globalArguments
-        case selectedCookieFile
-        case packageSource
-        case customPackageSpecs
-        case packageUpdateChecks
-        case automaticPackageUpdates
-        case youtubePatchMode
-    }
-
     private struct SearchableControlSetting: Identifiable {
-        let control: SearchableControl
+        let id: String
+        let menu: SettingsRoute
         let title: String
         let subtitle: String
         let keywords: [String]
-
-        var id: SearchableControl { control }
+        let makeControl: () -> AnyView
 
         func matches(_ query: String) -> Bool {
             ([title, subtitle] + keywords).contains { value in
@@ -413,70 +384,14 @@ struct SettingsTabView: View {
     }
 
     private var filteredControlGroups: [SearchableControlGroup] {
-        searchableControlMenuOrder.compactMap { route in
-            let settings = filteredControlSettings.filter { menu(for: $0.control) == route }
+        searchableSettings.compactMap { menu in
+            let settings = filteredControlSettings.filter { $0.menu == menu.route }
             guard !settings.isEmpty else { return nil }
             return SearchableControlGroup(
-                route: route,
-                title: setting(for: route).title,
+                route: menu.route,
+                title: menu.title,
                 settings: settings
             )
-        }
-    }
-
-    private var searchableControlMenuOrder: [SettingsRoute] {
-        [
-            .appearance,
-            .downloadsTab,
-            .history,
-            .notifications,
-            .downloadModes,
-            .customizeDownloadOptions,
-            .downloadOptions,
-            .afterDownload,
-            .downloadBehavior,
-            .downloadArguments,
-            .cookies,
-            .packageManager,
-            .advanced
-        ]
-    }
-
-    private func menu(for control: SearchableControl) -> SettingsRoute {
-        switch control {
-        case .appearance:
-            return .appearance
-        case .showTemporaryDownloads:
-            return .downloadsTab
-        case .historyEnabled, .historyLimit:
-            return .history
-        case .notificationsEnabled:
-            return .notifications
-        case .normalDownloadMode, .shareSheetDownloadMode, .rememberDownloadMode:
-            return .downloadModes
-        case .presetVisibility:
-            return .customizeDownloadOptions
-        case .defaultPlaylist,
-             .defaultSubtitles,
-             .defaultThumbnail,
-             .defaultCookies,
-             .restoreDownloadDefaults:
-            return .downloadOptions
-        case .afterDownload:
-            return .afterDownload
-        case .autoDownloadOnPaste, .retryFailedDownloads, .detailedProgress:
-            return .downloadBehavior
-        case .customArguments, .globalArguments:
-            return .downloadArguments
-        case .selectedCookieFile:
-            return .cookies
-        case .packageSource,
-             .customPackageSpecs,
-             .packageUpdateChecks,
-             .automaticPackageUpdates:
-            return .packageManager
-        case .youtubePatchMode:
-            return .advanced
         }
     }
 
@@ -487,11 +402,22 @@ struct SettingsTabView: View {
 
         settings.insert(
             contentsOf: downloadPresetSettings.map { setting in
-                SearchableControlSetting(
-                    control: .presetVisibility(setting.id),
-                    title: setting.preset.title,
+                let title = setting.preset.title
+                return SearchableControlSetting(
+                    id: "downloadPresetVisibility.\(setting.id)",
+                    menu: .customizeDownloadOptions,
+                    title: title,
                     subtitle: customizeHelp,
-                    keywords: [customizeTitle, String(localized: "settings.download_modes.title")]
+                    keywords: [customizeTitle, String(localized: "settings.download_modes.title")],
+                    makeControl: {
+                        AnyView(
+                            searchToggle(
+                                title,
+                                isOn: presetVisibilityBinding(for: setting.id),
+                                disabled: isPresetVisibilityDisabled(for: setting.id)
+                            )
+                        )
+                    }
                 )
             },
             at: 7
@@ -502,302 +428,326 @@ struct SettingsTabView: View {
     private var baseSearchableControlSettings: [SearchableControlSetting] {
         [
             controlSetting(
-                .appearance,
+                id: "appearance",
+                menu: .appearance,
                 title: "settings.ui.appearance.picker",
                 subtitle: "settings.ui.appearance.help",
                 keywords: AppAppearanceMode.allCases.map(\.title)
-            ),
+            ) { title in
+                AnyView(
+                    Picker(title, selection: $appAppearanceMode) {
+                        ForEach(AppAppearanceMode.allCases) { mode in
+                            Text(mode.title).tag(mode)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .disabled(isRunning)
+                )
+            },
             controlSetting(
-                .showTemporaryDownloads,
+                id: "showTemporaryDownloads",
+                menu: .downloadsTab,
                 title: "settings.ui.downloads.show_temp",
                 subtitle: "settings.ui.downloads.help"
-            ),
+            ) { title in
+                AnyView(searchToggle(title, isOn: $showTemporaryDownloads, disabled: isRunning))
+            },
             controlSetting(
-                .historyEnabled,
+                id: "historyEnabled",
+                menu: .history,
                 title: "settings.ui.history.enable",
                 subtitle: "settings.ui.history.help",
                 keywords: [String(localized: "settings.ui.history.section")]
-            ),
+            ) { title in
+                AnyView(searchToggle(title, isOn: $linkHistoryEnabled, disabled: isRunning))
+            },
             controlSetting(
-                .historyLimit,
+                id: "historyLimit",
+                menu: .history,
                 title: "settings.ui.history.limit",
                 subtitle: "settings.ui.history.help"
-            ),
+            ) { title in
+                AnyView(
+                    Stepper(value: $linkHistoryLimit, in: 0...ContentView.maxLinkHistoryLimit) {
+                        LabeledContent(title, value: String(linkHistoryLimit))
+                    }
+                    .disabled(isRunning || !linkHistoryEnabled)
+                )
+            },
             controlSetting(
-                .notificationsEnabled,
+                id: "notificationsEnabled",
+                menu: .notifications,
                 title: "settings.notifications.toggle_single",
                 subtitle: "settings.notifications.help"
-            ),
+            ) { title in
+                AnyView(searchToggle(title, isOn: $notificationsEnabled, disabled: isRunning))
+            },
             controlSetting(
-                .normalDownloadMode,
+                id: "normalDownloadMode",
+                menu: .downloadModes,
                 title: "settings.ui.modes.normal",
                 subtitle: "settings.ui.modes.help",
                 keywords: DownloadPreset.allCases.map(\.title)
-            ),
+            ) { title in
+                AnyView(
+                    Picker(title, selection: $selectedPreset) {
+                        ForEach(DownloadOptions.visiblePresets(from: downloadPresetSettings)) { preset in
+                            Text(preset.title).tag(preset)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .disabled(isRunning)
+                )
+            },
             controlSetting(
-                .shareSheetDownloadMode,
+                id: "shareSheetDownloadMode",
+                menu: .downloadModes,
                 title: "settings.ui.modes.share_sheet",
                 subtitle: "settings.ui.modes.help",
                 keywords: ShareSheetDownloadMode.allCases.map(\.title)
-            ),
+            ) { title in
+                AnyView(
+                    Picker(title, selection: $shareSheetDownloadMode) {
+                        ForEach(DownloadOptions.visibleShareSheetModes(from: downloadPresetSettings)) { mode in
+                            Text(mode.title).tag(mode)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .disabled(isRunning)
+                )
+            },
             controlSetting(
-                .rememberDownloadMode,
+                id: "rememberDownloadMode",
+                menu: .downloadModes,
                 title: "settings.ui.modes.remember",
                 subtitle: "settings.ui.modes.help"
-            ),
+            ) { title in
+                AnyView(searchToggle(title, isOn: $rememberSelectedPreset, disabled: isRunning))
+            },
             controlSetting(
-                .defaultPlaylist,
+                id: "defaultPlaylist",
+                menu: .downloadOptions,
                 title: "settings.download_defaults.playlist.default",
                 subtitle: "download.options.summary.default"
-            ),
+            ) { title in
+                AnyView(searchToggle(title, isOn: $defaultDownloadPlaylist, disabled: isRunning))
+            },
             controlSetting(
-                .defaultSubtitles,
+                id: "defaultSubtitles",
+                menu: .downloadOptions,
                 title: "settings.download_defaults.subtitles.default",
                 subtitle: "download.options.summary.default"
-            ),
+            ) { title in
+                AnyView(searchToggle(title, isOn: $defaultDownloadSubtitles, disabled: isRunning))
+            },
             controlSetting(
-                .defaultThumbnail,
+                id: "defaultThumbnail",
+                menu: .downloadOptions,
                 title: "settings.download_defaults.thumbnail.default",
                 subtitle: "download.options.summary.default"
-            ),
+            ) { title in
+                AnyView(searchToggle(title, isOn: $defaultEmbedThumbnail, disabled: isRunning))
+            },
             controlSetting(
-                .defaultCookies,
+                id: "defaultCookies",
+                menu: .downloadOptions,
                 title: "settings.download_defaults.cookies.default",
                 subtitle: "download.options.summary.default"
-            ),
+            ) { title in
+                AnyView(searchToggle(title, isOn: $defaultUseCookies, disabled: isRunning))
+            },
             controlSetting(
-                .restoreDownloadDefaults,
+                id: "restoreDownloadDefaults",
+                menu: .downloadOptions,
                 title: "settings.download_defaults.restore",
                 subtitle: "settings.download_defaults.restore.help"
-            ),
+            ) { title in
+                AnyView(searchToggle(title, isOn: $restoreDownloadDefaults, disabled: isRunning))
+            },
             controlSetting(
-                .afterDownload,
+                id: "afterDownload",
+                menu: .afterDownload,
                 title: "settings.ui.after_download.picker",
                 subtitle: "settings.ui.after_download.help",
                 keywords: AfterDownloadBehavior.allCases.map(\.title)
-            ),
+            ) { title in
+                AnyView(
+                    Picker(title, selection: $afterDownloadBehavior) {
+                        ForEach(AfterDownloadBehavior.allCases) { behavior in
+                            Label(behavior.title, systemImage: behavior.icon).tag(behavior)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .disabled(isRunning)
+                )
+            },
             controlSetting(
-                .autoDownloadOnPaste,
+                id: "autoDownloadOnPaste",
+                menu: .downloadBehavior,
                 title: "settings.ui.paste.auto_download",
                 subtitle: "settings.ui.paste.help"
-            ),
+            ) { title in
+                AnyView(searchToggle(title, isOn: $autoDownloadOnPaste, disabled: isRunning))
+            },
             controlSetting(
-                .retryFailedDownloads,
+                id: "retryFailedDownloads",
+                menu: .downloadBehavior,
                 title: "settings.ui.retry_failed.toggle",
                 subtitle: "settings.ui.retry_failed.help"
-            ),
+            ) { title in
+                AnyView(searchToggle(title, isOn: $autoRetryFailedDownloads, disabled: isRunning))
+            },
             controlSetting(
-                .detailedProgress,
+                id: "detailedProgress",
+                menu: .downloadBehavior,
                 title: "settings.ui.progress.verbose",
                 subtitle: "settings.ui.progress.help"
-            ),
+            ) { title in
+                AnyView(searchToggle(title, isOn: $detailedProgressEnabled, disabled: isRunning))
+            },
             controlSetting(
-                .customArguments,
+                id: "customArguments",
+                menu: .downloadArguments,
                 title: "download.args.custom.title",
                 subtitle: "download.args.custom.help"
-            ),
+            ) { title in
+                AnyView(searchTextField(title, text: $customArgsText))
+            },
             controlSetting(
-                .globalArguments,
+                id: "globalArguments",
+                menu: .downloadArguments,
                 title: "download.args.global.title",
                 subtitle: "download.args.global.help"
-            ),
+            ) { title in
+                AnyView(searchTextField(title, text: $extraArgsText))
+            },
             controlSetting(
-                .selectedCookieFile,
+                id: "selectedCookieFile",
+                menu: .cookies,
                 title: "download.options.cookies.picker",
                 subtitle: "cookies.settings.help",
                 keywords: importedCookieFiles.map(\.displayName)
-            ),
+            ) { title in
+                AnyView(
+                    Picker(title, selection: $selectedCookieFileName) {
+                        Text("common.none").tag("")
+                        ForEach(importedCookieFiles) { cookieFile in
+                            Text(cookieFile.displayName).tag(cookieFile.fileName)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .disabled(isRunning || isPackageRunning || importedCookieFiles.isEmpty)
+                )
+            },
             controlSetting(
-                .packageSource,
+                id: "packageSource",
+                menu: .packageManager,
                 title: "packages.source.picker",
                 subtitle: "settings.packages.subtitle",
                 keywords: PackageSourceMode.allCases.map(\.title)
-            ),
+            ) { title in
+                AnyView(
+                    Picker(title, selection: packageSourceSearchBinding) {
+                        ForEach(PackageSourceMode.allCases) { mode in
+                            Text(mode.title).tag(mode)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                    .disabled(isPackageRunning)
+                    .alert("packages.source.nightly.warning.title", isPresented: $showNightlyPackageWarning) {
+                        Button("common.cancel", role: .cancel) {}
+                        Button("packages.source.nightly.enable") {
+                            packageSourceMode = .nightly
+                        }
+                    } message: {
+                        Text("packages.source.nightly.warning.message")
+                    }
+                )
+            },
             controlSetting(
-                .customPackageSpecs,
+                id: "customPackageSpecs",
+                menu: .packageManager,
                 title: "packages.source.custom_specs.title",
                 subtitle: "packages.source.custom_specs.help"
-            ),
+            ) { title in
+                AnyView(
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(title)
+                        TextField(title, text: $customPackageSpecsText, axis: .vertical)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
+                            .font(.system(.footnote, design: .monospaced))
+                    }
+                    .disabled(isPackageRunning || packageSourceMode != .custom)
+                )
+            },
             controlSetting(
-                .packageUpdateChecks,
+                id: "packageUpdateChecks",
+                menu: .packageManager,
                 title: "settings.ui.packages.auto_check",
                 subtitle: "settings.ui.packages.auto_check.help"
-            ),
+            ) { title in
+                AnyView(searchToggle(title, isOn: $checkPackageUpdatesOnLaunch, disabled: isPackageRunning))
+            },
             controlSetting(
-                .automaticPackageUpdates,
+                id: "automaticPackageUpdates",
+                menu: .packageManager,
                 title: "settings.ui.packages.auto_update",
                 subtitle: "settings.ui.packages.auto_update.help"
-            ),
+            ) { title in
+                AnyView(
+                    searchToggle(
+                        title,
+                        isOn: $autoUpdatePackagesOnLaunch,
+                        disabled: isPackageRunning || !checkPackageUpdatesOnLaunch
+                    )
+                )
+            },
             controlSetting(
-                .youtubePatchMode,
+                id: "youtubePatchMode",
+                menu: .advanced,
                 title: "settings.advanced.youtube_patch_mode",
                 subtitle: "settings.advanced.restart_required",
                 keywords: YouTubePatchMode.allCases.map(\.title) + [String(localized: "settings.advanced.title")]
-            )
+            ) { title in
+                AnyView(
+                    Picker(title, selection: $youtubePatchMode) {
+                        ForEach(YouTubePatchMode.allCases) { mode in
+                            Text(mode.title).tag(mode)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .disabled(isRunning || isPackageRunning)
+                    .onChange(of: youtubePatchMode) {
+                        showPatchReinstallPrompt = true
+                    }
+                )
+            }
         ]
     }
 
     private func controlSetting(
-        _ control: SearchableControl,
+        id: String,
+        menu: SettingsRoute,
         title: String.LocalizationValue,
         subtitle: String.LocalizationValue,
-        keywords: [String] = []
+        keywords: [String] = [],
+        makeControl: @escaping (_ title: String) -> AnyView
     ) -> SearchableControlSetting {
-        SearchableControlSetting(
-            control: control,
-            title: String(localized: title),
+        let localizedTitle = String(localized: title)
+        return SearchableControlSetting(
+            id: id,
+            menu: menu,
+            title: localizedTitle,
             subtitle: String(localized: subtitle),
-            keywords: keywords
+            keywords: keywords,
+            makeControl: { makeControl(localizedTitle) }
         )
     }
 
-    @ViewBuilder
     private func searchableControlRow(for setting: SearchableControlSetting) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            switch setting.control {
-            case .appearance:
-                Picker(selection: $appAppearanceMode) {
-                    ForEach(AppAppearanceMode.allCases) { mode in
-                        Text(mode.title).tag(mode)
-                    }
-                } label: {
-                    Text(setting.title)
-                }
-                .pickerStyle(.menu)
-                .disabled(isRunning)
-            case .showTemporaryDownloads:
-                searchToggle(setting.title, isOn: $showTemporaryDownloads, disabled: isRunning)
-            case .historyEnabled:
-                searchToggle(setting.title, isOn: $linkHistoryEnabled, disabled: isRunning)
-            case .historyLimit:
-                Stepper(value: $linkHistoryLimit, in: 0...ContentView.maxLinkHistoryLimit) {
-                    LabeledContent(setting.title, value: String(linkHistoryLimit))
-                }
-                .disabled(isRunning || !linkHistoryEnabled)
-            case .notificationsEnabled:
-                searchToggle(setting.title, isOn: $notificationsEnabled, disabled: isRunning)
-            case .normalDownloadMode:
-                Picker(selection: $selectedPreset) {
-                    ForEach(DownloadOptions.visiblePresets(from: downloadPresetSettings)) { preset in
-                        Text(preset.title).tag(preset)
-                    }
-                } label: {
-                    Text(setting.title)
-                }
-                .pickerStyle(.menu)
-                .disabled(isRunning)
-            case .shareSheetDownloadMode:
-                Picker(selection: $shareSheetDownloadMode) {
-                    ForEach(DownloadOptions.visibleShareSheetModes(from: downloadPresetSettings)) { mode in
-                        Text(mode.title).tag(mode)
-                    }
-                } label: {
-                    Text(setting.title)
-                }
-                .pickerStyle(.menu)
-                .disabled(isRunning)
-            case .rememberDownloadMode:
-                searchToggle(setting.title, isOn: $rememberSelectedPreset, disabled: isRunning)
-            case .presetVisibility(let presetID):
-                searchToggle(
-                    setting.title,
-                    isOn: presetVisibilityBinding(for: presetID),
-                    disabled: isPresetVisibilityDisabled(for: presetID)
-                )
-            case .defaultPlaylist:
-                searchToggle(setting.title, isOn: $defaultDownloadPlaylist, disabled: isRunning)
-            case .defaultSubtitles:
-                searchToggle(setting.title, isOn: $defaultDownloadSubtitles, disabled: isRunning)
-            case .defaultThumbnail:
-                searchToggle(setting.title, isOn: $defaultEmbedThumbnail, disabled: isRunning)
-            case .defaultCookies:
-                searchToggle(setting.title, isOn: $defaultUseCookies, disabled: isRunning)
-            case .restoreDownloadDefaults:
-                searchToggle(setting.title, isOn: $restoreDownloadDefaults, disabled: isRunning)
-            case .afterDownload:
-                Picker(selection: $afterDownloadBehavior) {
-                    ForEach(AfterDownloadBehavior.allCases) { behavior in
-                        Label(behavior.title, systemImage: behavior.icon).tag(behavior)
-                    }
-                } label: {
-                    Text(setting.title)
-                }
-                .pickerStyle(.menu)
-                .disabled(isRunning)
-            case .autoDownloadOnPaste:
-                searchToggle(setting.title, isOn: $autoDownloadOnPaste, disabled: isRunning)
-            case .retryFailedDownloads:
-                searchToggle(setting.title, isOn: $autoRetryFailedDownloads, disabled: isRunning)
-            case .detailedProgress:
-                searchToggle(setting.title, isOn: $detailedProgressEnabled, disabled: isRunning)
-            case .customArguments:
-                searchTextField(setting.title, text: $customArgsText)
-            case .globalArguments:
-                searchTextField(setting.title, text: $extraArgsText)
-            case .selectedCookieFile:
-                Picker(selection: $selectedCookieFileName) {
-                    Text("common.none").tag("")
-                    ForEach(importedCookieFiles) { cookieFile in
-                        Text(cookieFile.displayName).tag(cookieFile.fileName)
-                    }
-                } label: {
-                    Text(setting.title)
-                }
-                .pickerStyle(.menu)
-                .disabled(isRunning || isPackageRunning || importedCookieFiles.isEmpty)
-            case .packageSource:
-                Picker(selection: packageSourceSearchBinding) {
-                    ForEach(PackageSourceMode.allCases) { mode in
-                        Text(mode.title).tag(mode)
-                    }
-                } label: {
-                    Text(setting.title)
-                }
-                .pickerStyle(.segmented)
-                .disabled(isPackageRunning)
-                .alert("packages.source.nightly.warning.title", isPresented: $showNightlyPackageWarning) {
-                    Button("common.cancel", role: .cancel) {}
-                    Button("packages.source.nightly.enable") {
-                        packageSourceMode = .nightly
-                    }
-                } message: {
-                    Text("packages.source.nightly.warning.message")
-                }
-            case .customPackageSpecs:
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(setting.title)
-                    TextField(setting.title, text: $customPackageSpecsText, axis: .vertical)
-                        .textInputAutocapitalization(.never)
-                        .autocorrectionDisabled()
-                        .font(.system(.footnote, design: .monospaced))
-                }
-                .disabled(isPackageRunning || packageSourceMode != .custom)
-            case .packageUpdateChecks:
-                searchToggle(
-                    setting.title,
-                    isOn: $checkPackageUpdatesOnLaunch,
-                    disabled: isPackageRunning
-                )
-            case .automaticPackageUpdates:
-                searchToggle(
-                    setting.title,
-                    isOn: $autoUpdatePackagesOnLaunch,
-                    disabled: isPackageRunning || !checkPackageUpdatesOnLaunch
-                )
-            case .youtubePatchMode:
-                Picker(selection: $youtubePatchMode) {
-                    ForEach(YouTubePatchMode.allCases) { mode in
-                        Text(mode.title).tag(mode)
-                    }
-                } label: {
-                    Text(setting.title)
-                }
-                .pickerStyle(.menu)
-                .disabled(isRunning || isPackageRunning)
-                .onChange(of: youtubePatchMode) {
-                    showPatchReinstallPrompt = true
-                }
-            }
+            setting.makeControl()
 
             Text(setting.subtitle)
                 .font(.caption)
