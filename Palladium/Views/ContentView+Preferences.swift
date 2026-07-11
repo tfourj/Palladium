@@ -8,9 +8,8 @@ import Darwin
 
 extension ContentView {
     func buildPresetArgumentsJSON() -> String {
-        let payload: [String: String] = [
-            "custom": customArgsText
-        ]
+        var payload = DownloadQualityPreferences.load().presetArguments()
+        payload["custom"] = customArgsText
         guard let data = try? JSONSerialization.data(withJSONObject: payload),
               let json = String(data: data, encoding: .utf8) else {
             return "{}"
