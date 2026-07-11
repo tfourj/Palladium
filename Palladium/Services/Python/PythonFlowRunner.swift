@@ -63,6 +63,20 @@ struct YTDLPFormat: Identifiable, Hashable, Sendable {
     var hasVideo: Bool { !videoCodec.isEmpty && videoCodec != "none" }
     var hasAudio: Bool { !audioCodec.isEmpty && audioCodec != "none" }
 
+    var videoCodecDisplayName: String {
+        let codec = videoCodec.lowercased()
+        if codec.hasPrefix("avc1") || codec.hasPrefix("avc3") || codec.hasPrefix("h264") {
+            return "H.264"
+        }
+        if codec.hasPrefix("hvc1")
+            || codec.hasPrefix("hev1")
+            || codec.hasPrefix("hevc")
+            || codec.hasPrefix("h265") {
+            return "H.265"
+        }
+        return videoCodec
+    }
+
     var isPhotosCompatible: Bool {
         guard hasVideo, ["mp4", "mov", "m4v"].contains(fileExtension.lowercased()) else {
             return false

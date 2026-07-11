@@ -458,7 +458,7 @@ struct DownloadTabView: View {
     private func codecDetails(_ format: YTDLPFormat) -> String {
         var codecs: [String] = []
         if format.hasVideo {
-            codecs.append("Video: \(format.videoCodec)")
+            codecs.append("Video: \(format.videoCodecDisplayName)")
             codecs.append(format.hasAudio
                 ? "Audio: \(format.audioCodec)"
                 : String(localized: "download.formats.best_audio"))
