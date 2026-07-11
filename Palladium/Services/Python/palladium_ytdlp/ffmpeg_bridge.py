@@ -7,6 +7,7 @@ import re
 import shlex
 import subprocess
 import sys
+import tempfile
 import time
 import urllib.parse
 from dataclasses import dataclass
@@ -244,6 +245,8 @@ class SwiftFFmpegBridge:
         return self._invoke("ffprobe", prepare_bridge_ffmpeg_args("ffprobe", args))
 
     def probe_metadata(self, path, opts=None):
+        output_fd, output_path = tempfile.mkstemp(prefix="palladium-ffprobe-", suffix=".json")
+        os.close(output_fd)
         command = [
             "-hide_banner",
             "-loglevel",
@@ -252,14 +255,24 @@ class SwiftFFmpegBridge:
             "-show_streams",
             "-print_format",
             "json=compact=1",
+            "-o",
+            output_path,
             *(str(opt) for opt in (opts or [])),
             str(path),
         ]
-        result = self.run_ffprobe(command)
         try:
-            parsed = parse_bridge_json_object(result.stdout)
+            self.run_ffprobe(command)
+            with open(output_path, encoding="utf-8") as output_file:
+                parsed = json.load(output_file)
         except Exception as error:
             raise RuntimeError(f"ffprobe metadata parse failed for {path}: {error}") from error
+        finally:
+            try:
+                os.unlink(output_path)
+            except OSError:
+                pass
+        if not isinstance(parsed, dict):
+            raise RuntimeError(f"ffprobe metadata probe returned unexpected payload for {path}")
         return parsed
 
     def probe_capabilities(self):

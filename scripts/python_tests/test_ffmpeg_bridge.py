@@ -1,3 +1,4 @@
+import os
 import unittest
 
 from scripts.python_tests import helpers  # noqa: F401
@@ -63,7 +64,10 @@ class FFmpegBridgeTests(unittest.TestCase):
 
         def run_ffprobe(args):
             calls.append(args)
-            return BridgeCommandResult(0, '{"streams":[],"format":{}}', "")
+            output_path = args[args.index("-o") + 1]
+            with open(output_path, "w", encoding="utf-8") as output_file:
+                output_file.write('{"streams":[],"format":{}}')
+            return BridgeCommandResult(0, "corrupted shared stdout", "")
 
         bridge.run_ffprobe = run_ffprobe
 
@@ -76,8 +80,11 @@ class FFmpegBridgeTests(unittest.TestCase):
             "-show_streams",
             "-print_format",
             "json=compact=1",
+            "-o",
+            calls[0][calls[0].index("-o") + 1],
             "/tmp/video.mp4",
         ]])
+        self.assertFalse(os.path.exists(calls[0][calls[0].index("-o") + 1]))
 
     def test_capability_probe_gets_version_and_features_separately(self):
         bridge, calls = self.make_bridge({
