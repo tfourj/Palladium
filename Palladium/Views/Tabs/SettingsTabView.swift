@@ -5,6 +5,7 @@ struct SettingsTabView: View {
         case userInterface
         case downloadSettings
         case downloadModes
+        case downloadQuality
         case downloadOptions
         case afterDownload
         case downloadBehavior
@@ -218,6 +219,8 @@ struct SettingsTabView: View {
                 downloadPresetSettings: $downloadPresetSettings,
                 isRunning: isRunning
             )
+        case .downloadQuality:
+            DownloadQualitySettingsView(isRunning: isRunning)
         case .downloadOptions:
             DownloadOptionsSettingsView(
                 defaultDownloadPlaylist: $defaultDownloadPlaylist,
@@ -363,6 +366,7 @@ struct SettingsTabView: View {
     private func downloadSettingsList() -> some View {
         List {
             settingsNavigationLink(for: .downloadModes)
+            settingsNavigationLink(for: .downloadQuality)
             settingsNavigationLink(for: .afterDownload)
             settingsNavigationLink(for: .downloadBehavior)
             settingsNavigationLink(for: .downloadArguments)
@@ -823,6 +827,7 @@ struct SettingsTabView: View {
             .notifications,
             .downloadSettings,
             .downloadModes,
+            .downloadQuality,
             .customizeDownloadOptions,
             .downloadOptions,
             .afterDownload,
@@ -863,6 +868,14 @@ struct SettingsTabView: View {
                 subtitle: String(localized: "settings.download_modes.subtitle"),
                 icon: "arrow.down.circle.fill",
                 color: .blue
+            )
+        case .downloadQuality:
+            return SearchableSetting(
+                route: route,
+                title: "Download Quality",
+                subtitle: "Default video and audio formats, codecs, and quality",
+                icon: "4k.tv.fill",
+                color: .purple
             )
         case .customizeDownloadOptions:
             return SearchableSetting(
