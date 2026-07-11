@@ -252,8 +252,7 @@ struct DownloadTabView: View {
                                 Text(isRunning ? "common.cancel" : "tab.download")
                             }
                             .font(.headline)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 12)
+                            .frame(maxWidth: .infinity, minHeight: 50, maxHeight: 50)
                         }
                         .buttonStyle(.borderedProminent)
                         .tint(isRunning ? .red : .blue)
@@ -269,8 +268,7 @@ struct DownloadTabView: View {
                                     }
                                 }
                                 .font(.headline)
-                                .frame(width: 44)
-                                .padding(.vertical, 12)
+                                .frame(width: 44, height: 50)
                             }
                             .buttonStyle(.borderedProminent)
                             .tint(.blue)
