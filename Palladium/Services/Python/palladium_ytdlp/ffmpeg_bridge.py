@@ -241,18 +241,27 @@ class SwiftFFmpegBridge:
 
         versions = {"ffmpeg": None, "ffprobe": None}
         features = {}
+        ffmpeg_version_text = ""
+        ffmpeg_bsfs_text = ""
 
         try:
-            ffmpeg_result = self.run_ffmpeg(["-bsfs"])
-            ffmpeg_text = ffmpeg_result.combined_output
-            versions["ffmpeg"] = parse_bridge_executable_version(ffmpeg_text, "ffmpeg")
-            features = {
-                "fdk": "--enable-libfdk-aac" in ffmpeg_text,
-                "setts": "setts" in ffmpeg_text.splitlines(),
-                "needs_adtstoasc": bridge_lists_bsf(ffmpeg_text, "aac_adtstoasc"),
-            }
+            ffmpeg_version_result = self.run_ffmpeg(["-version"])
+            ffmpeg_version_text = ffmpeg_version_result.combined_output
+            versions["ffmpeg"] = parse_bridge_executable_version(ffmpeg_version_text, "ffmpeg")
+        except Exception as error:
+            print(f"[palladium][ffmpeg-bridge] ffmpeg version probe failed: {error}")
+
+        try:
+            ffmpeg_bsfs_result = self.run_ffmpeg(["-bsfs"])
+            ffmpeg_bsfs_text = ffmpeg_bsfs_result.combined_output
         except Exception as error:
             print(f"[palladium][ffmpeg-bridge] ffmpeg capability probe failed: {error}")
+
+        features = {
+            "fdk": "--enable-libfdk-aac" in ffmpeg_version_text,
+            "setts": bridge_lists_bsf(ffmpeg_bsfs_text, "setts"),
+            "needs_adtstoasc": bridge_lists_bsf(ffmpeg_bsfs_text, "aac_adtstoasc"),
+        }
 
         try:
             ffprobe_result = self.run_ffprobe(["-version"])
