@@ -69,6 +69,7 @@ struct ContentView: View {
     static let linkHistoryEnabledDefaultsKey = "palladium.linkHistoryEnabled"
     static let linkHistoryLimitDefaultsKey = "palladium.linkHistoryLimit"
     static let linkHistoryEntriesDefaultsKey = "palladium.linkHistoryEntries"
+    static let hideHistoryCountDefaultsKey = "palladium.hideHistoryCount"
     static let appAppearanceModeDefaultsKey = "palladium.appAppearanceMode"
     static let showTemporaryDownloadsDefaultsKey = "palladium.showTemporaryDownloads"
     static let packageVersionsTextDefaultsKey = "palladium.packageVersionsText"
@@ -116,6 +117,7 @@ struct ContentView: View {
     @State var linkHistoryEnabled: Bool
     @State var linkHistoryLimit: Int
     @State var linkHistoryEntries: [LinkHistoryEntry]
+    @State var hideHistoryCount: Bool
     @State var urlAllowlistSources: [URLAllowlistSource]
     @State var isCheckingDownloadAllowlist = false
     @State var isRefreshingURLAllowlists = false
@@ -221,6 +223,7 @@ struct ContentView: View {
         let linkHistoryLimit = Self.loadLinkHistoryLimit()
         _linkHistoryLimit = State(initialValue: linkHistoryLimit)
         _linkHistoryEntries = State(initialValue: Self.loadLinkHistoryEntries(limit: linkHistoryLimit))
+        _hideHistoryCount = State(initialValue: Self.loadHideHistoryCount())
         _urlAllowlistSources = State(initialValue: URLAllowlistManager.loadSources())
         _appAppearanceMode = State(initialValue: Self.loadAppAppearanceMode())
         _showTemporaryDownloads = State(initialValue: Self.loadShowTemporaryDownloads())
@@ -260,6 +263,7 @@ struct ContentView: View {
                     onPastedURL: handlePastedURL,
                     linkHistoryEnabled: linkHistoryEnabled,
                     historyEntries: linkHistoryEntries,
+                    hideHistoryCount: hideHistoryCount,
                     onSelectHistoryEntry: handleHistoryEntrySelection,
                     onDeleteHistoryEntry: removeHistoryEntry,
                     onCopyHistoryLink: copyHistoryLink,
@@ -306,6 +310,7 @@ struct ContentView: View {
                     shareSheetDownloadMode: $shareSheetDownloadMode,
                     linkHistoryEnabled: $linkHistoryEnabled,
                     linkHistoryLimit: $linkHistoryLimit,
+                    hideHistoryCount: $hideHistoryCount,
                     appAppearanceMode: $appAppearanceMode,
                     showTemporaryDownloads: $showTemporaryDownloads,
                     selectedCookieFileName: $selectedCookieFileName,
@@ -484,6 +489,9 @@ struct ContentView: View {
         }
         .onChange(of: linkHistoryLimit, initial: false) {
             trimLinkHistoryEntriesIfNeeded()
+            persistPreferences()
+        }
+        .onChange(of: hideHistoryCount, initial: false) {
             persistPreferences()
         }
         .onChange(of: appAppearanceMode, initial: false) {
