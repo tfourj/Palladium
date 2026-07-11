@@ -20,7 +20,7 @@ from .ffmpeg_bridge import (
     is_cancel_requested,
     patch_ytdlp_for_swiftffmpeg,
 )
-from .files import cleanup_temp_download_files, detect_downloaded_files, has_primary_media_file
+from .files import cleanup_temp_download_files, detect_downloaded_files
 from .packages import (
     build_pip_install_args,
     collect_versions,
@@ -743,11 +743,10 @@ def run_yt_dlp_flow(
                         if primary_downloaded_path:
                             print(f"[palladium] primary downloaded file: {primary_downloaded_path}")
                         if yt_exit_code != 0:
-                            if has_primary_media_file(downloaded_paths):
-                                print(f"[palladium] overriding yt-dlp exit code {yt_exit_code} because a media file exists")
-                                yt_exit_code = 0
-                            else:
-                                print(f"[palladium] keeping yt-dlp exit code {yt_exit_code} because only sidecar files were downloaded")
+                            print(
+                                f"[palladium] keeping yt-dlp exit code {yt_exit_code} "
+                                "because download or postprocessing failed"
+                            )
                     else:
                         print("[palladium] downloaded files not detected")
                 except Exception:

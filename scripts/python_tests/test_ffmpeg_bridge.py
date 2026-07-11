@@ -6,6 +6,8 @@ from palladium_ytdlp.ffmpeg_bridge import (  # noqa: E402
     BridgeCommandResult,
     SwiftFFmpegBridge,
     audio_codec_from_metadata,
+    bridge_ffmpeg_output_path,
+    parse_bridge_json_object,
 )
 
 
@@ -43,6 +45,39 @@ class FFmpegBridgeTests(unittest.TestCase):
     def test_audio_codec_returns_none_without_audio_stream(self):
         self.assertIsNone(audio_codec_from_metadata({"streams": [{"codec_type": "video"}]}))
         self.assertIsNone(audio_codec_from_metadata(None))
+
+    def test_output_path_normalizes_file_url(self):
+        self.assertEqual(
+            bridge_ffmpeg_output_path(["-i", "input.mp4", "file:/tmp/output%20file.mp4"]),
+            "/tmp/output file.mp4",
+        )
+
+    def test_json_object_parser_ignores_captured_log_output(self):
+        output = "[palladium] prior output {'not': 'json'}\n{\"streams\": [], \"format\": {}}\ntrailing log"
+
+        self.assertEqual(parse_bridge_json_object(output), {"streams": [], "format": {}})
+
+    def test_metadata_probe_requests_compact_json(self):
+        bridge = SwiftFFmpegBridge.__new__(SwiftFFmpegBridge)
+        calls = []
+
+        def run_ffprobe(args):
+            calls.append(args)
+            return BridgeCommandResult(0, '{"streams":[],"format":{}}', "")
+
+        bridge.run_ffprobe = run_ffprobe
+
+        self.assertEqual(bridge.probe_metadata("/tmp/video.mp4"), {"streams": [], "format": {}})
+        self.assertEqual(calls, [[
+            "-hide_banner",
+            "-loglevel",
+            "error",
+            "-show_format",
+            "-show_streams",
+            "-print_format",
+            "json=compact=1",
+            "/tmp/video.mp4",
+        ]])
 
     def test_capability_probe_gets_version_and_features_separately(self):
         bridge, calls = self.make_bridge({
