@@ -353,11 +353,19 @@ struct DownloadTabView: View {
     }
 
     private var videoFormats: [YTDLPFormat] {
-        availableFormats.filter(\.hasVideo)
+        availableFormats.filter(\.hasVideo).sorted { lhs, rhs in
+            let leftQuality = (displayHeight(lhs), lhs.framesPerSecond ?? 0, lhs.videoBitrate ?? 0)
+            let rightQuality = (displayHeight(rhs), rhs.framesPerSecond ?? 0, rhs.videoBitrate ?? 0)
+            if leftQuality.0 != rightQuality.0 { return leftQuality.0 > rightQuality.0 }
+            if leftQuality.1 != rightQuality.1 { return leftQuality.1 > rightQuality.1 }
+            return leftQuality.2 > rightQuality.2
+        }
     }
 
     private var audioFormats: [YTDLPFormat] {
-        availableFormats.filter { $0.hasAudio && !$0.hasVideo }
+        availableFormats
+            .filter { $0.hasAudio && !$0.hasVideo }
+            .sorted { ($0.audioBitrate ?? 0) > ($1.audioBitrate ?? 0) }
     }
 
     private func formatPickerRow(_ format: YTDLPFormat) -> some View {
@@ -387,8 +395,46 @@ struct DownloadTabView: View {
     }
 
     private func formatHeading(_ format: YTDLPFormat) -> String {
-        let quality = format.resolution.isEmpty ? format.note : format.resolution
-        return quality.isEmpty ? format.fileExtension.uppercased() : quality
+        guard format.hasVideo else {
+            if let bitrate = format.audioBitrate, bitrate > 0 {
+                return "\(Int(bitrate.rounded())) kbps"
+            }
+            return format.fileExtension.uppercased()
+        }
+
+        let quality: String
+        switch displayHeight(format) {
+        case 2160...:
+            quality = "4K"
+        case 1440...:
+            quality = "1440p"
+        case 1080...:
+            quality = "1080p"
+        case 720...:
+            quality = "720p"
+        case 480...:
+            quality = "480p"
+        case 360...:
+            quality = "360p"
+        case 240...:
+            quality = "240p"
+        case 144...:
+            quality = "144p"
+        default:
+            quality = format.note.isEmpty ? format.fileExtension.uppercased() : format.note
+        }
+
+        if let fps = format.framesPerSecond, fps > 30 {
+            return "\(quality) · \(Int(fps.rounded())) fps"
+        }
+        return quality
+    }
+
+    private func displayHeight(_ format: YTDLPFormat) -> Int {
+        guard let width = format.width, let height = format.height else {
+            return format.height ?? 0
+        }
+        return min(width, height)
     }
 
     private func formatDetails(_ format: YTDLPFormat) -> String {

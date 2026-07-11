@@ -50,6 +50,11 @@ struct YTDLPFormat: Identifiable, Hashable, Sendable {
     let id: String
     let fileExtension: String
     let resolution: String
+    let width: Int?
+    let height: Int?
+    let framesPerSecond: Double?
+    let videoBitrate: Double?
+    let audioBitrate: Double?
     let videoCodec: String
     let audioCodec: String
     let fileSize: Int64?
@@ -409,6 +414,11 @@ enum PythonFlowRunner {
                 id: id,
                 fileExtension: item["extension"] as? String ?? "",
                 resolution: item["resolution"] as? String ?? "",
+                width: (item["width"] as? NSNumber)?.intValue,
+                height: (item["height"] as? NSNumber)?.intValue,
+                framesPerSecond: (item["fps"] as? NSNumber)?.doubleValue,
+                videoBitrate: (item["video_bitrate"] as? NSNumber)?.doubleValue,
+                audioBitrate: (item["audio_bitrate"] as? NSNumber)?.doubleValue,
                 videoCodec: item["video_codec"] as? String ?? "",
                 audioCodec: item["audio_codec"] as? String ?? "",
                 fileSize: sizeNumber?.int64Value,

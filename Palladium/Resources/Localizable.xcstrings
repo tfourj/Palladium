@@ -1076,6 +1076,7 @@
       }
     },
     "download.formats.audio" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1146,6 +1147,7 @@
       }
     },
     "download.formats.video" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1156,6 +1158,7 @@
       }
     },
     "download.formats.video_audio" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2085,6 +2088,16 @@
         }
       }
     },
+    "packages.reload_versions" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reload Available Versions"
+          }
+        }
+      }
+    },
     "packages.restore_pip" : {
       "localizations" : {
         "en" : {
@@ -2131,16 +2144,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Removes payload-installed packages and reinstalls runtime packages with pip."
-          }
-        }
-      }
-    },
-    "packages.reload_versions" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reload Available Versions"
           }
         }
       }
@@ -2335,22 +2338,22 @@
         }
       }
     },
-    "packages.status.running" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Running..."
-          }
-        }
-      }
-    },
     "packages.status.restoring" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Restoring pip packages..."
+          }
+        }
+      }
+    },
+    "packages.status.running" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Running..."
           }
         }
       }
@@ -3329,22 +3332,22 @@
         }
       }
     },
-    "settings.search.prompt" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Search Settings"
-          }
-        }
-      }
-    },
     "settings.search.destinations.section" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Menus"
+          }
+        }
+      }
+    },
+    "settings.search.prompt" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search Settings"
           }
         }
       }
