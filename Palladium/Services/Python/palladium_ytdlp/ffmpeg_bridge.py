@@ -6,6 +6,8 @@ import os
 import re
 import shlex
 import subprocess
+import sys
+import tempfile
 import time
 import urllib.parse
 from dataclasses import dataclass
@@ -54,8 +56,29 @@ def bridge_ffmpeg_output_path(args):
     for arg in reversed(args):
         if arg in ("-nostats", "-nostdin"):
             continue
-        return arg
+        return normalize_ffmpeg_args([arg])[0]
     return None
+
+
+def parse_bridge_json_object(output_text):
+    text = str(output_text or "")
+    decoder = json.JSONDecoder()
+    last_error = None
+
+    for index, character in enumerate(text):
+        if character != "{":
+            continue
+        try:
+            value, _ = decoder.raw_decode(text[index:])
+        except json.JSONDecodeError as error:
+            last_error = error
+            continue
+        if isinstance(value, dict):
+            return value
+
+    if last_error is not None:
+        raise last_error
+    raise json.JSONDecodeError("No JSON object found", text, 0)
 
 
 def clean_bridge_version(raw_version):
@@ -187,6 +210,11 @@ class SwiftFFmpegBridge:
 
     def _invoke(self, tool, args):
         payload = json.dumps({"tool": tool, "args": [str(arg) for arg in args]}).encode("utf-8")
+        for stream in (sys.stdout, sys.stderr):
+            try:
+                stream.flush()
+            except Exception:
+                pass
         response_ptr = self._run(payload)
         if not response_ptr:
             raise RuntimeError("swift ffmpeg bridge returned null pointer")
@@ -217,20 +245,32 @@ class SwiftFFmpegBridge:
         return self._invoke("ffprobe", prepare_bridge_ffmpeg_args("ffprobe", args))
 
     def probe_metadata(self, path, opts=None):
+        output_fd, output_path = tempfile.mkstemp(prefix="palladium-ffprobe-", suffix=".json")
+        os.close(output_fd)
         command = [
             "-hide_banner",
+            "-loglevel",
+            "error",
             "-show_format",
             "-show_streams",
             "-print_format",
-            "json",
+            "json=compact=1",
+            "-o",
+            output_path,
             *(str(opt) for opt in (opts or [])),
             str(path),
         ]
-        result = self.run_ffprobe(command)
         try:
-            parsed = json.loads(result.stdout)
+            self.run_ffprobe(command)
+            with open(output_path, encoding="utf-8") as output_file:
+                parsed = json.load(output_file)
         except Exception as error:
             raise RuntimeError(f"ffprobe metadata parse failed for {path}: {error}") from error
+        finally:
+            try:
+                os.unlink(output_path)
+            except OSError:
+                pass
         if not isinstance(parsed, dict):
             raise RuntimeError(f"ffprobe metadata probe returned unexpected payload for {path}")
         return parsed
