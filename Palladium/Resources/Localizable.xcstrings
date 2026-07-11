@@ -1136,6 +1136,16 @@
         }
       }
     },
+    "download.formats.photos_compatible" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compatible with Apple Photos"
+          }
+        }
+      }
+    },
     "download.formats.title" : {
       "localizations" : {
         "en" : {

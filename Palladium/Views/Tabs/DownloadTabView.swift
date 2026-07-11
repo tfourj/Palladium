@@ -378,6 +378,12 @@ struct DownloadTabView: View {
                     Text(formatHeading(format))
                         .font(.headline)
                         .foregroundStyle(.primary)
+                    if format.isPhotosCompatible {
+                        Image(systemName: "photo.on.rectangle")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.green)
+                            .accessibilityLabel("download.formats.photos_compatible")
+                    }
                     Spacer()
                     Text(format.id)
                         .font(.caption.monospaced())
