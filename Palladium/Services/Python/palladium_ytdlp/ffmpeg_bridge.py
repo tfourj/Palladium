@@ -99,6 +99,19 @@ def bridge_lists_bsf(output_text, bsf_name):
     return False
 
 
+def audio_codec_from_metadata(metadata):
+    if not isinstance(metadata, dict):
+        return None
+
+    for stream in metadata.get("streams") or []:
+        if not isinstance(stream, dict) or stream.get("codec_type") != "audio":
+            continue
+        codec_name = str(stream.get("codec_name") or "").strip()
+        if codec_name:
+            return codec_name
+    return None
+
+
 def log_bridge_output(stderr_text):
     text = str(stderr_text or "").strip()
     if not text:
@@ -322,6 +335,7 @@ def patch_ytdlp_for_swiftffmpeg(adapter):
     original_ffmpeg_popen = getattr(ydl_ffmpeg_pp, "Popen", None)
     original_get_ffmpeg_version = getattr(ydl_ffmpeg_pp.FFmpegPostProcessor, "_get_ffmpeg_version", None)
     original_get_metadata_object = getattr(ydl_ffmpeg_pp.FFmpegPostProcessor, "get_metadata_object", None)
+    original_get_audio_codec = getattr(ydl_ffmpeg_pp.FFmpegPostProcessor, "get_audio_codec", None)
 
     class BridgePopen:
         def __init__(self, args, *remaining, **kwargs):
@@ -464,6 +478,20 @@ def patch_ytdlp_for_swiftffmpeg(adapter):
                 raise ydl_utils.PostProcessingError(f"Unable to extract metadata with ffprobe: {error}") from error
         return original_get_metadata_object(self, path, opts or [])
 
+    def patched_get_audio_codec(self, path):
+        if getattr(self, "probe_executable", None) == "ffprobe":
+            try:
+                metadata = adapter.probe_metadata(path)
+                codec_name = audio_codec_from_metadata(metadata)
+                if codec_name:
+                    return codec_name
+                self.write_debug(f"SwiftFFmpeg metadata contained no audio stream for {path}")
+                return None
+            except Exception as error:
+                self.write_debug(f"SwiftFFmpeg audio codec probe failed for {path}: {error}")
+                return None
+        return original_get_audio_codec(self, path)
+
     YDLClass.to_screen = patched_to_screen
     FileDownloader.report_progress = patched_report_progress
     if original_public_utils_popen is not None:
@@ -477,6 +505,8 @@ def patch_ytdlp_for_swiftffmpeg(adapter):
         ydl_ffmpeg_pp.FFmpegPostProcessor._get_ffmpeg_version = patched_get_ffmpeg_version
     if original_get_metadata_object is not None:
         ydl_ffmpeg_pp.FFmpegPostProcessor.get_metadata_object = patched_get_metadata_object
+    if original_get_audio_codec is not None:
+        ydl_ffmpeg_pp.FFmpegPostProcessor.get_audio_codec = patched_get_audio_codec
 
     try:
         print("[palladium][ffmpeg-bridge] yt-dlp bridge adapter enabled")
@@ -495,3 +525,5 @@ def patch_ytdlp_for_swiftffmpeg(adapter):
             ydl_ffmpeg_pp.FFmpegPostProcessor._get_ffmpeg_version = original_get_ffmpeg_version
         if original_get_metadata_object is not None:
             ydl_ffmpeg_pp.FFmpegPostProcessor.get_metadata_object = original_get_metadata_object
+        if original_get_audio_codec is not None:
+            ydl_ffmpeg_pp.FFmpegPostProcessor.get_audio_codec = original_get_audio_codec
