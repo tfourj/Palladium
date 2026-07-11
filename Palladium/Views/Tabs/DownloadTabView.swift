@@ -22,6 +22,7 @@ struct DownloadTabView: View {
     let playlistProgress: PlaylistProgressSnapshot?
     let downloadErrorText: String?
     let onDownload: () -> Void
+    let onChooseFormat: () -> Void
     let onCancel: () -> Void
     let onPastedURL: (String) -> Void
     let linkHistoryEnabled: Bool
@@ -34,6 +35,11 @@ struct DownloadTabView: View {
     @Binding var showGalleryPicker: Bool
     let isResolvingGallery: Bool
     let onDownloadGallerySelection: () -> Void
+    let availableFormats: [YTDLPFormat]
+    let formatPickerTitle: String
+    @Binding var showFormatPicker: Bool
+    let isResolvingFormats: Bool
+    let onDownloadFormat: (YTDLPFormat) -> Void
     @State private var showHistorySheet = false
     @State private var showDownloadOptions = false
 
@@ -239,28 +245,40 @@ struct DownloadTabView: View {
                     .background(cardBackground)
                     .clipShape(RoundedRectangle(cornerRadius: 8))
 
-                    Button(action: {
-                        if isRunning {
-                            onCancel()
-                        } else {
-                            if showDownloadOptions {
-                                withAnimation(.easeInOut(duration: 0.16)) {
-                                    showDownloadOptions = false
-                                }
+                    HStack(spacing: 2) {
+                        Button(action: primaryDownloadAction) {
+                            HStack(spacing: 8) {
+                                Image(systemName: isRunning ? "stop.circle.fill" : "arrow.down.circle.fill")
+                                Text(isRunning ? "common.cancel" : "tab.download")
                             }
-                            onDownload()
+                            .font(.headline)
+                            .frame(maxWidth: .infinity, minHeight: 50, maxHeight: 50)
                         }
-                    }) {
-                        HStack(spacing: 8) {
-                            Image(systemName: isRunning ? "stop.circle.fill" : "arrow.down.circle.fill")
-                            Text(isRunning ? "common.cancel" : "tab.download")
+                        .buttonStyle(.borderedProminent)
+                        .tint(isRunning ? .red : .blue)
+
+                        if !isRunning {
+                            Button(action: onChooseFormat) {
+                                Group {
+                                    if isResolvingFormats {
+                                        ProgressView()
+                                            .tint(.white)
+                                    } else {
+                                        Image(systemName: "chevron.down")
+                                    }
+                                }
+                                .font(.headline)
+                                .frame(width: 44, height: 50)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .tint(.blue)
+                            .accessibilityLabel("download.formats.choose")
+                            .disabled(
+                                isResolvingFormats
+                                    || urlText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                            )
                         }
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 12)
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(isRunning ? .red : .blue)
                     .disabled(!isRunning && urlText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
                 .padding(12)
@@ -277,12 +295,174 @@ struct DownloadTabView: View {
         .sheet(isPresented: $showGalleryPicker) {
             galleryPickerSheet
         }
+        .sheet(isPresented: $showFormatPicker) {
+            formatPickerSheet
+        }
         .onChange(of: isRunning) { _, running in
             guard running, showDownloadOptions else { return }
             withAnimation(.easeInOut(duration: 0.16)) {
                 showDownloadOptions = false
             }
         }
+    }
+
+    private func primaryDownloadAction() {
+        if isRunning {
+            onCancel()
+            return
+        }
+        if showDownloadOptions {
+            withAnimation(.easeInOut(duration: 0.16)) {
+                showDownloadOptions = false
+            }
+        }
+        onDownload()
+    }
+
+    private var formatPickerSheet: some View {
+        NavigationStack {
+            List {
+                if !videoFormats.isEmpty {
+                    Section("download.formats.video_section") {
+                        ForEach(videoFormats) { format in
+                            formatPickerRow(format)
+                        }
+                    }
+                }
+
+                if !audioFormats.isEmpty {
+                    Section("download.formats.audio_section") {
+                        ForEach(audioFormats) { format in
+                            formatPickerRow(format)
+                        }
+                    }
+                }
+            }
+            .navigationTitle(formatPickerTitle.isEmpty
+                ? String(localized: "download.formats.title")
+                : formatPickerTitle)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("common.cancel") { showFormatPicker = false }
+                }
+            }
+        }
+    }
+
+    private var videoFormats: [YTDLPFormat] {
+        availableFormats.filter(\.hasVideo).sorted { lhs, rhs in
+            let leftQuality = (displayHeight(lhs), lhs.framesPerSecond ?? 0, lhs.videoBitrate ?? 0)
+            let rightQuality = (displayHeight(rhs), rhs.framesPerSecond ?? 0, rhs.videoBitrate ?? 0)
+            if leftQuality.0 != rightQuality.0 { return leftQuality.0 > rightQuality.0 }
+            if leftQuality.1 != rightQuality.1 { return leftQuality.1 > rightQuality.1 }
+            return leftQuality.2 > rightQuality.2
+        }
+    }
+
+    private var audioFormats: [YTDLPFormat] {
+        availableFormats
+            .filter { $0.hasAudio && !$0.hasVideo }
+            .sorted { ($0.audioBitrate ?? 0) > ($1.audioBitrate ?? 0) }
+    }
+
+    private func formatPickerRow(_ format: YTDLPFormat) -> some View {
+        Button {
+            showFormatPicker = false
+            onDownloadFormat(format)
+        } label: {
+            VStack(alignment: .leading, spacing: 4) {
+                HStack {
+                    Text(formatHeading(format))
+                        .font(.headline)
+                        .foregroundStyle(.primary)
+                    if format.isPhotosCompatible {
+                        Image(systemName: "photo.on.rectangle")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.green)
+                            .accessibilityLabel("download.formats.photos_compatible")
+                    }
+                    Spacer()
+                    Text(format.id)
+                        .font(.caption.monospaced())
+                        .foregroundStyle(.secondary)
+                }
+                Text(formatDetails(format))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Text(codecDetails(format))
+                    .font(.caption2.monospaced())
+                    .foregroundStyle(.secondary)
+            }
+            .padding(.vertical, 3)
+        }
+    }
+
+    private func formatHeading(_ format: YTDLPFormat) -> String {
+        guard format.hasVideo else {
+            if let bitrate = format.audioBitrate, bitrate > 0 {
+                return "\(Int(bitrate.rounded())) kbps"
+            }
+            return format.fileExtension.uppercased()
+        }
+
+        let quality: String
+        switch displayHeight(format) {
+        case 2160...:
+            quality = "4K"
+        case 1440...:
+            quality = "1440p"
+        case 1080...:
+            quality = "1080p"
+        case 720...:
+            quality = "720p"
+        case 480...:
+            quality = "480p"
+        case 360...:
+            quality = "360p"
+        case 240...:
+            quality = "240p"
+        case 144...:
+            quality = "144p"
+        default:
+            quality = format.note.isEmpty ? format.fileExtension.uppercased() : format.note
+        }
+
+        if let fps = format.framesPerSecond, fps > 30 {
+            return "\(quality) · \(Int(fps.rounded())) fps"
+        }
+        return quality
+    }
+
+    private func displayHeight(_ format: YTDLPFormat) -> Int {
+        guard let width = format.width, let height = format.height else {
+            return format.height ?? 0
+        }
+        return min(width, height)
+    }
+
+    private func formatDetails(_ format: YTDLPFormat) -> String {
+        var details = [format.fileExtension.uppercased()].filter { !$0.isEmpty }
+        if let fileSize = format.fileSize {
+            details.append(ByteCountFormatter.string(fromByteCount: fileSize, countStyle: .file))
+        }
+        if !format.note.isEmpty, format.note != format.resolution {
+            details.append(format.note)
+        }
+        return details.joined(separator: " · ")
+    }
+
+    private func codecDetails(_ format: YTDLPFormat) -> String {
+        var codecs: [String] = []
+        if format.hasVideo {
+            codecs.append("Video: \(format.videoCodec)")
+            codecs.append(format.hasAudio
+                ? "Audio: \(format.audioCodec)"
+                : String(localized: "download.formats.best_audio"))
+        } else if format.hasAudio {
+            codecs.append("Audio: \(format.audioCodec)")
+        }
+        return codecs.joined(separator: " · ")
     }
 
     private var galleryPickerSheet: some View {

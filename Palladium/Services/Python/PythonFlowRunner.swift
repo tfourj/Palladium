@@ -46,6 +46,58 @@ struct GalleryResolution: Sendable {
     let errorMessage: String?
 }
 
+struct YTDLPFormat: Identifiable, Hashable, Sendable {
+    let id: String
+    let fileExtension: String
+    let resolution: String
+    let width: Int?
+    let height: Int?
+    let framesPerSecond: Double?
+    let videoBitrate: Double?
+    let audioBitrate: Double?
+    let videoCodec: String
+    let audioCodec: String
+    let fileSize: Int64?
+    let note: String
+
+    var hasVideo: Bool { !videoCodec.isEmpty && videoCodec != "none" }
+    var hasAudio: Bool { !audioCodec.isEmpty && audioCodec != "none" }
+
+    var isPhotosCompatible: Bool {
+        guard hasVideo, ["mp4", "mov", "m4v"].contains(fileExtension.lowercased()) else {
+            return false
+        }
+        let codec = videoCodec.lowercased()
+        let hasCompatibleVideoCodec = codec.hasPrefix("avc1")
+            || codec.hasPrefix("avc3")
+            || codec.hasPrefix("h264")
+            || codec.hasPrefix("hvc1")
+            || codec.hasPrefix("hev1")
+            || codec.hasPrefix("hevc")
+            || codec.hasPrefix("h265")
+        guard hasCompatibleVideoCodec else { return false }
+        guard hasAudio else { return true }
+        let audio = audioCodec.lowercased()
+        return audio.hasPrefix("mp4a") || audio.hasPrefix("aac")
+    }
+
+    var downloadSelector: String {
+        guard hasVideo && !hasAudio else { return id }
+        if isPhotosCompatible {
+            return "\(id)+bestaudio[ext=m4a]/\(id)+bestaudio/best"
+        }
+        return "\(id)+bestaudio/best"
+    }
+}
+
+struct YTDLPFormatResolution: Sendable {
+    let title: String
+    let formats: [YTDLPFormat]
+    let outputText: String
+    let success: Bool
+    let errorMessage: String?
+}
+
 enum PythonFlowRunner {
     private static var insertedScriptDirectories = Set<String>()
 
@@ -112,6 +164,27 @@ enum PythonFlowRunner {
                 return decodeGalleryResolution(String(result) ?? "")
             } catch {
                 return GalleryResolution(items: [], outputText: String(describing: error), success: false, errorMessage: nil)
+            }
+        }
+    }
+
+    static func resolveFormats(url: String, cookieFilePath: String?) async -> YTDLPFormatResolution {
+        await runOnPythonThread {
+            do {
+                let module = try loadYtDlpModule()
+                let function = try pythonMember(module, named: "list_yt_dlp_formats")
+                let result = try function.throwing.dynamicallyCall(
+                    withArguments: [url, cookieFilePath ?? ""]
+                )
+                return decodeFormatResolution(String(result) ?? "")
+            } catch {
+                return YTDLPFormatResolution(
+                    title: "",
+                    formats: [],
+                    outputText: String(describing: error),
+                    success: false,
+                    errorMessage: String(describing: error)
+                )
             }
         }
     }
@@ -339,6 +412,44 @@ enum PythonFlowRunner {
         }
         return GalleryResolution(
             items: items,
+            outputText: result["output"] as? String ?? "",
+            success: result["success"] as? Bool ?? false,
+            errorMessage: result["error_message"] as? String
+        )
+    }
+
+    private static func decodeFormatResolution(_ payload: String) -> YTDLPFormatResolution {
+        guard let data = payload.data(using: .utf8),
+              let result = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] else {
+            return YTDLPFormatResolution(
+                title: "",
+                formats: [],
+                outputText: payload,
+                success: false,
+                errorMessage: "Failed to read the yt-dlp format list."
+            )
+        }
+        let formats = ((result["formats"] as? [[String: Any]]) ?? []).compactMap { item -> YTDLPFormat? in
+            guard let id = item["id"] as? String, !id.isEmpty else { return nil }
+            let sizeNumber = item["filesize"] as? NSNumber
+            return YTDLPFormat(
+                id: id,
+                fileExtension: item["extension"] as? String ?? "",
+                resolution: item["resolution"] as? String ?? "",
+                width: (item["width"] as? NSNumber)?.intValue,
+                height: (item["height"] as? NSNumber)?.intValue,
+                framesPerSecond: (item["fps"] as? NSNumber)?.doubleValue,
+                videoBitrate: (item["video_bitrate"] as? NSNumber)?.doubleValue,
+                audioBitrate: (item["audio_bitrate"] as? NSNumber)?.doubleValue,
+                videoCodec: item["video_codec"] as? String ?? "",
+                audioCodec: item["audio_codec"] as? String ?? "",
+                fileSize: sizeNumber?.int64Value,
+                note: item["note"] as? String ?? ""
+            )
+        }
+        return YTDLPFormatResolution(
+            title: result["title"] as? String ?? "",
+            formats: formats,
             outputText: result["output"] as? String ?? "",
             success: result["success"] as? Bool ?? false,
             errorMessage: result["error_message"] as? String

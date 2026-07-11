@@ -182,7 +182,8 @@ extension ContentView {
         presetOverride: DownloadPreset? = nil,
         afterDownloadOverride: AfterDownloadBehavior? = nil,
         allowlistChecked: Bool = false,
-        gallerySelectionOverride: Set<Int>? = nil
+        gallerySelectionOverride: Set<Int>? = nil,
+        formatOverride: String? = nil
     ) {
         guard !isRunning, !isPackageRunning, !isCheckingDownloadAllowlist else { return }
         let targetURL = (urlOverride ?? urlText).trimmingCharacters(in: .whitespacesAndNewlines)
@@ -211,7 +212,8 @@ extension ContentView {
                     presetOverride: presetOverride,
                     afterDownloadOverride: afterDownloadOverride,
                     allowlistChecked: true,
-                    gallerySelectionOverride: gallerySelectionOverride
+                    gallerySelectionOverride: gallerySelectionOverride,
+                    formatOverride: formatOverride
                 )
             }
             return
@@ -268,7 +270,15 @@ extension ContentView {
         let presetAtStart = selectedDownloadPreset.pythonValue
         let gallerySelectionRangeAtStart = gallerySelectionOverride.map(gallerySelectionRange)
         let gallerySelectionCountAtStart = gallerySelectionOverride?.count ?? 0
-        let extraArgsAtStart = extraArgsText.trimmingCharacters(in: .whitespacesAndNewlines)
+        let baseExtraArgs = extraArgsText.trimmingCharacters(in: .whitespacesAndNewlines)
+        let extraArgsAtStart: String
+        if let formatOverride, !formatOverride.isEmpty {
+            extraArgsAtStart = baseExtraArgs.isEmpty
+                ? "--format \(formatOverride)"
+                : "\(baseExtraArgs) --format \(formatOverride)"
+        } else {
+            extraArgsAtStart = baseExtraArgs
+        }
         let presetArgsJSONAtStart = buildPresetArgumentsJSON()
         let afterDownloadBehaviorAtStart = afterDownloadOverride ?? afterDownloadBehavior
         let linkHistoryEnabledAtStart = linkHistoryEnabled
@@ -471,6 +481,41 @@ extension ContentView {
             }
         }
         currentDownloadTask = task
+    }
+
+    func resolveFormatSelection() {
+        let targetURL = urlText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !targetURL.isEmpty, !isRunning, !isResolvingFormats else { return }
+        guard selectedPreset != .images else {
+            runDownloadFlow()
+            return
+        }
+
+        isResolvingFormats = true
+        downloadErrorText = nil
+        progressText = String(localized: "download.formats.loading")
+        let cookiePath = useCookies ? resolvedSelectedCookieFilePath() : nil
+        Task {
+            let resolution = await PythonFlowRunner.resolveFormats(
+                url: targetURL,
+                cookieFilePath: cookiePath
+            )
+            await MainActor.run {
+                isResolvingFormats = false
+                progressText = String(localized: "download.prompt.idle")
+                if resolution.success, !resolution.formats.isEmpty {
+                    availableFormats = resolution.formats
+                    formatPickerTitle = resolution.title
+                    showFormatPicker = true
+                } else {
+                    downloadErrorText = resolution.errorMessage
+                        ?? String(localized: "download.formats.empty")
+                    if !resolution.outputText.isEmpty {
+                        appendConsoleText(resolution.outputText)
+                    }
+                }
+            }
+        }
     }
 
     func resolveGallerySelection(url: String) {
