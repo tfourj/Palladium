@@ -396,7 +396,9 @@ struct DownloadTabView: View {
                     .foregroundStyle(.secondary)
             }
             .padding(.vertical, 3)
+            .contentShape(Rectangle())
         }
+        .buttonStyle(.plain)
     }
 
     private func formatHeading(_ format: YTDLPFormat) -> String {
