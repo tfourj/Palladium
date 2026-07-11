@@ -64,6 +64,7 @@ extension ContentView {
         defaults.set(selectedCookieFileName, forKey: Self.selectedCookieFileNameDefaultsKey)
         defaults.set(linkHistoryEnabled, forKey: Self.linkHistoryEnabledDefaultsKey)
         defaults.set(linkHistoryLimit, forKey: Self.linkHistoryLimitDefaultsKey)
+        defaults.set(hideHistoryCount, forKey: Self.hideHistoryCountDefaultsKey)
         defaults.set(appAppearanceMode.rawValue, forKey: Self.appAppearanceModeDefaultsKey)
         defaults.set(showTemporaryDownloads, forKey: Self.showTemporaryDownloadsDefaultsKey)
         defaults.set(checkPackageUpdatesOnLaunch, forKey: Self.checkPackageUpdatesOnLaunchDefaultsKey)
@@ -322,6 +323,10 @@ extension ContentView {
         }
         let storedLimit = UserDefaults.standard.integer(forKey: linkHistoryLimitDefaultsKey)
         return max(0, min(storedLimit, maxLinkHistoryLimit))
+    }
+
+    static func loadHideHistoryCount() -> Bool {
+        UserDefaults.standard.bool(forKey: hideHistoryCountDefaultsKey)
     }
 
     static func loadLinkHistoryEntries(limit: Int = maxLinkHistoryLimit) -> [LinkHistoryEntry] {

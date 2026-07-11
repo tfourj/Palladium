@@ -3,6 +3,7 @@ import SwiftUI
 struct HistorySettingsView: View {
     @Binding var linkHistoryEnabled: Bool
     @Binding var linkHistoryLimit: Int
+    @Binding var hideHistoryCount: Bool
 
     @State private var linkHistoryLimitText: String
     @FocusState private var isHistoryLimitFieldFocused: Bool
@@ -12,10 +13,12 @@ struct HistorySettingsView: View {
     init(
         linkHistoryEnabled: Binding<Bool>,
         linkHistoryLimit: Binding<Int>,
+        hideHistoryCount: Binding<Bool>,
         isRunning: Bool
     ) {
         _linkHistoryEnabled = linkHistoryEnabled
         _linkHistoryLimit = linkHistoryLimit
+        _hideHistoryCount = hideHistoryCount
         _linkHistoryLimitText = State(initialValue: String(linkHistoryLimit.wrappedValue))
         self.isRunning = isRunning
     }
@@ -44,6 +47,9 @@ struct HistorySettingsView: View {
                         .onSubmit(commitLinkHistoryLimit)
                 }
                 .disabled(isRunning || !linkHistoryEnabled)
+
+                Toggle("settings.ui.history.hide_count", isOn: $hideHistoryCount)
+                    .disabled(isRunning || !linkHistoryEnabled)
             } header: {
                 Text("settings.ui.history.section")
             } footer: {

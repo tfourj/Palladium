@@ -3639,6 +3639,16 @@
         }
       }
     },
+    "settings.ui.history.hide_count" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide history count"
+          }
+        }
+      }
+    },
     "settings.ui.history.limit" : {
       "localizations" : {
         "en" : {

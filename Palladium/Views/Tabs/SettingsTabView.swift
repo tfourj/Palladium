@@ -76,6 +76,7 @@ struct SettingsTabView: View {
     @Binding var shareSheetDownloadMode: ShareSheetDownloadMode
     @Binding var linkHistoryEnabled: Bool
     @Binding var linkHistoryLimit: Int
+    @Binding var hideHistoryCount: Bool
     @Binding var appAppearanceMode: AppAppearanceMode
     @Binding var showTemporaryDownloads: Bool
     @Binding var selectedCookieFileName: String
@@ -273,6 +274,7 @@ struct SettingsTabView: View {
             HistorySettingsView(
                 linkHistoryEnabled: $linkHistoryEnabled,
                 linkHistoryLimit: $linkHistoryLimit,
+                hideHistoryCount: $hideHistoryCount,
                 isRunning: isRunning
             )
         case .notifications:
@@ -476,6 +478,20 @@ struct SettingsTabView: View {
                         LabeledContent(title, value: String(linkHistoryLimit))
                     }
                     .disabled(isRunning || !linkHistoryEnabled)
+                )
+            },
+            controlSetting(
+                id: "hideHistoryCount",
+                menu: .history,
+                title: "settings.ui.history.hide_count",
+                subtitle: "settings.ui.history.help"
+            ) { title in
+                AnyView(
+                    searchToggle(
+                        title,
+                        isOn: $hideHistoryCount,
+                        disabled: isRunning || !linkHistoryEnabled
+                    )
                 )
             },
             controlSetting(

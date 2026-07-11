@@ -27,6 +27,7 @@ struct DownloadTabView: View {
     let onPastedURL: (String) -> Void
     let linkHistoryEnabled: Bool
     let historyEntries: [LinkHistoryEntry]
+    let hideHistoryCount: Bool
     let onSelectHistoryEntry: (LinkHistoryEntry) -> Void
     let onDeleteHistoryEntry: (LinkHistoryEntry) -> Void
     let onCopyHistoryLink: (String) -> Void
@@ -74,7 +75,7 @@ struct DownloadTabView: View {
                                         .background(cardElementBackground)
                                         .clipShape(RoundedRectangle(cornerRadius: 8))
 
-                                    if !historyEntries.isEmpty {
+                                    if !hideHistoryCount && !historyEntries.isEmpty {
                                         Text("\(historyEntries.count)")
                                             .font(.caption2.bold())
                                             .foregroundStyle(.white)
