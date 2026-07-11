@@ -1075,6 +1075,76 @@
         }
       }
     },
+    "download.formats.audio" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio only"
+          }
+        }
+      }
+    },
+    "download.formats.choose" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose download format"
+          }
+        }
+      }
+    },
+    "download.formats.empty" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No downloadable formats were found."
+          }
+        }
+      }
+    },
+    "download.formats.loading" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading formats..."
+          }
+        }
+      }
+    },
+    "download.formats.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose Format"
+          }
+        }
+      }
+    },
+    "download.formats.video" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video only"
+          }
+        }
+      }
+    },
+    "download.formats.video_audio" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video and audio"
+          }
+        }
+      }
+    },
     "download.mode.audio.help" : {
       "localizations" : {
         "en" : {

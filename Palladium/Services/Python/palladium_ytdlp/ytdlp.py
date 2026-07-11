@@ -36,6 +36,60 @@ from .shared import TailBuffer, Tee, YTDLP_RUNTIME_PACKAGES, open_live_log_strea
 PLAYLIST_PROGRESS_PREFIX = "[palladium][playlist-progress] "
 
 
+def list_yt_dlp_formats(download_url, cookie_file_path=""):
+    """Return the formats exposed by yt-dlp without downloading any media."""
+    output = TailBuffer()
+    try:
+        import yt_dlp
+
+        options = {
+            "quiet": True,
+            "no_warnings": True,
+            "skip_download": True,
+            "noplaylist": True,
+            "nocheckcertificate": True,
+        }
+        cookie_path = str(cookie_file_path or "").strip()
+        if cookie_path and os.path.isfile(cookie_path):
+            options["cookiefile"] = cookie_path
+
+        with contextlib.redirect_stdout(output), contextlib.redirect_stderr(output):
+            with yt_dlp.YoutubeDL(options) as downloader:
+                info = downloader.extract_info(str(download_url).strip(), download=False)
+
+        formats = []
+        for item in info.get("formats") or []:
+            format_id = str(item.get("format_id") or "").strip()
+            if not format_id:
+                continue
+            formats.append({
+                "id": format_id,
+                "extension": str(item.get("ext") or "").strip(),
+                "resolution": str(item.get("resolution") or "").strip(),
+                "video_codec": str(item.get("vcodec") or "").strip(),
+                "audio_codec": str(item.get("acodec") or "").strip(),
+                "filesize": item.get("filesize") or item.get("filesize_approx"),
+                "note": str(item.get("format_note") or "").strip(),
+            })
+
+        return json.dumps({
+            "success": True,
+            "title": str(info.get("title") or "").strip(),
+            "formats": formats,
+            "output": output.getvalue(),
+            "error_message": None,
+        })
+    except BaseException as error:
+        traceback.print_exc(file=output)
+        return json.dumps({
+            "success": False,
+            "title": "",
+            "formats": [],
+            "output": output.getvalue(),
+            "error_message": str(error),
+        })
+
+
 class PlaylistProgressCollector:
     playlist_title_pattern = re.compile(r"^\[download\] Downloading playlist: (?P<title>.+)$")
     playlist_count_pattern = re.compile(

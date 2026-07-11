@@ -176,6 +176,10 @@ struct ContentView: View {
     @State var selectedGalleryItemIndices = Set<Int>()
     @State var showGalleryPicker = false
     @State var isResolvingGallery = false
+    @State var availableFormats: [YTDLPFormat] = []
+    @State var formatPickerTitle = ""
+    @State var showFormatPicker = false
+    @State var isResolvingFormats = false
 
     init() {
         let rememberPreset = Self.loadRememberSelectedPreset()
@@ -251,6 +255,7 @@ struct ContentView: View {
                     playlistProgress: playlistProgress,
                     downloadErrorText: downloadErrorText,
                     onDownload: { runDownloadFlow() },
+                    onChooseFormat: resolveFormatSelection,
                     onCancel: cancelDownloadFlow,
                     onPastedURL: handlePastedURL,
                     linkHistoryEnabled: linkHistoryEnabled,
@@ -262,7 +267,12 @@ struct ContentView: View {
                     selectedGalleryItemIndices: $selectedGalleryItemIndices,
                     showGalleryPicker: $showGalleryPicker,
                     isResolvingGallery: isResolvingGallery,
-                    onDownloadGallerySelection: { runDownloadFlow(gallerySelectionOverride: selectedGalleryItemIndices) }
+                    onDownloadGallerySelection: { runDownloadFlow(gallerySelectionOverride: selectedGalleryItemIndices) },
+                    availableFormats: availableFormats,
+                    formatPickerTitle: formatPickerTitle,
+                    showFormatPicker: $showFormatPicker,
+                    isResolvingFormats: isResolvingFormats,
+                    onDownloadFormat: { runDownloadFlow(formatOverride: $0.id) }
                 )
                 .tabItem {
                     Label(String(localized: "tab.download"), systemImage: "arrow.down.circle")

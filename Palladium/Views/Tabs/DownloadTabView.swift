@@ -22,6 +22,7 @@ struct DownloadTabView: View {
     let playlistProgress: PlaylistProgressSnapshot?
     let downloadErrorText: String?
     let onDownload: () -> Void
+    let onChooseFormat: () -> Void
     let onCancel: () -> Void
     let onPastedURL: (String) -> Void
     let linkHistoryEnabled: Bool
@@ -34,6 +35,11 @@ struct DownloadTabView: View {
     @Binding var showGalleryPicker: Bool
     let isResolvingGallery: Bool
     let onDownloadGallerySelection: () -> Void
+    let availableFormats: [YTDLPFormat]
+    let formatPickerTitle: String
+    @Binding var showFormatPicker: Bool
+    let isResolvingFormats: Bool
+    let onDownloadFormat: (YTDLPFormat) -> Void
     @State private var showHistorySheet = false
     @State private var showDownloadOptions = false
 
@@ -239,28 +245,42 @@ struct DownloadTabView: View {
                     .background(cardBackground)
                     .clipShape(RoundedRectangle(cornerRadius: 8))
 
-                    Button(action: {
-                        if isRunning {
-                            onCancel()
-                        } else {
-                            if showDownloadOptions {
-                                withAnimation(.easeInOut(duration: 0.16)) {
-                                    showDownloadOptions = false
-                                }
+                    HStack(spacing: 2) {
+                        Button(action: primaryDownloadAction) {
+                            HStack(spacing: 8) {
+                                Image(systemName: isRunning ? "stop.circle.fill" : "arrow.down.circle.fill")
+                                Text(isRunning ? "common.cancel" : "tab.download")
                             }
-                            onDownload()
+                            .font(.headline)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
                         }
-                    }) {
-                        HStack(spacing: 8) {
-                            Image(systemName: isRunning ? "stop.circle.fill" : "arrow.down.circle.fill")
-                            Text(isRunning ? "common.cancel" : "tab.download")
+                        .buttonStyle(.borderedProminent)
+                        .tint(isRunning ? .red : .blue)
+
+                        if !isRunning {
+                            Button(action: onChooseFormat) {
+                                Group {
+                                    if isResolvingFormats {
+                                        ProgressView()
+                                            .tint(.white)
+                                    } else {
+                                        Image(systemName: "chevron.down")
+                                    }
+                                }
+                                .font(.headline)
+                                .frame(width: 44)
+                                .padding(.vertical, 12)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .tint(.blue)
+                            .accessibilityLabel("download.formats.choose")
+                            .disabled(
+                                isResolvingFormats
+                                    || urlText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                            )
                         }
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 12)
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(isRunning ? .red : .blue)
                     .disabled(!isRunning && urlText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
                 .padding(12)
@@ -277,12 +297,88 @@ struct DownloadTabView: View {
         .sheet(isPresented: $showGalleryPicker) {
             galleryPickerSheet
         }
+        .sheet(isPresented: $showFormatPicker) {
+            formatPickerSheet
+        }
         .onChange(of: isRunning) { _, running in
             guard running, showDownloadOptions else { return }
             withAnimation(.easeInOut(duration: 0.16)) {
                 showDownloadOptions = false
             }
         }
+    }
+
+    private func primaryDownloadAction() {
+        if isRunning {
+            onCancel()
+            return
+        }
+        if showDownloadOptions {
+            withAnimation(.easeInOut(duration: 0.16)) {
+                showDownloadOptions = false
+            }
+        }
+        onDownload()
+    }
+
+    private var formatPickerSheet: some View {
+        NavigationStack {
+            List(availableFormats) { format in
+                Button {
+                    showFormatPicker = false
+                    onDownloadFormat(format)
+                } label: {
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack {
+                            Text(formatHeading(format))
+                                .font(.headline)
+                                .foregroundStyle(.primary)
+                            Spacer()
+                            Text(format.id)
+                                .font(.caption.monospaced())
+                                .foregroundStyle(.secondary)
+                        }
+                        Text(formatDetails(format))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(.vertical, 3)
+                }
+            }
+            .navigationTitle(formatPickerTitle.isEmpty
+                ? String(localized: "download.formats.title")
+                : formatPickerTitle)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("common.cancel") { showFormatPicker = false }
+                }
+            }
+        }
+    }
+
+    private func formatHeading(_ format: YTDLPFormat) -> String {
+        let type: String
+        if format.hasVideo && format.hasAudio {
+            type = String(localized: "download.formats.video_audio")
+        } else if format.hasVideo {
+            type = String(localized: "download.formats.video")
+        } else {
+            type = String(localized: "download.formats.audio")
+        }
+        let quality = format.resolution.isEmpty ? format.note : format.resolution
+        return quality.isEmpty ? type : "\(quality) · \(type)"
+    }
+
+    private func formatDetails(_ format: YTDLPFormat) -> String {
+        var details = [format.fileExtension.uppercased()].filter { !$0.isEmpty }
+        if let fileSize = format.fileSize {
+            details.append(ByteCountFormatter.string(fromByteCount: fileSize, countStyle: .file))
+        }
+        if !format.note.isEmpty, format.note != format.resolution {
+            details.append(format.note)
+        }
+        return details.joined(separator: " · ")
     }
 
     private var galleryPickerSheet: some View {
