@@ -272,7 +272,7 @@ struct ContentView: View {
                     formatPickerTitle: formatPickerTitle,
                     showFormatPicker: $showFormatPicker,
                     isResolvingFormats: isResolvingFormats,
-                    onDownloadFormat: { runDownloadFlow(formatOverride: $0.id) }
+                    onDownloadFormat: { runDownloadFlow(formatOverride: $0.downloadSelector) }
                 )
                 .tabItem {
                     Label(String(localized: "tab.download"), systemImage: "arrow.down.circle")

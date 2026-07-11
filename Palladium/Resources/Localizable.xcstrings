@@ -1085,6 +1085,26 @@
         }
       }
     },
+    "download.formats.audio_section" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio"
+          }
+        }
+      }
+    },
+    "download.formats.best_audio" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio: best compatible"
+          }
+        }
+      }
+    },
     "download.formats.choose" : {
       "localizations" : {
         "en" : {
@@ -1141,6 +1161,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Video and audio"
+          }
+        }
+      }
+    },
+    "download.formats.video_section" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video with Audio"
           }
         }
       }

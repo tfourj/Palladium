@@ -57,6 +57,10 @@ struct YTDLPFormat: Identifiable, Hashable, Sendable {
 
     var hasVideo: Bool { !videoCodec.isEmpty && videoCodec != "none" }
     var hasAudio: Bool { !audioCodec.isEmpty && audioCodec != "none" }
+
+    var downloadSelector: String {
+        hasVideo && !hasAudio ? "\(id)+bestaudio/best" : id
+    }
 }
 
 struct YTDLPFormatResolution: Sendable {

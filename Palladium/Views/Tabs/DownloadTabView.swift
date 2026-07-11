@@ -323,26 +323,21 @@ struct DownloadTabView: View {
 
     private var formatPickerSheet: some View {
         NavigationStack {
-            List(availableFormats) { format in
-                Button {
-                    showFormatPicker = false
-                    onDownloadFormat(format)
-                } label: {
-                    VStack(alignment: .leading, spacing: 4) {
-                        HStack {
-                            Text(formatHeading(format))
-                                .font(.headline)
-                                .foregroundStyle(.primary)
-                            Spacer()
-                            Text(format.id)
-                                .font(.caption.monospaced())
-                                .foregroundStyle(.secondary)
+            List {
+                if !videoFormats.isEmpty {
+                    Section("download.formats.video_section") {
+                        ForEach(videoFormats) { format in
+                            formatPickerRow(format)
                         }
-                        Text(formatDetails(format))
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
                     }
-                    .padding(.vertical, 3)
+                }
+
+                if !audioFormats.isEmpty {
+                    Section("download.formats.audio_section") {
+                        ForEach(audioFormats) { format in
+                            formatPickerRow(format)
+                        }
+                    }
                 }
             }
             .navigationTitle(formatPickerTitle.isEmpty
@@ -357,17 +352,43 @@ struct DownloadTabView: View {
         }
     }
 
-    private func formatHeading(_ format: YTDLPFormat) -> String {
-        let type: String
-        if format.hasVideo && format.hasAudio {
-            type = String(localized: "download.formats.video_audio")
-        } else if format.hasVideo {
-            type = String(localized: "download.formats.video")
-        } else {
-            type = String(localized: "download.formats.audio")
+    private var videoFormats: [YTDLPFormat] {
+        availableFormats.filter(\.hasVideo)
+    }
+
+    private var audioFormats: [YTDLPFormat] {
+        availableFormats.filter { $0.hasAudio && !$0.hasVideo }
+    }
+
+    private func formatPickerRow(_ format: YTDLPFormat) -> some View {
+        Button {
+            showFormatPicker = false
+            onDownloadFormat(format)
+        } label: {
+            VStack(alignment: .leading, spacing: 4) {
+                HStack {
+                    Text(formatHeading(format))
+                        .font(.headline)
+                        .foregroundStyle(.primary)
+                    Spacer()
+                    Text(format.id)
+                        .font(.caption.monospaced())
+                        .foregroundStyle(.secondary)
+                }
+                Text(formatDetails(format))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Text(codecDetails(format))
+                    .font(.caption2.monospaced())
+                    .foregroundStyle(.secondary)
+            }
+            .padding(.vertical, 3)
         }
+    }
+
+    private func formatHeading(_ format: YTDLPFormat) -> String {
         let quality = format.resolution.isEmpty ? format.note : format.resolution
-        return quality.isEmpty ? type : "\(quality) · \(type)"
+        return quality.isEmpty ? format.fileExtension.uppercased() : quality
     }
 
     private func formatDetails(_ format: YTDLPFormat) -> String {
@@ -379,6 +400,19 @@ struct DownloadTabView: View {
             details.append(format.note)
         }
         return details.joined(separator: " · ")
+    }
+
+    private func codecDetails(_ format: YTDLPFormat) -> String {
+        var codecs: [String] = []
+        if format.hasVideo {
+            codecs.append("Video: \(format.videoCodec)")
+            codecs.append(format.hasAudio
+                ? "Audio: \(format.audioCodec)"
+                : String(localized: "download.formats.best_audio"))
+        } else if format.hasAudio {
+            codecs.append("Audio: \(format.audioCodec)")
+        }
+        return codecs.joined(separator: " · ")
     }
 
     private var galleryPickerSheet: some View {
