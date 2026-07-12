@@ -88,6 +88,7 @@ Palladium/
 | `Views/Tabs/Settings/NotificationsSettingsView.swift` | Notification settings screen. |
 | `Views/Tabs/Settings/PackageManagerSettingsView.swift` | Package-manager settings screen. |
 | `Views/Tabs/Settings/PackagesSettingsView.swift` | Package source and package settings screen. |
+| `Views/Tabs/Settings/ShareSheetSettingsView.swift` | Incoming share behavior and picker-button settings screen. |
 | `Views/Tabs/Settings/StorageSettingsView.swift` | Storage settings screen. |
 | `Views/Tabs/Settings/URLAllowlistsSettingsView.swift` | URL allowlist settings screen. |
 | `Views/Tabs/Settings/UseInterfaceSettingsView.swift` | Interface-use settings screen. |

@@ -52,6 +52,8 @@ struct ContentView: View {
     static let rememberSelectedPresetDefaultsKey = "palladium.rememberSelectedPreset"
     static let autoDownloadOnPasteDefaultsKey = "palladium.autoDownloadOnPaste"
     static let shareSheetDownloadModeDefaultsKey = "palladium.shareSheetDownloadMode"
+    static let showShareSheetFormatButtonDefaultsKey = "palladium.showShareSheetFormatButton"
+    static let showShareSheetFillURLButtonDefaultsKey = "palladium.showShareSheetFillURLButton"
     static let downloadPlaylistDefaultsKey = "palladium.downloadPlaylist"
     static let downloadSubtitlesDefaultsKey = "palladium.downloadSubtitles"
     static let embedThumbnailDefaultsKey = "palladium.embedThumbnail"
@@ -99,6 +101,8 @@ struct ContentView: View {
     @State var rememberSelectedPreset: Bool
     @State var autoDownloadOnPaste: Bool
     @State var shareSheetDownloadMode: ShareSheetDownloadMode
+    @State var showShareSheetFormatButton: Bool
+    @State var showShareSheetFillURLButton: Bool
     @State var downloadPlaylist: Bool
     @State var downloadSubtitles: Bool
     @State var embedThumbnail: Bool
@@ -171,6 +175,7 @@ struct ContentView: View {
     @State var keyboardDismissTapInstalled = false
     @State var showShareSheetDownloadPicker = false
     @State var shareSheetURL = ""
+    @State var pendingSharedFormatURL = ""
     @State var pendingSharedDownloadURL = ""
     @State var pendingSharedDownloadPreset: DownloadPreset?
     @State var lastConsumedShortcutRequestID: UUID?
@@ -182,6 +187,7 @@ struct ContentView: View {
     @State var formatPickerTitle = ""
     @State var showFormatPicker = false
     @State var isResolvingFormats = false
+    @State var formatDownloadPresetOverride: DownloadPreset?
 
     init() {
         let rememberPreset = Self.loadRememberSelectedPreset()
@@ -199,6 +205,8 @@ struct ContentView: View {
         _rememberSelectedPreset = State(initialValue: rememberPreset)
         _autoDownloadOnPaste = State(initialValue: Self.loadAutoDownloadOnPaste())
         _shareSheetDownloadMode = State(initialValue: Self.clampShareSheetMode(shareSheetDownloadMode, visiblePresets: visiblePresets))
+        _showShareSheetFormatButton = State(initialValue: Self.loadShowShareSheetFormatButton())
+        _showShareSheetFillURLButton = State(initialValue: Self.loadShowShareSheetFillURLButton())
         let restoreDefaults = Self.loadRestoreDownloadDefaults()
         let defPlaylist = Self.loadDefaultDownloadPlaylist()
         let defSubtitles = Self.loadDefaultDownloadSubtitles()
@@ -276,7 +284,14 @@ struct ContentView: View {
                     formatPickerTitle: formatPickerTitle,
                     showFormatPicker: $showFormatPicker,
                     isResolvingFormats: isResolvingFormats,
-                    onDownloadFormat: { runDownloadFlow(formatOverride: $0.downloadSelector) }
+                    onDownloadFormat: { format in
+                        let presetOverride = formatDownloadPresetOverride
+                        formatDownloadPresetOverride = nil
+                        runDownloadFlow(
+                            presetOverride: presetOverride,
+                            formatOverride: format.downloadSelector
+                        )
+                    }
                 )
                 .tabItem {
                     Label(String(localized: "tab.download"), systemImage: "arrow.down.circle")
@@ -308,6 +323,8 @@ struct ContentView: View {
                     detailedProgressEnabled: $detailedProgressEnabled,
                     downloadPresetSettings: $downloadPresetSettings,
                     shareSheetDownloadMode: $shareSheetDownloadMode,
+                    showShareSheetFormatButton: $showShareSheetFormatButton,
+                    showShareSheetFillURLButton: $showShareSheetFillURLButton,
                     linkHistoryEnabled: $linkHistoryEnabled,
                     linkHistoryLimit: $linkHistoryLimit,
                     hideHistoryCount: $hideHistoryCount,
@@ -435,6 +452,12 @@ struct ContentView: View {
         .onChange(of: shareSheetDownloadMode, initial: false) {
             persistPreferences()
         }
+        .onChange(of: showShareSheetFormatButton, initial: false) {
+            persistPreferences()
+        }
+        .onChange(of: showShareSheetFillURLButton, initial: false) {
+            persistPreferences()
+        }
         .onChange(of: downloadPlaylist, initial: false) {
             persistPreferences()
         }
@@ -521,7 +544,9 @@ struct ContentView: View {
         .sheet(item: $sharePayload) { payload in
             ShareSheet(activityItems: payload.activityItems)
         }
-        .sheet(isPresented: $showShareSheetDownloadPicker) {
+        .sheet(isPresented: $showShareSheetDownloadPicker, onDismiss: {
+            resolvePendingSharedFormatSelection()
+        }) {
             shareSheetModePickerSheet
         }
         .sheet(isPresented: $showDownloadActionSheet) {

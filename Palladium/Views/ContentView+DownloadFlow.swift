@@ -26,19 +26,66 @@ extension ContentView {
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
 
-            VStack(spacing: 14) {
-                ForEach(visibleDownloadPresets) { preset in
-                    let meta = shareSheetModeMetadata(for: preset)
-                    shareSheetModeButton(
-                        title: meta.title,
-                        subtitle: meta.subtitle,
-                        icon: meta.icon,
-                        color: meta.color,
-                        preset: preset
+            GeometryReader { geometry in
+                ScrollView {
+                    VStack(spacing: 14) {
+                        ForEach(visibleDownloadPresets) { preset in
+                            let meta = shareSheetModeMetadata(for: preset)
+                            shareSheetModeButton(
+                                title: meta.title,
+                                subtitle: meta.subtitle,
+                                icon: meta.icon,
+                                color: meta.color,
+                                preset: preset
+                            )
+                        }
+
+                        if showShareSheetFormatButton {
+                            Button(action: handleShareSheetFormatSelection) {
+                                HStack {
+                                    Image(systemName: "list.bullet.rectangle")
+                                        .font(.title3)
+                                    Text("download.formats.title")
+                                        .font(.headline)
+                                    Spacer()
+                                    Text("download.formats.share_sheet_help")
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                }
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background(Color.teal.opacity(0.1))
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
+                            }
+                        }
+
+                        if showShareSheetFillURLButton {
+                            Button(action: handleShareSheetFillURLSelection) {
+                                HStack {
+                                    Image(systemName: "link.badge.plus")
+                                        .font(.title3)
+                                    Text("download.share.fill_url")
+                                        .font(.headline)
+                                    Spacer()
+                                    Text("download.share.fill_url_help")
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                }
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background(Color.indigo.opacity(0.1))
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
+                            }
+                        }
+                    }
+                    .padding(.horizontal)
+                    .frame(
+                        maxWidth: .infinity,
+                        minHeight: geometry.size.height,
+                        alignment: .center
                     )
                 }
             }
-            .padding(.horizontal)
 
             Button(action: {
                 showShareSheetDownloadPicker = false
@@ -122,6 +169,41 @@ extension ContentView {
         shareSheetURL = ""
         guard !sharedLink.isEmpty else { return }
         startDownloadFromSharedURL(sharedLink, preset: preset)
+    }
+
+    func handleShareSheetFormatSelection() {
+        let sharedLink = shareSheetURL.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !sharedLink.isEmpty else { return }
+
+        pendingSharedFormatURL = sharedLink
+        shareSheetURL = ""
+        showShareSheetDownloadPicker = false
+    }
+
+    func handleShareSheetFillURLSelection() {
+        let sharedLink = shareSheetURL.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !sharedLink.isEmpty else { return }
+
+        pendingSharedDownloadURL = ""
+        pendingSharedDownloadPreset = nil
+        pendingSharedFormatURL = ""
+        formatDownloadPresetOverride = nil
+        shareSheetURL = ""
+        selectedTab = .download
+        urlText = sharedLink
+        showShareSheetDownloadPicker = false
+        appendConsoleText("[palladium] shared link filled without starting a download\n")
+    }
+
+    func resolvePendingSharedFormatSelection() {
+        let sharedLink = pendingSharedFormatURL.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !sharedLink.isEmpty else { return }
+
+        pendingSharedFormatURL = ""
+        selectedTab = .download
+        urlText = sharedLink
+        formatDownloadPresetOverride = .autoVideo
+        resolveFormatSelection(url: sharedLink, preset: .autoVideo)
     }
 
     func startDownloadFromSharedURL(_ sharedLink: String, preset: DownloadPreset) {
@@ -484,10 +566,15 @@ extension ContentView {
     }
 
     func resolveFormatSelection() {
-        let targetURL = urlText.trimmingCharacters(in: .whitespacesAndNewlines)
+        formatDownloadPresetOverride = nil
+        resolveFormatSelection(url: urlText, preset: selectedPreset)
+    }
+
+    func resolveFormatSelection(url: String, preset: DownloadPreset) {
+        let targetURL = url.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !targetURL.isEmpty, !isRunning, !isResolvingFormats else { return }
-        guard selectedPreset != .images else {
-            runDownloadFlow()
+        guard preset != .images else {
+            runDownloadFlow(urlOverride: targetURL, presetOverride: preset)
             return
         }
 

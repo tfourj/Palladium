@@ -49,6 +49,8 @@ extension ContentView {
         defaults.set(autoDownloadOnPaste, forKey: Self.autoDownloadOnPasteDefaultsKey)
         defaults.set(detailedProgressEnabled, forKey: Self.detailedProgressEnabledDefaultsKey)
         defaults.set(shareSheetDownloadMode.rawValue, forKey: Self.shareSheetDownloadModeDefaultsKey)
+        defaults.set(showShareSheetFormatButton, forKey: Self.showShareSheetFormatButtonDefaultsKey)
+        defaults.set(showShareSheetFillURLButton, forKey: Self.showShareSheetFillURLButtonDefaultsKey)
         defaults.set(downloadPlaylist, forKey: Self.downloadPlaylistDefaultsKey)
         defaults.set(downloadSubtitles, forKey: Self.downloadSubtitlesDefaultsKey)
         defaults.set(embedThumbnail, forKey: Self.embedThumbnailDefaultsKey)
@@ -205,6 +207,20 @@ extension ContentView {
             return .ask
         }
         return mode
+    }
+
+    static func loadShowShareSheetFormatButton() -> Bool {
+        if UserDefaults.standard.object(forKey: showShareSheetFormatButtonDefaultsKey) == nil {
+            return true
+        }
+        return UserDefaults.standard.bool(forKey: showShareSheetFormatButtonDefaultsKey)
+    }
+
+    static func loadShowShareSheetFillURLButton() -> Bool {
+        if UserDefaults.standard.object(forKey: showShareSheetFillURLButtonDefaultsKey) == nil {
+            return true
+        }
+        return UserDefaults.standard.bool(forKey: showShareSheetFillURLButtonDefaultsKey)
     }
 
     static func loadDetailedProgressEnabled() -> Bool {
