@@ -198,6 +198,13 @@ def package_marker_paths(package_name):
     return tuple(candidates)
 
 
+def package_owned_paths(package_name):
+    normalized_name = canonical_package_name(package_name)
+    if normalized_name == "yt-dlp-apple-webkit-jsi":
+        return (os.path.join("yt_dlp_plugins", "webkit_jsi"),)
+    return package_marker_paths(package_name)
+
+
 def has_target_package_marker(package_name, install_target):
     if not install_target or not os.path.isdir(install_target):
         return False
@@ -405,6 +412,21 @@ def cleanup_target_package(install_target, package_name):
     except Exception:
         print(f"[palladium] failed cleanup scan for {package_name}")
         traceback.print_exc()
+
+    for relative_path in package_owned_paths(package_name):
+        full_path = os.path.join(install_target, relative_path)
+        if not os.path.lexists(full_path):
+            continue
+        try:
+            if os.path.islink(full_path) or not os.path.isdir(full_path):
+                os.remove(full_path)
+            else:
+                shutil.rmtree(full_path)
+            removed += 1
+            cleanup_empty_parent_dirs(install_target, os.path.dirname(full_path))
+        except Exception:
+            print(f"[palladium] failed to remove package-owned target entry: {relative_path}")
+            traceback.print_exc()
 
     return removed
 
@@ -863,12 +885,20 @@ def parse_package_source(source_json=None):
     return source
 
 
-def build_pip_install_args(package_specs, install_target=None, allow_prereleases=False, upgrade=False):
+def build_pip_install_args(
+    package_specs,
+    install_target=None,
+    allow_prereleases=False,
+    upgrade=False,
+    force_reinstall=False,
+):
     args = ["install"]
     if install_target:
         args.extend(["--target", install_target])
     if upgrade:
         args.append("--upgrade")
+    if force_reinstall:
+        args.append("--force-reinstall")
     if allow_prereleases:
         args.append("--pre")
     args.extend([

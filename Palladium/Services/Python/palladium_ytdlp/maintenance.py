@@ -17,7 +17,7 @@ from .packages import (
     install_payload_zip,
     parse_package_source,
 )
-from .patching import apply_youtube_patches
+from .patching import apply_youtube_patches, youtube_patch_state_warning
 from .runtime import invalidate_runtime_package_modules, raise_if_cancel_requested
 from .shared import TRACKED_PACKAGES, TailBuffer, Tee, YTDLP_RUNTIME_PACKAGES, open_live_log_stream
 
@@ -189,6 +189,7 @@ def install_package_updates(action, install_target, package_source, custom_versi
         install_target=install_target,
         allow_prereleases=bool(package_source.get("allow_prereleases")),
         upgrade=True,
+        force_reinstall=action == ACTION_REINSTALL,
     )
     pip_result = pip_main(pip_args)
     pip_exit_code = 0 if pip_result is None else int(pip_result)
@@ -219,6 +220,7 @@ def run_package_maintenance(
     versions = {}
     cancelled = False
     restart_required = False
+    patch_state_warning = False
     did_package_install_action = False
     allow_version_cache_fallback = True
     install_target = os.environ.get("PALLADIUM_PYTHON_PACKAGES")
@@ -322,6 +324,10 @@ def run_package_maintenance(
 
             raise_if_cancel_requested(cancel_file_path, "[palladium] package action cancelled before youtube patches")
             apply_youtube_patches(install_target, package_source.get("patch_mode"))
+            patch_state_warning = youtube_patch_state_warning(
+                install_target,
+                package_source.get("patch_mode"),
+            )
 
             raise_if_cancel_requested(
                 cancel_file_path,
@@ -354,5 +360,6 @@ def run_package_maintenance(
         "versions": versions,
         "available_versions": available_versions,
         "restart_required": restart_required,
+        "patch_state_warning": patch_state_warning,
         "output": output.getvalue(),
     })

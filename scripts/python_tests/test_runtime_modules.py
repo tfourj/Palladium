@@ -27,8 +27,13 @@ class RuntimeModuleTests(unittest.TestCase):
                 else:
                     sys.modules[name] = module
 
-    def test_loaded_webkit_jsi_runtime_requires_restart(self):
-        module_names = ("yt_dlp", "yt_dlp_plugins.webkit_jsi")
+    def test_loaded_webkit_jsi_runtime_is_invalidated_without_restart(self):
+        module_names = (
+            "yt_dlp",
+            "yt_dlp_plugins",
+            "yt_dlp_plugins.webkit_jsi",
+            "yt_dlp_plugins.webkit_jsi.lib.api",
+        )
         originals = {name: sys.modules.get(name) for name in module_names}
         try:
             for name in module_names:
@@ -36,9 +41,9 @@ class RuntimeModuleTests(unittest.TestCase):
 
             restart_required = invalidate_runtime_package_modules()
 
-            self.assertTrue(restart_required)
+            self.assertFalse(restart_required)
             for name in module_names:
-                self.assertIn(name, sys.modules)
+                self.assertNotIn(name, sys.modules)
         finally:
             for name, module in originals.items():
                 if module is None:

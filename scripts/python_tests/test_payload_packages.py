@@ -11,10 +11,27 @@ from scripts.python_tests.helpers import (
     zip_directory,
 )
 
-from palladium_ytdlp.packages import clear_payload_packages, collect_versions, install_payload_zip  # noqa: E402
+from palladium_ytdlp.packages import (  # noqa: E402
+    cleanup_target_package,
+    clear_payload_packages,
+    collect_versions,
+    install_payload_zip,
+)
 
 
 class PayloadPackageTests(unittest.TestCase):
+    def test_cleanup_removes_orphaned_webkit_jsi_package_tree(self):
+        with tempfile.TemporaryDirectory() as temp:
+            target = pathlib.Path(temp)
+            package_dir = target / "yt_dlp_plugins" / "webkit_jsi"
+            package_dir.mkdir(parents=True)
+            (package_dir / "patched.py").write_text("patched = True\n", encoding="utf-8")
+
+            removed = cleanup_target_package(target, "yt-dlp-apple-webkit-jsi")
+
+            self.assertGreater(removed, 0)
+            self.assertFalse(package_dir.exists())
+
     def test_payload_imports_direct_wheel(self):
         with tempfile.TemporaryDirectory() as temp:
             root = pathlib.Path(temp)

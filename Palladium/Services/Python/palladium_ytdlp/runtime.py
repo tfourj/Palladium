@@ -45,14 +45,6 @@ def run_gallery_dl_module():
 
 def invalidate_runtime_package_modules():
     prefixes = ("yt_dlp", "yt_dlp_plugins")
-    webkit_jsi_loaded = any(
-        name == "yt_dlp_plugins.webkit_jsi" or name.startswith("yt_dlp_plugins.webkit_jsi.")
-        for name in sys.modules
-    )
-    if webkit_jsi_loaded:
-        print("[palladium] restart required to refresh loaded webkit jsi runtime")
-        return True
-
     stale_modules = [
         name
         for name in sys.modules

@@ -24,7 +24,7 @@ extension ContentView {
         guard !isRunning, !isPackageRunning, !isCheckingDownloadAllowlist, !isResolvingGallery else { return }
 
         isPackageRunning = true
-        isAutomaticallyUpdatingPackages = isAutomaticUpdate
+        isAutomaticallyUpdatingPackages = isAutomaticUpdate || action == .reinstall
         syncIdleTimerDisabled()
         packageStatusText = action.initialStatusText
         isLoadingPackageVersions = action == .indexVersions
@@ -109,6 +109,9 @@ extension ContentView {
             }
             if outcome.restartRequired {
                 alertMessage = String(localized: "settings.advanced.restart_required")
+                showAlert = true
+            } else if outcome.patchStateWarning {
+                alertMessage = String(localized: "settings.advanced.patch_state_warning")
                 showAlert = true
             }
             self.hasLoadedPackageStatus = true

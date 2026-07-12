@@ -131,6 +131,15 @@ def patch_webkit_jsi_api_source(source_text):
     return updated, changed, is_safe
 
 
+def is_webkit_jsi_patch_applied(source_text):
+    source = str(source_text)
+    return any((
+        "webView0_decidePolicyForNavigationAction1_decisionHandler2" in source,
+        "webView:createWebViewWithConfiguration:forNavigationAction:windowFeatures:" in source,
+        "'yt-dlp-wins' in lower_url" in source,
+    ))
+
+
 def ensure_safe_webkit_jsi_runtime(install_target=None):
     patched_count = 0
     found_any = False

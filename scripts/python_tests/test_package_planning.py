@@ -118,6 +118,17 @@ class PackagePlanningTests(unittest.TestCase):
         self.assertNotIn("--pre", args)
         self.assertIn("yt-dlp", args)
 
+    def test_clean_reinstall_forces_fresh_package_install(self):
+        args = build_pip_install_args(
+            ["yt-dlp", "yt-dlp-apple-webkit-jsi"],
+            install_target="/tmp/palladium-packages",
+            upgrade=True,
+            force_reinstall=True,
+        )
+
+        self.assertIn("--upgrade", args)
+        self.assertIn("--force-reinstall", args)
+
     def test_gallery_dl_is_managed_with_other_runtime_packages(self):
         packages, cleanup = build_package_install_plan(
             {"gallery-dl": "1.0"},
