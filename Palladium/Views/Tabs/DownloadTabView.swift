@@ -323,6 +323,14 @@ struct DownloadTabView: View {
     private var formatPickerSheet: some View {
         NavigationStack {
             List {
+                HStack(spacing: 6) {
+                    Image(systemName: "photo.on.rectangle")
+                        .foregroundStyle(.green)
+                    Text("download.formats.photos_compatible")
+                        .foregroundStyle(.secondary)
+                }
+                .font(.caption)
+
                 if !videoFormats.isEmpty {
                     Section("download.formats.video_section") {
                         ForEach(videoFormats) { format in
@@ -396,7 +404,9 @@ struct DownloadTabView: View {
                     .foregroundStyle(.secondary)
             }
             .padding(.vertical, 3)
+            .contentShape(Rectangle())
         }
+        .buttonStyle(.plain)
     }
 
     private func formatHeading(_ format: YTDLPFormat) -> String {
@@ -456,7 +466,7 @@ struct DownloadTabView: View {
     private func codecDetails(_ format: YTDLPFormat) -> String {
         var codecs: [String] = []
         if format.hasVideo {
-            codecs.append("Video: \(format.videoCodec)")
+            codecs.append("Video: \(format.videoCodecDisplayName)")
             codecs.append(format.hasAudio
                 ? "Audio: \(format.audioCodec)"
                 : String(localized: "download.formats.best_audio"))
