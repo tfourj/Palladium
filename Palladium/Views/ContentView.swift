@@ -171,6 +171,7 @@ struct ContentView: View {
     @State var keyboardDismissTapInstalled = false
     @State var showShareSheetDownloadPicker = false
     @State var shareSheetURL = ""
+    @State var pendingSharedFormatURL = ""
     @State var pendingSharedDownloadURL = ""
     @State var pendingSharedDownloadPreset: DownloadPreset?
     @State var lastConsumedShortcutRequestID: UUID?
@@ -182,6 +183,7 @@ struct ContentView: View {
     @State var formatPickerTitle = ""
     @State var showFormatPicker = false
     @State var isResolvingFormats = false
+    @State var formatDownloadPresetOverride: DownloadPreset?
 
     init() {
         let rememberPreset = Self.loadRememberSelectedPreset()
@@ -276,7 +278,14 @@ struct ContentView: View {
                     formatPickerTitle: formatPickerTitle,
                     showFormatPicker: $showFormatPicker,
                     isResolvingFormats: isResolvingFormats,
-                    onDownloadFormat: { runDownloadFlow(formatOverride: $0.downloadSelector) }
+                    onDownloadFormat: { format in
+                        let presetOverride = formatDownloadPresetOverride
+                        formatDownloadPresetOverride = nil
+                        runDownloadFlow(
+                            presetOverride: presetOverride,
+                            formatOverride: format.downloadSelector
+                        )
+                    }
                 )
                 .tabItem {
                     Label(String(localized: "tab.download"), systemImage: "arrow.down.circle")
@@ -521,7 +530,9 @@ struct ContentView: View {
         .sheet(item: $sharePayload) { payload in
             ShareSheet(activityItems: payload.activityItems)
         }
-        .sheet(isPresented: $showShareSheetDownloadPicker) {
+        .sheet(isPresented: $showShareSheetDownloadPicker, onDismiss: {
+            resolvePendingSharedFormatSelection()
+        }) {
             shareSheetModePickerSheet
         }
         .sheet(isPresented: $showDownloadActionSheet) {

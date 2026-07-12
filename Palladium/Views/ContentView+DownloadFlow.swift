@@ -37,6 +37,23 @@ extension ContentView {
                         preset: preset
                     )
                 }
+
+                Button(action: handleShareSheetFormatSelection) {
+                    HStack {
+                        Image(systemName: "list.bullet.rectangle")
+                            .font(.title3)
+                        Text("download.formats.title")
+                            .font(.headline)
+                        Spacer()
+                        Text("download.formats.share_sheet_help")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color.teal.opacity(0.1))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                }
             }
             .padding(.horizontal)
 
@@ -122,6 +139,26 @@ extension ContentView {
         shareSheetURL = ""
         guard !sharedLink.isEmpty else { return }
         startDownloadFromSharedURL(sharedLink, preset: preset)
+    }
+
+    func handleShareSheetFormatSelection() {
+        let sharedLink = shareSheetURL.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !sharedLink.isEmpty else { return }
+
+        pendingSharedFormatURL = sharedLink
+        shareSheetURL = ""
+        showShareSheetDownloadPicker = false
+    }
+
+    func resolvePendingSharedFormatSelection() {
+        let sharedLink = pendingSharedFormatURL.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !sharedLink.isEmpty else { return }
+
+        pendingSharedFormatURL = ""
+        selectedTab = .download
+        urlText = sharedLink
+        formatDownloadPresetOverride = .autoVideo
+        resolveFormatSelection(url: sharedLink, preset: .autoVideo)
     }
 
     func startDownloadFromSharedURL(_ sharedLink: String, preset: DownloadPreset) {
@@ -484,10 +521,15 @@ extension ContentView {
     }
 
     func resolveFormatSelection() {
-        let targetURL = urlText.trimmingCharacters(in: .whitespacesAndNewlines)
+        formatDownloadPresetOverride = nil
+        resolveFormatSelection(url: urlText, preset: selectedPreset)
+    }
+
+    func resolveFormatSelection(url: String, preset: DownloadPreset) {
+        let targetURL = url.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !targetURL.isEmpty, !isRunning, !isResolvingFormats else { return }
-        guard selectedPreset != .images else {
-            runDownloadFlow()
+        guard preset != .images else {
+            runDownloadFlow(urlOverride: targetURL, presetOverride: preset)
             return
         }
 

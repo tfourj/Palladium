@@ -1162,6 +1162,16 @@
         }
       }
     },
+    "download.formats.share_sheet_help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pick a specific format"
+          }
+        }
+      }
+    },
     "download.formats.title" : {
       "localizations" : {
         "en" : {
