@@ -924,6 +924,7 @@
       }
     },
     "cookies.selected.title" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -948,7 +949,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cookies can also be switched on the main page using \u201cMore options\u201d."
+            "value" : "Cookies can also be switched on the main page using “More options”."
           }
         }
       }
@@ -2849,6 +2850,16 @@
         }
       }
     },
+    "settings.advanced.patch_state_warning" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some installed runtime files still use a different YouTube patch mode. Review the package log and reinstall packages before downloading."
+          }
+        }
+      }
+    },
     "settings.advanced.reinstall" : {
       "localizations" : {
         "en" : {
@@ -2875,16 +2886,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Reinstall packages?"
-          }
-        }
-      }
-    },
-    "settings.advanced.patch_state_warning" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Some installed runtime files still use a different YouTube patch mode. Review the package log and reinstall packages before downloading."
           }
         }
       }
@@ -2929,22 +2930,22 @@
         }
       }
     },
-    "settings.advanced.youtube_patch_mode.help" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reinstall packages to apply a changed runtime patch mode."
-          }
-        }
-      }
-    },
     "settings.advanced.youtube_patch_mode.ejs" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "EJS scripts"
+          }
+        }
+      }
+    },
+    "settings.advanced.youtube_patch_mode.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reinstall packages to apply a changed runtime patch mode."
           }
         }
       }
