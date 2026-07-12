@@ -94,6 +94,9 @@ extension ContentView {
         try FileManager.default.createDirectory(at: try cookiesDirectoryURL(), withIntermediateDirectories: true)
         try text.write(to: destinationURL, atomically: true, encoding: .utf8)
         refreshImportedCookieFiles()
+        selectedCookieFileName = destinationURL.lastPathComponent
+        defaultUseCookies = true
+        useCookies = true
         showTemporaryToast(
             String(format: String(localized: "cookies.toast.imported"), destinationURL.lastPathComponent)
         )
