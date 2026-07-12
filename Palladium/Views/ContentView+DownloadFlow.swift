@@ -26,58 +26,65 @@ extension ContentView {
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
 
-            ScrollView {
-                VStack(spacing: 14) {
-                    ForEach(visibleDownloadPresets) { preset in
-                        let meta = shareSheetModeMetadata(for: preset)
-                        shareSheetModeButton(
-                            title: meta.title,
-                            subtitle: meta.subtitle,
-                            icon: meta.icon,
-                            color: meta.color,
-                            preset: preset
-                        )
-                    }
+            GeometryReader { geometry in
+                ScrollView {
+                    VStack(spacing: 14) {
+                        ForEach(visibleDownloadPresets) { preset in
+                            let meta = shareSheetModeMetadata(for: preset)
+                            shareSheetModeButton(
+                                title: meta.title,
+                                subtitle: meta.subtitle,
+                                icon: meta.icon,
+                                color: meta.color,
+                                preset: preset
+                            )
+                        }
 
-                    if showShareSheetFormatButton {
-                        Button(action: handleShareSheetFormatSelection) {
-                            HStack {
-                                Image(systemName: "list.bullet.rectangle")
-                                    .font(.title3)
-                                Text("download.formats.title")
-                                    .font(.headline)
-                                Spacer()
-                                Text("download.formats.share_sheet_help")
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
+                        if showShareSheetFormatButton {
+                            Button(action: handleShareSheetFormatSelection) {
+                                HStack {
+                                    Image(systemName: "list.bullet.rectangle")
+                                        .font(.title3)
+                                    Text("download.formats.title")
+                                        .font(.headline)
+                                    Spacer()
+                                    Text("download.formats.share_sheet_help")
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                }
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background(Color.teal.opacity(0.1))
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
                             }
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color.teal.opacity(0.1))
-                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                        }
+
+                        if showShareSheetFillURLButton {
+                            Button(action: handleShareSheetFillURLSelection) {
+                                HStack {
+                                    Image(systemName: "link.badge.plus")
+                                        .font(.title3)
+                                    Text("download.share.fill_url")
+                                        .font(.headline)
+                                    Spacer()
+                                    Text("download.share.fill_url_help")
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                }
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background(Color.indigo.opacity(0.1))
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
+                            }
                         }
                     }
-
-                    if showShareSheetFillURLButton {
-                        Button(action: handleShareSheetFillURLSelection) {
-                            HStack {
-                                Image(systemName: "link.badge.plus")
-                                    .font(.title3)
-                                Text("download.share.fill_url")
-                                    .font(.headline)
-                                Spacer()
-                                Text("download.share.fill_url_help")
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
-                            }
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color.indigo.opacity(0.1))
-                            .clipShape(RoundedRectangle(cornerRadius: 10))
-                        }
-                    }
+                    .padding(.horizontal)
+                    .frame(
+                        maxWidth: .infinity,
+                        minHeight: geometry.size.height,
+                        alignment: .center
+                    )
                 }
-                .padding(.horizontal)
             }
 
             Button(action: {
