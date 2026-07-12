@@ -24,7 +24,7 @@ extension ContentView {
         guard !isRunning, !isPackageRunning, !isCheckingDownloadAllowlist, !isResolvingGallery else { return }
 
         isPackageRunning = true
-        isAutomaticallyUpdatingPackages = isAutomaticUpdate
+        isAutomaticallyUpdatingPackages = isAutomaticUpdate || action == .reinstall
         syncIdleTimerDisabled()
         packageStatusText = action.initialStatusText
         isLoadingPackageVersions = action == .indexVersions
