@@ -3190,6 +3190,7 @@
       }
     },
     "settings.download_modes.share_section" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3204,7 +3205,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Default mode and share sheet handling"
+            "value" : "Default mode and visible download options"
           }
         }
       }
@@ -3415,6 +3416,76 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Search Settings"
+          }
+        }
+      }
+    },
+    "settings.share_sheet.buttons_help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "These buttons appear when Share Sheet Mode is set to Ask."
+          }
+        }
+      }
+    },
+    "settings.share_sheet.buttons_section" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ask Picker Buttons"
+          }
+        }
+      }
+    },
+    "settings.share_sheet.mode_section" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Incoming Links"
+          }
+        }
+      }
+    },
+    "settings.share_sheet.show_fill_url" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Fill URL"
+          }
+        }
+      }
+    },
+    "settings.share_sheet.show_format" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Choose Format"
+          }
+        }
+      }
+    },
+    "settings.share_sheet.subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Incoming link behavior and picker buttons"
+          }
+        }
+      }
+    },
+    "settings.share_sheet.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share Sheet"
           }
         }
       }

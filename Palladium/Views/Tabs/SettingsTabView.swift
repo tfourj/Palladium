@@ -5,6 +5,7 @@ struct SettingsTabView: View {
         case userInterface
         case downloadSettings
         case downloadModes
+        case shareSheet
         case downloadQuality
         case downloadOptions
         case afterDownload
@@ -74,6 +75,8 @@ struct SettingsTabView: View {
     @Binding var detailedProgressEnabled: Bool
     @Binding var downloadPresetSettings: [DownloadPresetSetting]
     @Binding var shareSheetDownloadMode: ShareSheetDownloadMode
+    @Binding var showShareSheetFormatButton: Bool
+    @Binding var showShareSheetFillURLButton: Bool
     @Binding var linkHistoryEnabled: Bool
     @Binding var linkHistoryLimit: Int
     @Binding var hideHistoryCount: Bool
@@ -216,8 +219,15 @@ struct SettingsTabView: View {
             DownloadModesSettingsView(
                 selectedPreset: $selectedPreset,
                 rememberSelectedPreset: $rememberSelectedPreset,
-                shareSheetDownloadMode: $shareSheetDownloadMode,
                 downloadPresetSettings: $downloadPresetSettings,
+                isRunning: isRunning
+            )
+        case .shareSheet:
+            ShareSheetSettingsView(
+                shareSheetDownloadMode: $shareSheetDownloadMode,
+                showFormatButton: $showShareSheetFormatButton,
+                showFillURLButton: $showShareSheetFillURLButton,
+                downloadPresetSettings: downloadPresetSettings,
                 isRunning: isRunning
             )
         case .downloadQuality:
@@ -368,6 +378,7 @@ struct SettingsTabView: View {
     private func downloadSettingsList() -> some View {
         List {
             settingsNavigationLink(for: .downloadModes)
+            settingsNavigationLink(for: .shareSheet)
             settingsNavigationLink(for: .downloadQuality)
             settingsNavigationLink(for: .afterDownload)
             settingsNavigationLink(for: .downloadBehavior)
@@ -521,9 +532,9 @@ struct SettingsTabView: View {
             },
             controlSetting(
                 id: "shareSheetDownloadMode",
-                menu: .downloadModes,
+                menu: .shareSheet,
                 title: "settings.ui.modes.share_sheet",
-                subtitle: "settings.ui.modes.help",
+                subtitle: "settings.download_modes.share_help",
                 keywords: ShareSheetDownloadMode.allCases.map(\.title)
             ) { title in
                 AnyView(
@@ -534,6 +545,34 @@ struct SettingsTabView: View {
                     }
                     .pickerStyle(.menu)
                     .disabled(isRunning)
+                )
+            },
+            controlSetting(
+                id: "showShareSheetFormatButton",
+                menu: .shareSheet,
+                title: "settings.share_sheet.show_format",
+                subtitle: "settings.share_sheet.buttons_help"
+            ) { title in
+                AnyView(
+                    searchToggle(
+                        title,
+                        isOn: $showShareSheetFormatButton,
+                        disabled: isRunning
+                    )
+                )
+            },
+            controlSetting(
+                id: "showShareSheetFillURLButton",
+                menu: .shareSheet,
+                title: "settings.share_sheet.show_fill_url",
+                subtitle: "settings.share_sheet.buttons_help"
+            ) { title in
+                AnyView(
+                    searchToggle(
+                        title,
+                        isOn: $showShareSheetFillURLButton,
+                        disabled: isRunning
+                    )
                 )
             },
             controlSetting(
@@ -843,6 +882,7 @@ struct SettingsTabView: View {
             .notifications,
             .downloadSettings,
             .downloadModes,
+            .shareSheet,
             .downloadQuality,
             .customizeDownloadOptions,
             .downloadOptions,
@@ -884,6 +924,14 @@ struct SettingsTabView: View {
                 subtitle: String(localized: "settings.download_modes.subtitle"),
                 icon: "arrow.down.circle.fill",
                 color: .blue
+            )
+        case .shareSheet:
+            return SearchableSetting(
+                route: route,
+                title: String(localized: "settings.share_sheet.title"),
+                subtitle: String(localized: "settings.share_sheet.subtitle"),
+                icon: "square.and.arrow.up.fill",
+                color: .teal
             )
         case .downloadQuality:
             return SearchableSetting(

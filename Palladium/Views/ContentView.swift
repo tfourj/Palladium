@@ -52,6 +52,8 @@ struct ContentView: View {
     static let rememberSelectedPresetDefaultsKey = "palladium.rememberSelectedPreset"
     static let autoDownloadOnPasteDefaultsKey = "palladium.autoDownloadOnPaste"
     static let shareSheetDownloadModeDefaultsKey = "palladium.shareSheetDownloadMode"
+    static let showShareSheetFormatButtonDefaultsKey = "palladium.showShareSheetFormatButton"
+    static let showShareSheetFillURLButtonDefaultsKey = "palladium.showShareSheetFillURLButton"
     static let downloadPlaylistDefaultsKey = "palladium.downloadPlaylist"
     static let downloadSubtitlesDefaultsKey = "palladium.downloadSubtitles"
     static let embedThumbnailDefaultsKey = "palladium.embedThumbnail"
@@ -99,6 +101,8 @@ struct ContentView: View {
     @State var rememberSelectedPreset: Bool
     @State var autoDownloadOnPaste: Bool
     @State var shareSheetDownloadMode: ShareSheetDownloadMode
+    @State var showShareSheetFormatButton: Bool
+    @State var showShareSheetFillURLButton: Bool
     @State var downloadPlaylist: Bool
     @State var downloadSubtitles: Bool
     @State var embedThumbnail: Bool
@@ -201,6 +205,8 @@ struct ContentView: View {
         _rememberSelectedPreset = State(initialValue: rememberPreset)
         _autoDownloadOnPaste = State(initialValue: Self.loadAutoDownloadOnPaste())
         _shareSheetDownloadMode = State(initialValue: Self.clampShareSheetMode(shareSheetDownloadMode, visiblePresets: visiblePresets))
+        _showShareSheetFormatButton = State(initialValue: Self.loadShowShareSheetFormatButton())
+        _showShareSheetFillURLButton = State(initialValue: Self.loadShowShareSheetFillURLButton())
         let restoreDefaults = Self.loadRestoreDownloadDefaults()
         let defPlaylist = Self.loadDefaultDownloadPlaylist()
         let defSubtitles = Self.loadDefaultDownloadSubtitles()
@@ -317,6 +323,8 @@ struct ContentView: View {
                     detailedProgressEnabled: $detailedProgressEnabled,
                     downloadPresetSettings: $downloadPresetSettings,
                     shareSheetDownloadMode: $shareSheetDownloadMode,
+                    showShareSheetFormatButton: $showShareSheetFormatButton,
+                    showShareSheetFillURLButton: $showShareSheetFillURLButton,
                     linkHistoryEnabled: $linkHistoryEnabled,
                     linkHistoryLimit: $linkHistoryLimit,
                     hideHistoryCount: $hideHistoryCount,
@@ -442,6 +450,12 @@ struct ContentView: View {
             persistPreferences()
         }
         .onChange(of: shareSheetDownloadMode, initial: false) {
+            persistPreferences()
+        }
+        .onChange(of: showShareSheetFormatButton, initial: false) {
+            persistPreferences()
+        }
+        .onChange(of: showShareSheetFillURLButton, initial: false) {
             persistPreferences()
         }
         .onChange(of: downloadPlaylist, initial: false) {

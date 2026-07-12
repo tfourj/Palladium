@@ -3,7 +3,6 @@ import SwiftUI
 struct DownloadModesSettingsView: View {
     @Binding var selectedPreset: DownloadPreset
     @Binding var rememberSelectedPreset: Bool
-    @Binding var shareSheetDownloadMode: ShareSheetDownloadMode
     @Binding var downloadPresetSettings: [DownloadPresetSetting]
 
     let isRunning: Bool
@@ -34,20 +33,6 @@ struct DownloadModesSettingsView: View {
                 Text("settings.download_modes.main_section")
             } footer: {
                 Text("settings.download_modes.main_help")
-            }
-
-            Section {
-                Picker("settings.ui.modes.share_sheet", selection: $shareSheetDownloadMode) {
-                    ForEach(DownloadOptions.visibleShareSheetModes(from: downloadPresetSettings)) { mode in
-                        Text(mode.title).tag(mode)
-                    }
-                }
-                .pickerStyle(.menu)
-                .disabled(isRunning)
-            } header: {
-                Text("settings.download_modes.share_section")
-            } footer: {
-                Text("settings.download_modes.share_help")
             }
         }
         .navigationTitle("settings.download_modes.title")
