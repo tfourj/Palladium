@@ -323,6 +323,14 @@ struct DownloadTabView: View {
     private var formatPickerSheet: some View {
         NavigationStack {
             List {
+                HStack(spacing: 6) {
+                    Image(systemName: "photo.on.rectangle")
+                        .foregroundStyle(.green)
+                    Text("download.formats.photos_compatible")
+                        .foregroundStyle(.secondary)
+                }
+                .font(.caption)
+
                 if !videoFormats.isEmpty {
                     Section("download.formats.video_section") {
                         ForEach(videoFormats) { format in
