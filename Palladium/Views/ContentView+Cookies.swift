@@ -40,10 +40,13 @@ extension ContentView {
     }
 
     func deleteImportedCookieFile(_ cookieFile: ImportedCookieFile) throws {
+        let wasSelected = selectedCookieFileName == cookieFile.fileName
         try FileManager.default.removeItem(at: cookieFile.fileURL)
         refreshImportedCookieFiles()
-        if selectedCookieFileName == cookieFile.fileName {
+        if wasSelected {
             selectedCookieFileName = ""
+            defaultUseCookies = false
+            useCookies = false
         }
     }
 
@@ -91,6 +94,9 @@ extension ContentView {
         try FileManager.default.createDirectory(at: try cookiesDirectoryURL(), withIntermediateDirectories: true)
         try text.write(to: destinationURL, atomically: true, encoding: .utf8)
         refreshImportedCookieFiles()
+        selectedCookieFileName = destinationURL.lastPathComponent
+        defaultUseCookies = true
+        useCookies = true
         showTemporaryToast(
             String(format: String(localized: "cookies.toast.imported"), destinationURL.lastPathComponent)
         )

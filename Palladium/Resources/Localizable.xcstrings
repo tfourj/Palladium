@@ -943,6 +943,16 @@
         }
       }
     },
+    "cookies.switch.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cookies can also be switched on the main page using \u201cMore options\u201d."
+          }
+        }
+      }
+    },
     "cookies.toast.imported" : {
       "localizations" : {
         "en" : {

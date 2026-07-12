@@ -82,6 +82,7 @@ struct SettingsTabView: View {
     @Binding var hideHistoryCount: Bool
     @Binding var appAppearanceMode: AppAppearanceMode
     @Binding var showTemporaryDownloads: Bool
+    @Binding var useCookies: Bool
     @Binding var selectedCookieFileName: String
     @Binding var defaultDownloadPlaylist: Bool
     @Binding var defaultDownloadSubtitles: Bool
@@ -307,7 +308,9 @@ struct SettingsTabView: View {
             )
         case .cookies:
             CookiesSettingsView(
+                useCookies: $useCookies,
                 selectedCookieFileName: $selectedCookieFileName,
+                defaultUseCookies: $defaultUseCookies,
                 importedCookieFiles: importedCookieFiles,
                 isBusy: isRunning || isPackageRunning,
                 onRefresh: onRefreshCookieFiles,

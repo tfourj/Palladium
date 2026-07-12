@@ -2,7 +2,9 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 struct CookiesSettingsView: View {
+    @Binding var useCookies: Bool
     @Binding var selectedCookieFileName: String
+    @Binding var defaultUseCookies: Bool
     let importedCookieFiles: [ImportedCookieFile]
     let isBusy: Bool
     let onRefresh: () -> Void
@@ -42,17 +44,7 @@ struct CookiesSettingsView: View {
                 Text("cookies.settings.help")
             }
 
-            Section("cookies.selected.title") {
-                Picker("download.options.cookies.picker", selection: $selectedCookieFileName) {
-                    Text("common.none").tag("")
-                    ForEach(importedCookieFiles) { cookieFile in
-                        Text(cookieFile.displayName).tag(cookieFile.fileName)
-                    }
-                }
-                .disabled(isBusy || importedCookieFiles.isEmpty)
-            }
-
-            Section("settings.cookies.title") {
+            Section {
                 if importedCookieFiles.isEmpty {
                     ContentUnavailableView(
                         "cookies.empty.title",
@@ -61,22 +53,25 @@ struct CookiesSettingsView: View {
                     )
                 } else {
                     ForEach(importedCookieFiles) { cookieFile in
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(cookieFile.displayName)
-                                .font(.subheadline.weight(.semibold))
-                            Text(cookieFile.fileURL.lastPathComponent)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                            Text(
-                                String(
-                                    format: String(localized: "cookies.file.meta"),
-                                    cookieFile.formattedSize,
-                                    cookieFile.modifiedAt.formatted(date: .abbreviated, time: .shortened)
+                        Toggle(isOn: cookieEnabledBinding(for: cookieFile)) {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(cookieFile.displayName)
+                                    .font(.subheadline.weight(.semibold))
+                                Text(cookieFile.fileURL.lastPathComponent)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                Text(
+                                    String(
+                                        format: String(localized: "cookies.file.meta"),
+                                        cookieFile.formattedSize,
+                                        cookieFile.modifiedAt.formatted(date: .abbreviated, time: .shortened)
+                                    )
                                 )
-                            )
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                            }
                         }
+                        .disabled(isBusy)
                         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                             Button(role: .destructive) {
                                 do {
@@ -91,6 +86,10 @@ struct CookiesSettingsView: View {
                         }
                     }
                 }
+            } header: {
+                Text("settings.cookies.title")
+            } footer: {
+                Text("cookies.switch.help")
             }
         }
         .navigationTitle("settings.cookies.title")
@@ -164,5 +163,23 @@ struct CookiesSettingsView: View {
             Text(errorMessage ?? "")
         }
         .onAppear(perform: onRefresh)
+    }
+
+    private func cookieEnabledBinding(for cookieFile: ImportedCookieFile) -> Binding<Bool> {
+        Binding(
+            get: {
+                defaultUseCookies && selectedCookieFileName == cookieFile.fileName
+            },
+            set: { isEnabled in
+                if isEnabled {
+                    selectedCookieFileName = cookieFile.fileName
+                    defaultUseCookies = true
+                    useCookies = true
+                } else if selectedCookieFileName == cookieFile.fileName {
+                    defaultUseCookies = false
+                    useCookies = false
+                }
+            }
+        )
     }
 }
