@@ -1624,6 +1624,26 @@
         }
       }
     },
+    "download.share.fill_url" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fill URL"
+          }
+        }
+      }
+    },
+    "download.share.fill_url_help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open without downloading"
+          }
+        }
+      }
+    },
     "download.status.cancelled" : {
       "localizations" : {
         "en" : {

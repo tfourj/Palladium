@@ -54,6 +54,23 @@ extension ContentView {
                     .background(Color.teal.opacity(0.1))
                     .clipShape(RoundedRectangle(cornerRadius: 10))
                 }
+
+                Button(action: handleShareSheetFillURLSelection) {
+                    HStack {
+                        Image(systemName: "link.badge.plus")
+                            .font(.title3)
+                        Text("download.share.fill_url")
+                            .font(.headline)
+                        Spacer()
+                        Text("download.share.fill_url_help")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color.indigo.opacity(0.1))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                }
             }
             .padding(.horizontal)
 
@@ -148,6 +165,21 @@ extension ContentView {
         pendingSharedFormatURL = sharedLink
         shareSheetURL = ""
         showShareSheetDownloadPicker = false
+    }
+
+    func handleShareSheetFillURLSelection() {
+        let sharedLink = shareSheetURL.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !sharedLink.isEmpty else { return }
+
+        pendingSharedDownloadURL = ""
+        pendingSharedDownloadPreset = nil
+        pendingSharedFormatURL = ""
+        formatDownloadPresetOverride = nil
+        shareSheetURL = ""
+        selectedTab = .download
+        urlText = sharedLink
+        showShareSheetDownloadPicker = false
+        appendConsoleText("[palladium] shared link filled without starting a download\n")
     }
 
     func resolvePendingSharedFormatSelection() {
