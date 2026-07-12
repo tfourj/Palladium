@@ -337,6 +337,7 @@ enum PythonFlowRunner {
             "updates_summary": isCancelled ? "Cancelled." : "Not checked yet.",
             "versions": [:],
             "available_versions": [:],
+            "patch_state_warning": false,
         ]
         guard let data = try? JSONSerialization.data(withJSONObject: payload),
               let text = String(data: data, encoding: .utf8) else {
@@ -368,7 +369,8 @@ enum PythonFlowRunner {
                 updatesSummary: nil,
                 availableVersions: nil,
                 runtimePackagesMissing: nil,
-                restartRequired: false
+                restartRequired: false,
+                patchStateWarning: false
             )
         }
 
@@ -407,7 +409,8 @@ enum PythonFlowRunner {
             updatesSummary: nil,
             availableVersions: nil,
             runtimePackagesMissing: nil,
-            restartRequired: false
+            restartRequired: false,
+            patchStateWarning: false
         )
     }
 
@@ -493,7 +496,8 @@ enum PythonFlowRunner {
                 updatesSummary: nil,
                 availableVersions: nil,
                 runtimePackagesMissing: nil,
-                restartRequired: false
+                restartRequired: false,
+                patchStateWarning: false
             )
         }
 
@@ -504,6 +508,7 @@ enum PythonFlowRunner {
         let updatesAvailable = result["updates_available"] as? Bool ?? false
         let updatesSummary = result["updates_summary"] as? String ?? "Not checked yet."
         let restartRequired = result["restart_required"] as? Bool ?? false
+        let patchStateWarning = result["patch_state_warning"] as? Bool ?? false
         let output = result["output"] as? String ?? ""
         let versions = normalizedVersions(from: result["versions"])
         let runtimePackagesMissing = hasMissingRuntimePackages(in: versions)
@@ -546,7 +551,8 @@ enum PythonFlowRunner {
             updatesSummary: updatesSummary,
             availableVersions: availableVersions,
             runtimePackagesMissing: runtimePackagesMissing,
-            restartRequired: restartRequired
+            restartRequired: restartRequired,
+            patchStateWarning: patchStateWarning
         )
     }
 
@@ -668,6 +674,7 @@ struct PythonFlowOutcome: Sendable {
     let availableVersions: [String: [String]]?
     let runtimePackagesMissing: Bool?
     let restartRequired: Bool
+    let patchStateWarning: Bool
 }
 
 struct PlaylistProgressSnapshot: Sendable {

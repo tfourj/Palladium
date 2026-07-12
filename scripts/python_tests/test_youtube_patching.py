@@ -8,9 +8,12 @@ from scripts.python_tests import helpers  # noqa: F401
 
 from palladium_ytdlp.packages import parse_package_source  # noqa: E402
 from palladium_ytdlp.patching import (  # noqa: E402
+    applied_youtube_patch_modes,
     ensure_safe_ejs_runtime,
+    is_ejs_patch_applied,
     normalize_youtube_patch_mode,
     patch_ejs_module_source,
+    youtube_patch_state_warning,
 )
 from palladium_ytdlp.shared import EJS_MODULE_RELATIVE_PATH  # noqa: E402
 
@@ -60,6 +63,12 @@ class PatchEJSModuleSourceTests(unittest.TestCase):
         self.assertFalse(changed)
         self.assertFalse(is_safe)
         self.assertEqual(updated, "print('unrelated module')")
+
+    def test_detects_applied_patch(self):
+        patched, _, _ = patch_ejs_module_source(UPSTREAM_EJS_SNIPPET)
+
+        self.assertTrue(is_ejs_patch_applied(patched))
+        self.assertFalse(is_ejs_patch_applied(UPSTREAM_EJS_SNIPPET))
 
     def test_guard_diverts_location_assignments(self):
         patched, _, _ = patch_ejs_module_source(UPSTREAM_EJS_SNIPPET)
@@ -129,6 +138,31 @@ class YouTubePatchModeParsingTests(unittest.TestCase):
         }))
 
         self.assertEqual(source["patch_mode"], "webkit")
+
+
+class YouTubePatchStateTests(unittest.TestCase):
+    def test_disabled_mode_accepts_clean_runtime(self):
+        with tempfile.TemporaryDirectory() as target:
+            self.assertFalse(youtube_patch_state_warning(target, "off"))
+
+    def test_disabled_mode_warns_when_ejs_patch_remains(self):
+        with tempfile.TemporaryDirectory() as target:
+            module_path = pathlib.Path(target) / EJS_MODULE_RELATIVE_PATH
+            module_path.parent.mkdir(parents=True)
+            patched, _, _ = patch_ejs_module_source(UPSTREAM_EJS_SNIPPET)
+            module_path.write_text(patched, encoding="utf-8")
+
+            self.assertEqual(applied_youtube_patch_modes(target), {"ejs"})
+            self.assertTrue(youtube_patch_state_warning(target, "off"))
+
+    def test_ejs_mode_accepts_matching_patch(self):
+        with tempfile.TemporaryDirectory() as target:
+            module_path = pathlib.Path(target) / EJS_MODULE_RELATIVE_PATH
+            module_path.parent.mkdir(parents=True)
+            patched, _, _ = patch_ejs_module_source(UPSTREAM_EJS_SNIPPET)
+            module_path.write_text(patched, encoding="utf-8")
+
+            self.assertFalse(youtube_patch_state_warning(target, "ejs"))
 
 
 if __name__ == "__main__":

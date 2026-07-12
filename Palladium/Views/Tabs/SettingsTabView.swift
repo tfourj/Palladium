@@ -769,7 +769,7 @@ struct SettingsTabView: View {
                 id: "youtubePatchMode",
                 menu: .advanced,
                 title: "settings.advanced.youtube_patch_mode",
-                subtitle: "settings.advanced.restart_required",
+                subtitle: "settings.advanced.youtube_patch_mode.help",
                 keywords: YouTubePatchMode.allCases.map(\.title) + [String(localized: "settings.advanced.title")]
             ) { title in
                 AnyView(

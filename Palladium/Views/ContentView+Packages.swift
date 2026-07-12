@@ -110,6 +110,9 @@ extension ContentView {
             if outcome.restartRequired {
                 alertMessage = String(localized: "settings.advanced.restart_required")
                 showAlert = true
+            } else if outcome.patchStateWarning {
+                alertMessage = String(localized: "settings.advanced.patch_state_warning")
+                showAlert = true
             }
             self.hasLoadedPackageStatus = true
             Self.logger.info("package flow finished with status: \(outcome.statusText, privacy: .public)")

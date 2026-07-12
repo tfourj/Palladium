@@ -2879,6 +2879,16 @@
         }
       }
     },
+    "settings.advanced.patch_state_warning" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some installed runtime files still use a different YouTube patch mode. Review the package log and reinstall packages before downloading."
+          }
+        }
+      }
+    },
     "settings.advanced.restart_required" : {
       "localizations" : {
         "en" : {
@@ -2915,6 +2925,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Patch target"
+          }
+        }
+      }
+    },
+    "settings.advanced.youtube_patch_mode.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reinstall packages to apply a changed runtime patch mode."
           }
         }
       }

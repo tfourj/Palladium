@@ -3,7 +3,11 @@ import sys
 import traceback
 
 from .shared import EJS_MODULE_RELATIVE_PATH
-from .webkit_jsi import ensure_safe_webkit_jsi_runtime
+from .webkit_jsi import (
+    ensure_safe_webkit_jsi_runtime,
+    is_webkit_jsi_patch_applied,
+    iter_webkit_jsi_api_paths,
+)
 
 YOUTUBE_PATCH_MODES = ("webkit", "ejs", "off")
 DEFAULT_YOUTUBE_PATCH_MODE = "webkit"
@@ -112,6 +116,54 @@ def ensure_safe_ejs_runtime(install_target=None):
         print("[palladium] ejs module not found")
 
     return patched_count > 0
+
+
+def is_ejs_patch_applied(source_text):
+    return "def _palladium_guard_location_assignment(" in str(source_text)
+
+
+def applied_youtube_patch_modes(install_target=None):
+    modes = set()
+    inspectors = (
+        ("webkit", iter_webkit_jsi_api_paths(install_target), is_webkit_jsi_patch_applied),
+        ("ejs", iter_ejs_module_paths(install_target), is_ejs_patch_applied),
+    )
+    for mode, paths, inspector in inspectors:
+        for path in paths:
+            try:
+                with open(path, "r", encoding="utf-8") as handle:
+                    if inspector(handle.read()):
+                        modes.add(mode)
+                        break
+            except Exception:
+                print(f"[palladium] failed to inspect {mode} patch state: {path}")
+                traceback.print_exc()
+    return modes
+
+
+def youtube_patch_state_warning(install_target=None, patch_mode=None):
+    mode = normalize_youtube_patch_mode(patch_mode)
+    applied_modes = applied_youtube_patch_modes(install_target)
+    expected_modes = set() if mode == "off" else {mode}
+    unexpected_modes = applied_modes - expected_modes
+    expected_runtime_found = False
+    if mode == "webkit":
+        expected_runtime_found = any(iter_webkit_jsi_api_paths(install_target))
+    elif mode == "ejs":
+        expected_runtime_found = any(iter_ejs_module_paths(install_target))
+    expected_patch_missing = bool(expected_modes - applied_modes) and expected_runtime_found
+
+    if not unexpected_modes and not expected_patch_missing:
+        print(f"[palladium] youtube patch state verified: {mode}")
+        return False
+
+    applied_text = ", ".join(sorted(applied_modes)) or "none"
+    expected_text = ", ".join(sorted(expected_modes)) or "none"
+    print(
+        "[palladium] warning: installed youtube patch state does not match configuration "
+        f"(expected={expected_text}, applied={applied_text})"
+    )
+    return True
 
 
 def normalize_youtube_patch_mode(value):
