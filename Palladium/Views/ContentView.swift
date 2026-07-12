@@ -330,6 +330,7 @@ struct ContentView: View {
                     hideHistoryCount: $hideHistoryCount,
                     appAppearanceMode: $appAppearanceMode,
                     showTemporaryDownloads: $showTemporaryDownloads,
+                    useCookies: $useCookies,
                     selectedCookieFileName: $selectedCookieFileName,
                     defaultDownloadPlaylist: $defaultDownloadPlaylist,
                     defaultDownloadSubtitles: $defaultDownloadSubtitles,

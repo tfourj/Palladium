@@ -40,10 +40,13 @@ extension ContentView {
     }
 
     func deleteImportedCookieFile(_ cookieFile: ImportedCookieFile) throws {
+        let wasSelected = selectedCookieFileName == cookieFile.fileName
         try FileManager.default.removeItem(at: cookieFile.fileURL)
         refreshImportedCookieFiles()
-        if selectedCookieFileName == cookieFile.fileName {
+        if wasSelected {
             selectedCookieFileName = ""
+            defaultUseCookies = false
+            useCookies = false
         }
     }
 
