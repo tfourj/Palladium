@@ -570,11 +570,48 @@ extension ContentView {
         resolveFormatSelection(url: urlText, preset: selectedPreset)
     }
 
-    func resolveFormatSelection(url: String, preset: DownloadPreset) {
+    func resolveFormatSelection(
+        url: String,
+        preset: DownloadPreset,
+        allowlistChecked: Bool = false
+    ) {
         let targetURL = url.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !targetURL.isEmpty, !isRunning, !isResolvingFormats else { return }
+        guard !targetURL.isEmpty,
+              !isRunning,
+              !isResolvingFormats,
+              !isCheckingDownloadAllowlist else { return }
         guard preset != .images else {
             runDownloadFlow(urlOverride: targetURL, presetOverride: preset)
+            return
+        }
+
+        guard allowlistChecked else {
+            isCheckingDownloadAllowlist = true
+            isResolvingFormats = true
+            downloadErrorText = nil
+            progressText = String(localized: "allowlists.status.checking")
+            appendConsoleText("[palladium] checking format url allowlists\n")
+
+            Task { @MainActor in
+                let result = await URLAllowlistManager.validateDownloadURL(targetURL)
+                isCheckingDownloadAllowlist = false
+                isResolvingFormats = false
+                urlAllowlistSources = URLAllowlistManager.loadSources()
+
+                guard result.isAllowed else {
+                    appendConsoleText("[palladium] blocked format url: \(result.message)\n")
+                    progressText = String(localized: "download.prompt.idle")
+                    downloadErrorText = result.message
+                    return
+                }
+
+                appendConsoleText("[palladium] allowed format url: \(result.message)\n")
+                resolveFormatSelection(
+                    url: targetURL,
+                    preset: preset,
+                    allowlistChecked: true
+                )
+            }
             return
         }
 
