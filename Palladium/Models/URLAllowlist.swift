@@ -310,6 +310,10 @@ enum URLAllowlistManager {
     }
 
     static func validateDownloadURL(_ urlString: String) async -> URLAllowlistValidationResult {
+        guard FeatureFlags.isURLAllowlistEnabled else {
+            return URLAllowlistValidationResult(isAllowed: true, matchedEntryName: nil, message: "")
+        }
+
         let trimmed = urlString.trimmingCharacters(in: .whitespacesAndNewlines)
         guard let url = URL(string: trimmed),
               let scheme = url.scheme?.lowercased(),

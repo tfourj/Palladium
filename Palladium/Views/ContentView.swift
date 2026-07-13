@@ -232,7 +232,9 @@ struct ContentView: View {
         _linkHistoryLimit = State(initialValue: linkHistoryLimit)
         _linkHistoryEntries = State(initialValue: Self.loadLinkHistoryEntries(limit: linkHistoryLimit))
         _hideHistoryCount = State(initialValue: Self.loadHideHistoryCount())
-        _urlAllowlistSources = State(initialValue: URLAllowlistManager.loadSources())
+        _urlAllowlistSources = State(
+            initialValue: FeatureFlags.isURLAllowlistEnabled ? URLAllowlistManager.loadSources() : []
+        )
         _appAppearanceMode = State(initialValue: Self.loadAppAppearanceMode())
         _showTemporaryDownloads = State(initialValue: Self.loadShowTemporaryDownloads())
         _versionsText = State(initialValue: Self.loadCachedPackageVersionsText())

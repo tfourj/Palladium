@@ -48,6 +48,7 @@ Palladium/
 | `AppIntents/ShortcutDownloadIntents.swift` | App Shortcuts intents for starting downloads. |
 | `Models/AppAppearanceMode.swift` | Appearance-mode setting model. |
 | `Models/DownloadOptions.swift` | Download option model and persisted settings. |
+| `Models/FeatureFlags.swift` | Build-configured feature availability. |
 | `Models/ImportedCookieFile.swift` | Imported cookie-file model. |
 | `Models/LinkHistory.swift` | Previously used link model and history storage data. |
 | `Models/PackageSourceMode.swift` | Package-source selection model. |

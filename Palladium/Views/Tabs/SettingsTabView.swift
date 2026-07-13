@@ -170,7 +170,9 @@ struct SettingsTabView: View {
             Section(header: Text("settings.general.section")) {
                 settingsNavigationLink(for: .userInterface)
                 settingsNavigationLink(for: .downloadSettings)
-                settingsNavigationLink(for: .urlAllowlists)
+                if FeatureFlags.isURLAllowlistEnabled {
+                    settingsNavigationLink(for: .urlAllowlists)
+                }
                 settingsNavigationLink(for: .packages)
                 settingsNavigationLink(for: .advanced)
             }
@@ -877,7 +879,7 @@ struct SettingsTabView: View {
     }
 
     private var searchableSettings: [SearchableSetting] {
-        [
+        let routes: [SettingsRoute] = [
             .userInterface,
             .appearance,
             .downloadsTab,
@@ -899,7 +901,11 @@ struct SettingsTabView: View {
             .advanced,
             .storage,
             .about
-        ].map { setting(for: $0) }
+        ]
+
+        return routes
+            .filter { FeatureFlags.isURLAllowlistEnabled || $0 != .urlAllowlists }
+            .map { setting(for: $0) }
     }
 
     private func setting(for route: SettingsRoute) -> SearchableSetting {

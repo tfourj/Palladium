@@ -7,6 +7,11 @@ set -e  # Exit immediately if a command fails
 PROJECT_NAME="Palladium"
 SCHEME_NAME="Palladium"
 BUILD_DIR="build"
+XCODEBUILD_OVERRIDES=()
+
+if [ -n "${ALLOWLIST_ENABLED:-}" ]; then
+  XCODEBUILD_OVERRIDES+=("ALLOWLIST_ENABLED=$ALLOWLIST_ENABLED")
+fi
 
 HEAD_TAG=$(git tag --points-at HEAD --sort=-v:refname | head -n 1)
 if [ -n "$HEAD_TAG" ]; then
@@ -101,6 +106,7 @@ xcodebuild clean build \
   -configuration Release \
   -destination "generic/platform=iOS" \
   -sdk "$SDK" \
+  "${XCODEBUILD_OVERRIDES[@]}" \
   PALLADIUM_DISABLE_PYTHON_DYLIB_CODESIGN=1 \
   CODE_SIGN_IDENTITY="" \
   CODE_SIGNING_REQUIRED=NO \
@@ -117,6 +123,7 @@ xcodebuild archive \
   -archivePath "$BUILD_DIR/archive.xcarchive" \
   -destination "generic/platform=iOS" \
   -sdk "$SDK" \
+  "${XCODEBUILD_OVERRIDES[@]}" \
   PALLADIUM_DISABLE_PYTHON_DYLIB_CODESIGN=1 \
   CODE_SIGN_IDENTITY="" \
   CODE_SIGNING_REQUIRED=NO \
