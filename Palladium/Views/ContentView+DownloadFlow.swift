@@ -271,7 +271,7 @@ extension ContentView {
         let targetURL = (urlOverride ?? urlText).trimmingCharacters(in: .whitespacesAndNewlines)
         guard !targetURL.isEmpty else { return }
 
-        guard allowlistChecked else {
+        if FeatureFlags.isURLAllowlistEnabled, !allowlistChecked {
             isCheckingDownloadAllowlist = true
             progressText = String(localized: "allowlists.status.checking")
             appendConsoleText("[palladium] checking download url allowlists\n")
@@ -585,7 +585,7 @@ extension ContentView {
             return
         }
 
-        guard allowlistChecked else {
+        if FeatureFlags.isURLAllowlistEnabled, !allowlistChecked {
             isCheckingDownloadAllowlist = true
             isResolvingFormats = true
             downloadErrorText = nil
@@ -763,7 +763,8 @@ extension ContentView {
     }
 
     func handleIncomingAllowlistURL(_ incomingURL: URL) {
-        guard let components = URLComponents(url: incomingURL, resolvingAgainstBaseURL: false),
+        guard FeatureFlags.isURLAllowlistEnabled,
+              let components = URLComponents(url: incomingURL, resolvingAgainstBaseURL: false),
               let queryItems = components.queryItems,
               let urlItem = queryItems.first(where: { $0.name == "url" }),
               let allowlistURL = urlItem.value,
