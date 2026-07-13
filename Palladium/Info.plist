@@ -6,6 +6,8 @@
 	<false/>
 	<key>APP_FINAL</key>
 	<string>$(APP_FINAL)</string>
+	<key>ALLOWLIST_ENABLED</key>
+	<string>$(ALLOWLIST_ENABLED)</string>
 	<key>GIT_COMMIT_ID</key>
 	<string></string>
 	<key>CFBundleURLTypes</key>
