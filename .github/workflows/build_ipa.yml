@@ -176,6 +176,7 @@ jobs:
 
     - name: Build IPA
       env:
+        ALLOWLIST_ENABLED: "false"
         PALLADIUM_DISABLE_PYTHON_DYLIB_CODESIGN: "1"
       run: ./build_ipa.sh
 
