@@ -819,6 +819,16 @@
         }
       }
     },
+    "cookies.error.invalid_url" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter a valid HTTP or HTTPS website URL."
+          }
+        }
+      }
+    },
     "cookies.error.name_conflict" : {
       "localizations" : {
         "en" : {
@@ -835,6 +845,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "The selected file could not be read as text."
+          }
+        }
+      }
+    },
+    "cookies.error.web_no_cookies" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No cookies were found. Sign in or continue browsing before importing."
           }
         }
       }
@@ -956,6 +976,96 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Imported cookie file: %@"
+          }
+        }
+      }
+    },
+    "cookies.web.browser.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign in, then tap Import to save this private browser session as a Netscape cookie file."
+          }
+        }
+      }
+    },
+    "cookies.web.browser.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Website Login"
+          }
+        }
+      }
+    },
+    "cookies.web.button" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import from Website"
+          }
+        }
+      }
+    },
+    "cookies.web.import" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import"
+          }
+        }
+      }
+    },
+    "cookies.web.open" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Login Page"
+          }
+        }
+      }
+    },
+    "cookies.web.privacy" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The login opens in a private browser session. Palladium saves its cookies only when you tap Import."
+          }
+        }
+      }
+    },
+    "cookies.web.url.message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter the website where you want to sign in."
+          }
+        }
+      }
+    },
+    "cookies.web.url.placeholder" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "example.com"
+          }
+        }
+      }
+    },
+    "cookies.web.url.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import Website Cookies"
           }
         }
       }
