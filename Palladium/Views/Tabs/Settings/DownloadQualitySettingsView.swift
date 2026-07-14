@@ -59,7 +59,7 @@ struct DownloadQualitySettingsView: View {
             } header: {
                 Text("Audio")
             } footer: {
-                Text("Best keeps the highest available source quality before conversion.")
+                Text("download.quality.audio.best_help")
             }
         }
         .disabled(isRunning)

@@ -72,6 +72,7 @@ enum VideoDownloadCodec: String, CaseIterable, Identifiable {
 }
 
 enum AudioDownloadFormat: String, CaseIterable, Identifiable {
+    case best
     case mp3
     case m4a
     case opus
@@ -79,7 +80,12 @@ enum AudioDownloadFormat: String, CaseIterable, Identifiable {
     case wav
 
     var id: String { rawValue }
-    var title: String { rawValue.uppercased() }
+    var title: String {
+        switch self {
+        case .best: return "Best"
+        default: return rawValue.uppercased()
+        }
+    }
 }
 
 enum AudioDownloadQuality: String, CaseIterable, Identifiable {
