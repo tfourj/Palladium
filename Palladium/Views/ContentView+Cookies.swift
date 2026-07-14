@@ -39,6 +39,12 @@ extension ContentView {
         try saveCookieText(validatedText, preferredFileName: "pasted-cookies.txt")
     }
 
+    func importBrowserCookies(_ cookies: [HTTPCookie], from sourceURL: URL) throws {
+        let cookieText = try NetscapeCookieExporter.text(from: cookies)
+        let sourceName = sourceURL.host(percentEncoded: false) ?? "website"
+        try saveCookieText(cookieText, preferredFileName: "\(sourceName)-cookies.txt")
+    }
+
     func deleteImportedCookieFile(_ cookieFile: ImportedCookieFile) throws {
         let wasSelected = selectedCookieFileName == cookieFile.fileName
         try FileManager.default.removeItem(at: cookieFile.fileURL)
