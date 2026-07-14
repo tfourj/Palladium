@@ -14,12 +14,17 @@ struct CookieWebsiteImportView: View {
                 navigationPath.append(sourceURL)
             }
             .navigationDestination(for: URL.self) { sourceURL in
-                CookieLoginBrowserView(sourceURL: sourceURL) { cookies in
-                    try onImport(cookies, sourceURL)
-                    dismiss()
-                }
+                CookieLoginBrowserView(
+                    sourceURL: sourceURL,
+                    onCancel: { dismiss() },
+                    onImport: { cookies in
+                        try onImport(cookies, sourceURL)
+                        dismiss()
+                    }
+                )
             }
         }
+        .interactiveDismissDisabled()
     }
 }
 
@@ -105,6 +110,7 @@ private struct CookieWebsiteURLView: View {
 
 private struct CookieLoginBrowserView: View {
     let sourceURL: URL
+    let onCancel: () -> Void
     let onImport: (_ cookies: [HTTPCookie]) throws -> Void
 
     @StateObject private var browser = CookieLoginBrowserModel()
@@ -140,6 +146,9 @@ private struct CookieLoginBrowserView: View {
             .navigationTitle("cookies.web.browser.title")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("common.cancel", action: onCancel)
+                }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("cookies.web.import", action: importCookies)
                         .disabled(isImporting)
