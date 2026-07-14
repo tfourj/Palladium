@@ -9,10 +9,12 @@ struct CookiesSettingsView: View {
     let isBusy: Bool
     let onRefresh: () -> Void
     let onImport: (_ sourceURL: URL) throws -> Void
+    let onImportFromWebsite: (_ cookies: [HTTPCookie], _ sourceURL: URL) throws -> Void
     let onPaste: (_ rawText: String) throws -> Void
     let onDelete: (_ cookieFile: ImportedCookieFile) throws -> Void
 
     @State private var showFileImporter = false
+    @State private var showWebsiteImporter = false
     @State private var showPasteCookiesSheet = false
     @State private var pastedCookiesText = ""
     @State private var errorMessage: String?
@@ -27,6 +29,13 @@ struct CookiesSettingsView: View {
 
                 Button("cookies.import.button") {
                     showFileImporter = true
+                }
+                .disabled(isBusy)
+
+                Button {
+                    showWebsiteImporter = true
+                } label: {
+                    Label("cookies.web.button", systemImage: "globe")
                 }
                 .disabled(isBusy)
 
@@ -104,6 +113,9 @@ struct CookiesSettingsView: View {
             } catch {
                 errorMessage = error.localizedDescription
             }
+        }
+        .sheet(isPresented: $showWebsiteImporter) {
+            CookieWebsiteImportView(onImport: onImportFromWebsite)
         }
         .sheet(isPresented: $showPasteCookiesSheet) {
             NavigationStack {
