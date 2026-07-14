@@ -265,7 +265,7 @@ extension ContentView {
         afterDownloadOverride: AfterDownloadBehavior? = nil,
         allowlistChecked: Bool = false,
         gallerySelectionOverride: Set<Int>? = nil,
-        formatOverride: String? = nil
+        formatOverride: YTDLPFormat? = nil
     ) {
         guard !isRunning, !isPackageRunning, !isCheckingDownloadAllowlist else { return }
         let targetURL = (urlOverride ?? urlText).trimmingCharacters(in: .whitespacesAndNewlines)
@@ -354,10 +354,10 @@ extension ContentView {
         let gallerySelectionCountAtStart = gallerySelectionOverride?.count ?? 0
         let baseExtraArgs = extraArgsText.trimmingCharacters(in: .whitespacesAndNewlines)
         let extraArgsAtStart: String
-        if let formatOverride, !formatOverride.isEmpty {
+        if let formatOverride {
             extraArgsAtStart = baseExtraArgs.isEmpty
-                ? "--format \(formatOverride)"
-                : "\(baseExtraArgs) --format \(formatOverride)"
+                ? formatOverride.downloadOverrideArguments
+                : "\(baseExtraArgs) \(formatOverride.downloadOverrideArguments)"
         } else {
             extraArgsAtStart = baseExtraArgs
         }
