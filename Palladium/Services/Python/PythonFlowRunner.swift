@@ -102,6 +102,14 @@ struct YTDLPFormat: Identifiable, Hashable, Sendable {
         }
         return "\(id)+bestaudio/best"
     }
+
+    func downloadOverrideArguments(usesQualitySettings: Bool) -> String {
+        var arguments = "--format \(downloadSelector)"
+        if hasAudio && !hasVideo && !usesQualitySettings {
+            arguments += " --extract-audio --audio-format best"
+        }
+        return arguments
+    }
 }
 
 struct YTDLPFormatResolution: Sendable {
@@ -527,7 +535,8 @@ enum PythonFlowRunner {
             "yt-dlp: \(versions["yt-dlp"] ?? "not installed")",
             "yt-dlp-apple-webkit-jsi: \(versions["yt-dlp-apple-webkit-jsi"] ?? "not installed")",
             "curl-cffi: \(versions["curl-cffi"] ?? "not installed")",
-            "gallery-dl: \(versions["gallery-dl"] ?? "not installed")"
+            "gallery-dl: \(versions["gallery-dl"] ?? "not installed")",
+            "mutagen: \(versions["mutagen"] ?? "not installed")"
         ]
         if let pipVersion = versions["pip"],
            !pipVersion.isEmpty,
@@ -565,7 +574,7 @@ enum PythonFlowRunner {
     private static func normalizedVersions(from value: Any?) -> [String: String] {
         guard let raw = value as? [String: Any] else { return [:] }
         var result: [String: String] = [:]
-        for key in ["yt-dlp", "yt-dlp-apple-webkit-jsi", "curl-cffi", "gallery-dl", "pip"] {
+        for key in ["yt-dlp", "yt-dlp-apple-webkit-jsi", "curl-cffi", "gallery-dl", "mutagen", "pip"] {
             guard let item = raw[key] else { continue }
             let versionText = String(describing: item).trimmingCharacters(in: .whitespacesAndNewlines)
             if !versionText.isEmpty {
@@ -576,7 +585,7 @@ enum PythonFlowRunner {
     }
 
     private static func hasMissingRuntimePackages(in versions: [String: String]) -> Bool {
-        for key in ["yt-dlp", "yt-dlp-apple-webkit-jsi", "curl-cffi", "gallery-dl"] {
+        for key in ["yt-dlp", "yt-dlp-apple-webkit-jsi", "curl-cffi", "gallery-dl", "mutagen"] {
             let versionText = versions[key]?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() ?? ""
             if versionText.isEmpty || versionText == "not installed" || versionText == "unknown" {
                 return true
@@ -588,7 +597,7 @@ enum PythonFlowRunner {
     private static func normalizedAvailableVersions(from value: Any?) -> [String: [String]] {
         guard let raw = value as? [String: Any] else { return [:] }
         var result: [String: [String]] = [:]
-        for key in ["yt-dlp", "yt-dlp-apple-webkit-jsi", "curl-cffi", "gallery-dl", "pip"] {
+        for key in ["yt-dlp", "yt-dlp-apple-webkit-jsi", "curl-cffi", "gallery-dl", "mutagen", "pip"] {
             guard let list = raw[key] as? [Any] else { continue }
             let values = list.map { String(describing: $0).trimmingCharacters(in: .whitespacesAndNewlines) }
                 .filter { !$0.isEmpty }

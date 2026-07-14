@@ -265,7 +265,7 @@ extension ContentView {
         afterDownloadOverride: AfterDownloadBehavior? = nil,
         allowlistChecked: Bool = false,
         gallerySelectionOverride: Set<Int>? = nil,
-        formatOverride: String? = nil
+        formatOverride: YTDLPFormat? = nil
     ) {
         guard !isRunning, !isPackageRunning, !isCheckingDownloadAllowlist else { return }
         let targetURL = (urlOverride ?? urlText).trimmingCharacters(in: .whitespacesAndNewlines)
@@ -349,19 +349,34 @@ extension ContentView {
         let readHandle = logPipe.fileHandleForReading
         let writeFD = logPipe.fileHandleForWriting.fileDescriptor
         let liveLogFD: Int32? = writeFD
-        let presetAtStart = selectedDownloadPreset.pythonValue
+        let isExplicitFormatSelection = formatOverride != nil
+        let overrideFormatListExportAtStart = isExplicitFormatSelection
+            && DownloadQualityPreferences.load().overrideFormatListExport
+        let usesQualitySettings = !isExplicitFormatSelection || overrideFormatListExportAtStart
+        let presetAtStart: String
+        if let formatOverride {
+            let formatPreset: DownloadPreset = formatOverride.hasVideo ? .autoVideo : .audio
+            presetAtStart = overrideFormatListExportAtStart
+                ? formatPreset.pythonValue
+                : DownloadPreset.custom.pythonValue
+        } else {
+            presetAtStart = selectedDownloadPreset.pythonValue
+        }
         let gallerySelectionRangeAtStart = gallerySelectionOverride.map(gallerySelectionRange)
         let gallerySelectionCountAtStart = gallerySelectionOverride?.count ?? 0
         let baseExtraArgs = extraArgsText.trimmingCharacters(in: .whitespacesAndNewlines)
         let extraArgsAtStart: String
-        if let formatOverride, !formatOverride.isEmpty {
+        if let formatOverride {
+            let formatArguments = formatOverride.downloadOverrideArguments(
+                usesQualitySettings: overrideFormatListExportAtStart
+            )
             extraArgsAtStart = baseExtraArgs.isEmpty
-                ? "--format \(formatOverride)"
-                : "\(baseExtraArgs) --format \(formatOverride)"
+                ? formatArguments
+                : "\(baseExtraArgs) \(formatArguments)"
         } else {
             extraArgsAtStart = baseExtraArgs
         }
-        let presetArgsJSONAtStart = buildPresetArgumentsJSON()
+        let presetArgsJSONAtStart = usesQualitySettings ? buildPresetArgumentsJSON() : "{}"
         let afterDownloadBehaviorAtStart = afterDownloadOverride ?? afterDownloadBehavior
         let linkHistoryEnabledAtStart = linkHistoryEnabled
         let downloadPlaylistAtStart = downloadPlaylist

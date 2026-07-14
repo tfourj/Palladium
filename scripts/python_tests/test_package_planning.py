@@ -155,6 +155,9 @@ class PackagePlanningTests(unittest.TestCase):
     def test_gallery_dl_is_required_for_yt_dlp_runtime(self):
         self.assertIn("gallery-dl", YTDLP_RUNTIME_PACKAGES)
 
+    def test_mutagen_is_required_for_yt_dlp_runtime(self):
+        self.assertIn("mutagen", YTDLP_RUNTIME_PACKAGES)
+
     def test_missing_curl_cffi_is_installed_from_index(self):
         packages, cleanup = build_package_install_plan(
             {
@@ -183,6 +186,22 @@ class PackagePlanningTests(unittest.TestCase):
 
         self.assertEqual(packages, ["gallery-dl==2.0"])
         self.assertEqual(cleanup, ["gallery-dl"])
+
+    def test_missing_mutagen_is_installed_from_index(self):
+        packages, cleanup = build_package_install_plan(
+            {
+                "yt-dlp": "1.0",
+                "yt-dlp-apple-webkit-jsi": "1.0",
+                "curl-cffi": "1.0",
+                "gallery-dl": "1.0",
+                "mutagen": "not installed",
+            },
+            {"mutagen": ["2.0"]},
+            package_source=parse_package_source(json.dumps({"mode": "stable"})),
+        )
+
+        self.assertEqual(packages, ["mutagen==2.0"])
+        self.assertEqual(cleanup, ["mutagen"])
 
     def test_missing_curl_cffi_is_not_reported_as_available_update_by_default(self):
         lines = build_package_update_lines(
@@ -217,7 +236,10 @@ class PackagePlanningTests(unittest.TestCase):
             "yt-dlp-apple-webkit-jsi @ https://example.com/webkit.whl",
             "curl-cffi==1.0",
         ])
-        self.assertEqual(cleanup, ["yt-dlp", "yt-dlp-apple-webkit-jsi", "curl-cffi", "gallery-dl"])
+        self.assertEqual(
+            cleanup,
+            ["yt-dlp", "yt-dlp-apple-webkit-jsi", "curl-cffi", "gallery-dl", "mutagen"],
+        )
 
     def test_custom_source_disables_patches(self):
         custom_source = parse_package_source(json.dumps({"mode": "custom"}))

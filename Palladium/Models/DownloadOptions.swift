@@ -72,6 +72,7 @@ enum VideoDownloadCodec: String, CaseIterable, Identifiable {
 }
 
 enum AudioDownloadFormat: String, CaseIterable, Identifiable {
+    case best
     case mp3
     case m4a
     case opus
@@ -79,7 +80,12 @@ enum AudioDownloadFormat: String, CaseIterable, Identifiable {
     case wav
 
     var id: String { rawValue }
-    var title: String { rawValue.uppercased() }
+    var title: String {
+        switch self {
+        case .best: return "Best"
+        default: return rawValue.uppercased()
+        }
+    }
 }
 
 enum AudioDownloadQuality: String, CaseIterable, Identifiable {
@@ -116,12 +122,14 @@ struct DownloadQualityPreferences {
     static let videoCodecKey = "palladium.videoDownloadCodec"
     static let audioFormatKey = "palladium.audioDownloadFormat"
     static let audioQualityKey = "palladium.audioDownloadQuality"
+    static let overrideFormatListExportKey = "palladium.overrideFormatListExport"
 
     var videoQuality: VideoDownloadQuality = .best
     var videoContainer: VideoDownloadContainer = .mp4
     var videoCodec: VideoDownloadCodec = .photosCompatible
     var audioFormat: AudioDownloadFormat = .mp3
     var audioQuality: AudioDownloadQuality = .best
+    var overrideFormatListExport = false
 
     static func load(from defaults: UserDefaults = .standard) -> Self {
         Self(
@@ -129,7 +137,8 @@ struct DownloadQualityPreferences {
             videoContainer: VideoDownloadContainer(rawValue: defaults.string(forKey: videoContainerKey) ?? "") ?? .mp4,
             videoCodec: VideoDownloadCodec(rawValue: defaults.string(forKey: videoCodecKey) ?? "") ?? .photosCompatible,
             audioFormat: AudioDownloadFormat(rawValue: defaults.string(forKey: audioFormatKey) ?? "") ?? .mp3,
-            audioQuality: AudioDownloadQuality(rawValue: defaults.string(forKey: audioQualityKey) ?? "") ?? .best
+            audioQuality: AudioDownloadQuality(rawValue: defaults.string(forKey: audioQualityKey) ?? "") ?? .best,
+            overrideFormatListExport: defaults.bool(forKey: overrideFormatListExportKey)
         )
     }
 

@@ -341,6 +341,7 @@ def run_package_maintenance(
             print(f"[palladium] yt-dlp-apple-webkit-jsi version: {versions.get('yt-dlp-apple-webkit-jsi')}")
             print(f"[palladium] curl-cffi version: {versions.get('curl-cffi')}")
             print(f"[palladium] gallery-dl version: {versions.get('gallery-dl')}")
+            print(f"[palladium] mutagen version: {versions.get('mutagen')}")
             print(f"[palladium] pip version: {versions.get('pip')}")
 
             success = (pip_exit_code in (None, 0))

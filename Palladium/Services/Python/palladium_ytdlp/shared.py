@@ -1,7 +1,13 @@
 import os
 
 MAX_CAPTURED_OUTPUT_CHARS = 250000
-YTDLP_RUNTIME_PACKAGES = ("yt-dlp", "yt-dlp-apple-webkit-jsi", "curl-cffi", "gallery-dl")
+YTDLP_RUNTIME_PACKAGES = (
+    "yt-dlp",
+    "yt-dlp-apple-webkit-jsi",
+    "curl-cffi",
+    "gallery-dl",
+    "mutagen",
+)
 BUNDLED_RUNTIME_PACKAGES = ("curl-cffi",)
 TRACKED_PACKAGES = YTDLP_RUNTIME_PACKAGES + ("pip",)
 DISPLAY_PACKAGES = TRACKED_PACKAGES

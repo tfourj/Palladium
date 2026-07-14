@@ -291,7 +291,7 @@ struct ContentView: View {
                         formatDownloadPresetOverride = nil
                         runDownloadFlow(
                             presetOverride: presetOverride,
-                            formatOverride: format.downloadSelector
+                            formatOverride: format
                         )
                     }
                 )
