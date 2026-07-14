@@ -349,7 +349,10 @@ extension ContentView {
         let readHandle = logPipe.fileHandleForReading
         let writeFD = logPipe.fileHandleForWriting.fileDescriptor
         let liveLogFD: Int32? = writeFD
-        let presetAtStart = selectedDownloadPreset.pythonValue
+        let isExplicitFormatSelection = formatOverride != nil
+        let presetAtStart = isExplicitFormatSelection
+            ? DownloadPreset.custom.pythonValue
+            : selectedDownloadPreset.pythonValue
         let gallerySelectionRangeAtStart = gallerySelectionOverride.map(gallerySelectionRange)
         let gallerySelectionCountAtStart = gallerySelectionOverride?.count ?? 0
         let baseExtraArgs = extraArgsText.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -361,7 +364,7 @@ extension ContentView {
         } else {
             extraArgsAtStart = baseExtraArgs
         }
-        let presetArgsJSONAtStart = buildPresetArgumentsJSON()
+        let presetArgsJSONAtStart = isExplicitFormatSelection ? "{}" : buildPresetArgumentsJSON()
         let afterDownloadBehaviorAtStart = afterDownloadOverride ?? afterDownloadBehavior
         let linkHistoryEnabledAtStart = linkHistoryEnabled
         let downloadPlaylistAtStart = downloadPlaylist
