@@ -79,6 +79,7 @@ Palladium/
 | `Views/Tabs/Settings/AdvancedSettingsView.swift` | Advanced runtime settings screen. |
 | `Views/Tabs/Settings/AppearanceSettingsView.swift` | Appearance settings screen. |
 | `Views/Tabs/Settings/CookiesSettingsView.swift` | Cookie settings screen. |
+| `Views/Tabs/Settings/CookieWebsiteImportView.swift` | Private website login flow for importing browser cookies. |
 | `Views/Tabs/Settings/DownloadArgumentsSettingsView.swift` | Custom yt-dlp argument settings screen. |
 | `Views/Tabs/Settings/DownloadBehaviorSettingsView.swift` | Download behavior settings screen. |
 | `Views/Tabs/Settings/DownloadModesSettingsView.swift` | Download-mode settings screen. |
@@ -99,6 +100,7 @@ Palladium/
 
 | Path | Purpose |
 | --- | --- |
+| `Services/Cookies/NetscapeCookieExporter.swift` | Converts browser cookies into Netscape cookie-file records. |
 | `Services/FFmpeg/SwiftFFmpegBridge.swift` | Swift interface to bundled FFmpeg functionality. |
 | `Services/Logging/ConsoleLogStore.swift` | Store backing the in-app console. |
 | `Services/Shortcuts/ShortcutDownloadRequestStore.swift` | Transfers download requests from App Shortcuts into the app. |
