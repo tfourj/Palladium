@@ -1642,6 +1642,28 @@
         }
       }
     },
+    "download.quality.override_format_list_export.help" : {
+      "comment" : "Help text explaining the format-list export override setting.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apply the video and audio Quality Settings when exporting a format selected from the format list."
+          }
+        }
+      }
+    },
+    "download.quality.override_format_list_export.title" : {
+      "comment" : "A toggle that applies Quality Settings to format-list exports.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Override format-list export"
+          }
+        }
+      }
+    },
     "download.share.fill_url" : {
       "localizations" : {
         "en" : {

@@ -16,6 +16,9 @@ struct DownloadQualitySettingsView: View {
     @AppStorage(DownloadQualityPreferences.audioQualityKey)
     private var audioQuality = AudioDownloadQuality.best.rawValue
 
+    @AppStorage(DownloadQualityPreferences.overrideFormatListExportKey)
+    private var overrideFormatListExport = false
+
     let isRunning: Bool
 
     var body: some View {
@@ -60,6 +63,15 @@ struct DownloadQualitySettingsView: View {
                 Text("Audio")
             } footer: {
                 Text("download.quality.audio.best_help")
+            }
+
+            Section {
+                Toggle(
+                    "download.quality.override_format_list_export.title",
+                    isOn: $overrideFormatListExport
+                )
+            } footer: {
+                Text("download.quality.override_format_list_export.help")
             }
         }
         .disabled(isRunning)
