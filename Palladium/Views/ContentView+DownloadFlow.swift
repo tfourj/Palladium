@@ -350,21 +350,27 @@ extension ContentView {
         let writeFD = logPipe.fileHandleForWriting.fileDescriptor
         let liveLogFD: Int32? = writeFD
         let isExplicitFormatSelection = formatOverride != nil
-        let presetAtStart = isExplicitFormatSelection
-            ? DownloadPreset.custom.pythonValue
-            : selectedDownloadPreset.pythonValue
+        let overrideFormatListExportAtStart = isExplicitFormatSelection
+            && DownloadQualityPreferences.load().overrideFormatListExport
+        let usesQualitySettings = !isExplicitFormatSelection || overrideFormatListExportAtStart
+        let presetAtStart = usesQualitySettings
+            ? selectedDownloadPreset.pythonValue
+            : DownloadPreset.custom.pythonValue
         let gallerySelectionRangeAtStart = gallerySelectionOverride.map(gallerySelectionRange)
         let gallerySelectionCountAtStart = gallerySelectionOverride?.count ?? 0
         let baseExtraArgs = extraArgsText.trimmingCharacters(in: .whitespacesAndNewlines)
         let extraArgsAtStart: String
         if let formatOverride {
+            let formatArguments = formatOverride.downloadOverrideArguments(
+                usesQualitySettings: overrideFormatListExportAtStart
+            )
             extraArgsAtStart = baseExtraArgs.isEmpty
-                ? formatOverride.downloadOverrideArguments
-                : "\(baseExtraArgs) \(formatOverride.downloadOverrideArguments)"
+                ? formatArguments
+                : "\(baseExtraArgs) \(formatArguments)"
         } else {
             extraArgsAtStart = baseExtraArgs
         }
-        let presetArgsJSONAtStart = isExplicitFormatSelection ? "{}" : buildPresetArgumentsJSON()
+        let presetArgsJSONAtStart = usesQualitySettings ? buildPresetArgumentsJSON() : "{}"
         let afterDownloadBehaviorAtStart = afterDownloadOverride ?? afterDownloadBehavior
         let linkHistoryEnabledAtStart = linkHistoryEnabled
         let downloadPlaylistAtStart = downloadPlaylist
