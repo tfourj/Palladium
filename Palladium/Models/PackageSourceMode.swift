@@ -50,6 +50,7 @@ enum PackageSourceDefaults {
         "yt-dlp-apple-webkit-jsi",
         "curl-cffi",
         "gallery-dl",
+        "mutagen",
         "pip"
     ]
 
@@ -58,6 +59,7 @@ enum PackageSourceDefaults {
     yt-dlp-apple-webkit-jsi
     curl-cffi
     gallery-dl
+    mutagen
     pip
     """
 }
