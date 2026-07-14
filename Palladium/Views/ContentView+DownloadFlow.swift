@@ -353,9 +353,15 @@ extension ContentView {
         let overrideFormatListExportAtStart = isExplicitFormatSelection
             && DownloadQualityPreferences.load().overrideFormatListExport
         let usesQualitySettings = !isExplicitFormatSelection || overrideFormatListExportAtStart
-        let presetAtStart = usesQualitySettings
-            ? selectedDownloadPreset.pythonValue
-            : DownloadPreset.custom.pythonValue
+        let presetAtStart: String
+        if let formatOverride {
+            let formatPreset: DownloadPreset = formatOverride.hasVideo ? .autoVideo : .audio
+            presetAtStart = overrideFormatListExportAtStart
+                ? formatPreset.pythonValue
+                : DownloadPreset.custom.pythonValue
+        } else {
+            presetAtStart = selectedDownloadPreset.pythonValue
+        }
         let gallerySelectionRangeAtStart = gallerySelectionOverride.map(gallerySelectionRange)
         let gallerySelectionCountAtStart = gallerySelectionOverride?.count ?? 0
         let baseExtraArgs = extraArgsText.trimmingCharacters(in: .whitespacesAndNewlines)

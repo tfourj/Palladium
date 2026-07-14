@@ -106,7 +106,7 @@ struct YTDLPFormat: Identifiable, Hashable, Sendable {
     func downloadOverrideArguments(usesQualitySettings: Bool) -> String {
         var arguments = "--format \(downloadSelector)"
         if hasAudio && !hasVideo && !usesQualitySettings {
-            arguments += " --audio-format best"
+            arguments += " --extract-audio --audio-format best"
         }
         return arguments
     }
