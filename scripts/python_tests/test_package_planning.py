@@ -321,3 +321,23 @@ class PackagePlanningTests(unittest.TestCase):
         }))
 
         self.assertEqual(source["locked_versions"], {"yt-dlp": "1.0"})
+
+    def test_additional_managed_package_is_normalized_and_planned(self):
+        source = parse_package_source(json.dumps({
+            "mode": "stable",
+            "additional_packages": ["Example_Pkg", "invalid package", "yt-dlp"],
+            "locked_versions": {
+                "example-pkg": "1.5.0",
+            },
+        }))
+
+        packages, cleanup = build_package_install_plan(
+            {"example-pkg": "not installed"},
+            {"example-pkg": ["2.0.0"]},
+            package_source=source,
+        )
+
+        self.assertEqual(source["additional_packages"], ["example-pkg"])
+        self.assertEqual(source["locked_versions"], {"example-pkg": "1.5.0"})
+        self.assertEqual(packages, ["example-pkg==1.5.0"])
+        self.assertEqual(cleanup, ["example-pkg"])

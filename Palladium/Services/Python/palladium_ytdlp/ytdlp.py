@@ -28,10 +28,11 @@ from .packages import (
     ensure_pip_entrypoint,
     is_package_installed,
     parse_package_source,
+    runtime_package_names,
 )
 from .patching import apply_youtube_patches
 from .runtime import raise_if_cancel_requested
-from .shared import TailBuffer, Tee, YTDLP_RUNTIME_PACKAGES, open_live_log_stream
+from .shared import TailBuffer, Tee, open_live_log_stream
 
 
 PLAYLIST_PROGRESS_PREFIX = "[palladium][playlist-progress] "
@@ -528,7 +529,8 @@ def run_yt_dlp_flow(
                 print(f"[palladium] cache target: {cache_dir}")
 
             missing_runtime_packages = []
-            for package_name in YTDLP_RUNTIME_PACKAGES:
+            configured_runtime_packages = runtime_package_names(package_source)
+            for package_name in configured_runtime_packages:
                 print(f"[palladium] checking {package_name} package metadata")
                 installed, version, source = is_package_installed(
                     package_name,
@@ -571,8 +573,12 @@ def run_yt_dlp_flow(
                 else:
                     pip_exit_code = 1
 
-                installed_versions = collect_versions(install_target=install_target, allow_cache_fallback=False)
-                for package_name in YTDLP_RUNTIME_PACKAGES:
+                installed_versions = collect_versions(
+                    install_target=install_target,
+                    allow_cache_fallback=False,
+                    package_source=package_source,
+                )
+                for package_name in configured_runtime_packages:
                     print(
                         f"[palladium] {package_name} after install: "
                         f"{installed_versions.get(package_name, 'not installed')}"
