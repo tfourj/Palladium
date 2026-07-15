@@ -2,13 +2,13 @@ import SwiftUI
 
 struct PackagesSettingsView: View {
     private static let latestSelectionToken = "__latest__"
-    private static let customUpdatePackageNames = PackageSourceDefaults.lockablePackageNames
 
     let packageStatusText: String
     @Binding var checkPackageUpdatesOnLaunch: Bool
     @Binding var autoUpdatePackagesOnLaunch: Bool
     @Binding var packageSourceMode: PackageSourceMode
     @Binding var customPackageSpecsText: String
+    @Binding var additionalManagedPackageNames: [String]
     @Binding var lockedPackageVersions: [String: String]
     let versionsText: String
     let updatesSummaryText: String
@@ -27,7 +27,9 @@ struct PackagesSettingsView: View {
     let onAppear: () -> Void
 
     @State private var showCustomVersionSheet = false
+    @State private var showAddCustomPackagePrompt = false
     @State private var showRestorePipConfirmation = false
+    @State private var customPackageNameInput = ""
     @State private var selectedPackageVersions: [String: String] = [:]
     @State private var selectedLockedPackages = Set<String>()
 
@@ -160,11 +162,18 @@ struct PackagesSettingsView: View {
         NavigationStack {
             Form {
                 Section("packages.custom_update.targets") {
-                    ForEach(Self.customUpdatePackageNames, id: \.self) { packageName in
+                    ForEach(customUpdatePackageNames, id: \.self) { packageName in
                         packageVersionPicker(
                             packageName: packageName,
                             selection: selectedVersionBinding(for: packageName)
                         )
+                    }
+
+                    Button {
+                        customPackageNameInput = ""
+                        showAddCustomPackagePrompt = true
+                    } label: {
+                        Label("packages.custom_update.add_package", systemImage: "plus.circle")
                     }
                 }
 
@@ -210,7 +219,19 @@ struct PackagesSettingsView: View {
                 }
             }
         }
-        .presentationDetents([.medium])
+        .alert("packages.custom_update.add_package.title", isPresented: $showAddCustomPackagePrompt) {
+            TextField("packages.custom_update.add_package.placeholder", text: $customPackageNameInput)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+            Button("common.cancel", role: .cancel) {}
+            Button("packages.custom_update.add_package.confirm") {
+                addCustomPackage()
+            }
+            .disabled(normalizedCustomPackageInput == nil)
+        } message: {
+            Text("packages.custom_update.add_package.help")
+        }
+        .presentationDetents([.medium, .large])
     }
 
     private func prepareCustomVersionEditor() {
@@ -256,7 +277,7 @@ struct PackagesSettingsView: View {
 
     private func selectedCustomVersions() -> [String: String] {
         var versions: [String: String] = [:]
-        for packageName in Self.customUpdatePackageNames {
+        for packageName in customUpdatePackageNames {
             let selection = selectedPackageVersions[packageName] ?? Self.latestSelectionToken
             if let version = normalizeSelection(selection) {
                 let existingLock = lockedPackageVersions[packageName] ?? ""
@@ -309,6 +330,19 @@ struct PackagesSettingsView: View {
             .buttonStyle(.borderless)
             .disabled(!canToggleSelectedPackageLock(packageName))
             .accessibilityLabel(lockAccessibilityLabel(for: packageName))
+
+            if additionalManagedPackageNames.contains(packageName) {
+                Button(role: .destructive) {
+                    removeCustomPackage(packageName)
+                } label: {
+                    Image(systemName: "trash")
+                        .frame(width: 28, height: 28)
+                }
+                .buttonStyle(.borderless)
+                .accessibilityLabel(
+                    String(format: String(localized: "packages.custom_update.remove_package"), packageName)
+                )
+            }
         }
     }
 
@@ -360,7 +394,7 @@ struct PackagesSettingsView: View {
     }
 
     private var sortedLockedPackageNames: [String] {
-        Self.customUpdatePackageNames.filter { packageName in
+        customUpdatePackageNames.filter { packageName in
             guard let version = lockedPackageVersions[packageName] else { return false }
             return !version.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         }
@@ -372,7 +406,7 @@ struct PackagesSettingsView: View {
 
     private func pendingLockedPackageVersions() -> [String: String] {
         var versions: [String: String] = [:]
-        for packageName in Self.customUpdatePackageNames where selectedLockedPackages.contains(packageName) {
+        for packageName in customUpdatePackageNames where selectedLockedPackages.contains(packageName) {
             let selection = selectedPackageVersions[packageName] ?? Self.latestSelectionToken
             if let version = normalizeSelection(selection) {
                 versions[packageName] = version
@@ -412,6 +446,39 @@ struct PackagesSettingsView: View {
             return String(format: String(localized: "packages.custom_update.unlock_package"), packageName)
         }
         return String(format: String(localized: "packages.custom_update.lock_package"), packageName)
+    }
+
+    private var customUpdatePackageNames: [String] {
+        PackageSourceDefaults.allManagedPackageNames(
+            additionalPackageNames: additionalManagedPackageNames
+        )
+    }
+
+    private var normalizedCustomPackageInput: String? {
+        guard let packageName = PackageSourceDefaults.normalizedAdditionalPackageName(customPackageNameInput),
+              !customUpdatePackageNames.contains(packageName) else {
+            return nil
+        }
+        return packageName
+    }
+
+    private func addCustomPackage() {
+        guard let packageName = normalizedCustomPackageInput else { return }
+        additionalManagedPackageNames.append(packageName)
+        selectedPackageVersions[packageName] = Self.latestSelectionToken
+        showCustomVersionSheet = false
+
+        Task { @MainActor in
+            await Task.yield()
+            onUpdatePackages()
+        }
+    }
+
+    private func removeCustomPackage(_ packageName: String) {
+        additionalManagedPackageNames.removeAll { $0 == packageName }
+        lockedPackageVersions.removeValue(forKey: packageName)
+        selectedPackageVersions.removeValue(forKey: packageName)
+        selectedLockedPackages.remove(packageName)
     }
 
     private var progressStatusMessage: String {

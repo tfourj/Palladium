@@ -112,6 +112,45 @@ enum PackageSourceDefaults {
         return "\(package.name)==\(lockedVersion)"
     }.joined(separator: "\n")
 
+    static func normalizedAdditionalPackageName(_ value: String) -> String? {
+        let packageName = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !packageName.isEmpty,
+              packageName.unicodeScalars.allSatisfy({
+                CharacterSet.alphanumerics.contains($0) || ".-_".unicodeScalars.contains($0)
+              }),
+              packageName.first?.isLetter == true || packageName.first?.isNumber == true,
+              packageName.last?.isLetter == true || packageName.last?.isNumber == true else {
+            return nil
+        }
+
+        return packageName.lowercased().replacingOccurrences(
+            of: "[-_.]+",
+            with: "-",
+            options: .regularExpression
+        )
+    }
+
+    static func normalizedAdditionalPackageNames(_ values: [String]) -> [String] {
+        let builtInNames = Set(managedPackageNames.map { $0.lowercased() })
+        var seenNames = builtInNames
+        return values.compactMap { value in
+            guard let packageName = normalizedAdditionalPackageName(value),
+                  seenNames.insert(packageName).inserted else {
+                return nil
+            }
+            return packageName
+        }
+    }
+
+    static func allManagedPackageNames(additionalPackageNames: [String]) -> [String] {
+        managedPackageNames + normalizedAdditionalPackageNames(additionalPackageNames)
+    }
+
+    static func allRuntimePackageNames(additionalPackageNames: [String]) -> [String] {
+        allManagedPackageNames(additionalPackageNames: additionalPackageNames)
+            .filter { $0.lowercased() != "pip" }
+    }
+
     private static func parseManifestEntry(
         _ entry: String,
         lineNumber: Int

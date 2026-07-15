@@ -240,6 +240,7 @@ enum PythonFlowRunner {
         action: PackageAction,
         customVersions: [String: String]? = nil,
         packageSourceJSON: String,
+        managedPackageNames: [String],
         payloadZipPath: String? = nil,
         liveLogFD: Int32?
     ) async -> PythonFlowOutcome {
@@ -272,7 +273,7 @@ enum PythonFlowRunner {
             } catch {
                 payload = fallbackPythonErrorPayload(error)
             }
-            return decodePackagePayload(payload)
+            return decodePackagePayload(payload, managedPackageNames: managedPackageNames)
         }
     }
 
@@ -481,7 +482,10 @@ enum PythonFlowRunner {
         )
     }
 
-    private static func decodePackagePayload(_ payload: String) -> PythonFlowOutcome {
+    private static func decodePackagePayload(
+        _ payload: String,
+        managedPackageNames: [String]
+    ) -> PythonFlowOutcome {
         guard let data = payload.data(using: .utf8),
               let result = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] else {
             return PythonFlowOutcome(
@@ -518,9 +522,15 @@ enum PythonFlowRunner {
         let restartRequired = result["restart_required"] as? Bool ?? false
         let patchStateWarning = result["patch_state_warning"] as? Bool ?? false
         let output = result["output"] as? String ?? ""
-        let versions = normalizedVersions(from: result["versions"])
-        let runtimePackagesMissing = hasMissingRuntimePackages(in: versions)
-        let availableVersions = normalizedAvailableVersions(from: result["available_versions"])
+        let versions = normalizedVersions(from: result["versions"], packageNames: managedPackageNames)
+        let runtimePackagesMissing = hasMissingRuntimePackages(
+            in: versions,
+            packageNames: managedPackageNames
+        )
+        let availableVersions = normalizedAvailableVersions(
+            from: result["available_versions"],
+            packageNames: managedPackageNames
+        )
 
         let summary = """
         pip attempted: \(pipAttempted)
@@ -531,7 +541,7 @@ enum PythonFlowRunner {
         success: \(success)
         """
 
-        let versionLines: [String] = PackageSourceDefaults.managedPackageNames.compactMap { packageName in
+        let versionLines: [String] = managedPackageNames.compactMap { packageName in
             let version = versions[packageName] ?? "not installed"
             if packageName.lowercased() == "pip",
                version.isEmpty || version.lowercased() == "not installed" {
@@ -567,10 +577,13 @@ enum PythonFlowRunner {
         await PythonExecutor.shared.run(work)
     }
 
-    private static func normalizedVersions(from value: Any?) -> [String: String] {
+    private static func normalizedVersions(
+        from value: Any?,
+        packageNames: [String]
+    ) -> [String: String] {
         guard let raw = value as? [String: Any] else { return [:] }
         var result: [String: String] = [:]
-        for key in PackageSourceDefaults.managedPackageNames {
+        for key in packageNames {
             guard let item = raw[key] else { continue }
             let versionText = String(describing: item).trimmingCharacters(in: .whitespacesAndNewlines)
             if !versionText.isEmpty {
@@ -580,8 +593,11 @@ enum PythonFlowRunner {
         return result
     }
 
-    private static func hasMissingRuntimePackages(in versions: [String: String]) -> Bool {
-        for key in PackageSourceDefaults.runtimePackageNames {
+    private static func hasMissingRuntimePackages(
+        in versions: [String: String],
+        packageNames: [String]
+    ) -> Bool {
+        for key in packageNames where key.lowercased() != "pip" {
             let versionText = versions[key]?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() ?? ""
             if versionText.isEmpty || versionText == "not installed" || versionText == "unknown" {
                 return true
@@ -590,10 +606,13 @@ enum PythonFlowRunner {
         return false
     }
 
-    private static func normalizedAvailableVersions(from value: Any?) -> [String: [String]] {
+    private static func normalizedAvailableVersions(
+        from value: Any?,
+        packageNames: [String]
+    ) -> [String: [String]] {
         guard let raw = value as? [String: Any] else { return [:] }
         var result: [String: [String]] = [:]
-        for key in PackageSourceDefaults.managedPackageNames {
+        for key in packageNames {
             guard let list = raw[key] as? [Any] else { continue }
             let values = list.map { String(describing: $0).trimmingCharacters(in: .whitespacesAndNewlines) }
                 .filter { !$0.isEmpty }

@@ -59,6 +59,7 @@ extension ContentView {
                 action: action,
                 customVersions: customVersions,
                 packageSourceJSON: buildPackageSourceJSON(),
+                managedPackageNames: allManagedPackageNames,
                 payloadZipPath: payloadZipPath,
                 liveLogFD: liveLogFD
             )
@@ -202,10 +203,17 @@ extension ContentView {
 
     func buildPackageSourceJSON() -> String {
         let specs = customPackageSpecs()
+        let additionalPackages = PackageSourceDefaults.normalizedAdditionalPackageNames(
+            additionalManagedPackageNames
+        )
         let payload: [String: Any] = [
             "mode": packageSourceMode.rawValue,
             "custom_specs": specs,
-            "locked_versions": Self.normalizedLockedPackageVersions(lockedPackageVersions),
+            "additional_packages": additionalPackages,
+            "locked_versions": Self.normalizedLockedPackageVersions(
+                lockedPackageVersions,
+                additionalManagedPackageNames: additionalPackages
+            ),
             "youtube_patch_mode": youtubePatchMode.rawValue
         ]
         guard let data = try? JSONSerialization.data(withJSONObject: payload),
@@ -213,6 +221,12 @@ extension ContentView {
             return "{\"mode\":\"stable\",\"custom_specs\":[]}"
         }
         return text
+    }
+
+    var allManagedPackageNames: [String] {
+        PackageSourceDefaults.allManagedPackageNames(
+            additionalPackageNames: additionalManagedPackageNames
+        )
     }
 
     func customPackageSpecs() -> [String] {
