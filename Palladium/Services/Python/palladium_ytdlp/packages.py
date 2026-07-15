@@ -16,6 +16,7 @@ from .shared import (
     BUNDLED_RUNTIME_PACKAGES,
     CLEANUP_PACKAGES,
     DISPLAY_PACKAGES,
+    MANAGED_PACKAGE_LOCKS,
     TRACKED_PACKAGES,
     WEBKIT_JSI_API_PACKAGE_RELATIVE_PATH,
     YTDLP_RUNTIME_PACKAGES,
@@ -836,7 +837,7 @@ def parse_package_source(source_json=None):
     source = {
         "mode": "stable",
         "custom_specs": [],
-        "locked_versions": {},
+        "locked_versions": dict(MANAGED_PACKAGE_LOCKS),
         "allow_prereleases": False,
         "patch_mode": DEFAULT_YOUTUBE_PATCH_MODE,
     }
@@ -863,7 +864,7 @@ def parse_package_source(source_json=None):
             if spec and not spec.startswith("#"):
                 specs.append(spec)
 
-    locked_versions = {}
+    locked_versions = dict(MANAGED_PACKAGE_LOCKS)
     raw_locked_versions = parsed.get("locked_versions", {})
     if isinstance(raw_locked_versions, dict):
         for package_name in TRACKED_PACKAGES:

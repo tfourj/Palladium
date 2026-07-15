@@ -1,15 +1,75 @@
 import os
 
 MAX_CAPTURED_OUTPUT_CHARS = 250000
-YTDLP_RUNTIME_PACKAGES = (
-    "yt-dlp",
-    "yt-dlp-apple-webkit-jsi",
-    "curl-cffi",
-    "gallery-dl",
-    "mutagen",
-)
+MANAGED_PIP_PACKAGES_FILE = "ManagedPipPackages.txt"
+
+
+def parse_managed_package_lines(lines):
+    packages = []
+    locked_versions = {}
+    seen_names = set()
+
+    for line_number, raw_line in enumerate(lines, start=1):
+        entry = str(raw_line).strip()
+        if not entry or entry.startswith("#"):
+            continue
+
+        package_name = entry
+        locked_version = ""
+        if "[" in entry or "]" in entry:
+            opening_bracket = entry.find("[")
+            if opening_bracket <= 0 or not entry.endswith("]") or "[" in entry[opening_bracket + 1:-1]:
+                raise ValueError(f"Invalid managed package entry on line {line_number}: {entry}")
+            package_name = entry[:opening_bracket].strip()
+            locked_version = entry[opening_bracket + 1:-1].strip()
+            if not locked_version or "]" in locked_version:
+                raise ValueError(f"Invalid managed package entry on line {line_number}: {entry}")
+
+        if not package_name or any(character.isspace() for character in package_name):
+            raise ValueError(f"Invalid managed package entry on line {line_number}: {entry}")
+
+        normalized_name = package_name.lower()
+        if normalized_name in seen_names:
+            raise ValueError(f"Duplicate managed package on line {line_number}: {package_name}")
+
+        seen_names.add(normalized_name)
+        packages.append(package_name)
+        if locked_version:
+            locked_versions[package_name] = locked_version
+
+    if not packages:
+        raise ValueError("Managed pip package manifest is empty")
+
+    return tuple(packages), locked_versions
+
+
+def managed_package_manifest_path():
+    configured_path = os.environ.get("PALLADIUM_MANAGED_PIP_PACKAGES", "").strip()
+    if configured_path:
+        return configured_path
+
+    return os.path.abspath(os.path.join(
+        os.path.dirname(__file__),
+        "..",
+        "..",
+        "..",
+        "Resources",
+        MANAGED_PIP_PACKAGES_FILE,
+    ))
+
+
+def load_managed_packages():
+    manifest_path = managed_package_manifest_path()
+    try:
+        with open(manifest_path, "r", encoding="utf-8") as manifest_file:
+            return parse_managed_package_lines(manifest_file)
+    except Exception as error:
+        raise RuntimeError(f"Unable to load managed pip packages from {manifest_path}") from error
+
+
+TRACKED_PACKAGES, MANAGED_PACKAGE_LOCKS = load_managed_packages()
+YTDLP_RUNTIME_PACKAGES = tuple(name for name in TRACKED_PACKAGES if name.lower() != "pip")
 BUNDLED_RUNTIME_PACKAGES = ("curl-cffi",)
-TRACKED_PACKAGES = YTDLP_RUNTIME_PACKAGES + ("pip",)
 DISPLAY_PACKAGES = TRACKED_PACKAGES
 CLEANUP_PACKAGES = YTDLP_RUNTIME_PACKAGES
 WEBKIT_JSI_API_PACKAGE_RELATIVE_PATH = os.path.join(

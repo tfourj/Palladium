@@ -9,10 +9,27 @@ from palladium_ytdlp.packages import (  # noqa: E402
     build_pip_install_args,
     parse_package_source,
 )
-from palladium_ytdlp.shared import YTDLP_RUNTIME_PACKAGES  # noqa: E402
+from palladium_ytdlp.shared import (  # noqa: E402
+    YTDLP_RUNTIME_PACKAGES,
+    parse_managed_package_lines,
+)
 
 
 class PackagePlanningTests(unittest.TestCase):
+    def test_managed_package_manifest_parses_names_and_locked_versions(self):
+        packages, locks = parse_managed_package_lines([
+            "# managed packages",
+            "yt-dlp",
+            "pip[1.0.0]",
+        ])
+
+        self.assertEqual(packages, ("yt-dlp", "pip"))
+        self.assertEqual(locks, {"pip": "1.0.0"})
+
+    def test_managed_package_manifest_rejects_malformed_lock(self):
+        with self.assertRaises(ValueError):
+            parse_managed_package_lines(["pip[]"])
+
     def test_stable_install_plan_pins_latest_index_version(self):
         packages, cleanup = build_package_install_plan(
             {

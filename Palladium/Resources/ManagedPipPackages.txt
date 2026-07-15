@@ -1,0 +1,8 @@
+# Add one managed pip package per line.
+# Append [version] to lock a package, for example: pip[26.1]
+yt-dlp
+yt-dlp-apple-webkit-jsi
+curl-cffi
+gallery-dl
+mutagen
+pip
