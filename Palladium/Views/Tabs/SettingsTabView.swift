@@ -113,6 +113,7 @@ struct SettingsTabView: View {
     let onUpdatePackages: () -> Void
     let onInstallPackagePayloadZip: (_ sourceURL: URL) -> Void
     let onRestorePipPackages: () -> Void
+    let onRemoveManagedPackage: (_ packageName: String) -> Void
     let onReinstallPackages: () -> Void
     let onCustomUpdatePackages: (_ versions: [String: String]) -> Void
     let onFetchPackageVersions: () -> Void
@@ -344,6 +345,7 @@ struct SettingsTabView: View {
                 onUpdatePackages: onUpdatePackages,
                 onInstallPayloadZip: onInstallPackagePayloadZip,
                 onRestorePipPackages: onRestorePipPackages,
+                onRemoveManagedPackage: onRemoveManagedPackage,
                 onCustomUpdatePackages: onCustomUpdatePackages,
                 onFetchPackageVersions: onFetchPackageVersions,
                 onAppear: onOpenPackageManager

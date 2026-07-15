@@ -22,6 +22,7 @@ struct PackagesSettingsView: View {
     let onUpdatePackages: () -> Void
     let onInstallPayloadZip: (_ sourceURL: URL) -> Void
     let onRestorePipPackages: () -> Void
+    let onRemoveManagedPackage: (_ packageName: String) -> Void
     let onCustomUpdatePackages: (_ versions: [String: String]) -> Void
     let onFetchPackageVersions: () -> Void
     let onAppear: () -> Void
@@ -333,12 +334,13 @@ struct PackagesSettingsView: View {
 
             if additionalManagedPackageNames.contains(packageName) {
                 Button(role: .destructive) {
-                    removeCustomPackage(packageName)
+                    onRemoveManagedPackage(packageName)
                 } label: {
                     Image(systemName: "trash")
                         .frame(width: 28, height: 28)
                 }
                 .buttonStyle(.borderless)
+                .disabled(isRunning)
                 .accessibilityLabel(
                     String(format: String(localized: "packages.custom_update.remove_package"), packageName)
                 )
@@ -474,13 +476,6 @@ struct PackagesSettingsView: View {
         }
     }
 
-    private func removeCustomPackage(_ packageName: String) {
-        additionalManagedPackageNames.removeAll { $0 == packageName }
-        lockedPackageVersions.removeValue(forKey: packageName)
-        selectedPackageVersions.removeValue(forKey: packageName)
-        selectedLockedPackages.remove(packageName)
-    }
-
     private var progressStatusMessage: String {
         if packageStatusText == "updating" {
             return String(localized: "packages.status.updating")
@@ -490,6 +485,9 @@ struct PackagesSettingsView: View {
         }
         if packageStatusText == "restoring" {
             return String(localized: "packages.status.restoring")
+        }
+        if packageStatusText == "removing" {
+            return String(localized: "packages.status.removing")
         }
         if packageStatusText == "indexing" {
             return String(localized: "packages.status.loading_index")

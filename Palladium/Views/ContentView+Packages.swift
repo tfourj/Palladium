@@ -17,6 +17,7 @@ extension ContentView {
         action: PackageAction,
         customVersions: [String: String]? = nil,
         payloadZipPath: String? = nil,
+        packageName: String? = nil,
         temporaryPayloadZipURL: URL? = nil,
         updateWhenAvailable: Bool = false,
         isAutomaticUpdate: Bool = false
@@ -61,6 +62,7 @@ extension ContentView {
                 packageSourceJSON: buildPackageSourceJSON(),
                 managedPackageNames: allManagedPackageNames,
                 payloadZipPath: payloadZipPath,
+                packageName: packageName,
                 liveLogFD: liveLogFD
             )
             if let temporaryPayloadZipURL {
@@ -178,6 +180,11 @@ extension ContentView {
             return
         }
         runPackageFlow(action: .restorePipPackages)
+    }
+
+    func removeManagedPackage(_ packageName: String) {
+        guard additionalManagedPackageNames.contains(packageName) else { return }
+        runPackageFlow(action: .removePackage, packageName: packageName)
     }
 
     func updatePackagesWithCustomVersions(_ customVersions: [String: String]) {

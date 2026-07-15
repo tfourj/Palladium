@@ -242,6 +242,7 @@ enum PythonFlowRunner {
         packageSourceJSON: String,
         managedPackageNames: [String],
         payloadZipPath: String? = nil,
+        packageName: String? = nil,
         liveLogFD: Int32?
     ) async -> PythonFlowOutcome {
         await runOnPythonThread {
@@ -266,7 +267,8 @@ enum PythonFlowRunner {
                         customVersionsJSON,
                         liveLogArgument,
                         packageSourceJSON,
-                        payloadZipPathArgument
+                        payloadZipPathArgument,
+                        packageName ?? ""
                     ]
                 )
                 payload = String(result) ?? ""

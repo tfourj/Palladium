@@ -2673,6 +2673,16 @@
         }
       }
     },
+    "packages.status.removing" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Removing package..."
+          }
+        }
+      }
+    },
     "packages.status.running" : {
       "localizations" : {
         "en" : {
