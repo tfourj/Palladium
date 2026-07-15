@@ -71,6 +71,26 @@ enum VideoDownloadCodec: String, CaseIterable, Identifiable {
     }
 }
 
+enum VideoDownloadAudioPreset: String, CaseIterable, Identifiable {
+    case bestCompatible
+    case bestQuality
+
+    var id: String { rawValue }
+    var title: String {
+        switch self {
+        case .bestCompatible:
+            return String(localized: "download.quality.video.audio_preset.best_compatible")
+        case .bestQuality: return String(localized: "download.quality.video.audio_preset.best_quality")
+        }
+    }
+    var sortPreference: String? {
+        switch self {
+        case .bestCompatible: return "acodec:aac"
+        case .bestQuality: return nil
+        }
+    }
+}
+
 enum AudioDownloadFormat: String, CaseIterable, Identifiable {
     case best
     case mp3
@@ -120,6 +140,7 @@ struct DownloadQualityPreferences {
     static let videoQualityKey = "palladium.videoDownloadQuality"
     static let videoContainerKey = "palladium.videoDownloadContainer"
     static let videoCodecKey = "palladium.videoDownloadCodec"
+    static let videoAudioPresetKey = "palladium.videoDownloadAudioPreset"
     static let audioFormatKey = "palladium.audioDownloadFormat"
     static let audioQualityKey = "palladium.audioDownloadQuality"
     static let overrideFormatListExportKey = "palladium.overrideFormatListExport"
@@ -127,6 +148,7 @@ struct DownloadQualityPreferences {
     var videoQuality: VideoDownloadQuality = .best
     var videoContainer: VideoDownloadContainer = .mp4
     var videoCodec: VideoDownloadCodec = .photosCompatible
+    var videoAudioPreset: VideoDownloadAudioPreset = .bestCompatible
     var audioFormat: AudioDownloadFormat = .mp3
     var audioQuality: AudioDownloadQuality = .best
     var overrideFormatListExport = false
@@ -136,6 +158,9 @@ struct DownloadQualityPreferences {
             videoQuality: VideoDownloadQuality(rawValue: defaults.string(forKey: videoQualityKey) ?? "") ?? .best,
             videoContainer: VideoDownloadContainer(rawValue: defaults.string(forKey: videoContainerKey) ?? "") ?? .mp4,
             videoCodec: VideoDownloadCodec(rawValue: defaults.string(forKey: videoCodecKey) ?? "") ?? .photosCompatible,
+            videoAudioPreset: VideoDownloadAudioPreset(
+                rawValue: defaults.string(forKey: videoAudioPresetKey) ?? ""
+            ) ?? .bestCompatible,
             audioFormat: AudioDownloadFormat(rawValue: defaults.string(forKey: audioFormatKey) ?? "") ?? .mp3,
             audioQuality: AudioDownloadQuality(rawValue: defaults.string(forKey: audioQualityKey) ?? "") ?? .best,
             overrideFormatListExport: defaults.bool(forKey: overrideFormatListExportKey)
@@ -159,9 +184,12 @@ struct DownloadQualityPreferences {
         let format = includeAudio
             ? "bv*\(filter)+ba/b\(filter)/\(fallback)"
             : "bv\(filter)/\(fallback)"
-        let sort = videoCodec == .photosCompatible || videoCodec == .h264
-            ? "vcodec:h264,lang,quality,res,fps,hdr:12,acodec:aac"
-            : "lang,quality,res,fps,hdr:12,acodec:aac"
+        var sort = videoCodec == .photosCompatible || videoCodec == .h264
+            ? "vcodec:h264,lang,quality,res,fps,hdr:12"
+            : "lang,quality,res,fps,hdr:12"
+        if includeAudio, let audioSort = videoAudioPreset.sortPreference {
+            sort += ",\(audioSort)"
+        }
         return "-f \"\(format)\" --merge-output-format \(videoContainer.rawValue) "
             + "--remux-video \(videoContainer.rawValue) -S \"\(sort)\""
     }
@@ -212,7 +240,8 @@ enum DownloadPreset: String, Codable, CaseIterable, Identifiable {
     var defaultArguments: String {
         switch self {
         case .autoVideo:
-            return "--merge-output-format mp4 --remux-video mp4 -S vcodec:h264,lang,quality,res,fps,hdr:12,acodec:aac"
+            return "--merge-output-format mp4 --remux-video mp4 "
+                + "-S vcodec:h264,lang,quality,res,fps,hdr:12,acodec:aac"
         case .mute:
             return "-f bv/bestvideo --merge-output-format mp4 --remux-video mp4 -S vcodec:h264,lang,quality,res,fps,hdr:12"
         case .audio:
