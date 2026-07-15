@@ -78,8 +78,9 @@ enum VideoDownloadAudioPreset: String, CaseIterable, Identifiable {
     var id: String { rawValue }
     var title: String {
         switch self {
-        case .bestCompatible: return "Best Compatible"
-        case .bestQuality: return "Best Quality"
+        case .bestCompatible:
+            return String(localized: "download.quality.video.audio_preset.best_compatible")
+        case .bestQuality: return String(localized: "download.quality.video.audio_preset.best_quality")
         }
     }
     var sortPreference: String? {

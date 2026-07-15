@@ -10,6 +10,9 @@ struct DownloadQualitySettingsView: View {
     @AppStorage(DownloadQualityPreferences.videoCodecKey)
     private var videoCodec = VideoDownloadCodec.photosCompatible.rawValue
 
+    @AppStorage(DownloadQualityPreferences.videoAudioPresetKey)
+    private var videoAudioPreset = VideoDownloadAudioPreset.bestCompatible.rawValue
+
     @AppStorage(DownloadQualityPreferences.audioFormatKey)
     private var audioFormat = AudioDownloadFormat.mp3.rawValue
 
@@ -41,10 +44,19 @@ struct DownloadQualitySettingsView: View {
                         Text(codec.title).tag(codec.rawValue)
                     }
                 }
+
+                Picker("download.quality.video.audio_preset.title", selection: $videoAudioPreset) {
+                    ForEach(VideoDownloadAudioPreset.allCases) { preset in
+                        Text(preset.title).tag(preset.rawValue)
+                    }
+                }
             } header: {
                 Text("Video")
             } footer: {
-                Text("H.264 and H.265/HEVC in MP4 are compatible with the Photos app. H.264 is preferred when both are available.")
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("download.quality.video.codec_help")
+                    Text("download.quality.video.audio_preset.help")
+                }
             }
 
             Section {
