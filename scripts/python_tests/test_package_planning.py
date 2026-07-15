@@ -13,7 +13,10 @@ from palladium_ytdlp.packages import (  # noqa: E402
     build_pip_install_args,
     parse_package_source,
 )
-from palladium_ytdlp.maintenance import restore_pip_packages_action  # noqa: E402
+from palladium_ytdlp.maintenance import (  # noqa: E402
+    remove_managed_package_action,
+    restore_pip_packages_action,
+)
 from palladium_ytdlp.shared import (  # noqa: E402
     YTDLP_RUNTIME_PACKAGES,
     parse_managed_package_lines,
@@ -21,6 +24,39 @@ from palladium_ytdlp.shared import (  # noqa: E402
 
 
 class PackagePlanningTests(unittest.TestCase):
+    @mock.patch("palladium_ytdlp.maintenance.invalidate_runtime_package_modules", return_value=False)
+    def test_remove_managed_package_cleans_installed_files(self, _invalidate_modules):
+        source = parse_package_source(json.dumps({
+            "mode": "stable",
+            "additional_packages": ["example-pkg"],
+            "locked_versions": {
+                "example-pkg": "2.0.0",
+            },
+        }))
+
+        with tempfile.TemporaryDirectory() as install_target:
+            package_path = os.path.join(install_target, "example_pkg")
+            os.makedirs(package_path)
+
+            result = remove_managed_package_action(
+                install_target,
+                source,
+                "example-pkg",
+                "",
+            )
+
+            self.assertFalse(os.path.exists(package_path))
+
+        self.assertEqual(source["additional_packages"], [])
+        self.assertEqual(source["locked_versions"], {})
+        self.assertEqual(result["removed_additional_packages"], ["example-pkg"])
+
+    def test_remove_managed_package_rejects_builtin_package(self):
+        source = parse_package_source(json.dumps({"mode": "stable"}))
+
+        with self.assertRaisesRegex(ValueError, "Only user-added"):
+            remove_managed_package_action("", source, "yt-dlp", "")
+
     @mock.patch("palladium_ytdlp.maintenance.install_package_updates")
     @mock.patch("palladium_ytdlp.maintenance.clear_payload_packages", return_value=0)
     @mock.patch("palladium_ytdlp.maintenance.invalidate_runtime_package_modules", return_value=False)

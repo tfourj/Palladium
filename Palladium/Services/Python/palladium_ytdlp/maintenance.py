@@ -16,6 +16,7 @@ from .packages import (
     filter_installable_packages,
     install_payload_zip,
     managed_package_names,
+    normalized_additional_package_name,
     parse_package_source,
     runtime_package_names,
 )
@@ -31,6 +32,7 @@ ACTION_REINSTALL = "reinstall"
 ACTION_INDEX_VERSIONS = "index_versions"
 ACTION_INSTALL_PAYLOAD_ZIP = "install_payload_zip"
 ACTION_RESTORE_PIP_PACKAGES = "restore_pip_packages"
+ACTION_REMOVE_PACKAGE = "remove_package"
 PACKAGE_INSTALL_ACTIONS = (ACTION_UPDATE, ACTION_REINSTALL)
 
 
@@ -78,6 +80,10 @@ def check_or_fetch_package_updates(action, install_target, package_source):
     if action == ACTION_RESTORE_PIP_PACKAGES:
         print("[palladium] pip package restore requested")
         return False, "Restoring pip packages.", {}
+
+    if action == ACTION_REMOVE_PACKAGE:
+        print("[palladium] custom package removal requested")
+        return False, "Removing custom package.", {}
 
     if action == ACTION_INDEX_VERSIONS:
         available_versions = fetch_package_index_versions(
@@ -171,6 +177,43 @@ def restore_pip_packages_action(
     return result
 
 
+def remove_managed_package_action(
+    install_target,
+    package_source,
+    package_name,
+    cancel_file_path,
+):
+    normalized_package_name = normalized_additional_package_name(package_name)
+    additional_packages = list(package_source.get("additional_packages") or [])
+    if not normalized_package_name or normalized_package_name not in additional_packages:
+        raise ValueError("Only user-added managed packages can be removed.")
+
+    raise_if_cancel_requested(
+        cancel_file_path,
+        "[palladium] package action cancelled before custom package cleanup",
+    )
+    restart_required = invalidate_runtime_package_modules()
+    removed_entries = cleanup_target_package(install_target, normalized_package_name)
+    package_source["additional_packages"] = [
+        name for name in additional_packages
+        if name != normalized_package_name
+    ]
+    package_source["locked_versions"] = {
+        name: version
+        for name, version in (package_source.get("locked_versions") or {}).items()
+        if name != normalized_package_name
+    }
+    print(f"[palladium] removed custom managed package: {normalized_package_name}")
+    print(f"[palladium] removed custom managed package entries: {removed_entries}")
+    return {
+        "pip_attempted": False,
+        "pip_exit_code": 0,
+        "restart_required": restart_required,
+        "updates_summary": f"Removed custom package {normalized_package_name}.",
+        "removed_additional_packages": [normalized_package_name],
+    }
+
+
 def install_package_updates(action, install_target, package_source, custom_versions, cancel_file_path):
     raise_if_cancel_requested(cancel_file_path, "[palladium] package action cancelled before pip startup")
     pip_main = ensure_pip_entrypoint(install_target)
@@ -242,6 +285,7 @@ def run_package_maintenance(
     live_log_fd_override=None,
     package_source_json_override=None,
     payload_zip_path_override=None,
+    package_name_override=None,
 ):
     output = TailBuffer()
     console_stdout = sys.__stdout__ if sys.__stdout__ is not None else None
@@ -310,6 +354,27 @@ def run_package_maintenance(
                     updates_summary = "Pip package restore failed."
                     allow_version_cache_fallback = False
                     print("[palladium] pip package restore failed")
+                    traceback.print_exc()
+
+            if action == ACTION_REMOVE_PACKAGE:
+                try:
+                    result = remove_managed_package_action(
+                        install_target,
+                        package_source,
+                        package_name_override,
+                        cancel_file_path,
+                    )
+                    pip_attempted = result["pip_attempted"]
+                    pip_exit_code = result["pip_exit_code"]
+                    restart_required = result["restart_required"] or restart_required
+                    updates_summary = result["updates_summary"]
+                    removed_additional_packages = result["removed_additional_packages"]
+                    allow_version_cache_fallback = False
+                except Exception:
+                    pip_exit_code = 1
+                    updates_summary = "Custom package removal failed."
+                    allow_version_cache_fallback = False
+                    print("[palladium] custom package removal failed")
                     traceback.print_exc()
 
             if action == ACTION_INSTALL_PAYLOAD_ZIP:
