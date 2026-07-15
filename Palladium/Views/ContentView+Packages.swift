@@ -91,6 +91,18 @@ extension ContentView {
             isLoadingPackageVersions = false
             packageStatusText = outcome.statusText
             appendConsoleText("\n\(outcome.summaryText)\n")
+            let removedManagedPackageNames = Set(outcome.removedManagedPackageNames)
+            if !removedManagedPackageNames.isEmpty {
+                additionalManagedPackageNames.removeAll {
+                    removedManagedPackageNames.contains($0)
+                }
+                lockedPackageVersions = lockedPackageVersions.filter {
+                    !removedManagedPackageNames.contains($0.key)
+                }
+                availablePackageVersions = availablePackageVersions.filter {
+                    !removedManagedPackageNames.contains($0.key)
+                }
+            }
             if let versionsText = outcome.versionsText {
                 self.versionsText = versionsText
                 persistPackageVersionsText(versionsText)

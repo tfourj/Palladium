@@ -2448,7 +2448,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This removes imported payload packages and reinstalls packages from the configured package source."
+            "value" : "This removes imported payload packages and user-added managed packages, then reinstalls the remaining packages from the configured source."
           }
         }
       }
@@ -2468,7 +2468,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Removes payload-installed packages and reinstalls runtime packages with pip."
+            "value" : "Removes payload-installed and user-added managed packages, then reinstalls the remaining runtime packages with pip."
           }
         }
       }

@@ -379,7 +379,8 @@ enum PythonFlowRunner {
                 availableVersions: nil,
                 runtimePackagesMissing: nil,
                 restartRequired: false,
-                patchStateWarning: false
+                patchStateWarning: false,
+                removedManagedPackageNames: []
             )
         }
 
@@ -419,7 +420,8 @@ enum PythonFlowRunner {
             availableVersions: nil,
             runtimePackagesMissing: nil,
             restartRequired: false,
-            patchStateWarning: false
+            patchStateWarning: false,
+            removedManagedPackageNames: []
         )
     }
 
@@ -509,7 +511,8 @@ enum PythonFlowRunner {
                 availableVersions: nil,
                 runtimePackagesMissing: nil,
                 restartRequired: false,
-                patchStateWarning: false
+                patchStateWarning: false,
+                removedManagedPackageNames: []
             )
         }
 
@@ -521,15 +524,23 @@ enum PythonFlowRunner {
         let updatesSummary = result["updates_summary"] as? String ?? "Not checked yet."
         let restartRequired = result["restart_required"] as? Bool ?? false
         let patchStateWarning = result["patch_state_warning"] as? Bool ?? false
+        let removedManagedPackageNames = result["removed_additional_packages"] as? [String] ?? []
+        let removedManagedPackageNameSet = Set(removedManagedPackageNames)
+        let activeManagedPackageNames = managedPackageNames.filter {
+            !removedManagedPackageNameSet.contains($0)
+        }
         let output = result["output"] as? String ?? ""
-        let versions = normalizedVersions(from: result["versions"], packageNames: managedPackageNames)
+        let versions = normalizedVersions(
+            from: result["versions"],
+            packageNames: activeManagedPackageNames
+        )
         let runtimePackagesMissing = hasMissingRuntimePackages(
             in: versions,
-            packageNames: managedPackageNames
+            packageNames: activeManagedPackageNames
         )
         let availableVersions = normalizedAvailableVersions(
             from: result["available_versions"],
-            packageNames: managedPackageNames
+            packageNames: activeManagedPackageNames
         )
 
         let summary = """
@@ -541,7 +552,7 @@ enum PythonFlowRunner {
         success: \(success)
         """
 
-        let versionLines: [String] = managedPackageNames.compactMap { packageName in
+        let versionLines: [String] = activeManagedPackageNames.compactMap { packageName in
             let version = versions[packageName] ?? "not installed"
             if packageName.lowercased() == "pip",
                version.isEmpty || version.lowercased() == "not installed" {
@@ -567,7 +578,8 @@ enum PythonFlowRunner {
             availableVersions: availableVersions,
             runtimePackagesMissing: runtimePackagesMissing,
             restartRequired: restartRequired,
-            patchStateWarning: patchStateWarning
+            patchStateWarning: patchStateWarning,
+            removedManagedPackageNames: removedManagedPackageNames
         )
     }
 
@@ -699,6 +711,7 @@ struct PythonFlowOutcome: Sendable {
     let runtimePackagesMissing: Bool?
     let restartRequired: Bool
     let patchStateWarning: Bool
+    let removedManagedPackageNames: [String]
 }
 
 struct PlaylistProgressSnapshot: Sendable {
