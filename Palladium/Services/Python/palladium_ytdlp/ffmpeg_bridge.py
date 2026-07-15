@@ -230,7 +230,7 @@ class SwiftFFmpegBridge:
             stdout=str(response.get("output", "") or ""),
             stderr=str(response.get("stderr", "") or ""),
         )
-        if bool(response.get("ok", False)):
+        if bool(response.get("ok", False)) or bool(response.get("executed", False)):
             return result
 
         error = response.get("error") or f"swift ffmpeg bridge failed with exit code {result.exit_code}"
