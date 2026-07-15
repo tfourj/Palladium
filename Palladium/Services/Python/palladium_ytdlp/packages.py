@@ -932,6 +932,21 @@ def package_target_version(indexed_versions, package_name, package_source=None):
     return latest_index_version(indexed_versions, package_name)
 
 
+def build_missing_package_install_specs(package_names, package_source=None):
+    package_source = package_source or parse_package_source()
+    if package_source.get("mode") == "custom":
+        return list(package_source.get("custom_specs") or [])
+
+    specs = []
+    for package_name in package_names:
+        locked_version = package_target_version({}, package_name, package_source)
+        if locked_version:
+            specs.append(f"{package_name}=={locked_version}")
+        else:
+            specs.append(package_name)
+    return specs
+
+
 def missing_installable_runtime_packages(installed_versions):
     missing_packages = []
     for package_name in YTDLP_RUNTIME_PACKAGES:
@@ -1011,8 +1026,13 @@ def build_package_install_plan(installed_versions, indexed_versions, custom_vers
         current_version = normalized_version_text(installed_versions.get(package_name))
         target_version = package_target_version(indexed_versions, package_name, package_source)
         if not current_version or current_version in ("not installed", "unknown"):
-            if target_version and package_name in YTDLP_RUNTIME_PACKAGES:
-                packages.append(f"{package_name}=={target_version}")
+            if package_name in YTDLP_RUNTIME_PACKAGES:
+                if target_version:
+                    packages.append(f"{package_name}=={target_version}")
+                elif package_name in installed_versions:
+                    packages.append(package_name)
+                else:
+                    continue
                 if package_name in CLEANUP_PACKAGES:
                     cleanup_packages.append(package_name)
             continue

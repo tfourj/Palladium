@@ -22,6 +22,7 @@ from .ffmpeg_bridge import (
 )
 from .files import cleanup_temp_download_files, detect_downloaded_files
 from .packages import (
+    build_missing_package_install_specs,
     build_pip_install_args,
     collect_versions,
     ensure_pip_entrypoint,
@@ -544,10 +545,10 @@ def run_yt_dlp_flow(
                 pip_attempted = True
                 pip_main = ensure_pip_entrypoint(install_target)
                 if pip_main is not None:
-                    if package_source.get("mode") == "custom":
-                        packages = list(package_source.get("custom_specs") or [])
-                    else:
-                        packages = list(missing_runtime_packages)
+                    packages = build_missing_package_install_specs(
+                        missing_runtime_packages,
+                        package_source,
+                    )
 
                     try:
                         raise_if_cancel_requested(cancel_file_path, "[palladium] cancellation requested before pip install")

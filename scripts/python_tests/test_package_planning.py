@@ -5,6 +5,7 @@ from unittest import mock
 from scripts.python_tests import helpers  # noqa: F401
 
 from palladium_ytdlp.packages import (  # noqa: E402
+    build_missing_package_install_specs,
     build_package_install_plan,
     build_package_update_lines,
     build_pip_install_args,
@@ -127,6 +128,31 @@ class PackagePlanningTests(unittest.TestCase):
         self.assertEqual(packages, ["gallery-dl==1.0"])
         self.assertEqual(cleanup, ["gallery-dl"])
         self.assertEqual(lines, ["gallery-dl: not installed -> 1.0"])
+
+    def test_first_run_install_uses_manifest_version_lock(self):
+        source = parse_package_source(json.dumps({
+            "mode": "stable",
+            "locked_versions": {
+                "yt-dlp": "1.0.0",
+            },
+        }))
+
+        packages = build_missing_package_install_specs(
+            ["yt-dlp", "yt-dlp-apple-webkit-jsi"],
+            source,
+        )
+
+        self.assertEqual(packages, ["yt-dlp==1.0.0", "yt-dlp-apple-webkit-jsi"])
+
+    def test_first_run_plan_installs_unpinned_package_without_index_versions(self):
+        packages, cleanup = build_package_install_plan(
+            {"yt-dlp": "not installed"},
+            {},
+            package_source=parse_package_source(json.dumps({"mode": "stable"})),
+        )
+
+        self.assertEqual(packages, ["yt-dlp"])
+        self.assertEqual(cleanup, ["yt-dlp"])
 
     def test_nightly_install_args_include_prereleases(self):
         args = build_pip_install_args(
