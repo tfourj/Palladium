@@ -53,7 +53,7 @@ def build_preset_args(preset):
     return [
         "--merge-output-format", "mp4",
         "--remux-video", "mp4",
-        "-S", "vcodec:h264,lang,quality,res,fps,hdr:12,acodec:aac",
+        "-S", "vcodec:h264,lang,quality,res,fps,hdr:12",
     ]
 
 

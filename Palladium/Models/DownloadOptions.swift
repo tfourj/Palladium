@@ -160,8 +160,8 @@ struct DownloadQualityPreferences {
             ? "bv*\(filter)+ba/b\(filter)/\(fallback)"
             : "bv\(filter)/\(fallback)"
         let sort = videoCodec == .photosCompatible || videoCodec == .h264
-            ? "vcodec:h264,lang,quality,res,fps,hdr:12,acodec:aac"
-            : "lang,quality,res,fps,hdr:12,acodec:aac"
+            ? "vcodec:h264,lang,quality,res,fps,hdr:12"
+            : "lang,quality,res,fps,hdr:12"
         return "-f \"\(format)\" --merge-output-format \(videoContainer.rawValue) "
             + "--remux-video \(videoContainer.rawValue) -S \"\(sort)\""
     }
@@ -212,7 +212,7 @@ enum DownloadPreset: String, Codable, CaseIterable, Identifiable {
     var defaultArguments: String {
         switch self {
         case .autoVideo:
-            return "--merge-output-format mp4 --remux-video mp4 -S vcodec:h264,lang,quality,res,fps,hdr:12,acodec:aac"
+            return "--merge-output-format mp4 --remux-video mp4 -S vcodec:h264,lang,quality,res,fps,hdr:12"
         case .mute:
             return "-f bv/bestvideo --merge-output-format mp4 --remux-video mp4 -S vcodec:h264,lang,quality,res,fps,hdr:12"
         case .audio:
