@@ -2203,6 +2203,56 @@
         }
       }
     },
+    "packages.custom_update.add_package" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Custom Package"
+          }
+        }
+      }
+    },
+    "packages.custom_update.add_package.confirm" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add and Install"
+          }
+        }
+      }
+    },
+    "packages.custom_update.add_package.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter a pip package name. The package will be installed now and managed during future updates."
+          }
+        }
+      }
+    },
+    "packages.custom_update.add_package.placeholder" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Package name"
+          }
+        }
+      }
+    },
+    "packages.custom_update.add_package.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Custom Package"
+          }
+        }
+      }
+    },
     "packages.custom_update.help" : {
       "localizations" : {
         "en" : {
@@ -2219,6 +2269,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Lock %@ to selected version"
+          }
+        }
+      }
+    },
+    "packages.custom_update.remove_package" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stop managing %@"
           }
         }
       }
@@ -2388,7 +2448,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This removes imported payload packages and reinstalls packages from the configured package source."
+            "value" : "This removes imported payload packages and user-added managed packages, then reinstalls the remaining packages from the configured source."
           }
         }
       }
@@ -2408,7 +2468,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Removes payload-installed packages and reinstalls runtime packages with pip."
+            "value" : "Removes payload-installed and user-added managed packages, then reinstalls the remaining runtime packages with pip."
           }
         }
       }
@@ -2609,6 +2669,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Restoring pip packages..."
+          }
+        }
+      }
+    },
+    "packages.status.removing" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Removing package..."
           }
         }
       }

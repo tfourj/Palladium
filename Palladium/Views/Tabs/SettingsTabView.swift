@@ -95,6 +95,7 @@ struct SettingsTabView: View {
     let storageSummary: StorageManagementSummary
     @Binding var packageSourceMode: PackageSourceMode
     @Binding var customPackageSpecsText: String
+    @Binding var additionalManagedPackageNames: [String]
     @Binding var lockedPackageVersions: [String: String]
     @Binding var youtubePatchMode: YouTubePatchMode
     let packageStatusText: String
@@ -112,6 +113,7 @@ struct SettingsTabView: View {
     let onUpdatePackages: () -> Void
     let onInstallPackagePayloadZip: (_ sourceURL: URL) -> Void
     let onRestorePipPackages: () -> Void
+    let onRemoveManagedPackage: (_ packageName: String) -> Void
     let onReinstallPackages: () -> Void
     let onCustomUpdatePackages: (_ versions: [String: String]) -> Void
     let onFetchPackageVersions: () -> Void
@@ -329,6 +331,7 @@ struct SettingsTabView: View {
                 autoUpdatePackagesOnLaunch: $autoUpdatePackagesOnLaunch,
                 packageSourceMode: $packageSourceMode,
                 customPackageSpecsText: $customPackageSpecsText,
+                additionalManagedPackageNames: $additionalManagedPackageNames,
                 lockedPackageVersions: $lockedPackageVersions,
                 versionsText: versionsText,
                 updatesSummaryText: updatesSummaryText,
@@ -342,6 +345,7 @@ struct SettingsTabView: View {
                 onUpdatePackages: onUpdatePackages,
                 onInstallPayloadZip: onInstallPackagePayloadZip,
                 onRestorePipPackages: onRestorePipPackages,
+                onRemoveManagedPackage: onRemoveManagedPackage,
                 onCustomUpdatePackages: onCustomUpdatePackages,
                 onFetchPackageVersions: onFetchPackageVersions,
                 onAppear: onOpenPackageManager

@@ -22,15 +22,17 @@ from .ffmpeg_bridge import (
 )
 from .files import cleanup_temp_download_files, detect_downloaded_files
 from .packages import (
+    build_missing_package_install_specs,
     build_pip_install_args,
     collect_versions,
     ensure_pip_entrypoint,
     is_package_installed,
     parse_package_source,
+    runtime_package_names,
 )
 from .patching import apply_youtube_patches
 from .runtime import raise_if_cancel_requested
-from .shared import TailBuffer, Tee, YTDLP_RUNTIME_PACKAGES, open_live_log_stream
+from .shared import TailBuffer, Tee, open_live_log_stream
 
 
 PLAYLIST_PROGRESS_PREFIX = "[palladium][playlist-progress] "
@@ -527,7 +529,8 @@ def run_yt_dlp_flow(
                 print(f"[palladium] cache target: {cache_dir}")
 
             missing_runtime_packages = []
-            for package_name in YTDLP_RUNTIME_PACKAGES:
+            configured_runtime_packages = runtime_package_names(package_source)
+            for package_name in configured_runtime_packages:
                 print(f"[palladium] checking {package_name} package metadata")
                 installed, version, source = is_package_installed(
                     package_name,
@@ -544,10 +547,10 @@ def run_yt_dlp_flow(
                 pip_attempted = True
                 pip_main = ensure_pip_entrypoint(install_target)
                 if pip_main is not None:
-                    if package_source.get("mode") == "custom":
-                        packages = list(package_source.get("custom_specs") or [])
-                    else:
-                        packages = list(missing_runtime_packages)
+                    packages = build_missing_package_install_specs(
+                        missing_runtime_packages,
+                        package_source,
+                    )
 
                     try:
                         raise_if_cancel_requested(cancel_file_path, "[palladium] cancellation requested before pip install")
@@ -570,8 +573,12 @@ def run_yt_dlp_flow(
                 else:
                     pip_exit_code = 1
 
-                installed_versions = collect_versions(install_target=install_target, allow_cache_fallback=False)
-                for package_name in YTDLP_RUNTIME_PACKAGES:
+                installed_versions = collect_versions(
+                    install_target=install_target,
+                    allow_cache_fallback=False,
+                    package_source=package_source,
+                )
+                for package_name in configured_runtime_packages:
                     print(
                         f"[palladium] {package_name} after install: "
                         f"{installed_versions.get(package_name, 'not installed')}"

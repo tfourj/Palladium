@@ -15,11 +15,14 @@ from .packages import (
     fetch_package_index_versions,
     filter_installable_packages,
     install_payload_zip,
+    managed_package_names,
+    normalized_additional_package_name,
     parse_package_source,
+    runtime_package_names,
 )
 from .patching import apply_youtube_patches, youtube_patch_state_warning
 from .runtime import invalidate_runtime_package_modules, raise_if_cancel_requested
-from .shared import TRACKED_PACKAGES, TailBuffer, Tee, YTDLP_RUNTIME_PACKAGES, open_live_log_stream
+from .shared import TailBuffer, Tee, open_live_log_stream
 
 
 ACTION_CHECK = "check"
@@ -29,6 +32,7 @@ ACTION_REINSTALL = "reinstall"
 ACTION_INDEX_VERSIONS = "index_versions"
 ACTION_INSTALL_PAYLOAD_ZIP = "install_payload_zip"
 ACTION_RESTORE_PIP_PACKAGES = "restore_pip_packages"
+ACTION_REMOVE_PACKAGE = "remove_package"
 PACKAGE_INSTALL_ACTIONS = (ACTION_UPDATE, ACTION_REINSTALL)
 
 
@@ -42,7 +46,7 @@ def ensure_package_path(path, label):
     print(f"[palladium] {label}: {path}")
 
 
-def parse_custom_versions(custom_versions_json):
+def parse_custom_versions(custom_versions_json, package_source=None):
     custom_versions = {}
     if not custom_versions_json:
         return custom_versions
@@ -50,7 +54,7 @@ def parse_custom_versions(custom_versions_json):
     try:
         parsed_versions = json.loads(custom_versions_json)
         if isinstance(parsed_versions, dict):
-            for package_name in TRACKED_PACKAGES:
+            for package_name in managed_package_names(package_source):
                 raw_value = parsed_versions.get(package_name)
                 if raw_value is None:
                     continue
@@ -77,10 +81,15 @@ def check_or_fetch_package_updates(action, install_target, package_source):
         print("[palladium] pip package restore requested")
         return False, "Restoring pip packages.", {}
 
+    if action == ACTION_REMOVE_PACKAGE:
+        print("[palladium] custom package removal requested")
+        return False, "Removing custom package.", {}
+
     if action == ACTION_INDEX_VERSIONS:
         available_versions = fetch_package_index_versions(
             install_target,
             allow_prereleases=bool(package_source.get("allow_prereleases")),
+            package_source=package_source,
         )
         print("[palladium] fetched package index versions")
         return False, "Skipped update check.", available_versions
@@ -99,8 +108,8 @@ def reinstall_package_plan(package_source):
     if package_source.get("mode") == "custom":
         packages = list(package_source.get("custom_specs") or [])
     else:
-        packages = filter_installable_packages(YTDLP_RUNTIME_PACKAGES)
-    return packages, list(YTDLP_RUNTIME_PACKAGES)
+        packages = filter_installable_packages(runtime_package_names(package_source))
+    return packages, list(runtime_package_names(package_source))
 
 
 def install_payload_action(payload_zip_path, manual_payload_target, cancel_file_path):
@@ -129,6 +138,32 @@ def restore_pip_packages_action(
     removed_entries = clear_payload_packages(manual_payload_target)
     print(f"[palladium] removed manual payload entries: {removed_entries}")
 
+    removed_additional_packages = list(package_source.get("additional_packages") or [])
+    removed_additional_entries = 0
+    for package_name in removed_additional_packages:
+        raise_if_cancel_requested(
+            cancel_file_path,
+            "[palladium] package action cancelled during custom package cleanup",
+        )
+        removed_additional_entries += cleanup_target_package(install_target, package_name)
+
+    package_source["additional_packages"] = []
+    built_in_package_names = set(managed_package_names(package_source))
+    package_source["locked_versions"] = {
+        package_name: version
+        for package_name, version in (package_source.get("locked_versions") or {}).items()
+        if package_name in built_in_package_names
+    }
+    if removed_additional_packages:
+        print(
+            "[palladium] removed custom managed packages: "
+            f"{', '.join(removed_additional_packages)}"
+        )
+        print(
+            "[palladium] removed custom managed package entries: "
+            f"{removed_additional_entries}"
+        )
+
     result = install_package_updates(
         ACTION_REINSTALL,
         install_target,
@@ -138,7 +173,45 @@ def restore_pip_packages_action(
     )
     result["restart_required"] = result["restart_required"] or restart_required
     result["updates_summary"] = "Restored pip-managed packages."
+    result["removed_additional_packages"] = removed_additional_packages
     return result
+
+
+def remove_managed_package_action(
+    install_target,
+    package_source,
+    package_name,
+    cancel_file_path,
+):
+    normalized_package_name = normalized_additional_package_name(package_name)
+    additional_packages = list(package_source.get("additional_packages") or [])
+    if not normalized_package_name or normalized_package_name not in additional_packages:
+        raise ValueError("Only user-added managed packages can be removed.")
+
+    raise_if_cancel_requested(
+        cancel_file_path,
+        "[palladium] package action cancelled before custom package cleanup",
+    )
+    restart_required = invalidate_runtime_package_modules()
+    removed_entries = cleanup_target_package(install_target, normalized_package_name)
+    package_source["additional_packages"] = [
+        name for name in additional_packages
+        if name != normalized_package_name
+    ]
+    package_source["locked_versions"] = {
+        name: version
+        for name, version in (package_source.get("locked_versions") or {}).items()
+        if name != normalized_package_name
+    }
+    print(f"[palladium] removed custom managed package: {normalized_package_name}")
+    print(f"[palladium] removed custom managed package entries: {removed_entries}")
+    return {
+        "pip_attempted": False,
+        "pip_exit_code": 0,
+        "restart_required": restart_required,
+        "updates_summary": f"Removed custom package {normalized_package_name}.",
+        "removed_additional_packages": [normalized_package_name],
+    }
 
 
 def install_package_updates(action, install_target, package_source, custom_versions, cancel_file_path):
@@ -151,11 +224,16 @@ def install_package_updates(action, install_target, package_source, custom_versi
             "restart_required": False,
         }
 
-    installed_versions = collect_versions(install_target=install_target, allow_cache_fallback=False)
+    installed_versions = collect_versions(
+        install_target=install_target,
+        allow_cache_fallback=False,
+        package_source=package_source,
+    )
     indexed_versions = fetch_package_index_versions(
         install_target=install_target,
         pip_main=pip_main,
         allow_prereleases=bool(package_source.get("allow_prereleases")),
+        package_source=package_source,
     )
     if action == ACTION_REINSTALL:
         packages, cleanup_packages = reinstall_package_plan(package_source)
@@ -207,6 +285,7 @@ def run_package_maintenance(
     live_log_fd_override=None,
     package_source_json_override=None,
     payload_zip_path_override=None,
+    package_name_override=None,
 ):
     output = TailBuffer()
     console_stdout = sys.__stdout__ if sys.__stdout__ is not None else None
@@ -221,6 +300,7 @@ def run_package_maintenance(
     cancelled = False
     restart_required = False
     patch_state_warning = False
+    removed_additional_packages = []
     did_package_install_action = False
     allow_version_cache_fallback = True
     install_target = os.environ.get("PALLADIUM_PYTHON_PACKAGES")
@@ -249,7 +329,7 @@ def run_package_maintenance(
                 package_source,
             )
 
-            custom_versions = parse_custom_versions(custom_versions_json)
+            custom_versions = parse_custom_versions(custom_versions_json, package_source)
             if custom_versions:
                 print(f"[palladium] custom package versions requested: {custom_versions}")
 
@@ -266,6 +346,7 @@ def run_package_maintenance(
                     pip_exit_code = result["pip_exit_code"]
                     restart_required = result["restart_required"] or restart_required
                     updates_summary = result["updates_summary"]
+                    removed_additional_packages = result["removed_additional_packages"]
                     did_package_install_action = True
                     allow_version_cache_fallback = False
                 except Exception:
@@ -273,6 +354,27 @@ def run_package_maintenance(
                     updates_summary = "Pip package restore failed."
                     allow_version_cache_fallback = False
                     print("[palladium] pip package restore failed")
+                    traceback.print_exc()
+
+            if action == ACTION_REMOVE_PACKAGE:
+                try:
+                    result = remove_managed_package_action(
+                        install_target,
+                        package_source,
+                        package_name_override,
+                        cancel_file_path,
+                    )
+                    pip_attempted = result["pip_attempted"]
+                    pip_exit_code = result["pip_exit_code"]
+                    restart_required = result["restart_required"] or restart_required
+                    updates_summary = result["updates_summary"]
+                    removed_additional_packages = result["removed_additional_packages"]
+                    allow_version_cache_fallback = False
+                except Exception:
+                    pip_exit_code = 1
+                    updates_summary = "Custom package removal failed."
+                    allow_version_cache_fallback = False
+                    print("[palladium] custom package removal failed")
                     traceback.print_exc()
 
             if action == ACTION_INSTALL_PAYLOAD_ZIP:
@@ -336,6 +438,7 @@ def run_package_maintenance(
             versions = collect_versions(
                 install_target=install_target,
                 allow_cache_fallback=allow_version_cache_fallback,
+                package_source=package_source,
             )
             print(f"[palladium] yt-dlp version: {versions.get('yt-dlp')}")
             print(f"[palladium] yt-dlp-apple-webkit-jsi version: {versions.get('yt-dlp-apple-webkit-jsi')}")
@@ -362,5 +465,6 @@ def run_package_maintenance(
         "available_versions": available_versions,
         "restart_required": restart_required,
         "patch_state_warning": patch_state_warning,
+        "removed_additional_packages": removed_additional_packages,
         "output": output.getvalue(),
     })

@@ -14,11 +14,9 @@ from email.parser import Parser
 from .patching import DEFAULT_YOUTUBE_PATCH_MODE, normalize_youtube_patch_mode
 from .shared import (
     BUNDLED_RUNTIME_PACKAGES,
-    CLEANUP_PACKAGES,
-    DISPLAY_PACKAGES,
+    MANAGED_PACKAGE_LOCKS,
     TRACKED_PACKAGES,
     WEBKIT_JSI_API_PACKAGE_RELATIVE_PATH,
-    YTDLP_RUNTIME_PACKAGES,
 )
 
 
@@ -129,7 +127,7 @@ def package_versions_cache_path(install_target=None):
     return os.path.join(base_dir, ".palladium-package-versions.json")
 
 
-def load_cached_versions(install_target=None):
+def load_cached_versions(install_target=None, package_names=None):
     cache_path = package_versions_cache_path(install_target)
     if not cache_path or not os.path.isfile(cache_path):
         return {}
@@ -140,7 +138,7 @@ def load_cached_versions(install_target=None):
         if not isinstance(parsed, dict):
             return {}
         resolved = {}
-        for package_name in TRACKED_PACKAGES:
+        for package_name in package_names or TRACKED_PACKAGES:
             value = parsed.get(package_name)
             if value is None:
                 continue
@@ -152,13 +150,13 @@ def load_cached_versions(install_target=None):
         return {}
 
 
-def save_cached_versions(versions, install_target=None):
+def save_cached_versions(versions, install_target=None, package_names=None):
     cache_path = package_versions_cache_path(install_target)
     if not cache_path:
         return
 
     payload = {}
-    for package_name in TRACKED_PACKAGES:
+    for package_name in package_names or TRACKED_PACKAGES:
         version_value = str(versions.get(package_name, "")).strip()
         if version_value and version_value not in ("not installed", "unknown"):
             payload[package_name] = version_value
@@ -181,6 +179,36 @@ def save_cached_versions(versions, install_target=None):
 
 def canonical_package_name(name):
     return re.sub(r"[-_.]+", "-", str(name or "").strip().lower())
+
+
+def normalized_additional_package_name(value):
+    package_name = str(value or "").strip()
+    if not re.fullmatch(r"[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?", package_name):
+        return ""
+    return canonical_package_name(package_name)
+
+
+def managed_package_names(package_source=None):
+    package_source = package_source or {}
+    names = list(TRACKED_PACKAGES)
+    names.extend(package_source.get("additional_packages") or [])
+
+    resolved = []
+    seen = set()
+    for name in names:
+        normalized_name = canonical_package_name(name)
+        if not normalized_name or normalized_name in seen:
+            continue
+        seen.add(normalized_name)
+        resolved.append(str(name))
+    return tuple(resolved)
+
+
+def runtime_package_names(package_source=None):
+    return tuple(
+        name for name in managed_package_names(package_source)
+        if canonical_package_name(name) != "pip"
+    )
 
 
 def wheel_safe_package_name(name):
@@ -350,7 +378,10 @@ def is_package_installed(package_name, install_target=None, allow_cache_fallback
         return True, resolved_version, "metadata"
 
     if allow_cache_fallback and install_target and has_target_package_marker(package_name, install_target):
-        cached_version = load_cached_versions(install_target).get(package_name, "").strip()
+        cached_version = load_cached_versions(
+            install_target,
+            package_names=(package_name,),
+        ).get(package_name, "").strip()
         if cached_version:
             return True, cached_version, "cache"
 
@@ -806,25 +837,26 @@ def install_payload_zip(payload_zip_path, install_target):
         shutil.rmtree(temp_root, ignore_errors=True)
 
 
-def collect_versions(install_target=None, allow_cache_fallback=True):
-    cached_versions = load_cached_versions(install_target) if allow_cache_fallback else {}
+def collect_versions(install_target=None, allow_cache_fallback=True, package_source=None):
+    package_names = managed_package_names(package_source)
+    cached_versions = (
+        load_cached_versions(install_target, package_names=package_names)
+        if allow_cache_fallback else {}
+    )
     versions = {}
-    for package_name in DISPLAY_PACKAGES:
+    for package_name in package_names:
         resolved_version = installed_version(package_name, install_target)
         if resolved_version:
             versions[package_name] = display_version(package_name, resolved_version)
             continue
 
-        if package_name in TRACKED_PACKAGES:
-            cached_version = cached_versions.get(package_name, "").strip()
-            if allow_cache_fallback and cached_version:
-                versions[package_name] = cached_version
-            else:
-                versions[package_name] = "not installed"
+        cached_version = cached_versions.get(package_name, "").strip()
+        if allow_cache_fallback and cached_version:
+            versions[package_name] = cached_version
         else:
             versions[package_name] = "not installed"
 
-    save_cached_versions(versions, install_target)
+    save_cached_versions(versions, install_target, package_names=package_names)
     return versions
 
 
@@ -836,7 +868,8 @@ def parse_package_source(source_json=None):
     source = {
         "mode": "stable",
         "custom_specs": [],
-        "locked_versions": {},
+        "additional_packages": [],
+        "locked_versions": dict(MANAGED_PACKAGE_LOCKS),
         "allow_prereleases": False,
         "patch_mode": DEFAULT_YOUTUBE_PATCH_MODE,
     }
@@ -863,10 +896,21 @@ def parse_package_source(source_json=None):
             if spec and not spec.startswith("#"):
                 specs.append(spec)
 
-    locked_versions = {}
+    additional_packages = []
+    seen_packages = {canonical_package_name(name) for name in TRACKED_PACKAGES}
+    raw_additional_packages = parsed.get("additional_packages", [])
+    if isinstance(raw_additional_packages, list):
+        for item in raw_additional_packages:
+            package_name = normalized_additional_package_name(item)
+            if not package_name or package_name in seen_packages:
+                continue
+            seen_packages.add(package_name)
+            additional_packages.append(package_name)
+
+    locked_versions = dict(MANAGED_PACKAGE_LOCKS)
     raw_locked_versions = parsed.get("locked_versions", {})
     if isinstance(raw_locked_versions, dict):
-        for package_name in TRACKED_PACKAGES:
+        for package_name in managed_package_names({"additional_packages": additional_packages}):
             version_text = normalized_version_text(raw_locked_versions.get(package_name))
             if version_text:
                 locked_versions[package_name] = version_text
@@ -879,6 +923,7 @@ def parse_package_source(source_json=None):
 
     source["mode"] = mode
     source["custom_specs"] = specs
+    source["additional_packages"] = additional_packages
     source["locked_versions"] = locked_versions
     source["allow_prereleases"] = mode == "nightly"
     source["patch_mode"] = patch_mode
@@ -931,9 +976,24 @@ def package_target_version(indexed_versions, package_name, package_source=None):
     return latest_index_version(indexed_versions, package_name)
 
 
-def missing_installable_runtime_packages(installed_versions):
+def build_missing_package_install_specs(package_names, package_source=None):
+    package_source = package_source or parse_package_source()
+    if package_source.get("mode") == "custom":
+        return list(package_source.get("custom_specs") or [])
+
+    specs = []
+    for package_name in package_names:
+        locked_version = package_target_version({}, package_name, package_source)
+        if locked_version:
+            specs.append(f"{package_name}=={locked_version}")
+        else:
+            specs.append(package_name)
+    return specs
+
+
+def missing_installable_runtime_packages(installed_versions, package_source=None):
     missing_packages = []
-    for package_name in YTDLP_RUNTIME_PACKAGES:
+    for package_name in runtime_package_names(package_source):
         if is_bundled_runtime_package(package_name):
             continue
 
@@ -954,15 +1014,16 @@ def missing_runtime_packages_summary(missing_packages):
 
 def build_package_update_lines(installed_versions, indexed_versions, include_missing=False, package_source=None):
     package_source = package_source or parse_package_source()
+    runtime_packages = set(runtime_package_names(package_source))
     lines = []
-    for package_name in TRACKED_PACKAGES:
+    for package_name in managed_package_names(package_source):
         if is_bundled_runtime_package(package_name):
             continue
 
         current_version = normalized_version_text(installed_versions.get(package_name))
         target_version = package_target_version(indexed_versions, package_name, package_source)
         if not current_version or current_version in ("not installed", "unknown"):
-            if include_missing and target_version and package_name in YTDLP_RUNTIME_PACKAGES:
+            if include_missing and target_version and package_name in runtime_packages:
                 lines.append(f"{package_name}: not installed -> {target_version}")
             continue
 
@@ -976,15 +1037,17 @@ def build_package_install_plan(installed_versions, indexed_versions, custom_vers
     package_source = package_source or parse_package_source()
     packages = []
     cleanup_packages = []
+    managed_packages = managed_package_names(package_source)
+    runtime_packages = set(runtime_package_names(package_source))
 
     if package_source.get("mode") == "custom":
         custom_specs = list(package_source.get("custom_specs") or [])
         if custom_specs:
-            return custom_specs, list(CLEANUP_PACKAGES)
+            return custom_specs, list(runtime_package_names(package_source))
         return [], []
 
     if custom_versions:
-        for package_name in TRACKED_PACKAGES:
+        for package_name in managed_packages:
             requested_version = normalized_version_text(custom_versions.get(package_name))
             if not requested_version:
                 continue
@@ -999,26 +1062,31 @@ def build_package_install_plan(installed_versions, indexed_versions, custom_vers
                 continue
 
             packages.append(f"{package_name}=={requested_version}")
-            if package_name in CLEANUP_PACKAGES:
+            if package_name in runtime_packages:
                 cleanup_packages.append(package_name)
         return packages, cleanup_packages
 
-    for package_name in TRACKED_PACKAGES:
+    for package_name in managed_packages:
         if is_bundled_runtime_package(package_name):
             continue
 
         current_version = normalized_version_text(installed_versions.get(package_name))
         target_version = package_target_version(indexed_versions, package_name, package_source)
         if not current_version or current_version in ("not installed", "unknown"):
-            if target_version and package_name in YTDLP_RUNTIME_PACKAGES:
-                packages.append(f"{package_name}=={target_version}")
-                if package_name in CLEANUP_PACKAGES:
+            if package_name in runtime_packages:
+                if target_version:
+                    packages.append(f"{package_name}=={target_version}")
+                elif package_name in installed_versions:
+                    packages.append(package_name)
+                else:
+                    continue
+                if package_name in runtime_packages:
                     cleanup_packages.append(package_name)
             continue
 
         if target_version and target_version != current_version:
             packages.append(f"{package_name}=={target_version}")
-            if package_name in CLEANUP_PACKAGES:
+            if package_name in runtime_packages:
                 cleanup_packages.append(package_name)
 
     return packages, cleanup_packages
@@ -1031,9 +1099,13 @@ def check_package_updates(install_target=None, package_source=None, include_miss
             return True, "Custom packages will be installed on update."
         return False, "Add custom package requirements before updating."
 
-    installed_versions = collect_versions(install_target=install_target, allow_cache_fallback=False)
-    missing_runtime_packages = missing_installable_runtime_packages(installed_versions)
-    installable_runtime_packages = filter_installable_packages(YTDLP_RUNTIME_PACKAGES)
+    installed_versions = collect_versions(
+        install_target=install_target,
+        allow_cache_fallback=False,
+        package_source=package_source,
+    )
+    missing_runtime_packages = missing_installable_runtime_packages(installed_versions, package_source)
+    installable_runtime_packages = filter_installable_packages(runtime_package_names(package_source))
     if (
         missing_runtime_packages
         and len(missing_runtime_packages) == len(installable_runtime_packages)
@@ -1050,6 +1122,7 @@ def check_package_updates(install_target=None, package_source=None, include_miss
             install_target=install_target,
             pip_main=pip_main,
             allow_prereleases=bool(package_source.get("allow_prereleases")),
+            package_source=package_source,
         )
         update_lines = build_package_update_lines(
             installed_versions,
@@ -1096,7 +1169,7 @@ def check_package_updates(install_target=None, package_source=None, include_miss
         if not isinstance(items, list):
             return False, "All packages are up to date."
 
-        tracked = {name.lower() for name in TRACKED_PACKAGES}
+        tracked = {name.lower() for name in managed_package_names(package_source)}
         locked = {
             name.lower()
             for name, version in (package_source.get("locked_versions") or {}).items()
@@ -1171,14 +1244,19 @@ def parse_index_versions_output(raw_output):
     return []
 
 
-def fetch_package_index_versions(install_target=None, pip_main=None, allow_prereleases=False):
+def fetch_package_index_versions(
+    install_target=None,
+    pip_main=None,
+    allow_prereleases=False,
+    package_source=None,
+):
     if pip_main is None:
         pip_main = ensure_pip_entrypoint(install_target)
     if pip_main is None:
         return {}
 
     resolved = {}
-    for package_name in TRACKED_PACKAGES:
+    for package_name in managed_package_names(package_source):
         if is_bundled_runtime_package(package_name):
             print(f"[palladium] skipping index versions for bundled {package_name}")
             continue

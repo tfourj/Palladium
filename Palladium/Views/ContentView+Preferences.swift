@@ -73,7 +73,14 @@ extension ContentView {
         defaults.set(autoUpdatePackagesOnLaunch, forKey: Self.autoUpdatePackagesOnLaunchDefaultsKey)
         defaults.set(packageSourceMode.rawValue, forKey: Self.packageSourceModeDefaultsKey)
         defaults.set(customPackageSpecsText, forKey: Self.customPackageSpecsDefaultsKey)
-        let normalizedLocks = Self.normalizedLockedPackageVersions(lockedPackageVersions)
+        let normalizedAdditionalPackages = PackageSourceDefaults.normalizedAdditionalPackageNames(
+            additionalManagedPackageNames
+        )
+        defaults.set(normalizedAdditionalPackages, forKey: Self.additionalManagedPackagesDefaultsKey)
+        let normalizedLocks = Self.normalizedLockedPackageVersions(
+            lockedPackageVersions,
+            additionalManagedPackageNames: normalizedAdditionalPackages
+        )
         if normalizedLocks.isEmpty {
             defaults.removeObject(forKey: Self.lockedPackageVersionsDefaultsKey)
         } else if let data = try? JSONEncoder().encode(normalizedLocks) {
@@ -370,13 +377,9 @@ extension ContentView {
     }
 
     static func loadCachedPackageVersionsText() -> String {
-        let fallback = [
-            "yt-dlp: unknown",
-            "yt-dlp-apple-webkit-jsi: unknown",
-            "curl-cffi: unknown",
-            "gallery-dl: unknown",
-            "mutagen: unknown"
-        ].joined(separator: "\n")
+        let fallback = PackageSourceDefaults.runtimePackageNames
+            .map { "\($0): unknown" }
+            .joined(separator: "\n")
         guard let value = UserDefaults.standard.string(forKey: packageVersionsTextDefaultsKey),
               !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             return fallback
@@ -414,23 +417,42 @@ extension ContentView {
         return value
     }
 
-    static func loadLockedPackageVersions() -> [String: String] {
+    static func loadAdditionalManagedPackageNames() -> [String] {
+        let values = UserDefaults.standard.stringArray(forKey: additionalManagedPackagesDefaultsKey) ?? []
+        return PackageSourceDefaults.normalizedAdditionalPackageNames(values)
+    }
+
+    static func loadLockedPackageVersions(
+        additionalManagedPackageNames: [String] = []
+    ) -> [String: String] {
         let defaults = UserDefaults.standard
         if let data = defaults.data(forKey: lockedPackageVersionsDefaultsKey),
            let decoded = try? JSONDecoder().decode([String: String].self, from: data) {
-            return normalizedLockedPackageVersions(decoded)
+            return normalizedLockedPackageVersions(
+                decoded,
+                additionalManagedPackageNames: additionalManagedPackageNames
+            )
         }
 
         if let dictionary = defaults.dictionary(forKey: lockedPackageVersionsDefaultsKey) as? [String: String] {
-            return normalizedLockedPackageVersions(dictionary)
+            return normalizedLockedPackageVersions(
+                dictionary,
+                additionalManagedPackageNames: additionalManagedPackageNames
+            )
         }
 
         return [:]
     }
 
-    static func normalizedLockedPackageVersions(_ versions: [String: String]) -> [String: String] {
+    static func normalizedLockedPackageVersions(
+        _ versions: [String: String],
+        additionalManagedPackageNames: [String] = []
+    ) -> [String: String] {
         var normalized: [String: String] = [:]
-        for packageName in PackageSourceDefaults.lockablePackageNames {
+        let packageNames = PackageSourceDefaults.allManagedPackageNames(
+            additionalPackageNames: additionalManagedPackageNames
+        )
+        for packageName in packageNames {
             let version = versions[packageName]?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
             if !version.isEmpty {
                 normalized[packageName] = version
