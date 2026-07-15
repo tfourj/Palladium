@@ -1,5 +1,7 @@
+import json
 import os
 import unittest
+from unittest import mock
 
 from scripts.python_tests import helpers  # noqa: F401
 
@@ -32,6 +34,43 @@ class FFmpegBridgeTests(unittest.TestCase):
         bridge.run_ffmpeg = run_ffmpeg
         bridge.run_ffprobe = run_ffprobe
         return bridge, calls
+
+    def invoke_bridge_response(self, response):
+        bridge = SwiftFFmpegBridge.__new__(SwiftFFmpegBridge)
+        bridge._run = lambda _: 1
+        bridge._free = lambda _: None
+        encoded_response = json.dumps(response).encode("utf-8")
+
+        with mock.patch(
+            "palladium_ytdlp.ffmpeg_bridge.ctypes.string_at",
+            return_value=encoded_response,
+        ):
+            return bridge._invoke("ffmpeg", ["-version"])
+
+    def test_executed_command_returns_nonzero_exit_code(self):
+        result = self.invoke_bridge_response({
+            "ok": False,
+            "executed": True,
+            "exit_code": 1,
+            "output": "probe output",
+            "stderr": "expected ffmpeg error",
+            "error": "execution failed",
+        })
+
+        self.assertEqual(result.exit_code, 1)
+        self.assertEqual(result.stdout, "probe output")
+        self.assertEqual(result.stderr, "expected ffmpeg error")
+
+    def test_bridge_failure_still_raises(self):
+        with self.assertRaisesRegex(RuntimeError, "bridge unavailable"):
+            self.invoke_bridge_response({
+                "ok": False,
+                "executed": False,
+                "exit_code": 1,
+                "output": "",
+                "stderr": "",
+                "error": "bridge unavailable",
+            })
 
     def test_audio_codec_uses_audio_stream(self):
         metadata = {
