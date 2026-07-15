@@ -132,6 +132,32 @@ def restore_pip_packages_action(
     removed_entries = clear_payload_packages(manual_payload_target)
     print(f"[palladium] removed manual payload entries: {removed_entries}")
 
+    removed_additional_packages = list(package_source.get("additional_packages") or [])
+    removed_additional_entries = 0
+    for package_name in removed_additional_packages:
+        raise_if_cancel_requested(
+            cancel_file_path,
+            "[palladium] package action cancelled during custom package cleanup",
+        )
+        removed_additional_entries += cleanup_target_package(install_target, package_name)
+
+    package_source["additional_packages"] = []
+    built_in_package_names = set(managed_package_names(package_source))
+    package_source["locked_versions"] = {
+        package_name: version
+        for package_name, version in (package_source.get("locked_versions") or {}).items()
+        if package_name in built_in_package_names
+    }
+    if removed_additional_packages:
+        print(
+            "[palladium] removed custom managed packages: "
+            f"{', '.join(removed_additional_packages)}"
+        )
+        print(
+            "[palladium] removed custom managed package entries: "
+            f"{removed_additional_entries}"
+        )
+
     result = install_package_updates(
         ACTION_REINSTALL,
         install_target,
@@ -141,6 +167,7 @@ def restore_pip_packages_action(
     )
     result["restart_required"] = result["restart_required"] or restart_required
     result["updates_summary"] = "Restored pip-managed packages."
+    result["removed_additional_packages"] = removed_additional_packages
     return result
 
 
@@ -229,6 +256,7 @@ def run_package_maintenance(
     cancelled = False
     restart_required = False
     patch_state_warning = False
+    removed_additional_packages = []
     did_package_install_action = False
     allow_version_cache_fallback = True
     install_target = os.environ.get("PALLADIUM_PYTHON_PACKAGES")
@@ -274,6 +302,7 @@ def run_package_maintenance(
                     pip_exit_code = result["pip_exit_code"]
                     restart_required = result["restart_required"] or restart_required
                     updates_summary = result["updates_summary"]
+                    removed_additional_packages = result["removed_additional_packages"]
                     did_package_install_action = True
                     allow_version_cache_fallback = False
                 except Exception:
@@ -371,5 +400,6 @@ def run_package_maintenance(
         "available_versions": available_versions,
         "restart_required": restart_required,
         "patch_state_warning": patch_state_warning,
+        "removed_additional_packages": removed_additional_packages,
         "output": output.getvalue(),
     })

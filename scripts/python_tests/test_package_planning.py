@@ -1,4 +1,6 @@
 import json
+import os
+import tempfile
 import unittest
 from unittest import mock
 
@@ -11,6 +13,7 @@ from palladium_ytdlp.packages import (  # noqa: E402
     build_pip_install_args,
     parse_package_source,
 )
+from palladium_ytdlp.maintenance import restore_pip_packages_action  # noqa: E402
 from palladium_ytdlp.shared import (  # noqa: E402
     YTDLP_RUNTIME_PACKAGES,
     parse_managed_package_lines,
@@ -18,6 +21,48 @@ from palladium_ytdlp.shared import (  # noqa: E402
 
 
 class PackagePlanningTests(unittest.TestCase):
+    @mock.patch("palladium_ytdlp.maintenance.install_package_updates")
+    @mock.patch("palladium_ytdlp.maintenance.clear_payload_packages", return_value=0)
+    @mock.patch("palladium_ytdlp.maintenance.invalidate_runtime_package_modules", return_value=False)
+    def test_restore_removes_additional_managed_packages(
+        self,
+        _invalidate_modules,
+        _clear_payload_packages,
+        install_package_updates,
+    ):
+        install_package_updates.return_value = {
+            "pip_attempted": True,
+            "pip_exit_code": 0,
+            "restart_required": False,
+        }
+        source = parse_package_source(json.dumps({
+            "mode": "stable",
+            "additional_packages": ["example-pkg"],
+            "locked_versions": {
+                "yt-dlp": "1.0.0",
+                "example-pkg": "2.0.0",
+            },
+        }))
+
+        with tempfile.TemporaryDirectory() as install_target:
+            package_path = os.path.join(install_target, "example_pkg")
+            os.makedirs(package_path)
+
+            result = restore_pip_packages_action(
+                install_target,
+                install_target,
+                source,
+                {},
+                "",
+            )
+
+            self.assertFalse(os.path.exists(package_path))
+
+        restored_source = install_package_updates.call_args.args[2]
+        self.assertEqual(restored_source["additional_packages"], [])
+        self.assertEqual(restored_source["locked_versions"], {"yt-dlp": "1.0.0"})
+        self.assertEqual(result["removed_additional_packages"], ["example-pkg"])
+
     def test_managed_package_manifest_parses_names_and_locked_versions(self):
         packages, locks = parse_managed_package_lines([
             "# managed packages",
