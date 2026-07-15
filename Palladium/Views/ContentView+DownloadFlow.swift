@@ -187,7 +187,6 @@ extension ContentView {
         pendingSharedDownloadURL = ""
         pendingSharedDownloadPreset = nil
         pendingSharedFormatURL = ""
-        formatDownloadPresetOverride = nil
         shareSheetURL = ""
         selectedTab = .download
         urlText = sharedLink
@@ -202,7 +201,6 @@ extension ContentView {
         pendingSharedFormatURL = ""
         selectedTab = .download
         urlText = sharedLink
-        formatDownloadPresetOverride = .autoVideo
         resolveFormatSelection(url: sharedLink, preset: .autoVideo)
     }
 
@@ -301,12 +299,17 @@ extension ContentView {
             return
         }
 
-        let selectedDownloadPreset = presetOverride ?? selectedPreset
-        if selectedDownloadPreset == .images, gallerySelectionOverride == nil {
+        let effectiveDownloadPreset: DownloadPreset
+        if let formatOverride {
+            effectiveDownloadPreset = formatOverride.hasVideo ? .autoVideo : .audio
+        } else {
+            effectiveDownloadPreset = presetOverride ?? selectedPreset
+        }
+        if effectiveDownloadPreset == .images, gallerySelectionOverride == nil {
             resolveGallerySelection(url: targetURL)
             return
         }
-        guard selectedDownloadPreset != .images || !(gallerySelectionOverride ?? []).isEmpty else { return }
+        guard effectiveDownloadPreset != .images || !(gallerySelectionOverride ?? []).isEmpty else { return }
 
         consoleLogStore.clearAll()
         downloadErrorText = nil
@@ -340,9 +343,9 @@ extension ContentView {
         ffmpegProgressDurationSeconds = nil
         pendingDownloadProgressLine = ""
         isInstallingPackagesDuringDownload = false
-        galleryDownloadExpectedCount = selectedDownloadPreset == .images ? gallerySelectionOverride?.count ?? 0 : 0
+        galleryDownloadExpectedCount = effectiveDownloadPreset == .images ? gallerySelectionOverride?.count ?? 0 : 0
         galleryDownloadCompletedCount = 0
-        galleryDownloadOutputDirectory = selectedDownloadPreset == .images ? runOutputURL.path : nil
+        galleryDownloadOutputDirectory = effectiveDownloadPreset == .images ? runOutputURL.path : nil
         galleryDownloadedOutputPaths = []
 
         let logPipe = Pipe()
@@ -360,7 +363,7 @@ extension ContentView {
                 ? formatPreset.pythonValue
                 : DownloadPreset.custom.pythonValue
         } else {
-            presetAtStart = selectedDownloadPreset.pythonValue
+            presetAtStart = effectiveDownloadPreset.pythonValue
         }
         let gallerySelectionRangeAtStart = gallerySelectionOverride.map(gallerySelectionRange)
         let gallerySelectionCountAtStart = gallerySelectionOverride?.count ?? 0
@@ -417,13 +420,13 @@ extension ContentView {
         if backgroundTaskID != .invalid {
             appendConsoleText("[palladium] background download time requested\n")
         }
-        if selectedDownloadPreset == .images {
+        if effectiveDownloadPreset == .images {
             appendConsoleText("[palladium] gallery-dl download started for \(gallerySelectionCountAtStart) image(s)\n")
         }
 
         let task = Task {
             let outcome: PythonFlowOutcome
-            if selectedDownloadPreset == .images, let gallerySelectionRangeAtStart {
+            if effectiveDownloadPreset == .images, let gallerySelectionRangeAtStart {
                 outcome = await PythonFlowRunner.executeGalleryDownloadFlow(
                     url: targetURL,
                     selectionRange: gallerySelectionRangeAtStart,
@@ -581,7 +584,6 @@ extension ContentView {
     }
 
     func resolveFormatSelection() {
-        formatDownloadPresetOverride = nil
         resolveFormatSelection(url: urlText, preset: selectedPreset)
     }
 

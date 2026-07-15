@@ -187,7 +187,6 @@ struct ContentView: View {
     @State var formatPickerTitle = ""
     @State var showFormatPicker = false
     @State var isResolvingFormats = false
-    @State var formatDownloadPresetOverride: DownloadPreset?
 
     init() {
         let rememberPreset = Self.loadRememberSelectedPreset()
@@ -287,12 +286,7 @@ struct ContentView: View {
                     showFormatPicker: $showFormatPicker,
                     isResolvingFormats: isResolvingFormats,
                     onDownloadFormat: { format in
-                        let presetOverride = formatDownloadPresetOverride
-                        formatDownloadPresetOverride = nil
-                        runDownloadFlow(
-                            presetOverride: presetOverride,
-                            formatOverride: format
-                        )
+                        runDownloadFlow(formatOverride: format)
                     }
                 )
                 .tabItem {
