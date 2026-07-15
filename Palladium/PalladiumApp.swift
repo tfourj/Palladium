@@ -69,6 +69,7 @@ private enum PythonRuntimeBootstrap {
         if let executablePath = bundle.executableURL?.path {
             setenv("PALLADIUM_EXECUTABLE_PATH", executablePath, 1)
         }
+        setenv("PALLADIUM_MANAGED_PIP_PACKAGES", PackageSourceDefaults.manifestURL.path, 1)
 
         setenv("PYTHONHOME", pythonRoot.path, 1)
         setenv("PYTHONPATH", pythonPathComponents.joined(separator: ":"), 1)

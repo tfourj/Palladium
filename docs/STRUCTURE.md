@@ -45,6 +45,7 @@ Palladium/
 | `PalladiumApp.swift` | SwiftUI app entry point and root app configuration. |
 | `Info.plist` | Main app bundle metadata and iOS configuration. |
 | `PalladiumDebug.entitlements` | Debug signing capabilities. |
+| `Resources/ManagedPipPackages.txt` | Single manifest for managed pip packages and optional `[version]` locks. |
 | `AppIntents/ShortcutDownloadIntents.swift` | App Shortcuts intents for starting downloads. |
 | `Models/AppAppearanceMode.swift` | Appearance-mode setting model. |
 | `Models/DownloadOptions.swift` | Download option model and persisted settings. |

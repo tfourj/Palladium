@@ -1,5 +1,6 @@
 import json
 import unittest
+from unittest import mock
 
 from scripts.python_tests import helpers  # noqa: F401
 
@@ -29,6 +30,16 @@ class PackagePlanningTests(unittest.TestCase):
     def test_managed_package_manifest_rejects_malformed_lock(self):
         with self.assertRaises(ValueError):
             parse_managed_package_lines(["pip[]"])
+
+    def test_manifest_locked_version_becomes_default_package_source_lock(self):
+        with mock.patch.dict(
+            "palladium_ytdlp.packages.MANAGED_PACKAGE_LOCKS",
+            {"pip": "1.0.0"},
+            clear=True,
+        ):
+            source = parse_package_source()
+
+        self.assertEqual(source["locked_versions"], {"pip": "1.0.0"})
 
     def test_stable_install_plan_pins_latest_index_version(self):
         packages, cleanup = build_package_install_plan(
