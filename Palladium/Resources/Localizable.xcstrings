@@ -1747,7 +1747,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Best format keeps the source audio format. Best quality keeps the highest available source quality before conversion."
+            "value" : "Video downloads keep the best available source audio without preferring a codec. Format and bitrate choices apply when using the Audio preset."
           }
         }
       }
