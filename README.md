@@ -19,6 +19,14 @@ On-device iOS media downloader powered by `yt-dlp`, `gallery-dl`, `ffmpeg`, and 
   </a>
 </div>
 
+## App Screenshoots
+
+<p align="center">
+  <img src="https://getpalladium.app/assets/palladium_save_download-3klk9xNj.png" alt="Palladium save and download screen" width="30%">
+  <img src="https://getpalladium.app/assets/palladium_home-D3fXGuDM.png" alt="Palladium home screen" width="30%">
+  <img src="https://getpalladium.app/assets/palladium_package_manager-CDmMQXL5.png" alt="Palladium package manager screen" width="30%">
+</p>
+
 > [!TIP]
 > **This URL is not allowed by the configured download allowlists.**
 >
