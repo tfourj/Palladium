@@ -92,8 +92,8 @@ This pattern permits every URL. Only add it if you intend to remove allowlist re
   "name": "Palladium's default allowlist",
   "entries": [
     {
-      "name": "Vimeo",
-      "pattern": "^https?://(www\\.)?vimeo\\.com/.+$",
+      "name": "Peerate",
+      "pattern": "^https?://(www\\.)?peerate\\.fr(?:/.*)?$",
       "enabled": true
     },
     {

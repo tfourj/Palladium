@@ -476,8 +476,8 @@ enum URLAllowlistManager {
                 id: UUID(uuidString: "B4A16D19-A49E-4563-8A23-46D5973F3435") ?? UUID(),
                 sourceID: defaultSourceID,
                 sourceURLString: defaultAllowlistURLString,
-                name: "Vimeo",
-                pattern: "^https?://(www\\.)?vimeo\\.com/.+$"
+                name: "Peerate",
+                pattern: "^https?://(www\\.)?peerate\\.fr(?:/.*)?$"
             ),
             URLAllowlistEntry(
                 id: UUID(uuidString: "4A26E825-7D75-497C-94E3-11C124F77727") ?? UUID(),
