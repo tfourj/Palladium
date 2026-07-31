@@ -51,6 +51,7 @@ Palladium/
 | `Models/AppAppearanceMode.swift` | Appearance-mode setting model. |
 | `Models/DownloadServiceDomain.swift` | Canonical source-service domain resolver for saved-download folders. |
 | `Models/DownloadOptions.swift` | Download option model and persisted settings. |
+| `Models/DownloadQueue.swift` | Sequential download queue models, state transitions, and persistence. |
 | `Models/ImportedCookieFile.swift` | Imported cookie-file model. |
 | `Models/LinkHistory.swift` | Previously used link model and history storage data. |
 | `Models/PackageSourceMode.swift` | Package-source selection model. |
@@ -143,6 +144,12 @@ Palladium/
 | `Info.plist` | Share extension bundle metadata. |
 | `ShareExtension.entitlements` | Share extension signing capabilities and app-group access. |
 | `Base.lproj/MainInterface.storyboard` | Share extension interface definition. |
+
+## Tests
+
+| Path | Purpose |
+| --- | --- |
+| `PalladiumTests/DownloadQueueTests.swift` | Download queue parsing, state transition, ordering, and persistence tests. |
 
 ## Other Files and Directories
 
