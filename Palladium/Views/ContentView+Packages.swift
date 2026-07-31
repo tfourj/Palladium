@@ -22,7 +22,7 @@ extension ContentView {
         updateWhenAvailable: Bool = false,
         isAutomaticUpdate: Bool = false
     ) {
-        guard !isRunning, !isPackageRunning, !isCheckingDownloadAllowlist, !isResolvingGallery else { return }
+        guard !isRunning, !isPackageRunning, !isResolvingGallery else { return }
 
         isPackageRunning = true
         isAutomaticallyUpdatingPackages = isAutomaticUpdate || action == .reinstall
@@ -134,7 +134,7 @@ extension ContentView {
 
             let shouldAutomaticallyUpdate = updatesAvailable || outcome.runtimePackagesMissing == true
             if action == .check, updateWhenAvailable, shouldAutomaticallyUpdate {
-                guard !isRunning, !isCheckingDownloadAllowlist, !isResolvingGallery else {
+                guard !isRunning, !isResolvingGallery else {
                     appendConsoleText("[palladium] automatic package update skipped because a download is starting\n")
                     return
                 }
@@ -194,7 +194,7 @@ extension ContentView {
     }
 
     func installPackagePayloadZip(from sourceURL: URL) {
-        guard !isRunning, !isPackageRunning, !isCheckingDownloadAllowlist, !isResolvingGallery else { return }
+        guard !isRunning, !isPackageRunning, !isResolvingGallery else { return }
 
         do {
             let temporaryPayloadZipURL = try copyPayloadZipToTemporaryStorage(from: sourceURL)

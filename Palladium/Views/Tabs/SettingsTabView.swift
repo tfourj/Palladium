@@ -11,7 +11,6 @@ struct SettingsTabView: View {
         case afterDownload
         case downloadBehavior
         case downloadArguments
-        case urlAllowlists
         case cookies
         case appearance
         case downloadsTab
@@ -89,7 +88,6 @@ struct SettingsTabView: View {
     @Binding var defaultEmbedThumbnail: Bool
     @Binding var defaultUseCookies: Bool
     @Binding var restoreDownloadDefaults: Bool
-    let urlAllowlistSources: [URLAllowlistSource]
     let importedCookieFiles: [ImportedCookieFile]
 
     let storageSummary: StorageManagementSummary
@@ -107,7 +105,6 @@ struct SettingsTabView: View {
     let isLoadingPackageVersions: Bool
     let isRunning: Bool
     let isPackageRunning: Bool
-    let isRefreshingURLAllowlists: Bool
     let onRefreshVersions: () -> Void
     let onCancelPackages: () -> Void
     let onUpdatePackages: () -> Void
@@ -131,12 +128,6 @@ struct SettingsTabView: View {
     let onImportCookiesFromWebsite: (_ cookies: [HTTPCookie], _ sourceURL: URL) throws -> Void
     let onPasteCookieFile: (_ rawText: String) throws -> Void
     let onDeleteCookieFile: (_ cookieFile: ImportedCookieFile) throws -> Void
-    let onRefreshURLAllowlists: (_ onComplete: ((_ message: String) -> Void)?) -> Void
-    let onAddURLAllowlist: (_ urlString: String, _ onComplete: ((_ message: String) -> Void)?) -> Void
-    let onImportURLAllowlist: (_ sourceURL: URL, _ onComplete: ((_ message: String) -> Void)?) -> Void
-    let onPasteURLAllowlist: (_ json: String, _ onComplete: ((_ message: String) -> Void)?) -> Void
-    let onRemoveURLAllowlist: (_ source: URLAllowlistSource) -> Void
-
     var body: some View {
         NavigationStack {
             Group {
@@ -173,9 +164,6 @@ struct SettingsTabView: View {
             Section(header: Text("settings.general.section")) {
                 settingsNavigationLink(for: .userInterface)
                 settingsNavigationLink(for: .downloadSettings)
-                if FeatureFlags.isURLAllowlistEnabled {
-                    settingsNavigationLink(for: .urlAllowlists)
-                }
                 settingsNavigationLink(for: .packages)
                 settingsNavigationLink(for: .advanced)
             }
@@ -264,17 +252,6 @@ struct SettingsTabView: View {
                 customArgsText: $customArgsText,
                 extraArgsText: $extraArgsText,
                 isRunning: isRunning
-            )
-        case .urlAllowlists:
-            URLAllowlistsSettingsView(
-                sources: urlAllowlistSources,
-                isBusy: isRunning || isPackageRunning,
-                isRefreshing: isRefreshingURLAllowlists,
-                onRefresh: onRefreshURLAllowlists,
-                onAdd: onAddURLAllowlist,
-                onImport: onImportURLAllowlist,
-                onPaste: onPasteURLAllowlist,
-                onRemove: onRemoveURLAllowlist
             )
         case .appearance:
             AppearanceSettingsView(
@@ -901,7 +878,6 @@ struct SettingsTabView: View {
             .downloadBehavior,
             .downloadArguments,
             .cookies,
-            .urlAllowlists,
             .packages,
             .packageManager,
             .advanced,
@@ -909,9 +885,7 @@ struct SettingsTabView: View {
             .about
         ]
 
-        return routes
-            .filter { FeatureFlags.isURLAllowlistEnabled || $0 != .urlAllowlists }
-            .map { setting(for: $0) }
+        return routes.map { setting(for: $0) }
     }
 
     private func setting(for route: SettingsRoute) -> SearchableSetting {
@@ -995,17 +969,6 @@ struct SettingsTabView: View {
                 subtitle: String(localized: "settings.download_args.subtitle"),
                 icon: "terminal",
                 color: .blue
-            )
-        case .urlAllowlists:
-            return SearchableSetting(
-                route: route,
-                title: String(localized: "allowlists.title"),
-                subtitle: String(
-                    format: String(localized: "allowlists.subtitle"),
-                    urlAllowlistSources.count
-                ),
-                icon: "checkmark.shield.fill",
-                color: .mint
             )
         case .cookies:
             return SearchableSetting(

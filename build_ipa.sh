@@ -9,10 +9,6 @@ SCHEME_NAME="Palladium"
 BUILD_DIR="build"
 XCODEBUILD_OVERRIDES=()
 
-if [ -n "${ALLOWLIST_ENABLED:-}" ]; then
-  XCODEBUILD_OVERRIDES+=("ALLOWLIST_ENABLED=$ALLOWLIST_ENABLED")
-fi
-
 HEAD_TAG=$(git tag --points-at HEAD --sort=-v:refname | head -n 1)
 if [ -n "$HEAD_TAG" ]; then
   BUILD_REF="$HEAD_TAG"
