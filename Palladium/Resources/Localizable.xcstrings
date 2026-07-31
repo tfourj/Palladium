@@ -219,16 +219,6 @@
         }
       }
     },
-    "common.save" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        }
-      }
-    },
     "console.empty" : {
       "localizations" : {
         "en" : {
@@ -455,17 +445,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "App folder"
-          }
-        }
-      }
-    },
-    "cookies.selected.title" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Default Selection"
           }
         }
       }
@@ -728,17 +707,6 @@
         }
       }
     },
-    "download.formats.audio" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Audio only"
-          }
-        }
-      }
-    },
     "download.formats.audio_section" : {
       "localizations" : {
         "en" : {
@@ -815,28 +783,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Choose Format"
-          }
-        }
-      }
-    },
-    "download.formats.video" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Video only"
-          }
-        }
-      }
-    },
-    "download.formats.video_audio" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Video and audio"
           }
         }
       }
@@ -2183,22 +2129,22 @@
         }
       }
     },
-    "packages.status.restoring" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Restoring pip packages..."
-          }
-        }
-      }
-    },
     "packages.status.removing" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Removing package..."
+          }
+        }
+      }
+    },
+    "packages.status.restoring" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restoring pip packages..."
           }
         }
       }
@@ -2996,17 +2942,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Controls the mode used when a link is sent to Palladium from another app."
-          }
-        }
-      }
-    },
-    "settings.download_modes.share_section" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Share Sheet"
           }
         }
       }
