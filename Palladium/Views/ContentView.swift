@@ -190,6 +190,11 @@ struct ContentView: View {
     @State var formatPickerTitle = ""
     @State var showFormatPicker = false
     @State var isResolvingFormats = false
+    @State var downloadQueue: DownloadQueue
+    @State var awaitingQueueItemID: UUID?
+    @State var awaitingQueueItemWasPartial = false
+    @State var queueConsoleInitialized = false
+    @State var shareSheetCompletion: (() -> Void)?
 
     init() {
         let rememberPreset = Self.loadRememberSelectedPreset()
@@ -250,6 +255,9 @@ struct ContentView: View {
         )
         _youtubePatchMode = State(initialValue: Self.loadYouTubePatchMode())
         _consoleLogStore = StateObject(wrappedValue: ConsoleLogStore())
+        _downloadQueue = State(initialValue: DownloadQueuePersistence.load())
+        _awaitingQueueItemID = State(initialValue: nil)
+        _shareSheetCompletion = State(initialValue: nil)
     }
 
     var body: some View {
@@ -544,11 +552,7 @@ struct ContentView: View {
         .onChange(of: youtubePatchMode, initial: false) {
             persistPreferences()
         }
-        .sheet(item: $sharePayload, onDismiss: {
-            guard advancePostDownloadAfterSharing else { return }
-            advancePostDownloadAfterSharing = false
-            advancePostDownloadPromptSequence()
-        }) { payload in
+        .sheet(item: $sharePayload, onDismiss: handleShareSheetDismissal) { payload in
             ShareSheet(activityItems: payload.activityItems)
         }
         .sheet(isPresented: $showShareSheetDownloadPicker, onDismiss: {

@@ -65,6 +65,7 @@ Palladium/
 | `Views/ContentView.swift` | Root UI, tab layout, and shared view state. |
 | `Views/ContentView+Cookies.swift` | Cookie import and management UI logic. |
 | `Views/ContentView+DownloadFlow.swift` | Download initiation and progress flow. |
+| `Views/ContentView+DownloadQueue.swift` | Persistent sequential queue coordination and queue state actions. |
 | `Views/ContentView+History.swift` | Download and link history behavior. |
 | `Views/ContentView+Notifications.swift` | Local notification handling. |
 | `Views/ContentView+Packages.swift` | Python package management behavior. |

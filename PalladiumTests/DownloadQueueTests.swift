@@ -82,6 +82,32 @@ final class DownloadQueueTests: XCTestCase {
         XCTAssertEqual(queue.outstandingCount, 2)
     }
 
+    func testFailureKeepsQueueActiveWhenAnotherItemIsPending() throws {
+        var queue = makeQueue()
+        queue.start()
+        let first = try XCTUnwrap(queue.nextPendingItem)
+        queue.markRunning(first.id)
+
+        queue.markFailed(first.id, errorMessage: "failed")
+
+        XCTAssertTrue(queue.isActive)
+        XCTAssertEqual(queue.nextPendingItem?.url, "https://example.com/two")
+    }
+
+    func testPauseLetsCurrentItemFinishWithoutStartingAnother() throws {
+        var queue = makeQueue()
+        queue.start()
+        let first = try XCTUnwrap(queue.nextPendingItem)
+        queue.markRunning(first.id)
+
+        queue.pause()
+        queue.markAwaitingAction(first.id)
+        queue.markCompleted(first.id, partial: false)
+
+        XCTAssertFalse(queue.isActive)
+        XCTAssertEqual(queue.nextPendingItem?.url, "https://example.com/two")
+    }
+
     func testPendingItemsCanMoveWithoutChangingTerminalRows() throws {
         var queue = makeQueue()
         let first = try XCTUnwrap(queue.nextPendingItem)
