@@ -16,7 +16,6 @@ Palladium/
 ├── scripts/                 Build and validation helper scripts
 ├── Frameworks/              Local, untracked Python, FFmpeg, and curl-cffi dependencies
 ├── build_ipa.sh             Command-line IPA build script
-├── CHANGELOG.md             Release history
 ├── LICENSE                  GPLv3 license text
 └── README.md                Project overview and contributor entry point
 ```
@@ -150,7 +149,6 @@ Palladium/
 | `docs/STRUCTURE.md` | This project map. |
 | `privacy-manifests/python/_hashlib.xcprivacy` | Required-reason API declaration for Python's hashlib module. |
 | `privacy-manifests/python/_ssl.xcprivacy` | Required-reason API declaration for Python's SSL module. |
-| `CHANGELOG.md` | Versioned change history. |
 | `LICENSE` | GPLv3 terms. |
 | `Frameworks/Python.xcframework` | Locally installed Python runtime; required to build and intentionally untracked. |
 | `Frameworks/SwiftFFmpeg-iOS` | Locally installed SwiftFFmpeg package and FFmpeg framework; required to build and intentionally untracked. |
