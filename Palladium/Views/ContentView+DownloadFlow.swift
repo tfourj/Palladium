@@ -226,7 +226,7 @@ extension ContentView {
     }
 
     func consumePendingSharedDownloadIfNeeded() {
-        guard !isPackageRunning, !isRunning, !isCheckingDownloadAllowlist else { return }
+        guard !isPackageRunning, !isRunning else { return }
 
         let sharedLink = pendingSharedDownloadURL.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !sharedLink.isEmpty else { return }
@@ -261,43 +261,12 @@ extension ContentView {
         urlOverride: String? = nil,
         presetOverride: DownloadPreset? = nil,
         afterDownloadOverride: AfterDownloadBehavior? = nil,
-        allowlistChecked: Bool = false,
         gallerySelectionOverride: Set<Int>? = nil,
         formatOverride: YTDLPFormat? = nil
     ) {
-        guard !isRunning, !isPackageRunning, !isCheckingDownloadAllowlist else { return }
+        guard !isRunning, !isPackageRunning else { return }
         let targetURL = (urlOverride ?? urlText).trimmingCharacters(in: .whitespacesAndNewlines)
         guard !targetURL.isEmpty else { return }
-
-        if FeatureFlags.isURLAllowlistEnabled, !allowlistChecked {
-            isCheckingDownloadAllowlist = true
-            progressText = String(localized: "allowlists.status.checking")
-            appendConsoleText("[palladium] checking download url allowlists\n")
-
-            Task { @MainActor in
-                let result = await URLAllowlistManager.validateDownloadURL(targetURL)
-                isCheckingDownloadAllowlist = false
-                urlAllowlistSources = URLAllowlistManager.loadSources()
-
-                guard result.isAllowed else {
-                    appendConsoleText("[palladium] blocked download url: \(result.message)\n")
-                    progressText = String(localized: "download.prompt.idle")
-                    downloadErrorText = result.message
-                    return
-                }
-
-                appendConsoleText("[palladium] allowed download url: \(result.message)\n")
-                runDownloadFlow(
-                    urlOverride: targetURL,
-                    presetOverride: presetOverride,
-                    afterDownloadOverride: afterDownloadOverride,
-                    allowlistChecked: true,
-                    gallerySelectionOverride: gallerySelectionOverride,
-                    formatOverride: formatOverride
-                )
-            }
-            return
-        }
 
         let effectiveDownloadPreset: DownloadPreset
         if let formatOverride {
@@ -589,46 +558,14 @@ extension ContentView {
 
     func resolveFormatSelection(
         url: String,
-        preset: DownloadPreset,
-        allowlistChecked: Bool = false
+        preset: DownloadPreset
     ) {
         let targetURL = url.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !targetURL.isEmpty,
               !isRunning,
-              !isResolvingFormats,
-              !isCheckingDownloadAllowlist else { return }
+              !isResolvingFormats else { return }
         guard preset != .images else {
             runDownloadFlow(urlOverride: targetURL, presetOverride: preset)
-            return
-        }
-
-        if FeatureFlags.isURLAllowlistEnabled, !allowlistChecked {
-            isCheckingDownloadAllowlist = true
-            isResolvingFormats = true
-            downloadErrorText = nil
-            progressText = String(localized: "allowlists.status.checking")
-            appendConsoleText("[palladium] checking format url allowlists\n")
-
-            Task { @MainActor in
-                let result = await URLAllowlistManager.validateDownloadURL(targetURL)
-                isCheckingDownloadAllowlist = false
-                isResolvingFormats = false
-                urlAllowlistSources = URLAllowlistManager.loadSources()
-
-                guard result.isAllowed else {
-                    appendConsoleText("[palladium] blocked format url: \(result.message)\n")
-                    progressText = String(localized: "download.prompt.idle")
-                    downloadErrorText = result.message
-                    return
-                }
-
-                appendConsoleText("[palladium] allowed format url: \(result.message)\n")
-                resolveFormatSelection(
-                    url: targetURL,
-                    preset: preset,
-                    allowlistChecked: true
-                )
-            }
             return
         }
 
@@ -772,27 +709,9 @@ extension ContentView {
         switch incomingURL.host?.lowercased() {
         case "download":
             handleIncomingDownloadURL(incomingURL)
-        case "allowlist":
-            handleIncomingAllowlistURL(incomingURL)
         default:
             return
         }
-    }
-
-    func handleIncomingAllowlistURL(_ incomingURL: URL) {
-        guard FeatureFlags.isURLAllowlistEnabled,
-              let components = URLComponents(url: incomingURL, resolvingAgainstBaseURL: false),
-              let queryItems = components.queryItems,
-              let urlItem = queryItems.first(where: { $0.name == "url" }),
-              let allowlistURL = urlItem.value,
-              !allowlistURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            appendConsoleText("[palladium] allowlist url scheme received but missing url query param\n")
-            return
-        }
-
-        selectedTab = .settings
-        appendConsoleText("[palladium] app opened via allowlist url scheme. allowlist: \(allowlistURL)\n")
-        addURLAllowlistFromScheme(allowlistURL)
     }
 
     func handleIncomingDownloadURL(_ incomingURL: URL) {

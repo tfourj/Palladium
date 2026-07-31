@@ -16,7 +16,6 @@ Palladium/
 ├── scripts/                 Build and validation helper scripts
 ├── Frameworks/              Local, untracked Python, FFmpeg, and curl-cffi dependencies
 ├── build_ipa.sh             Command-line IPA build script
-├── CHANGELOG.md             Release history
 ├── LICENSE                  GPLv3 license text
 └── README.md                Project overview and contributor entry point
 ```
@@ -49,11 +48,9 @@ Palladium/
 | `AppIntents/ShortcutDownloadIntents.swift` | App Shortcuts intents for starting downloads. |
 | `Models/AppAppearanceMode.swift` | Appearance-mode setting model. |
 | `Models/DownloadOptions.swift` | Download option model and persisted settings. |
-| `Models/FeatureFlags.swift` | Build-configured feature availability. |
 | `Models/ImportedCookieFile.swift` | Imported cookie-file model. |
 | `Models/LinkHistory.swift` | Previously used link model and history storage data. |
 | `Models/PackageSourceMode.swift` | Package-source selection model. |
-| `Models/URLAllowlist.swift` | URL allowlist model. |
 | `Models/YouTubePatchMode.swift` | Patch target setting model. |
 
 ### Views
@@ -70,7 +67,6 @@ Palladium/
 | `Views/ContentView+Preferences.swift` | Shared preference access and updates. |
 | `Views/ContentView+Storage.swift` | Download storage and file-management behavior. |
 | `Views/ContentView+Support.swift` | Support, diagnostics, and helper UI behavior. |
-| `Views/ContentView+URLAllowlists.swift` | URL allowlist UI behavior. |
 | `Views/Tabs/DownloadTabView.swift` | Main download screen. |
 | `Views/Tabs/PackagesTabView.swift` | Python package management screen. |
 | `Views/Tabs/SavedDownloadsTabView.swift` | Saved-downloads browser. |
@@ -93,7 +89,6 @@ Palladium/
 | `Views/Tabs/Settings/PackagesSettingsView.swift` | Package source and package settings screen. |
 | `Views/Tabs/Settings/ShareSheetSettingsView.swift` | Incoming share behavior and picker-button settings screen. |
 | `Views/Tabs/Settings/StorageSettingsView.swift` | Storage settings screen. |
-| `Views/Tabs/Settings/URLAllowlistsSettingsView.swift` | URL allowlist settings screen. |
 | `Views/Tabs/Settings/UseInterfaceSettingsView.swift` | Interface-use settings screen. |
 | `Views/Tabs/Settings/about.swift` | About screen. |
 
@@ -149,12 +144,11 @@ Palladium/
 
 | Path | Purpose |
 | --- | --- |
-| `docs/ALLOWLISTS.md` | URL allowlist format and configuration instructions. |
+| `docs/ALLOWLISTS.md` | Legacy URL allowlist instructions for versions earlier than 1.3.2. |
 | `docs/BUILD.md` | Local dependency setup and Xcode build instructions. |
 | `docs/STRUCTURE.md` | This project map. |
 | `privacy-manifests/python/_hashlib.xcprivacy` | Required-reason API declaration for Python's hashlib module. |
 | `privacy-manifests/python/_ssl.xcprivacy` | Required-reason API declaration for Python's SSL module. |
-| `CHANGELOG.md` | Versioned change history. |
 | `LICENSE` | GPLv3 terms. |
 | `Frameworks/Python.xcframework` | Locally installed Python runtime; required to build and intentionally untracked. |
 | `Frameworks/SwiftFFmpeg-iOS` | Locally installed SwiftFFmpeg package and FFmpeg framework; required to build and intentionally untracked. |
