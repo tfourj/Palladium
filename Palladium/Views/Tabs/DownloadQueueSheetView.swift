@@ -97,9 +97,11 @@ struct DownloadQueueSheetView: View {
                 }
             } label: {
                 Label("queue.add", systemImage: "text.badge.plus")
+                    .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
+            .tint(.blue)
             .disabled(
                 selectedPreset == .images
                     || DownloadQueue.parsedLinks(from: linksText).isEmpty
@@ -125,9 +127,11 @@ struct DownloadQueueSheetView: View {
                         hasPreviouslyStartedItems ? "queue.resume" : "queue.start",
                         systemImage: "play.circle.fill"
                     )
+                    .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
+                .tint(.blue)
                 .disabled(isOperationBusy || !queue.hasPendingItems)
             }
         } footer: {
