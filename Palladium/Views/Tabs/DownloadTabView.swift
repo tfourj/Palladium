@@ -31,6 +31,8 @@ struct DownloadTabView: View {
     let onSelectHistoryEntry: (LinkHistoryEntry) -> Void
     let onDeleteHistoryEntry: (LinkHistoryEntry) -> Void
     let onCopyHistoryLink: (String) -> Void
+    let downloadQueue: DownloadQueue
+    @Binding var showDownloadQueueSheet: Bool
     let galleryItems: [GalleryItem]
     @Binding var selectedGalleryItemIndices: Set<Int>
     @Binding var showGalleryPicker: Bool
@@ -62,30 +64,27 @@ struct DownloadTabView: View {
                     }
 
                     HStack {
+                        Button {
+                            showDownloadQueueSheet = true
+                        } label: {
+                            headerIcon(
+                                systemName: "list.bullet.rectangle",
+                                badgeCount: downloadQueue.outstandingCount
+                            )
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("queue.open")
+
                         Spacer()
+
                         if linkHistoryEnabled {
                             Button {
                                 showHistorySheet = true
                             } label: {
-                                ZStack(alignment: .topTrailing) {
-                                    Image(systemName: "clock")
-                                        .font(.system(size: 18, weight: .semibold))
-                                        .foregroundStyle(primaryTextColor)
-                                        .frame(width: 40, height: 40)
-                                        .background(cardElementBackground)
-                                        .clipShape(RoundedRectangle(cornerRadius: 8))
-
-                                    if !hideHistoryCount && !historyEntries.isEmpty {
-                                        Text("\(historyEntries.count)")
-                                            .font(.caption2.bold())
-                                            .foregroundStyle(.white)
-                                            .padding(.horizontal, 5)
-                                            .padding(.vertical, 2)
-                                            .background(Color.blue)
-                                            .clipShape(Capsule())
-                                            .offset(x: 8, y: -8)
-                                    }
-                                }
+                                headerIcon(
+                                    systemName: "clock",
+                                    badgeCount: hideHistoryCount ? nil : historyEntries.count
+                                )
                             }
                             .buttonStyle(.plain)
                             .accessibilityLabel("history.open")
@@ -95,8 +94,12 @@ struct DownloadTabView: View {
                 .padding(.horizontal, 20)
                 .padding(.top, 10)
 
-                if isRunning || shouldShowPlaylistProgress {
+                if isRunning || shouldShowPlaylistProgress || shouldShowQueueProgress {
                     VStack(alignment: .leading, spacing: 8) {
+                        if let currentQueueItem = downloadQueue.currentItem {
+                            queueProgressCard(currentQueueItem)
+                        }
+
                         if let playlistProgress, playlistProgress.isPlaylist {
                             playlistProgressCard(playlistProgress)
                         }
@@ -318,6 +321,28 @@ struct DownloadTabView: View {
             }
         }
         onDownload()
+    }
+
+    private func headerIcon(systemName: String, badgeCount: Int?) -> some View {
+        ZStack(alignment: .topTrailing) {
+            Image(systemName: systemName)
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundStyle(primaryTextColor)
+                .frame(width: 40, height: 40)
+                .background(cardElementBackground)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+
+            if let badgeCount, badgeCount > 0 {
+                Text("\(badgeCount)")
+                    .font(.caption2.bold())
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 5)
+                    .padding(.vertical, 2)
+                    .background(Color.blue)
+                    .clipShape(Capsule())
+                    .offset(x: 8, y: -8)
+            }
+        }
     }
 
     private var formatPickerSheet: some View {
@@ -819,6 +844,64 @@ struct DownloadTabView: View {
             parts.append(String(localized: "download.options.cookies.title"))
         }
         return parts.isEmpty ? String(localized: "download.options.summary.default") : parts.joined(separator: " • ")
+    }
+
+    private func queueProgressCard(_ item: DownloadQueueItem) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 8) {
+                Image(systemName: "list.bullet.rectangle")
+                    .foregroundStyle(.blue)
+
+                Text(queueProgressTitle(for: item))
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(primaryTextColor)
+
+                Spacer()
+
+                Text(item.configuration.preset.title)
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(.secondary)
+            }
+
+            if let title = item.title, !title.isEmpty {
+                Text(title)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(primaryTextColor)
+                    .lineLimit(2)
+            }
+
+            Text(item.url)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .lineLimit(2)
+                .truncationMode(.middle)
+
+            if item.status == .awaitingAction {
+                Label("queue.status.awaiting_action", systemImage: "hand.tap")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.indigo)
+            }
+        }
+        .padding(12)
+        .background(cardElementBackground)
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(Color.blue.opacity(0.28), lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+    }
+
+    private func queueProgressTitle(for item: DownloadQueueItem) -> String {
+        let currentIndex = downloadQueue.items.firstIndex(where: { $0.id == item.id }) ?? 0
+        return String(
+            format: String(localized: "queue.progress.value"),
+            currentIndex + 1,
+            downloadQueue.items.count
+        )
+    }
+
+    private var shouldShowQueueProgress: Bool {
+        downloadQueue.currentItem != nil
     }
 
     private func playlistProgressCard(_ snapshot: PlaylistProgressSnapshot) -> some View {

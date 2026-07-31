@@ -112,6 +112,7 @@ extension ContentView {
         title: String?,
         partial: Bool
     ) {
+        showDownloadQueueSheet = false
         downloadQueue.markAwaitingAction(itemID, title: title)
         awaitingQueueItemID = itemID
         awaitingQueueItemWasPartial = partial

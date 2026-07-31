@@ -74,6 +74,7 @@ Palladium/
 | `Views/ContentView+Storage.swift` | Download storage and file-management behavior. |
 | `Views/ContentView+Support.swift` | Support, diagnostics, and helper UI behavior. |
 | `Views/Tabs/DownloadTabView.swift` | Main download screen. |
+| `Views/Tabs/DownloadQueueSheetView.swift` | Multiline queue editor, controls, ordering, and item statuses. |
 | `Views/Tabs/PackagesTabView.swift` | Python package management screen. |
 | `Views/Tabs/SavedDownloadsTabView.swift` | Saved-downloads browser. |
 | `Views/Tabs/ConsoleTabView.swift` | In-app log console. |
