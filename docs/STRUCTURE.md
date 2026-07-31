@@ -144,7 +144,7 @@ Palladium/
 
 | Path | Purpose |
 | --- | --- |
-| `docs/ALLOWLISTS.md` | URL allowlist format and configuration instructions. |
+| `docs/ALLOWLISTS.md` | Legacy URL allowlist instructions for versions earlier than 1.3.2. |
 | `docs/BUILD.md` | Local dependency setup and Xcode build instructions. |
 | `docs/STRUCTURE.md` | This project map. |
 | `privacy-manifests/python/_hashlib.xcprivacy` | Required-reason API declaration for Python's hashlib module. |

@@ -1,6 +1,9 @@
-# Allowlists
+# Allowlists (legacy)
 
-Palladium uses allowlists to decide which URLs can be downloaded. An allowlist is a JSON document containing regular-expression patterns. A URL is allowed when it matches at least one enabled entry from any configured allowlist.
+> [!IMPORTANT]
+> URL allowlists are only needed in Palladium versions earlier than 1.3.2. Palladium 1.3.2 and
+> later do not use allowlists because App Store versions will not receive further updates. This
+> page remains available for users of older App Store builds.
 
 The built-in default allowlist is loaded from `https://al.getpalladium.app/default.json`. You can add your own allowlist from an HTTPS URL, import a `.json` file, or paste its JSON directly in **Settings > URL Allowlists**.
 
@@ -35,7 +38,9 @@ Patterns should normally begin with `^` and end with `$` so they match only the 
 
 ## Add a hosted allowlist
 
-Host the JSON at a public HTTPS URL, then in Palladium open **Settings > URL Allowlists**, choose **Add allowlist**, and enter the URL. Palladium downloads the document immediately and checks it whenever you choose **Refresh**.
+Host the JSON at a public HTTPS URL, then in Palladium open **Settings > URL Allowlists**, choose
+**Add allowlist**, and enter the URL. Palladium downloads the document immediately and checks it
+whenever you choose **Refresh**.
 
 For example, an allowlist hosted at `https://example.com/palladium-allowlist.json` can contain:
 
@@ -64,7 +69,8 @@ Only HTTPS source URLs can be added remotely. Keep the URL stable so existing us
 
 ### Allow every URL
 
-[`https://al.getpalladium.app/all.json`](https://al.getpalladium.app/all.json) is an unrestricted allowlist:
+[`https://al.getpalladium.app/all.json`](https://al.getpalladium.app/all.json) is an unrestricted
+allowlist:
 
 ```json
 {
