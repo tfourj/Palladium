@@ -229,17 +229,6 @@
         }
       }
     },
-    "common.save" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        }
-      }
-    },
     "console.empty" : {
       "localizations" : {
         "en" : {
@@ -486,17 +475,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rename Cookie File"
-          }
-        }
-      }
-    },
-    "cookies.selected.title" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Default Selection"
           }
         }
       }
@@ -769,17 +747,6 @@
         }
       }
     },
-    "download.formats.audio" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Audio only"
-          }
-        }
-      }
-    },
     "download.formats.audio_section" : {
       "localizations" : {
         "en" : {
@@ -856,28 +823,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Choose Format"
-          }
-        }
-      }
-    },
-    "download.formats.video" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Video only"
-          }
-        }
-      }
-    },
-    "download.formats.video_audio" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Video and audio"
           }
         }
       }
@@ -3157,17 +3102,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Controls the mode used when a link is sent to Palladium from another app."
-          }
-        }
-      }
-    },
-    "settings.download_modes.share_section" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Share Sheet"
           }
         }
       }
