@@ -126,7 +126,8 @@ struct SettingsTabView: View {
     let onRefreshCookieFiles: () -> Void
     let onImportCookieFile: (_ sourceURL: URL) throws -> Void
     let onImportCookiesFromWebsite: (_ cookies: [HTTPCookie], _ sourceURL: URL) throws -> Void
-    let onPasteCookieFile: (_ rawText: String) throws -> Void
+    let onPasteCookieFile: (_ rawText: String, _ preferredName: String) throws -> Void
+    let onRenameCookieFile: (_ cookieFile: ImportedCookieFile, _ newName: String) throws -> Void
     let onDeleteCookieFile: (_ cookieFile: ImportedCookieFile) throws -> Void
     var body: some View {
         NavigationStack {
@@ -299,6 +300,7 @@ struct SettingsTabView: View {
                 onImport: onImportCookieFile,
                 onImportFromWebsite: onImportCookiesFromWebsite,
                 onPaste: onPasteCookieFile,
+                onRename: onRenameCookieFile,
                 onDelete: onDeleteCookieFile
             )
         case .packages:

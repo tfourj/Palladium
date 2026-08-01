@@ -219,6 +219,16 @@
         }
       }
     },
+    "common.rename" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rename"
+          }
+        }
+      }
+    },
     "common.save" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -440,6 +450,16 @@
         }
       }
     },
+    "cookies.name.placeholder" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cookie name"
+          }
+        }
+      }
+    },
     "cookies.path.documents" : {
       "localizations" : {
         "en" : {
@@ -456,6 +476,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "App folder"
+          }
+        }
+      }
+    },
+    "cookies.rename.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rename Cookie File"
           }
         }
       }
@@ -497,6 +527,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Imported cookie file: %@"
+          }
+        }
+      }
+    },
+    "cookies.toast.renamed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Renamed cookie file: %@"
           }
         }
       }

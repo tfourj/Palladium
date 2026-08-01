@@ -371,6 +371,7 @@ struct ContentView: View {
                     onImportCookieFile: importCookieFile,
                     onImportCookiesFromWebsite: importBrowserCookies,
                     onPasteCookieFile: pasteCookieFile,
+                    onRenameCookieFile: renameImportedCookieFile,
                     onDeleteCookieFile: deleteImportedCookieFile
                 )
                 .tabItem {
