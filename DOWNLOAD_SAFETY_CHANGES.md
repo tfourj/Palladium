@@ -12,6 +12,15 @@ contain service-specific names or rules tied to a named website.
   removing `www.` and characters that are unsafe in a folder name.
 - The two options are independent and apply only when saving into Palladium's
   `Saved` directory.
+- **Organize by service** changes only the parent directory. Collections still
+  receive a uniquely named download folder; single items stay directly in the
+  service directory unless **Always create a folder** is also enabled.
+- When both options are enabled, the layout is
+  `Saved/<service>/<unique download folder>/<media>` for both collections and
+  single items.
+- Collection folders are assembled from the selected media only and published
+  atomically after every copy succeeds. Repeated collections become `Name (1)`,
+  `Name (2)`, and so on; equal filenames inside one collection are numbered too.
 - A successful copy removes the associated temporary `run-*` download folder.
   Failed copies leave the temporary source intact so data is not lost.
 
@@ -40,6 +49,8 @@ contain service-specific names or rules tied to a named website.
 
 - Gallery downloads use the same progress card as video playlists, including
   total, completed, failed, current-item, cancellation, and final state.
+- Gallery progress comes from structured start/completion/failure events emitted
+  by the downloader job, rather than inferred console paths.
 - The format-selection chevron is hidden for image/gallery mode, where it does
   not represent an available action.
 - Structured gallery failures expose the useful final error instead of a generic

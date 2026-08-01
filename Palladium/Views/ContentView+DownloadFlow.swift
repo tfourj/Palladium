@@ -314,7 +314,8 @@ extension ContentView {
         isInstallingPackagesDuringDownload = false
         galleryDownloadExpectedCount = effectiveDownloadPreset == .images ? gallerySelectionOverride?.count ?? 0 : 0
         galleryDownloadCompletedCount = 0
-        galleryDownloadOutputDirectory = effectiveDownloadPreset == .images ? runOutputURL.path : nil
+        galleryDownloadFailedCount = 0
+        galleryDownloadFailedItems = []
         galleryDownloadedOutputPaths = []
         if effectiveDownloadPreset == .images {
             playlistProgress = PlaylistProgressSnapshot(
@@ -461,7 +462,15 @@ extension ContentView {
 
             let cancelWasRequested = downloadCancelRequested
             let galleryExpectedCountAtFinish = galleryDownloadExpectedCount
-            let galleryCompletedCountAtFinish = galleryDownloadCompletedCount
+            let galleryCompletedCountAtFinish = max(
+                galleryDownloadCompletedCount,
+                min(outcome.downloadedPaths.count, galleryDownloadExpectedCount)
+            )
+            let galleryFailedCountAtFinish = max(
+                galleryDownloadFailedCount,
+                max(0, galleryExpectedCountAtFinish - galleryCompletedCountAtFinish)
+            )
+            let galleryFailedItemsAtFinish = galleryDownloadFailedItems
             isRunning = false
             syncIdleTimerDisabled()
             downloadCancelRequested = false
@@ -471,7 +480,8 @@ extension ContentView {
             isInstallingPackagesDuringDownload = false
             galleryDownloadExpectedCount = 0
             galleryDownloadCompletedCount = 0
-            galleryDownloadOutputDirectory = nil
+            galleryDownloadFailedCount = 0
+            galleryDownloadFailedItems = []
             galleryDownloadedOutputPaths = []
 
             if restoreDownloadDefaults {
@@ -484,13 +494,12 @@ extension ContentView {
             let finalResultKind = cancelWasRequested ? "cancelled" : (outcome.resultKind ?? outcome.statusText)
             statusText = finalResultKind
             if effectiveDownloadPreset == .images {
-                let failedCount = max(0, galleryExpectedCountAtFinish - galleryCompletedCountAtFinish)
                 playlistProgress = PlaylistProgressSnapshot(
                     title: effectiveDownloadPreset.title,
                     expectedCount: galleryExpectedCountAtFinish,
                     completedCount: galleryCompletedCountAtFinish,
-                    failedCount: finalResultKind == "success" ? 0 : failedCount,
-                    failedItems: [],
+                    failedCount: finalResultKind == "success" ? 0 : galleryFailedCountAtFinish,
+                    failedItems: finalResultKind == "success" ? [] : galleryFailedItemsAtFinish,
                     currentItemIndex: nil,
                     currentItemTitle: nil,
                     resultKind: finalResultKind
@@ -838,10 +847,6 @@ extension ContentView {
             return
         }
 
-        if handleGalleryDownloadOutputLine(trimmed) {
-            return
-        }
-
         if handlePackageInstallProgressLine(trimmed) {
             return
         }
@@ -892,26 +897,48 @@ extension ContentView {
     }
 
     private func handleGalleryProgressMarkerLine(_ line: String) -> Bool {
-        guard line.hasPrefix("[palladium][gallery-progress]") else { return false }
-
-        recordGalleryDownloadCompletion(identifier: line)
-        return true
-    }
-
-    private func handleGalleryDownloadOutputLine(_ line: String) -> Bool {
-        guard let outputDirectory = galleryDownloadOutputDirectory,
-              line.hasPrefix(outputDirectory + "/") else {
-            return false
+        let prefix = "[palladium][gallery-progress] "
+        guard line.hasPrefix(prefix) else { return false }
+        let payload = String(line.dropFirst(prefix.count))
+        guard let data = payload.data(using: .utf8),
+              let marker = try? JSONDecoder().decode(GalleryProgressMarker.self, from: data) else {
+            return true
         }
 
-        recordGalleryDownloadCompletion(identifier: line)
+        if marker.expectedCount > 0 {
+            galleryDownloadExpectedCount = marker.expectedCount
+        }
+        switch marker.event {
+        case "started":
+            updateGalleryProgressSnapshot(
+                currentItemIndex: marker.index,
+                currentItemTitle: marker.title
+            )
+        case "completed":
+            recordGalleryDownloadCompletion(
+                identifier: marker.path.isEmpty ? "completed:\(marker.index)" : marker.path,
+                completedTitle: marker.title
+            )
+        case "failed":
+            galleryDownloadFailedCount += 1
+            if !marker.title.isEmpty {
+                galleryDownloadFailedItems.append(marker.title)
+            }
+            updateGalleryProgressSnapshot(currentItemIndex: nil, currentItemTitle: nil)
+        default:
+            break
+        }
         return true
     }
 
-    private func recordGalleryDownloadCompletion(identifier: String) {
+    private func recordGalleryDownloadCompletion(identifier: String, completedTitle: String) {
         guard galleryDownloadedOutputPaths.insert(identifier).inserted else { return }
 
         galleryDownloadCompletedCount += 1
+        updateGalleryProgressSnapshot(currentItemIndex: nil, currentItemTitle: completedTitle)
+    }
+
+    private func updateGalleryProgressSnapshot(currentItemIndex: Int?, currentItemTitle: String?) {
         let completed = galleryDownloadExpectedCount > 0
             ? min(galleryDownloadCompletedCount, galleryDownloadExpectedCount)
             : galleryDownloadCompletedCount
@@ -919,10 +946,10 @@ extension ContentView {
             title: DownloadPreset.images.title,
             expectedCount: galleryDownloadExpectedCount > 0 ? galleryDownloadExpectedCount : nil,
             completedCount: completed,
-            failedCount: 0,
-            failedItems: [],
-            currentItemIndex: galleryDownloadExpectedCount > completed ? completed + 1 : nil,
-            currentItemTitle: nil,
+            failedCount: galleryDownloadFailedCount,
+            failedItems: galleryDownloadFailedItems,
+            currentItemIndex: currentItemIndex,
+            currentItemTitle: currentItemTitle,
             resultKind: "running"
         )
         if galleryDownloadExpectedCount > 0 {
@@ -1218,5 +1245,21 @@ extension ContentView {
         }
         let rawValue = line[range].dropLast()
         return Double(rawValue)
+    }
+}
+
+private struct GalleryProgressMarker: Decodable {
+    let event: String
+    let index: Int
+    let expectedCount: Int
+    let title: String
+    let path: String
+
+    enum CodingKeys: String, CodingKey {
+        case event
+        case index
+        case expectedCount = "expected_count"
+        case title
+        case path
     }
 }

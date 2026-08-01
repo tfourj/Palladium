@@ -213,9 +213,10 @@ def filter_user_visible_downloaded_paths(paths, primary_path, preserve_images=Fa
     return visible_paths or paths
 
 
-def detect_downloaded_files(scan_dir, preserve_images=False):
+def detect_downloaded_files(scan_dir, preserve_images=False, deduplicate=True):
     all_downloaded_paths = collect_downloaded_file_paths(scan_dir)
-    all_downloaded_paths = remove_duplicate_downloads(all_downloaded_paths)
+    if deduplicate:
+        all_downloaded_paths = remove_duplicate_downloads(all_downloaded_paths)
     primary_path = choose_primary_downloaded_path(all_downloaded_paths)
     visible_paths = filter_user_visible_downloaded_paths(
         all_downloaded_paths,

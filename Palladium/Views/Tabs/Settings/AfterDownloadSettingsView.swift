@@ -1,10 +1,25 @@
 import SwiftUI
 
+struct SavedDownloadPreferences {
+    static let alwaysUseFolderKey = "palladium.savedDownloads.alwaysUseFolder"
+    static let organizeByServiceKey = "palladium.savedDownloads.organizeByService"
+
+    let alwaysUseFolder: Bool
+    let organizeByService: Bool
+
+    static func load(from defaults: UserDefaults = .standard) -> Self {
+        Self(
+            alwaysUseFolder: defaults.bool(forKey: alwaysUseFolderKey),
+            organizeByService: defaults.bool(forKey: organizeByServiceKey)
+        )
+    }
+}
+
 struct AfterDownloadSettingsView: View {
     @Binding var afterDownloadBehavior: AfterDownloadBehavior
     let isRunning: Bool
-    @AppStorage("palladium.savedDownloads.alwaysUseFolder") private var alwaysUseFolder = false
-    @AppStorage("palladium.savedDownloads.organizeByService") private var organizeByService = false
+    @AppStorage(SavedDownloadPreferences.alwaysUseFolderKey) private var alwaysUseFolder = false
+    @AppStorage(SavedDownloadPreferences.organizeByServiceKey) private var organizeByService = false
 
     var body: some View {
         Form {

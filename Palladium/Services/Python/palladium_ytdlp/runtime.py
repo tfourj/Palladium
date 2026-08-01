@@ -2,6 +2,7 @@ import gc
 import importlib
 import io
 import logging
+import os
 import runpy
 import sys
 
@@ -52,11 +53,36 @@ def reset_gallery_dl_runtime():
     gc.collect()
 
 
-def run_gallery_dl_module():
+def run_gallery_dl_module(progress_callback=None):
     reset_gallery_dl_runtime()
+    original_handle_url = None
     try:
+        if progress_callback is not None:
+            from gallery_dl import job
+
+            original_handle_url = job.DownloadJob.handle_url
+
+            def handle_url_with_progress(download_job, url, kwdict):
+                try:
+                    progress_callback("started", url, kwdict, None)
+                except Exception:
+                    pass
+                original_handle_url(download_job, url, kwdict)
+                path = getattr(getattr(download_job, "pathfmt", None), "path", None)
+                try:
+                    completed = bool(path and os.path.isfile(path) and os.path.getsize(path) > 0)
+                except Exception:
+                    completed = False
+                try:
+                    progress_callback("completed" if completed else "failed", url, kwdict, path)
+                except Exception:
+                    pass
+
+            job.DownloadJob.handle_url = handle_url_with_progress
         runpy.run_module("gallery_dl", run_name="__main__", alter_sys=True)
     finally:
+        if original_handle_url is not None:
+            job.DownloadJob.handle_url = original_handle_url
         reset_gallery_dl_runtime()
 
 

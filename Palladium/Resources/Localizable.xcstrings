@@ -2564,6 +2564,16 @@
         }
       }
     },
+    "post_download.error.missing_service" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The source service could not be determined from the download address."
+          }
+        }
+      }
+    },
     "post_download.error.no_files" : {
       "localizations" : {
         "en" : {
@@ -3497,7 +3507,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Single downloads can be wrapped in their own folder. Service folders use the source hostname."
+            "value" : "Service folders only add a parent based on the source hostname. Collections still use their own folder; single downloads use one only when Always create a folder is enabled."
           }
         }
       }

@@ -96,6 +96,23 @@ GALLERY_AUDIO_URL_HINTS = (
 )
 
 
+def gallery_selection_count(selection_range):
+    selected = set()
+    try:
+        for component in str(selection_range or "").split(","):
+            component = component.strip()
+            if not component:
+                continue
+            if "-" in component:
+                start, end = component.split("-", 1)
+                selected.update(range(int(start), int(end) + 1))
+            else:
+                selected.add(int(component))
+    except Exception:
+        return 0
+    return len(selected)
+
+
 def gallery_item_media_type(url):
     try:
         parsed = urllib.parse.urlparse(url)
@@ -233,6 +250,29 @@ def run_gallery_dl_flow(download_url_override=None, selection_range_override=Non
     cancelled = False
     downloaded_paths = []
     primary_downloaded_path = None
+    expected_count = gallery_selection_count(selection_range)
+    progress_index = 0
+    active_progress_index = None
+
+    def emit_progress(event, media_url, metadata, path):
+        nonlocal progress_index, active_progress_index
+        if event == "started":
+            progress_index += 1
+            active_progress_index = progress_index
+        index = active_progress_index or progress_index
+        title = str((metadata or {}).get("filename") or (metadata or {}).get("title") or "").strip()
+        if not title:
+            title = gallery_item_title(str(media_url or ""), index, gallery_item_media_type(str(media_url or "")))
+        payload = {
+            "event": event,
+            "index": index,
+            "expected_count": expected_count,
+            "title": title,
+            "path": str(path or ""),
+        }
+        print(f"[palladium][gallery-progress] {json.dumps(payload, ensure_ascii=False, sort_keys=True)}")
+        if event != "started":
+            active_progress_index = None
 
     with contextlib.redirect_stdout(Tee(output, console_stdout, live_log_stream)), contextlib.redirect_stderr(Tee(output, console_stderr, live_log_stream)):
         try:
@@ -253,7 +293,7 @@ def run_gallery_dl_flow(download_url_override=None, selection_range_override=Non
                 )
                 print(f"[palladium] running gallery-dl for selected range: {selection_range}")
                 try:
-                    run_gallery_dl_module()
+                    run_gallery_dl_module(progress_callback=emit_progress)
                     exit_code = 0
                 except KeyboardInterrupt:
                     cancelled = True
@@ -267,6 +307,7 @@ def run_gallery_dl_flow(download_url_override=None, selection_range_override=Non
                 downloaded_paths, primary_downloaded_path = detect_downloaded_files(
                     run_output_dir,
                     preserve_images=True,
+                    deduplicate=False,
                 )
                 if downloaded_paths and exit_code != 0:
                     exit_code = 0
@@ -281,7 +322,21 @@ def run_gallery_dl_flow(download_url_override=None, selection_range_override=Non
             if live_log_stream is not None:
                 live_log_stream.flush()
 
-    success = pip_exit_code in (None, 0) and exit_code == 0 and bool(downloaded_paths) and not cancelled
+    downloaded_count = len(downloaded_paths)
+    complete_selection = expected_count == 0 or downloaded_count >= expected_count
+    success = (
+        pip_exit_code in (None, 0)
+        and exit_code == 0
+        and bool(downloaded_paths)
+        and complete_selection
+        and not cancelled
+    )
+    if cancelled:
+        result_kind = "cancelled"
+    elif downloaded_paths and (exit_code != 0 or not complete_selection):
+        result_kind = "partial"
+    else:
+        result_kind = "success" if success else "error"
     return json.dumps({
         "pip_attempted": pip_attempted,
         "pip_exit_code": pip_exit_code,
@@ -292,5 +347,5 @@ def run_gallery_dl_flow(download_url_override=None, selection_range_override=Non
         "primary_downloaded_path": primary_downloaded_path,
         "downloaded_path": primary_downloaded_path,
         "output": output.getvalue(),
-        "result_kind": "cancelled" if cancelled else ("success" if success else "error"),
+        "result_kind": result_kind,
     })

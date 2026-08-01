@@ -383,47 +383,56 @@ extension ContentView {
             )
             var appFolder = documents.appendingPathComponent("Saved", isDirectory: true)
             try FileManager.default.createDirectory(at: appFolder, withIntermediateDirectories: true)
-            if UserDefaults.standard.bool(forKey: "palladium.savedDownloads.organizeByService"),
-               let serviceFolderName = result.serviceFolderName {
+            let preferences = SavedDownloadPreferences.load()
+            if preferences.organizeByService {
+                guard let serviceFolderName = result.serviceFolderName else {
+                    throw NSError(
+                        domain: "Palladium",
+                        code: 2,
+                        userInfo: [NSLocalizedDescriptionKey: String(localized: "post_download.error.missing_service")]
+                    )
+                }
                 appFolder.appendPathComponent(serviceFolderName, isDirectory: true)
                 try FileManager.default.createDirectory(at: appFolder, withIntermediateDirectories: true)
             }
 
-            let sourceURL: URL
-            let destination: URL
-            let alwaysUseFolder = UserDefaults.standard.bool(forKey: "palladium.savedDownloads.alwaysUseFolder")
-            if result.isCollection, let folderURL = result.folderURL {
-                sourceURL = folderURL
-                destination = uniqueDestinationURL(
+            let shouldCreateDownloadFolder = result.isCollection || preferences.alwaysUseFolder
+            appendConsoleText(
+                "[palladium] save layout: service=\(preferences.organizeByService) "
+                    + "always-folder=\(preferences.alwaysUseFolder) collection=\(result.isCollection)\n",
+                source: .app
+            )
+            if shouldCreateDownloadFolder {
+                let destinationFolder = uniqueDestinationURL(
                     in: appFolder,
                     preferredName: result.savedFolderName,
                     isDirectory: true
                 )
-            } else if alwaysUseFolder, let itemURL = result.primaryMediaURL ?? result.items.first {
-                sourceURL = itemURL
-                destination = uniqueDestinationURL(
-                    in: appFolder,
-                    preferredName: result.savedFolderName,
-                    isDirectory: true
-                )
-                try FileManager.default.createDirectory(at: destination, withIntermediateDirectories: false)
-                try FileManager.default.copyItem(
-                    at: itemURL,
-                    to: destination.appendingPathComponent(itemURL.lastPathComponent)
-                )
-                cleanupTemporaryDownloadSource(for: result, sourceURL: sourceURL)
+                try copyItemsAtomically(result.items, to: destinationFolder, stagingParent: appFolder)
+                cleanupTemporaryDownloadSource(for: result)
                 alertMessage = nil
                 showAlert = false
                 showTemporaryToast(
-                    String(format: String(localized: "post_download.toast.saved_folder_name"), destination.lastPathComponent)
+                    String(
+                        format: String(localized: "post_download.toast.saved_folder_name"),
+                        destinationFolder.lastPathComponent
+                    )
                 )
                 return
-            } else if let itemURL = result.primaryMediaURL ?? result.items.first {
-                sourceURL = itemURL
-                destination = uniqueDestinationURL(
+            }
+
+            if let itemURL = result.primaryMediaURL ?? result.items.first {
+                let destination = uniqueDestinationURL(
                     in: appFolder,
                     preferredName: itemURL.lastPathComponent,
                     isDirectory: false
+                )
+                try FileManager.default.copyItem(at: itemURL, to: destination)
+                cleanupTemporaryDownloadSource(for: result)
+                alertMessage = nil
+                showAlert = false
+                showTemporaryToast(
+                    String(format: String(localized: "post_download.toast.saved_folder"), destination.lastPathComponent)
                 )
             } else {
                 throw NSError(
@@ -433,29 +442,19 @@ extension ContentView {
                 )
             }
 
-            try FileManager.default.copyItem(at: sourceURL, to: destination)
-            cleanupTemporaryDownloadSource(for: result, sourceURL: sourceURL)
-            alertMessage = nil
-            showAlert = false
-            if result.isCollection {
-                showTemporaryToast(
-                    String(format: String(localized: "post_download.toast.saved_folder_name"), destination.lastPathComponent)
-                )
-            } else {
-                showTemporaryToast(
-                    String(format: String(localized: "post_download.toast.saved_folder"), destination.lastPathComponent)
-                )
-            }
         } catch {
             alertMessage = String(format: String(localized: "post_download.error.save_folder"), error.localizedDescription)
             showAlert = true
         }
     }
 
-    private func cleanupTemporaryDownloadSource(for result: CompletedDownloadResult, sourceURL: URL) {
+    private func cleanupTemporaryDownloadSource(for result: CompletedDownloadResult) {
         let temporaryRoot = try? downloadsDirectoryURL()
-        let candidate = result.folderURL ?? sourceURL.deletingLastPathComponent()
+        let candidate = result.folderURL
+            ?? result.primaryMediaURL?.deletingLastPathComponent()
+            ?? result.items.first?.deletingLastPathComponent()
         guard let temporaryRoot,
+              let candidate,
               candidate.path.hasPrefix(temporaryRoot.path + "/") else { return }
         try? FileManager.default.removeItem(at: candidate)
     }
@@ -478,6 +477,26 @@ extension ContentView {
             index += 1
         } while fileManager.fileExists(atPath: candidate.path)
         return candidate
+    }
+
+    private func copyItemsAtomically(_ items: [URL], to destination: URL, stagingParent: URL) throws {
+        let fileManager = FileManager.default
+        let staging = stagingParent.appendingPathComponent(".palladium-save-\(UUID().uuidString)", isDirectory: true)
+        try fileManager.createDirectory(at: staging, withIntermediateDirectories: false)
+        do {
+            for itemURL in items {
+                let itemDestination = uniqueDestinationURL(
+                    in: staging,
+                    preferredName: itemURL.lastPathComponent,
+                    isDirectory: false
+                )
+                try fileManager.copyItem(at: itemURL, to: itemDestination)
+            }
+            try fileManager.moveItem(at: staging, to: destination)
+        } catch {
+            try? fileManager.removeItem(at: staging)
+            throw error
+        }
     }
 
     func handlePostDownloadAction(_ action: PostDownloadAction, for result: CompletedDownloadResult) {
