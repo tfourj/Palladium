@@ -264,7 +264,10 @@ def run_gallery_dl_flow(download_url_override=None, selection_range_override=Non
                 print("[palladium] gallery-dl download missing URL or selected images")
 
             if not cancelled and run_output_dir:
-                downloaded_paths, primary_downloaded_path = detect_downloaded_files(run_output_dir)
+                downloaded_paths, primary_downloaded_path = detect_downloaded_files(
+                    run_output_dir,
+                    preserve_images=True,
+                )
                 if downloaded_paths and exit_code != 0:
                     exit_code = 0
         except KeyboardInterrupt:

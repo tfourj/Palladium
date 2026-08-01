@@ -316,6 +316,18 @@ extension ContentView {
         galleryDownloadCompletedCount = 0
         galleryDownloadOutputDirectory = effectiveDownloadPreset == .images ? runOutputURL.path : nil
         galleryDownloadedOutputPaths = []
+        if effectiveDownloadPreset == .images {
+            playlistProgress = PlaylistProgressSnapshot(
+                title: effectiveDownloadPreset.title,
+                expectedCount: galleryDownloadExpectedCount,
+                completedCount: 0,
+                failedCount: 0,
+                failedItems: [],
+                currentItemIndex: galleryDownloadExpectedCount > 0 ? 1 : nil,
+                currentItemTitle: nil,
+                resultKind: "running"
+            )
+        }
 
         let logPipe = Pipe()
         let readHandle = logPipe.fileHandleForReading
@@ -448,6 +460,8 @@ extension ContentView {
             }
 
             let cancelWasRequested = downloadCancelRequested
+            let galleryExpectedCountAtFinish = galleryDownloadExpectedCount
+            let galleryCompletedCountAtFinish = galleryDownloadCompletedCount
             isRunning = false
             syncIdleTimerDisabled()
             downloadCancelRequested = false
@@ -469,7 +483,21 @@ extension ContentView {
 
             let finalResultKind = cancelWasRequested ? "cancelled" : (outcome.resultKind ?? outcome.statusText)
             statusText = finalResultKind
-            playlistProgress = outcome.playlistProgress ?? playlistProgress
+            if effectiveDownloadPreset == .images {
+                let failedCount = max(0, galleryExpectedCountAtFinish - galleryCompletedCountAtFinish)
+                playlistProgress = PlaylistProgressSnapshot(
+                    title: effectiveDownloadPreset.title,
+                    expectedCount: galleryExpectedCountAtFinish,
+                    completedCount: galleryCompletedCountAtFinish,
+                    failedCount: finalResultKind == "success" ? 0 : failedCount,
+                    failedItems: [],
+                    currentItemIndex: nil,
+                    currentItemTitle: nil,
+                    resultKind: finalResultKind
+                )
+            } else {
+                playlistProgress = outcome.playlistProgress ?? playlistProgress
+            }
             if finalResultKind == "cancelled" {
                 progressText = String(localized: "download.status.cancelled")
                 showDownloadActionSheet = false
@@ -504,7 +532,8 @@ extension ContentView {
                     items: outcome.downloadedPaths.map { URL(fileURLWithPath: $0) },
                     primaryMediaURL: outcome.primaryDownloadedPath.map { URL(fileURLWithPath: $0) },
                     folderURL: runOutputURL,
-                    titleHint: resultTitle
+                    titleHint: resultTitle,
+                    sourceURL: URL(string: targetURL)
                 )
                 completedDownloadAllowsSaveToApplicationFolder = true
                 if linkHistoryEnabledAtStart {
@@ -643,7 +672,15 @@ extension ContentView {
     }
 
     func galleryResolutionErrorText(for resolution: GalleryResolution) -> String {
-        resolution.errorMessage ?? String(localized: "gallery.error.no_items_found")
+        if let errorMessage = resolution.errorMessage, !errorMessage.isEmpty {
+            return errorMessage
+        }
+        let errorLine = resolution.outputText
+            .split(whereSeparator: \.isNewline)
+            .reversed()
+            .map { String($0).trimmingCharacters(in: .whitespacesAndNewlines) }
+            .first { $0.localizedCaseInsensitiveContains("[error]") }
+        return errorLine ?? String(localized: "gallery.error.no_items_found")
     }
 
     func gallerySelectionRange(_ indices: Set<Int>) -> String {
@@ -875,8 +912,20 @@ extension ContentView {
         guard galleryDownloadedOutputPaths.insert(identifier).inserted else { return }
 
         galleryDownloadCompletedCount += 1
+        let completed = galleryDownloadExpectedCount > 0
+            ? min(galleryDownloadCompletedCount, galleryDownloadExpectedCount)
+            : galleryDownloadCompletedCount
+        playlistProgress = PlaylistProgressSnapshot(
+            title: DownloadPreset.images.title,
+            expectedCount: galleryDownloadExpectedCount > 0 ? galleryDownloadExpectedCount : nil,
+            completedCount: completed,
+            failedCount: 0,
+            failedItems: [],
+            currentItemIndex: galleryDownloadExpectedCount > completed ? completed + 1 : nil,
+            currentItemTitle: nil,
+            resultKind: "running"
+        )
         if galleryDownloadExpectedCount > 0 {
-            let completed = min(galleryDownloadCompletedCount, galleryDownloadExpectedCount)
             progressText = "Downloading Gallery \(completed) of \(galleryDownloadExpectedCount)"
         } else {
             progressText = "Downloading Gallery"

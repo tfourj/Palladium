@@ -5,6 +5,7 @@ import re
 import runpy
 import sys
 import traceback
+import urllib.parse
 
 from .args import (
     build_preset_args,
@@ -36,6 +37,114 @@ from .shared import TailBuffer, Tee, open_live_log_stream
 
 
 PLAYLIST_PROGRESS_PREFIX = "[palladium][playlist-progress] "
+
+
+IMAGE_EXTENSIONS = {"avif", "bmp", "gif", "heic", "heif", "jpeg", "jpg", "png", "tif", "tiff", "webp"}
+
+
+def should_inspect_embedded_playlist(download_url, download_preset):
+    """Identify album-style pages that can expose duplicate HTML5 embeds."""
+    if str(download_preset or "").strip() == "images":
+        return False
+    try:
+        parsed = urllib.parse.urlparse(str(download_url or "").strip())
+        host = (parsed.hostname or "").lower().removeprefix("www.")
+        # Album-style pages exposing duplicate HTML5 embeds use a short
+        # `/a/<id>` path. Keep this generic so the downloader has no
+        # service-specific source dependency.
+        return bool(host) and parsed.path.lower().startswith("/a/")
+    except Exception:
+        return False
+
+
+def _entry_extension(entry):
+    extension = str((entry or {}).get("ext") or "").lower().lstrip(".")
+    if extension:
+        return extension
+    media_url = str((entry or {}).get("url") or "").strip()
+    try:
+        return os.path.splitext(urllib.parse.urlparse(media_url).path)[1].lower().lstrip(".")
+    except Exception:
+        return ""
+
+
+def _resolved_media_identity(entry):
+    """Return stable direct-media URLs without using the shared webpage URL."""
+    direct_url = str((entry or {}).get("url") or "").strip()
+    if direct_url and _entry_extension(entry) not in IMAGE_EXTENSIONS:
+        return ("url", direct_url)
+
+    format_urls = sorted({
+        str(item.get("url") or "").strip()
+        for item in ((entry or {}).get("formats") or [])
+        if isinstance(item, dict) and str(item.get("url") or "").strip()
+    })
+    return ("formats", tuple(format_urls)) if format_urls else None
+
+
+@contextlib.contextmanager
+def filter_embedded_playlist_entries(enabled):
+    """Filter a discovered playlist inside the existing yt-dlp invocation.
+
+    Avoiding a separate metadata preflight is important on iOS: a second
+    in-process network/extractor pass can trigger CoreSimulator SQLite tracking
+    assertions on beta runtimes.
+    """
+    if not enabled:
+        yield
+        return
+
+    import yt_dlp
+
+    original = yt_dlp.YoutubeDL.process_ie_result
+    seen_resolved_media = set()
+
+    def filtered_process_ie_result(downloader, ie_result, download=True, extra_info=None):
+        if isinstance(ie_result, dict) and ie_result.get("_type") in {"playlist", "multi_video"}:
+            raw_entries = ie_result.get("entries")
+            if raw_entries is not None:
+                entries = list(raw_entries)
+                seen_urls = set()
+                filtered_entries = []
+                for index, entry in enumerate(entries, start=1):
+                    entry = entry or {}
+                    if _entry_extension(entry) in IMAGE_EXTENSIONS:
+                        print(f"[palladium] excluding image playlist entry {index} from video mode")
+                        continue
+
+                    media_url = str(entry.get("url") or entry.get("webpage_url") or "").strip()
+                    identity = media_url or str(entry.get("id") or "").strip() or f"index:{index}"
+                    if identity in seen_urls:
+                        print(f"[palladium] excluding duplicate playlist entry {index}")
+                        continue
+                    seen_urls.add(identity)
+                    filtered_entries.append(entry)
+
+                if len(filtered_entries) != len(entries):
+                    ie_result = dict(ie_result)
+                    ie_result["entries"] = filtered_entries
+                    print(
+                        f"[palladium] embedded playlist filtered: "
+                        f"{len(entries)} -> {len(filtered_entries)} item(s)"
+                    )
+        elif isinstance(ie_result, dict) and ie_result.get("_type", "video") == "video":
+            if _entry_extension(ie_result) in IMAGE_EXTENSIONS:
+                print("[palladium][playlist-skip-image] excluding resolved image from video mode")
+                return None
+
+            identity = _resolved_media_identity(ie_result)
+            if identity is not None:
+                if identity in seen_resolved_media:
+                    print("[palladium][playlist-skip-duplicate] excluding repeated resolved media")
+                    return None
+                seen_resolved_media.add(identity)
+        return original(downloader, ie_result, download=download, extra_info=extra_info)
+
+    yt_dlp.YoutubeDL.process_ie_result = filtered_process_ie_result
+    try:
+        yield
+    finally:
+        yt_dlp.YoutubeDL.process_ie_result = original
 
 
 def list_yt_dlp_formats(download_url, cookie_file_path=""):
@@ -121,6 +230,7 @@ class PlaylistProgressCollector:
         self.current_item_paths = set()
         self.current_item_had_error = False
         self.current_item_error_line = None
+        self.current_item_skipped = False
         self.is_playlist_run = False
         self.last_emitted_payload = None
         self.suspend_tracking = False
@@ -236,11 +346,20 @@ class PlaylistProgressCollector:
             self.current_item_error_line = line
             self._emit()
 
+        if line.startswith(("[palladium][playlist-skip-duplicate]", "[palladium][playlist-skip-image]")):
+            self.current_item_skipped = True
+            if self.playlist_expected_count is not None:
+                self.playlist_expected_count = max(
+                    self.playlist_completed_count,
+                    self.playlist_expected_count - 1,
+                )
+            self._emit()
+
     def _finalize_current_item(self, aborted=False):
         if self.current_item_index is None:
             return
 
-        if not aborted:
+        if not aborted and not self.current_item_skipped:
             has_output = any(self._path_exists(path) for path in self.current_item_paths)
             if has_output:
                 self.playlist_completed_count += 1
@@ -253,6 +372,7 @@ class PlaylistProgressCollector:
         self.current_item_paths = set()
         self.current_item_had_error = False
         self.current_item_error_line = None
+        self.current_item_skipped = False
         self._emit()
 
     def retry_candidates(self):
@@ -638,6 +758,7 @@ def run_yt_dlp_flow(
                         raise_if_cancel_requested(cancel_file_path, "[palladium] cancellation requested before yt-dlp invocation")
                         output_args = []
                         download_behavior_args = []
+                        filter_embedded_entries = should_inspect_embedded_playlist(download_url, download_preset)
                         if has_custom_output_template(preset_args) or has_custom_output_template(extra_args):
                             print("[palladium] custom output template detected")
                         else:
@@ -686,7 +807,7 @@ def run_yt_dlp_flow(
                         ]
 
                         try:
-                            with patch_ytdlp_for_swiftffmpeg(bridge_adapter):
+                            with patch_ytdlp_for_swiftffmpeg(bridge_adapter), filter_embedded_playlist_entries(filter_embedded_entries):
                                 runpy.run_module("yt_dlp", run_name="__main__", alter_sys=True)
                             yt_exit_code = 0
                         except KeyboardInterrupt:

@@ -189,7 +189,8 @@ extension ContentView {
             items: [item.url],
             primaryMediaURL: item.url,
             folderURL: nil,
-            titleHint: item.displayName
+            titleHint: item.displayName,
+            sourceURL: nil
         )
         completedPhotosCompatibility = .checking
         showDownloadActionSheet = true
@@ -380,17 +381,50 @@ extension ContentView {
                 appropriateFor: nil,
                 create: true
             )
-            let appFolder = documents.appendingPathComponent("Saved", isDirectory: true)
+            var appFolder = documents.appendingPathComponent("Saved", isDirectory: true)
             try FileManager.default.createDirectory(at: appFolder, withIntermediateDirectories: true)
+            if UserDefaults.standard.bool(forKey: "palladium.savedDownloads.organizeByService"),
+               let serviceFolderName = result.serviceFolderName {
+                appFolder.appendPathComponent(serviceFolderName, isDirectory: true)
+                try FileManager.default.createDirectory(at: appFolder, withIntermediateDirectories: true)
+            }
 
             let sourceURL: URL
             let destination: URL
+            let alwaysUseFolder = UserDefaults.standard.bool(forKey: "palladium.savedDownloads.alwaysUseFolder")
             if result.isCollection, let folderURL = result.folderURL {
                 sourceURL = folderURL
-                destination = appFolder.appendingPathComponent(result.savedFolderName, isDirectory: true)
+                destination = uniqueDestinationURL(
+                    in: appFolder,
+                    preferredName: result.savedFolderName,
+                    isDirectory: true
+                )
+            } else if alwaysUseFolder, let itemURL = result.primaryMediaURL ?? result.items.first {
+                sourceURL = itemURL
+                destination = uniqueDestinationURL(
+                    in: appFolder,
+                    preferredName: result.savedFolderName,
+                    isDirectory: true
+                )
+                try FileManager.default.createDirectory(at: destination, withIntermediateDirectories: false)
+                try FileManager.default.copyItem(
+                    at: itemURL,
+                    to: destination.appendingPathComponent(itemURL.lastPathComponent)
+                )
+                cleanupTemporaryDownloadSource(for: result, sourceURL: sourceURL)
+                alertMessage = nil
+                showAlert = false
+                showTemporaryToast(
+                    String(format: String(localized: "post_download.toast.saved_folder_name"), destination.lastPathComponent)
+                )
+                return
             } else if let itemURL = result.primaryMediaURL ?? result.items.first {
                 sourceURL = itemURL
-                destination = appFolder.appendingPathComponent(itemURL.lastPathComponent)
+                destination = uniqueDestinationURL(
+                    in: appFolder,
+                    preferredName: itemURL.lastPathComponent,
+                    isDirectory: false
+                )
             } else {
                 throw NSError(
                     domain: "Palladium",
@@ -399,10 +433,8 @@ extension ContentView {
                 )
             }
 
-            if FileManager.default.fileExists(atPath: destination.path) {
-                try FileManager.default.removeItem(at: destination)
-            }
             try FileManager.default.copyItem(at: sourceURL, to: destination)
+            cleanupTemporaryDownloadSource(for: result, sourceURL: sourceURL)
             alertMessage = nil
             showAlert = false
             if result.isCollection {
@@ -418,6 +450,34 @@ extension ContentView {
             alertMessage = String(format: String(localized: "post_download.error.save_folder"), error.localizedDescription)
             showAlert = true
         }
+    }
+
+    private func cleanupTemporaryDownloadSource(for result: CompletedDownloadResult, sourceURL: URL) {
+        let temporaryRoot = try? downloadsDirectoryURL()
+        let candidate = result.folderURL ?? sourceURL.deletingLastPathComponent()
+        guard let temporaryRoot,
+              candidate.path.hasPrefix(temporaryRoot.path + "/") else { return }
+        try? FileManager.default.removeItem(at: candidate)
+    }
+
+    private func uniqueDestinationURL(in directory: URL, preferredName: String, isDirectory: Bool) -> URL {
+        let fileManager = FileManager.default
+        let sanitizedName = preferredName.isEmpty ? "Download" : preferredName
+        var candidate = directory.appendingPathComponent(sanitizedName, isDirectory: isDirectory)
+        guard fileManager.fileExists(atPath: candidate.path) else { return candidate }
+
+        let url = URL(fileURLWithPath: sanitizedName)
+        let baseName = url.deletingPathExtension().lastPathComponent
+        let extensionName = url.pathExtension
+        var index = 1
+        repeat {
+            let numberedName = extensionName.isEmpty
+                ? "\(baseName) (\(index))"
+                : "\(baseName) (\(index)).\(extensionName)"
+            candidate = directory.appendingPathComponent(numberedName, isDirectory: isDirectory)
+            index += 1
+        } while fileManager.fileExists(atPath: candidate.path)
+        return candidate
     }
 
     func handlePostDownloadAction(_ action: PostDownloadAction, for result: CompletedDownloadResult) {
@@ -447,6 +507,7 @@ struct CompletedDownloadResult {
     let primaryMediaURL: URL?
     let folderURL: URL?
     let titleHint: String?
+    let sourceURL: URL?
 
     var isCollection: Bool {
         items.count > 1
@@ -480,6 +541,12 @@ struct CompletedDownloadResult {
             return sanitized
         }
         return String(localized: "download.fallback_title")
+    }
+
+    var serviceFolderName: String? {
+        guard let host = sourceURL?.host(percentEncoded: false), !host.isEmpty else { return nil }
+        let normalized = host.lowercased().hasPrefix("www.") ? String(host.dropFirst(4)) : host
+        return sanitizedFolderName(normalized)
     }
 
     private func sanitizedFolderName(_ rawValue: String?) -> String? {

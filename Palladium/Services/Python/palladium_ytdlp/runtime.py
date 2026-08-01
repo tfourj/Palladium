@@ -1,3 +1,4 @@
+import gc
 import importlib
 import io
 import logging
@@ -17,6 +18,17 @@ class GalleryDLOutputCapture(io.StringIO):
 
 def reset_gallery_dl_runtime():
     """Discard gallery-dl state and log handlers from a previous in-process run."""
+    cache_module = sys.modules.get("gallery_dl.cache")
+    database = getattr(cache_module, "DATABASE", None) if cache_module is not None else None
+    if database is not None:
+        try:
+            database.close()
+            print("[palladium] closed gallery-dl cache database")
+        except Exception:
+            print("[palladium] failed to close gallery-dl cache database")
+        finally:
+            cache_module.DATABASE = None
+
     loggers = [logging.getLogger()]
     loggers.extend(
         logger
@@ -33,6 +45,11 @@ def reset_gallery_dl_runtime():
     for module_name in list(sys.modules):
         if module_name == "gallery_dl" or module_name.startswith("gallery_dl."):
             del sys.modules[module_name]
+
+    # gallery-dl is run repeatedly inside one embedded interpreter. Ensure
+    # cursors, HTTP sessions, and module globals from the completed job are
+    # finalized before a later resolver/download opens the same SQLite cache.
+    gc.collect()
 
 
 def run_gallery_dl_module():

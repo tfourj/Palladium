@@ -1,4 +1,5 @@
 import os
+import hashlib
 import re
 import traceback
 import urllib.parse
@@ -141,6 +142,36 @@ def collect_downloaded_file_paths(scan_dir):
     return sorted(collected, key=lambda path: os.path.relpath(path, scan_dir).lower())
 
 
+def remove_duplicate_downloads(paths):
+    """Remove byte-identical media outputs produced by duplicate embeds."""
+    seen = {}
+    unique = []
+    for path in paths:
+        try:
+            size = os.path.getsize(path)
+            digest = hashlib.sha256()
+            with open(path, "rb") as handle:
+                for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+                    digest.update(chunk)
+            key = (size, digest.hexdigest())
+        except Exception:
+            unique.append(path)
+            continue
+
+        original = seen.get(key)
+        if original is None:
+            seen[key] = path
+            unique.append(path)
+            continue
+
+        try:
+            os.remove(path)
+            print(f"[palladium] removed duplicate downloaded file: {path} (same as {original})")
+        except Exception:
+            unique.append(path)
+    return unique
+
+
 def choose_primary_downloaded_path(paths):
     if not paths:
         return None
@@ -159,7 +190,7 @@ def choose_primary_downloaded_path(paths):
     return min(paths, key=path_priority)
 
 
-def filter_user_visible_downloaded_paths(paths, primary_path):
+def filter_user_visible_downloaded_paths(paths, primary_path, preserve_images=False):
     if not paths:
         return []
 
@@ -171,7 +202,10 @@ def filter_user_visible_downloaded_paths(paths, primary_path):
 
         if extension in AUXILIARY_SIDE_CAR_EXTENSIONS:
             continue
-        if primary_extension in PRIMARY_MEDIA_EXTENSIONS and extension in IMAGE_MEDIA_EXTENSIONS:
+        # yt-dlp may leave an embedded-thumbnail image beside the final media
+        # file. Gallery downloads, however, can legitimately contain both
+        # images and videos and must keep both kinds of media.
+        if not preserve_images and primary_extension in PRIMARY_MEDIA_EXTENSIONS and extension in IMAGE_MEDIA_EXTENSIONS:
             continue
 
         visible_paths.append(path)
@@ -179,8 +213,13 @@ def filter_user_visible_downloaded_paths(paths, primary_path):
     return visible_paths or paths
 
 
-def detect_downloaded_files(scan_dir):
+def detect_downloaded_files(scan_dir, preserve_images=False):
     all_downloaded_paths = collect_downloaded_file_paths(scan_dir)
+    all_downloaded_paths = remove_duplicate_downloads(all_downloaded_paths)
     primary_path = choose_primary_downloaded_path(all_downloaded_paths)
-    visible_paths = filter_user_visible_downloaded_paths(all_downloaded_paths, primary_path)
+    visible_paths = filter_user_visible_downloaded_paths(
+        all_downloaded_paths,
+        primary_path,
+        preserve_images=preserve_images,
+    )
     return visible_paths, choose_primary_downloaded_path(visible_paths)

@@ -220,6 +220,7 @@
       }
     },
     "common.save" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2183,22 +2184,22 @@
         }
       }
     },
-    "packages.status.restoring" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Restoring pip packages..."
-          }
-        }
-      }
-    },
     "packages.status.removing" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Removing package..."
+          }
+        }
+      }
+    },
+    "packages.status.restoring" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restoring pip packages..."
           }
         }
       }
@@ -3437,6 +3438,46 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Total"
+          }
+        }
+      }
+    },
+    "settings.saved_downloads.always_folder" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Always create a folder"
+          }
+        }
+      }
+    },
+    "settings.saved_downloads.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Single downloads can be wrapped in their own folder. Service folders use the source hostname."
+          }
+        }
+      }
+    },
+    "settings.saved_downloads.organize_by_service" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Organize by service"
+          }
+        }
+      }
+    },
+    "settings.saved_downloads.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved downloads"
           }
         }
       }

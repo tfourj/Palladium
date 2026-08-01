@@ -2,6 +2,8 @@
 nc_*.md
 /Palladium.xcodeproj/xcuserdata
 /build
+/DerivedData
+/SourcePackages
 *.log
 __pycache__/
 *.pyc
