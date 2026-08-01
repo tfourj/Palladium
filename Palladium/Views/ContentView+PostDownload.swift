@@ -802,9 +802,7 @@ struct CompletedDownloadResult {
     }
 
     var serviceFolderName: String? {
-        guard let host = sourceURL?.host(percentEncoded: false), !host.isEmpty else { return nil }
-        let normalized = host.lowercased().hasPrefix("www.") ? String(host.dropFirst(4)) : host
-        return sanitizedFolderName(normalized)
+        sanitizedFolderName(DownloadServiceDomain.canonicalHost(for: sourceURL))
     }
 
     private func sanitizedFolderName(_ rawValue: String?) -> String? {

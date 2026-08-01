@@ -47,6 +47,7 @@ Palladium/
 | `Resources/ManagedPipPackages.txt` | Single manifest for managed pip packages and optional `[version]` locks. |
 | `AppIntents/ShortcutDownloadIntents.swift` | App Shortcuts intents for starting downloads. |
 | `Models/AppAppearanceMode.swift` | Appearance-mode setting model. |
+| `Models/DownloadServiceDomain.swift` | Canonical source-service domain resolver for saved-download folders. |
 | `Models/DownloadOptions.swift` | Download option model and persisted settings. |
 | `Models/ImportedCookieFile.swift` | Imported cookie-file model. |
 | `Models/LinkHistory.swift` | Previously used link model and history storage data. |

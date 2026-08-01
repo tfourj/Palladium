@@ -3617,7 +3617,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Service folders only add a parent based on the source hostname. Collections still use their own folder; single downloads use one only when Always create a folder is enabled."
+            "value" : "Service folders add a parent based on the source service. Subdomains and known short-link domains share one folder. Collections still use their own folder; single downloads use one only when Always create a folder is enabled."
           }
         }
       }
