@@ -109,7 +109,6 @@ extension ContentView {
     func debugNotification(_ message: String) {
         let line = "[notify] \(message)"
         Self.logger.info("\(line, privacy: .public)")
-        print(line)
         Task { @MainActor in
             appendConsoleText("\(line)\n", source: .app)
         }

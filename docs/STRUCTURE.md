@@ -34,6 +34,8 @@ Palladium/
 | `build_ipa.sh` | Builds and exports an IPA outside Xcode. |
 | `scripts/install_python_runtime.sh` | Copies Python runtime files and privacy manifests into the app bundle during builds. |
 | `scripts/python_tests/` | Split Python unittest modules and shared helpers for package/runtime behavior. |
+| `scripts/swift_tests/` | Standalone Swift model regression checks. |
+| `scripts/test_swift_models.sh` | Compiles and runs standalone Swift model tests. |
 | `scripts/update_build_metadata.sh` | Writes Git commit and final-build metadata into the built app Info.plist. |
 | `scripts/test_package_source_modes.py` | Compatibility runner for split Python package/runtime tests. |
 
@@ -47,10 +49,12 @@ Palladium/
 | `Resources/ManagedPipPackages.txt` | Single manifest for managed pip packages and optional `[version]` locks. |
 | `AppIntents/ShortcutDownloadIntents.swift` | App Shortcuts intents for starting downloads. |
 | `Models/AppAppearanceMode.swift` | Appearance-mode setting model. |
+| `Models/DownloadServiceDomain.swift` | Canonical source-service domain resolver for saved-download folders. |
 | `Models/DownloadOptions.swift` | Download option model and persisted settings. |
 | `Models/ImportedCookieFile.swift` | Imported cookie-file model. |
 | `Models/LinkHistory.swift` | Previously used link model and history storage data. |
 | `Models/PackageSourceMode.swift` | Package-source selection model. |
+| `Models/TemporaryDownloadRetentionPolicy.swift` | Decides whether completed temporary downloads are removed after saving. |
 | `Models/YouTubePatchMode.swift` | Patch target setting model. |
 
 ### Views

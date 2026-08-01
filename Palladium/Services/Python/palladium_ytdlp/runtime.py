@@ -1,6 +1,8 @@
+import gc
 import importlib
 import io
 import logging
+import os
 import runpy
 import sys
 
@@ -17,6 +19,17 @@ class GalleryDLOutputCapture(io.StringIO):
 
 def reset_gallery_dl_runtime():
     """Discard gallery-dl state and log handlers from a previous in-process run."""
+    cache_module = sys.modules.get("gallery_dl.cache")
+    database = getattr(cache_module, "DATABASE", None) if cache_module is not None else None
+    if database is not None:
+        try:
+            database.close()
+            print("[palladium] closed gallery-dl cache database")
+        except Exception:
+            print("[palladium] failed to close gallery-dl cache database")
+        finally:
+            cache_module.DATABASE = None
+
     loggers = [logging.getLogger()]
     loggers.extend(
         logger
@@ -34,12 +47,42 @@ def reset_gallery_dl_runtime():
         if module_name == "gallery_dl" or module_name.startswith("gallery_dl."):
             del sys.modules[module_name]
 
+    # gallery-dl is run repeatedly inside one embedded interpreter. Ensure
+    # cursors, HTTP sessions, and module globals from the completed job are
+    # finalized before a later resolver/download opens the same SQLite cache.
+    gc.collect()
 
-def run_gallery_dl_module():
+
+def run_gallery_dl_module(progress_callback=None):
     reset_gallery_dl_runtime()
+    original_handle_url = None
     try:
+        if progress_callback is not None:
+            from gallery_dl import job
+
+            original_handle_url = job.DownloadJob.handle_url
+
+            def handle_url_with_progress(download_job, url, kwdict):
+                try:
+                    progress_callback("started", url, kwdict, None)
+                except Exception:
+                    pass
+                original_handle_url(download_job, url, kwdict)
+                path = getattr(getattr(download_job, "pathfmt", None), "path", None)
+                try:
+                    completed = bool(path and os.path.isfile(path) and os.path.getsize(path) > 0)
+                except Exception:
+                    completed = False
+                try:
+                    progress_callback("completed" if completed else "failed", url, kwdict, path)
+                except Exception:
+                    pass
+
+            job.DownloadJob.handle_url = handle_url_with_progress
         runpy.run_module("gallery_dl", run_name="__main__", alter_sys=True)
     finally:
+        if original_handle_url is not None:
+            job.DownloadJob.handle_url = original_handle_url
         reset_gallery_dl_runtime()
 
 

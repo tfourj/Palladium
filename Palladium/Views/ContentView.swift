@@ -17,7 +17,7 @@ struct ContentView: View {
         case console
     }
 
-    enum PhotosMediaType {
+    enum PhotosMediaType: Equatable {
         case video
         case image
     }
@@ -146,9 +146,14 @@ struct ContentView: View {
     @State var storageSummary: StorageManagementSummary = .empty
     @StateObject var consoleLogStore: ConsoleLogStore
     @State var completedDownloadResult: CompletedDownloadResult?
+    @State var pendingPostDownloadResults: [CompletedDownloadResult] = []
     @State var completedDownloadAllowsSaveToApplicationFolder = true
     @State var completedPhotosCompatibility: PhotosCompatibilityState = .checking
     @State var showDownloadActionSheet = false
+    @State var advancePostDownloadAfterActionSheetDismissal = false
+    @State var advancePostDownloadAfterSharing = false
+    @State var sharedPostDownloadFolderID: UUID?
+    @State var sharedPostDownloadFolderURL: URL?
     @State var alertMessage: String?
     @State var showAlert = false
     @State var reopenDownloadActionAfterAlert = false
@@ -165,7 +170,8 @@ struct ContentView: View {
     @State var isInstallingPackagesDuringDownload = false
     @State var galleryDownloadExpectedCount = 0
     @State var galleryDownloadCompletedCount = 0
-    @State var galleryDownloadOutputDirectory: String?
+    @State var galleryDownloadFailedCount = 0
+    @State var galleryDownloadFailedItems: [String] = []
     @State var galleryDownloadedOutputPaths = Set<String>()
     @State var pendingConsoleChunks = ""
     @State var isConsoleFlushScheduled = false
@@ -371,6 +377,7 @@ struct ContentView: View {
                     onImportCookieFile: importCookieFile,
                     onImportCookiesFromWebsite: importBrowserCookies,
                     onPasteCookieFile: pasteCookieFile,
+                    onRenameCookieFile: renameImportedCookieFile,
                     onDeleteCookieFile: deleteImportedCookieFile
                 )
                 .tabItem {
@@ -537,7 +544,11 @@ struct ContentView: View {
         .onChange(of: youtubePatchMode, initial: false) {
             persistPreferences()
         }
-        .sheet(item: $sharePayload) { payload in
+        .sheet(item: $sharePayload, onDismiss: {
+            guard advancePostDownloadAfterSharing else { return }
+            advancePostDownloadAfterSharing = false
+            advancePostDownloadPromptSequence()
+        }) { payload in
             ShareSheet(activityItems: payload.activityItems)
         }
         .sheet(isPresented: $showShareSheetDownloadPicker, onDismiss: {
@@ -545,7 +556,11 @@ struct ContentView: View {
         }) {
             shareSheetModePickerSheet
         }
-        .sheet(isPresented: $showDownloadActionSheet) {
+        .sheet(isPresented: $showDownloadActionSheet, onDismiss: {
+            guard advancePostDownloadAfterActionSheetDismissal else { return }
+            advancePostDownloadAfterActionSheetDismissal = false
+            advancePostDownloadPromptSequence()
+        }) {
             downloadCompleteActionSheet
                 .interactiveDismissDisabled(true)
         }

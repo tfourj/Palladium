@@ -258,7 +258,7 @@ struct DownloadTabView: View {
                         .buttonStyle(.borderedProminent)
                         .tint(isRunning ? .red : .blue)
 
-                        if !isRunning {
+                        if !isRunning && selectedPreset != .images {
                             Button(action: onChooseFormat) {
                                 Group {
                                     if isResolvingFormats {

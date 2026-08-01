@@ -11,7 +11,7 @@ extension ContentView {
             importedCookieFiles = try listImportedCookieFiles()
             guard !selectedCookieFileName.isEmpty else { return }
             if !importedCookieFiles.contains(where: { $0.fileName == selectedCookieFileName }) {
-                selectedCookieFileName = ""
+                clearSelectedCookieFile()
             }
         } catch {
             appendConsoleText(
@@ -34,9 +34,12 @@ extension ContentView {
         try saveCookieText(validatedText, preferredFileName: sourceURL.lastPathComponent)
     }
 
-    func pasteCookieFile(from rawText: String) throws {
+    func pasteCookieFile(from rawText: String, preferredName: String) throws {
         let validatedText = try normalizedNetscapeCookiesText(from: rawText)
-        try saveCookieText(validatedText, preferredFileName: "pasted-cookies.txt")
+        try saveCookieText(
+            validatedText,
+            preferredFileName: cookieFileName(from: preferredName, fallback: "pasted-cookies.txt")
+        )
     }
 
     func importBrowserCookies(_ cookies: [HTTPCookie], from sourceURL: URL) throws {
@@ -56,6 +59,35 @@ extension ContentView {
         }
     }
 
+    func renameImportedCookieFile(_ cookieFile: ImportedCookieFile, to rawName: String) throws {
+        let destinationName = cookieFileName(
+            from: rawName,
+            fallback: cookieFile.fileName,
+            defaultExtension: cookieFile.fileURL.pathExtension
+        )
+        let destinationURL = try cookiesDirectoryURL().appendingPathComponent(destinationName, isDirectory: false)
+        guard destinationURL.lastPathComponent != cookieFile.fileName else { return }
+        guard !FileManager.default.fileExists(atPath: destinationURL.path) else {
+            throw NSError(
+                domain: "PalladiumCookies",
+                code: 3,
+                userInfo: [NSLocalizedDescriptionKey: String(localized: "cookies.error.name_conflict")]
+            )
+        }
+
+        let wasSelected = selectedCookieFileName == cookieFile.fileName
+        try FileManager.default.moveItem(at: cookieFile.fileURL, to: destinationURL)
+        refreshImportedCookieFiles()
+        if wasSelected {
+            selectedCookieFileName = destinationName
+            defaultUseCookies = true
+            useCookies = true
+        }
+        showTemporaryToast(
+            String(format: String(localized: "cookies.toast.renamed"), destinationName)
+        )
+    }
+
     func resolvedSelectedCookieFilePath() -> String? {
         let trimmedSelection = selectedCookieFileName.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedSelection.isEmpty else { return nil }
@@ -70,7 +102,7 @@ extension ContentView {
                         "[palladium] selected cookie file is invalid: \(error.localizedDescription)\n",
                         source: .app
                     )
-                    selectedCookieFileName = ""
+                    clearSelectedCookieFile()
                     refreshImportedCookieFiles()
                     return nil
                 }
@@ -83,7 +115,7 @@ extension ContentView {
             )
         }
         appendConsoleText("[palladium] selected cookie file missing, clearing selection\n", source: .app)
-        selectedCookieFileName = ""
+        clearSelectedCookieFile()
         return nil
     }
 
@@ -93,6 +125,12 @@ extension ContentView {
 
     static func loadSelectedCookieFileName() -> String {
         UserDefaults.standard.string(forKey: selectedCookieFileNameDefaultsKey) ?? ""
+    }
+
+    private func clearSelectedCookieFile() {
+        selectedCookieFileName = ""
+        defaultUseCookies = false
+        useCookies = false
     }
 
     private func saveCookieText(_ text: String, preferredFileName: String) throws {
@@ -331,11 +369,27 @@ extension ContentView {
         let invalidCharacters = CharacterSet(charactersIn: "/:\\?%*|\"<>")
         let parts = rawValue.components(separatedBy: invalidCharacters)
         let collapsed = parts.joined(separator: "_")
-            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .trimmingCharacters(in: CharacterSet.whitespacesAndNewlines.union(CharacterSet(charactersIn: ".")))
         if collapsed.isEmpty {
             return "cookies.txt"
         }
         return collapsed
+    }
+
+    private func cookieFileName(
+        from rawValue: String,
+        fallback: String,
+        defaultExtension: String = "txt"
+    ) -> String {
+        let sanitized = sanitizedCookieFileName(from: rawValue)
+        let candidate = sanitized == "cookies.txt" && rawValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            ? sanitizedCookieFileName(from: fallback)
+            : sanitized
+        guard URL(fileURLWithPath: candidate).pathExtension.isEmpty,
+              !defaultExtension.isEmpty else {
+            return candidate
+        }
+        return "\(candidate).\(defaultExtension)"
     }
 
     private func uniqueCookieDestinationURL(for fileName: String) throws -> URL {

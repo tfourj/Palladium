@@ -162,22 +162,12 @@ private struct SavedDownloadsFolderView: View {
             } else {
                 List {
                     ForEach(items) { item in
-                        SavedDownloadRow(item: item) {
-                            onOpenOptions(item)
-                        }
-                            .contentShape(Rectangle())
+                        if item.isFolder {
+                            NavigationLink(value: item) {
+                                SavedDownloadRow(item: item, showsFolderChevron: false)
+                            }
                             .listRowSeparator(.visible)
                             .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
-                            .onTapGesture {
-                                if item.isPlayable {
-                                    onOpenPlayback(item)
-                                } else {
-                                    onOpenOptions(item)
-                                }
-                            }
-                            .onLongPressGesture {
-                                onOpenOptions(item)
-                            }
                             .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                                 Button(role: .destructive) {
                                     delete(item)
@@ -185,14 +175,35 @@ private struct SavedDownloadsFolderView: View {
                                     Label("common.delete", systemImage: "trash")
                                 }
                             }
-                            .swipeActions(edge: .leading, allowsFullSwipe: false) {
-                                Button {
-                                    onOpenOptions(item)
-                                } label: {
-                                    Label("downloads.options", systemImage: "ellipsis.circle")
-                                }
-                                .tint(.blue)
+                        } else {
+                            SavedDownloadRow(item: item) {
+                                onOpenOptions(item)
                             }
+                                .contentShape(Rectangle())
+                                .listRowSeparator(.visible)
+                                .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
+                                .onTapGesture {
+                                    onOpenPlayback(item)
+                                }
+                                .onLongPressGesture {
+                                    onOpenOptions(item)
+                                }
+                                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                    Button(role: .destructive) {
+                                        delete(item)
+                                    } label: {
+                                        Label("common.delete", systemImage: "trash")
+                                    }
+                                }
+                                .swipeActions(edge: .leading, allowsFullSwipe: false) {
+                                    Button {
+                                        onOpenOptions(item)
+                                    } label: {
+                                        Label("downloads.options", systemImage: "ellipsis.circle")
+                                    }
+                                    .tint(.blue)
+                                }
+                        }
                     }
                 }
                 .listStyle(.plain)
@@ -213,7 +224,7 @@ private struct SavedDownloadsFolderView: View {
 
     private func loadItems() {
         do {
-            items = try SavedDownloadScanner.mediaItems(in: folder.url, location: folder.location)
+            items = try SavedDownloadScanner.topLevelItems(in: folder.url, location: folder.location)
             loadError = nil
         } catch {
             items = []

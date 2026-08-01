@@ -219,6 +219,16 @@
         }
       }
     },
+    "common.rename" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rename"
+          }
+        }
+      }
+    },
     "console.empty" : {
       "localizations" : {
         "en" : {
@@ -429,6 +439,16 @@
         }
       }
     },
+    "cookies.name.placeholder" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cookie name"
+          }
+        }
+      }
+    },
     "cookies.path.documents" : {
       "localizations" : {
         "en" : {
@@ -445,6 +465,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "App folder"
+          }
+        }
+      }
+    },
+    "cookies.rename.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rename Cookie File"
           }
         }
       }
@@ -475,6 +505,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Imported cookie file: %@"
+          }
+        }
+      }
+    },
+    "cookies.toast.renamed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Renamed cookie file: %@"
           }
         }
       }
@@ -2319,6 +2359,16 @@
         }
       }
     },
+    "photos.error.mixed_collection" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Every file in this group must be compatible with Photos."
+          }
+        }
+      }
+    },
     "photos.error.no_video_track" : {
       "localizations" : {
         "en" : {
@@ -2375,6 +2425,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Unsupported image format (%@)."
+          }
+        }
+      }
+    },
+    "photos.error.unsupported_media_group" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio and other files cannot be saved to Photos."
           }
         }
       }
@@ -2469,6 +2529,26 @@
         }
       }
     },
+    "post_download.action.skip" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skip"
+          }
+        }
+      }
+    },
+    "post_download.error.missing_service" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The source service could not be determined from the download address."
+          }
+        }
+      }
+    },
     "post_download.error.no_files" : {
       "localizations" : {
         "en" : {
@@ -2504,7 +2584,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This download produced %lld files. Photos import is disabled for collections and subtitle sidecars."
+            "value" : "Choose what to do with these %lld downloaded files."
           }
         }
       }
@@ -2525,6 +2605,46 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Download Complete"
+          }
+        }
+      }
+    },
+    "post_download.title.audio" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio Downloaded"
+          }
+        }
+      }
+    },
+    "post_download.title.files" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Files Downloaded"
+          }
+        }
+      }
+    },
+    "post_download.title.images" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Images Downloaded"
+          }
+        }
+      }
+    },
+    "post_download.title.videos" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Videos Downloaded"
           }
         }
       }
@@ -3376,6 +3496,46 @@
         }
       }
     },
+    "settings.saved_downloads.always_folder" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Always create a folder"
+          }
+        }
+      }
+    },
+    "settings.saved_downloads.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Service folders add a parent based on the source service. Subdomains and known short-link domains share one folder. Collections still use their own folder; single downloads use one only when Always create a folder is enabled."
+          }
+        }
+      }
+    },
+    "settings.saved_downloads.organize_by_service" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Organize by service"
+          }
+        }
+      }
+    },
+    "settings.saved_downloads.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved downloads"
+          }
+        }
+      }
+    },
     "settings.ui.after_download.help" : {
       "localizations" : {
         "en" : {
@@ -3441,7 +3601,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "When enabled, the Downloads tab also shows temporary download runs from Palladium/Temp."
+            "value" : "When enabled, Palladium keeps completed downloads in Palladium/Temp and shows them in the Downloads tab. Saving to Saved Files copies them without removing the temporary originals."
           }
         }
       }

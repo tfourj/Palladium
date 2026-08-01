@@ -9,7 +9,8 @@ struct ImportedCookieFile: Identifiable, Equatable, Hashable {
     var id: String { fileName }
 
     var displayName: String {
-        fileName
+        let stem = fileURL.deletingPathExtension().lastPathComponent
+        return stem.isEmpty ? fileName : stem
     }
 
     var formattedSize: String {
