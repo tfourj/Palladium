@@ -3641,7 +3641,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "When enabled, the Downloads tab also shows temporary download runs from Palladium/Temp."
+            "value" : "When enabled, Palladium keeps completed downloads in Palladium/Temp and shows them in the Downloads tab. Saving to Saved Files copies them without removing the temporary originals."
           }
         }
       }

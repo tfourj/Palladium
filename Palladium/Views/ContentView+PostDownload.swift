@@ -567,7 +567,10 @@ extension ContentView {
     }
 
     private func cleanupTemporaryDownloadSource(for result: CompletedDownloadResult) {
-        guard result.cleansTemporarySourceAfterSave else { return }
+        guard TemporaryDownloadRetentionPolicy.shouldRemoveSource(
+            showsTemporaryDownloads: showTemporaryDownloads,
+            resultAllowsCleanup: result.cleansTemporarySourceAfterSave
+        ) else { return }
         let temporaryRoot = try? downloadsDirectoryURL()
         let candidate = result.folderURL
             ?? result.primaryMediaURL?.deletingLastPathComponent()
