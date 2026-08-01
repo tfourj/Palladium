@@ -17,7 +17,7 @@ struct ContentView: View {
         case console
     }
 
-    enum PhotosMediaType {
+    enum PhotosMediaType: Equatable {
         case video
         case image
     }
@@ -146,9 +146,12 @@ struct ContentView: View {
     @State var storageSummary: StorageManagementSummary = .empty
     @StateObject var consoleLogStore: ConsoleLogStore
     @State var completedDownloadResult: CompletedDownloadResult?
+    @State var pendingPostDownloadResults: [CompletedDownloadResult] = []
     @State var completedDownloadAllowsSaveToApplicationFolder = true
     @State var completedPhotosCompatibility: PhotosCompatibilityState = .checking
     @State var showDownloadActionSheet = false
+    @State var advancePostDownloadAfterActionSheetDismissal = false
+    @State var advancePostDownloadAfterSharing = false
     @State var alertMessage: String?
     @State var showAlert = false
     @State var reopenDownloadActionAfterAlert = false
@@ -539,7 +542,11 @@ struct ContentView: View {
         .onChange(of: youtubePatchMode, initial: false) {
             persistPreferences()
         }
-        .sheet(item: $sharePayload) { payload in
+        .sheet(item: $sharePayload, onDismiss: {
+            guard advancePostDownloadAfterSharing else { return }
+            advancePostDownloadAfterSharing = false
+            advancePostDownloadPromptSequence()
+        }) { payload in
             ShareSheet(activityItems: payload.activityItems)
         }
         .sheet(isPresented: $showShareSheetDownloadPicker, onDismiss: {
@@ -547,7 +554,11 @@ struct ContentView: View {
         }) {
             shareSheetModePickerSheet
         }
-        .sheet(isPresented: $showDownloadActionSheet) {
+        .sheet(isPresented: $showDownloadActionSheet, onDismiss: {
+            guard advancePostDownloadAfterActionSheetDismissal else { return }
+            advancePostDownloadAfterActionSheetDismissal = false
+            advancePostDownloadPromptSequence()
+        }) {
             downloadCompleteActionSheet
                 .interactiveDismissDisabled(true)
         }

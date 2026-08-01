@@ -283,6 +283,9 @@ extension ContentView {
         consoleLogStore.clearAll()
         downloadErrorText = nil
         completedDownloadResult = nil
+        pendingPostDownloadResults = []
+        advancePostDownloadAfterActionSheetDismissal = false
+        advancePostDownloadAfterSharing = false
         playlistProgress = nil
 
         do {
@@ -511,6 +514,7 @@ extension ContentView {
                 progressText = String(localized: "download.status.cancelled")
                 showDownloadActionSheet = false
                 completedDownloadResult = nil
+                pendingPostDownloadResults = []
                 completedDownloadAllowsSaveToApplicationFolder = true
                 completedPhotosCompatibility = .checking
                 reopenDownloadActionAfterAlert = false
@@ -561,23 +565,29 @@ extension ContentView {
                     notifyDownloadCompletionIfNeeded(fileURL: notificationTarget)
                 }
 
-                let needsPhotosCompatibilityCheck = afterDownloadBehaviorAtStart == .ask
-                    || afterDownloadBehaviorAtStart.postDownloadAction == .saveToPhotos
-                if needsPhotosCompatibilityCheck, result.isCollection {
-                    completedPhotosCompatibility = .compatible(.image)
-                } else if needsPhotosCompatibilityCheck, let photosCandidateURL = result.photosCandidateURL {
-                    completedPhotosCompatibility = .checking
-                    completedPhotosCompatibility = await evaluatePhotosCompatibility(for: photosCandidateURL)
-                } else {
-                    completedPhotosCompatibility = .incompatible(String(localized: "photos.error.single_only"))
-                }
-
                 if afterDownloadBehaviorAtStart == .ask {
-                    showDownloadActionSheet = true
+                    let promptResults = effectiveDownloadPreset == .images
+                        ? result.separatedByMediaGroup()
+                        : [result]
+                    beginPostDownloadPromptSequence(with: promptResults)
                 } else if afterDownloadBehaviorAtStart.postDownloadAction == .saveToPhotos {
-                    if completedPhotosCompatibility.isCompatible {
-                        handlePostDownloadAction(.saveToPhotos, for: result)
+                    let groupedGalleryResults = effectiveDownloadPreset == .images
+                        ? result.separatedByMediaGroup()
+                        : []
+                    let galleryNeedsPrompts = effectiveDownloadPreset == .images
+                        && (
+                            groupedGalleryResults.count > 1
+                                || groupedGalleryResults.first?.mediaGroup?.supportsPhotos == false
+                        )
+                    if galleryNeedsPrompts {
+                        beginPostDownloadPromptSequence(with: groupedGalleryResults)
                     } else {
+                        completedPhotosCompatibility = await evaluatePhotosCompatibility(for: result)
+                    }
+
+                    if !galleryNeedsPrompts, completedPhotosCompatibility.isCompatible {
+                        handlePostDownloadAction(.saveToPhotos, for: result)
+                    } else if !galleryNeedsPrompts {
                         showDownloadActionSheet = true
                     }
                 } else if let action = afterDownloadBehaviorAtStart.postDownloadAction {

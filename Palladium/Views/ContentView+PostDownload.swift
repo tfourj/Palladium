@@ -11,7 +11,7 @@ import AVFoundation
 extension ContentView {
     var downloadCompleteActionSheet: some View {
         VStack(spacing: 20) {
-            Text("post_download.title")
+            Text(downloadCompleteTitle)
                 .font(.title2)
                 .fontWeight(.bold)
                 .padding(.top)
@@ -69,7 +69,7 @@ extension ContentView {
             .padding(.horizontal)
 
             Button(action: dismissDownloadActionSheet) {
-                Text("common.cancel")
+                Text(postDownloadDismissButtonTitle)
                     .font(.headline)
                     .foregroundStyle(.red)
                     .padding()
@@ -124,7 +124,26 @@ extension ContentView {
             return
         }
         showDownloadActionSheet = false
-        handlePostDownloadAction(action, for: result)
+        switch action {
+        case .saveToPhotos:
+            handlePostDownloadAction(action, for: result) {
+                advancePostDownloadPromptSequence()
+            }
+        case .openShareSheet:
+            advancePostDownloadAfterSharing = true
+            handlePostDownloadAction(action, for: result)
+        case .saveToApplicationFolder:
+            if saveDownloadedFileToApplicationFolder(result) {
+                advancePostDownloadAfterActionSheetDismissal = true
+            } else {
+                reopenDownloadActionAfterAlert = true
+            }
+        }
+    }
+
+    var downloadCompleteTitle: String {
+        completedDownloadResult?.mediaGroup?.completionTitle
+            ?? String(localized: "post_download.title")
     }
 
     var completedResultDisplayTitle: String? {
@@ -147,6 +166,9 @@ extension ContentView {
 
     var shouldOfferPhotosAction: Bool {
         guard let result = completedDownloadResult else { return false }
+        if let mediaGroup = result.mediaGroup {
+            return mediaGroup.supportsPhotos
+        }
         return !result.items.isEmpty
     }
 
@@ -176,14 +198,69 @@ extension ContentView {
         }
     }
 
+    var postDownloadDismissButtonTitle: String {
+        pendingPostDownloadResults.isEmpty
+            ? String(localized: "common.cancel")
+            : String(localized: "post_download.action.skip")
+    }
+
     func dismissDownloadActionSheet() {
+        advancePostDownloadAfterActionSheetDismissal = !pendingPostDownloadResults.isEmpty
         showDownloadActionSheet = false
+        guard pendingPostDownloadResults.isEmpty else { return }
+        resetPostDownloadPromptSequence()
+    }
+
+    func beginPostDownloadPromptSequence(with results: [CompletedDownloadResult]) {
+        guard let firstResult = results.first else {
+            resetPostDownloadPromptSequence()
+            return
+        }
+        pendingPostDownloadResults = Array(results.dropFirst())
+        presentPostDownloadPrompt(for: firstResult)
+    }
+
+    func advancePostDownloadPromptSequence() {
+        guard !pendingPostDownloadResults.isEmpty else {
+            resetPostDownloadPromptSequence()
+            return
+        }
+        let nextResult = pendingPostDownloadResults.removeFirst()
+        presentPostDownloadPrompt(for: nextResult)
+    }
+
+    private func presentPostDownloadPrompt(for result: CompletedDownloadResult) {
+        completedDownloadResult = result
+        completedPhotosCompatibility = .checking
+        showDownloadActionSheet = true
+
+        guard result.mediaGroup?.supportsPhotos != false else {
+            completedPhotosCompatibility = .incompatible(
+                String(localized: "photos.error.unsupported_media_group")
+            )
+            return
+        }
+
+        Task {
+            let compatibility = await evaluatePhotosCompatibility(for: result)
+            await MainActor.run {
+                guard completedDownloadResult?.id == result.id else { return }
+                completedPhotosCompatibility = compatibility
+            }
+        }
+    }
+
+    private func resetPostDownloadPromptSequence() {
+        pendingPostDownloadResults = []
         completedDownloadResult = nil
         completedDownloadAllowsSaveToApplicationFolder = true
         completedPhotosCompatibility = .checking
+        advancePostDownloadAfterActionSheetDismissal = false
+        advancePostDownloadAfterSharing = false
     }
 
     func openSavedDownloadActions(_ item: SavedDownloadItem) {
+        pendingPostDownloadResults = []
         completedDownloadAllowsSaveToApplicationFolder = item.location != .saved
         completedDownloadResult = CompletedDownloadResult(
             items: [item.url],
@@ -204,7 +281,10 @@ extension ContentView {
         }
     }
 
-    func saveDownloadedFileToPhotos(_ url: URL) {
+    func saveDownloadedFileToPhotos(
+        _ url: URL,
+        onSuccess: (@MainActor () -> Void)? = nil
+    ) {
         Task {
             let compatibility = await evaluatePhotosCompatibility(for: url)
             guard case .compatible(let mediaType) = compatibility else {
@@ -246,6 +326,7 @@ extension ContentView {
                     alertMessage = nil
                     showAlert = false
                     showTemporaryToast(String(localized: "photos.toast.saved"))
+                    onSuccess?()
                 }
             } catch {
                 await MainActor.run {
@@ -257,7 +338,10 @@ extension ContentView {
         }
     }
 
-    func saveDownloadedFilesToPhotos(_ urls: [URL]) {
+    func saveDownloadedFilesToPhotos(
+        _ urls: [URL],
+        onSuccess: (@MainActor () -> Void)? = nil
+    ) {
         Task {
             var compatible: [(URL, PhotosMediaType)] = []
             for url in urls {
@@ -266,16 +350,23 @@ extension ContentView {
                     compatible.append((url, mediaType))
                 }
             }
-            guard !compatible.isEmpty else {
+            guard compatible.count == urls.count else {
                 await MainActor.run {
                     reopenDownloadActionAfterAlert = true
-                    alertMessage = String(localized: "photos.error.single_only")
+                    alertMessage = String(localized: "photos.error.mixed_collection")
                     showAlert = true
                 }
                 return
             }
             let permission = await PHPhotoLibrary.requestAuthorization(for: .addOnly)
-            guard permission == .authorized || permission == .limited else { return }
+            guard permission == .authorized || permission == .limited else {
+                await MainActor.run {
+                    reopenDownloadActionAfterAlert = true
+                    alertMessage = String(localized: "photos.error.permission")
+                    showAlert = true
+                }
+                return
+            }
             do {
                 try await PHPhotoLibrary.shared().performChanges {
                     for (url, mediaType) in compatible {
@@ -289,14 +380,38 @@ extension ContentView {
                 }
                 await MainActor.run {
                     showTemporaryToast(String(localized: "photos.toast.saved"))
+                    onSuccess?()
                 }
             } catch {
                 await MainActor.run {
+                    reopenDownloadActionAfterAlert = true
                     alertMessage = String(format: String(localized: "photos.error.save"), error.localizedDescription)
                     showAlert = true
                 }
             }
         }
+    }
+
+    func evaluatePhotosCompatibility(for result: CompletedDownloadResult) async -> PhotosCompatibilityState {
+        guard let firstItem = result.items.first else {
+            return .incompatible(String(localized: "post_download.error.no_files"))
+        }
+
+        let firstCompatibility = await evaluatePhotosCompatibility(for: firstItem)
+        guard case .compatible(let expectedMediaType) = firstCompatibility else {
+            return firstCompatibility
+        }
+
+        for item in result.items.dropFirst() {
+            let compatibility = await evaluatePhotosCompatibility(for: item)
+            guard case .compatible(let mediaType) = compatibility else {
+                return compatibility
+            }
+            guard mediaType == expectedMediaType else {
+                return .incompatible(String(localized: "photos.error.mixed_collection"))
+            }
+        }
+        return .compatible(expectedMediaType)
     }
 
     func evaluatePhotosCompatibility(for fileURL: URL) async -> PhotosCompatibilityState {
@@ -373,7 +488,8 @@ extension ContentView {
         return UIImage(contentsOfFile: fileURL.path) != nil
     }
 
-    func saveDownloadedFileToApplicationFolder(_ result: CompletedDownloadResult) {
+    @discardableResult
+    func saveDownloadedFileToApplicationFolder(_ result: CompletedDownloadResult) -> Bool {
         do {
             let documents = try FileManager.default.url(
                 for: .documentDirectory,
@@ -418,7 +534,7 @@ extension ContentView {
                         destinationFolder.lastPathComponent
                     )
                 )
-                return
+                return true
             }
 
             if let itemURL = result.primaryMediaURL ?? result.items.first {
@@ -434,6 +550,7 @@ extension ContentView {
                 showTemporaryToast(
                     String(format: String(localized: "post_download.toast.saved_folder"), destination.lastPathComponent)
                 )
+                return true
             } else {
                 throw NSError(
                     domain: "Palladium",
@@ -445,10 +562,12 @@ extension ContentView {
         } catch {
             alertMessage = String(format: String(localized: "post_download.error.save_folder"), error.localizedDescription)
             showAlert = true
+            return false
         }
     }
 
     private func cleanupTemporaryDownloadSource(for result: CompletedDownloadResult) {
+        guard result.cleansTemporarySourceAfterSave else { return }
         let temporaryRoot = try? downloadsDirectoryURL()
         let candidate = result.folderURL
             ?? result.primaryMediaURL?.deletingLastPathComponent()
@@ -499,11 +618,15 @@ extension ContentView {
         }
     }
 
-    func handlePostDownloadAction(_ action: PostDownloadAction, for result: CompletedDownloadResult) {
+    func handlePostDownloadAction(
+        _ action: PostDownloadAction,
+        for result: CompletedDownloadResult,
+        onSuccess: (@MainActor () -> Void)? = nil
+    ) {
         switch action {
         case .saveToPhotos:
             if result.isCollection {
-                saveDownloadedFilesToPhotos(result.items)
+                saveDownloadedFilesToPhotos(result.items, onSuccess: onSuccess)
                 return
             }
             guard let fileURL = result.photosCandidateURL else {
@@ -512,11 +635,74 @@ extension ContentView {
                 showAlert = true
                 return
             }
-            saveDownloadedFileToPhotos(fileURL)
+            saveDownloadedFileToPhotos(fileURL, onSuccess: onSuccess)
         case .openShareSheet:
             sharePayload = SharePayload(activityItems: result.shareActivityItems)
         case .saveToApplicationFolder:
-            saveDownloadedFileToApplicationFolder(result)
+            if saveDownloadedFileToApplicationFolder(result) {
+                onSuccess?()
+            }
+        }
+    }
+}
+
+enum DownloadedMediaGroup: Int, CaseIterable {
+    case image
+    case video
+    case audio
+    case file
+
+    private static let imageExtensions: Set<String> = [
+        "avif", "bmp", "gif", "heic", "heif", "jpeg", "jpg", "png", "tif", "tiff", "webp",
+    ]
+    private static let videoExtensions: Set<String> = [
+        "3gp", "avi", "flv", "m4v", "mkv", "mov", "mp4", "mpeg", "mpg", "ts", "webm",
+    ]
+    private static let audioExtensions: Set<String> = [
+        "aac", "aiff", "flac", "m4a", "mp3", "ogg", "opus", "wav", "weba", "wma",
+    ]
+
+    static func classify(_ url: URL) -> Self {
+        let fileExtension = url.pathExtension.lowercased()
+        if imageExtensions.contains(fileExtension) {
+            return .image
+        }
+        if videoExtensions.contains(fileExtension) {
+            return .video
+        }
+        if audioExtensions.contains(fileExtension) {
+            return .audio
+        }
+        return .file
+    }
+
+    var supportsPhotos: Bool {
+        self == .image || self == .video
+    }
+
+    var displayName: String {
+        switch self {
+        case .image:
+            return String(localized: "post_download.group.images")
+        case .video:
+            return String(localized: "post_download.group.videos")
+        case .audio:
+            return String(localized: "post_download.group.audio")
+        case .file:
+            return String(localized: "post_download.group.files")
+        }
+    }
+
+    var completionTitle: String {
+        switch self {
+        case .image:
+            return String(localized: "post_download.title.images")
+        case .video:
+            return String(localized: "post_download.title.videos")
+        case .audio:
+            return String(localized: "post_download.title.audio")
+        case .file:
+            return String(localized: "post_download.title.files")
         }
     }
 }
@@ -527,6 +713,27 @@ struct CompletedDownloadResult {
     let folderURL: URL?
     let titleHint: String?
     let sourceURL: URL?
+    let mediaGroup: DownloadedMediaGroup?
+    let cleansTemporarySourceAfterSave: Bool
+    let id = UUID()
+
+    init(
+        items: [URL],
+        primaryMediaURL: URL?,
+        folderURL: URL?,
+        titleHint: String?,
+        sourceURL: URL?,
+        mediaGroup: DownloadedMediaGroup? = nil,
+        cleansTemporarySourceAfterSave: Bool = true
+    ) {
+        self.items = items
+        self.primaryMediaURL = primaryMediaURL
+        self.folderURL = folderURL
+        self.titleHint = titleHint
+        self.sourceURL = sourceURL
+        self.mediaGroup = mediaGroup
+        self.cleansTemporarySourceAfterSave = cleansTemporarySourceAfterSave
+    }
 
     var isCollection: Bool {
         items.count > 1
@@ -543,6 +750,38 @@ struct CompletedDownloadResult {
 
     var shareActivityItems: [Any] {
         items.map { $0 as Any }
+    }
+
+    @MainActor
+    func separatedByMediaGroup() -> [Self] {
+        let groupedItems = Dictionary(grouping: items, by: DownloadedMediaGroup.classify)
+        let orderedGroups = DownloadedMediaGroup.allCases.compactMap { group -> (DownloadedMediaGroup, [URL])? in
+            guard let items = groupedItems[group], !items.isEmpty else { return nil }
+            return (group, items)
+        }
+        let isMixedMedia = orderedGroups.count > 1
+
+        return orderedGroups.map { group, groupedItems in
+            let groupedPrimaryURL = primaryMediaURL.flatMap { primaryURL in
+                groupedItems.contains(primaryURL) ? primaryURL : nil
+            } ?? groupedItems.first
+            let groupedTitleHint: String?
+            if isMixedMedia, let titleHint {
+                groupedTitleHint = "\(titleHint) - \(group.displayName)"
+            } else {
+                groupedTitleHint = titleHint
+            }
+
+            return Self(
+                items: groupedItems,
+                primaryMediaURL: groupedPrimaryURL,
+                folderURL: folderURL,
+                titleHint: groupedTitleHint,
+                sourceURL: sourceURL,
+                mediaGroup: group,
+                cleansTemporarySourceAfterSave: !isMixedMedia
+            )
+        }
     }
 
     var savedFolderName: String {
