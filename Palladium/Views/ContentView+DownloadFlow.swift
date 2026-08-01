@@ -434,7 +434,7 @@ extension ContentView {
             appendConsoleText("[palladium] gallery-dl download started for \(gallerySelectionCountAtStart) image(s)\n")
         }
 
-        let task: Task<Void, Never> = Task {
+        let task = Task {
             let outcome: PythonFlowOutcome
             if effectiveDownloadPreset == .images, let gallerySelectionRangeAtStart {
                 outcome = await PythonFlowRunner.executeGalleryDownloadFlow(
@@ -602,9 +602,14 @@ extension ContentView {
                     notifyDownloadCompletionIfNeeded(fileURL: notificationTarget)
                 }
 
-                let queueActionCompletion: ((Bool) -> Void)? = queuedItemID == nil
-                    ? nil
-                    : handleQueuePostDownloadActionCompletion
+                let queueActionCompletion: ((Bool) -> Void)?
+                if queuedItemID == nil {
+                    queueActionCompletion = nil
+                } else {
+                    queueActionCompletion = { succeeded in
+                        handleQueuePostDownloadActionCompletion(succeeded)
+                    }
+                }
                 if afterDownloadBehaviorAtStart == .ask {
                     let promptResults = effectiveDownloadPreset == .images
                         ? result.separatedByMediaGroup()
