@@ -286,6 +286,8 @@ extension ContentView {
         pendingPostDownloadResults = []
         advancePostDownloadAfterActionSheetDismissal = false
         advancePostDownloadAfterSharing = false
+        sharedPostDownloadFolderID = nil
+        sharedPostDownloadFolderURL = nil
         playlistProgress = nil
 
         do {
@@ -515,6 +517,8 @@ extension ContentView {
                 showDownloadActionSheet = false
                 completedDownloadResult = nil
                 pendingPostDownloadResults = []
+                sharedPostDownloadFolderID = nil
+                sharedPostDownloadFolderURL = nil
                 completedDownloadAllowsSaveToApplicationFolder = true
                 completedPhotosCompatibility = .checking
                 reopenDownloadActionAfterAlert = false

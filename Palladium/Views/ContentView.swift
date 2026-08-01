@@ -152,6 +152,8 @@ struct ContentView: View {
     @State var showDownloadActionSheet = false
     @State var advancePostDownloadAfterActionSheetDismissal = false
     @State var advancePostDownloadAfterSharing = false
+    @State var sharedPostDownloadFolderID: UUID?
+    @State var sharedPostDownloadFolderURL: URL?
     @State var alertMessage: String?
     @State var showAlert = false
     @State var reopenDownloadActionAfterAlert = false

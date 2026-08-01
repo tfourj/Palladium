@@ -253,6 +253,8 @@ extension ContentView {
     private func resetPostDownloadPromptSequence() {
         pendingPostDownloadResults = []
         completedDownloadResult = nil
+        sharedPostDownloadFolderID = nil
+        sharedPostDownloadFolderURL = nil
         completedDownloadAllowsSaveToApplicationFolder = true
         completedPhotosCompatibility = .checking
         advancePostDownloadAfterActionSheetDismissal = false
@@ -261,6 +263,8 @@ extension ContentView {
 
     func openSavedDownloadActions(_ item: SavedDownloadItem) {
         pendingPostDownloadResults = []
+        sharedPostDownloadFolderID = nil
+        sharedPostDownloadFolderURL = nil
         completedDownloadAllowsSaveToApplicationFolder = item.location != .saved
         completedDownloadResult = CompletedDownloadResult(
             items: [item.url],
@@ -512,19 +516,32 @@ extension ContentView {
                 try FileManager.default.createDirectory(at: appFolder, withIntermediateDirectories: true)
             }
 
-            let shouldCreateDownloadFolder = result.isCollection || preferences.alwaysUseFolder
+            let shouldCreateDownloadFolder = result.isCollection
+                || result.sharedSaveFolderID != nil
+                || preferences.alwaysUseFolder
             appendConsoleText(
                 "[palladium] save layout: service=\(preferences.organizeByService) "
-                    + "always-folder=\(preferences.alwaysUseFolder) collection=\(result.isCollection)\n",
+                    + "always-folder=\(preferences.alwaysUseFolder) "
+                    + "collection=\(result.isCollection) shared=\(result.sharedSaveFolderID != nil)\n",
                 source: .app
             )
             if shouldCreateDownloadFolder {
-                let destinationFolder = uniqueDestinationURL(
-                    in: appFolder,
-                    preferredName: result.savedFolderName,
-                    isDirectory: true
-                )
-                try copyItemsAtomically(result.items, to: destinationFolder, stagingParent: appFolder)
+                let destinationFolder: URL
+                if let sharedFolder = existingSharedSaveFolder(for: result) {
+                    destinationFolder = sharedFolder
+                    try appendItemsAtomically(result.items, to: destinationFolder)
+                } else {
+                    destinationFolder = uniqueDestinationURL(
+                        in: appFolder,
+                        preferredName: result.savedFolderName,
+                        isDirectory: true
+                    )
+                    try copyItemsAtomically(result.items, to: destinationFolder, stagingParent: appFolder)
+                    if let sharedSaveFolderID = result.sharedSaveFolderID {
+                        sharedPostDownloadFolderID = sharedSaveFolderID
+                        sharedPostDownloadFolderURL = destinationFolder
+                    }
+                }
                 cleanupTemporaryDownloadSource(for: result)
                 alertMessage = nil
                 showAlert = false
@@ -601,6 +618,23 @@ extension ContentView {
         return candidate
     }
 
+    private func existingSharedSaveFolder(for result: CompletedDownloadResult) -> URL? {
+        guard let resultFolderID = result.sharedSaveFolderID,
+              resultFolderID == sharedPostDownloadFolderID,
+              let folderURL = sharedPostDownloadFolderURL else {
+            return nil
+        }
+
+        var isDirectory: ObjCBool = false
+        guard FileManager.default.fileExists(atPath: folderURL.path, isDirectory: &isDirectory),
+              isDirectory.boolValue else {
+            sharedPostDownloadFolderID = nil
+            sharedPostDownloadFolderURL = nil
+            return nil
+        }
+        return folderURL
+    }
+
     private func copyItemsAtomically(_ items: [URL], to destination: URL, stagingParent: URL) throws {
         let fileManager = FileManager.default
         let staging = stagingParent.appendingPathComponent(".palladium-save-\(UUID().uuidString)", isDirectory: true)
@@ -616,6 +650,50 @@ extension ContentView {
             }
             try fileManager.moveItem(at: staging, to: destination)
         } catch {
+            try? fileManager.removeItem(at: staging)
+            throw error
+        }
+    }
+
+    private func appendItemsAtomically(_ items: [URL], to destinationFolder: URL) throws {
+        let fileManager = FileManager.default
+        let stagingParent = destinationFolder.deletingLastPathComponent()
+        let staging = stagingParent.appendingPathComponent(
+            ".palladium-save-\(UUID().uuidString)",
+            isDirectory: true
+        )
+        try fileManager.createDirectory(at: staging, withIntermediateDirectories: false)
+
+        var appendedItems: [URL] = []
+        do {
+            for itemURL in items {
+                let stagedItem = uniqueDestinationURL(
+                    in: staging,
+                    preferredName: itemURL.lastPathComponent,
+                    isDirectory: false
+                )
+                try fileManager.copyItem(at: itemURL, to: stagedItem)
+            }
+
+            let stagedItems = try fileManager.contentsOfDirectory(
+                at: staging,
+                includingPropertiesForKeys: nil,
+                options: [.skipsHiddenFiles]
+            )
+            for stagedItem in stagedItems {
+                let destination = uniqueDestinationURL(
+                    in: destinationFolder,
+                    preferredName: stagedItem.lastPathComponent,
+                    isDirectory: false
+                )
+                try fileManager.moveItem(at: stagedItem, to: destination)
+                appendedItems.append(destination)
+            }
+            try fileManager.removeItem(at: staging)
+        } catch {
+            for appendedItem in appendedItems {
+                try? fileManager.removeItem(at: appendedItem)
+            }
             try? fileManager.removeItem(at: staging)
             throw error
         }
@@ -683,19 +761,6 @@ enum DownloadedMediaGroup: Int, CaseIterable {
         self == .image || self == .video
     }
 
-    var displayName: String {
-        switch self {
-        case .image:
-            return String(localized: "post_download.group.images")
-        case .video:
-            return String(localized: "post_download.group.videos")
-        case .audio:
-            return String(localized: "post_download.group.audio")
-        case .file:
-            return String(localized: "post_download.group.files")
-        }
-    }
-
     var completionTitle: String {
         switch self {
         case .image:
@@ -717,6 +782,8 @@ struct CompletedDownloadResult {
     let titleHint: String?
     let sourceURL: URL?
     let mediaGroup: DownloadedMediaGroup?
+    let sharedSaveFolderID: UUID?
+    let savedFolderNameOverride: String?
     let cleansTemporarySourceAfterSave: Bool
     let id = UUID()
 
@@ -727,6 +794,8 @@ struct CompletedDownloadResult {
         titleHint: String?,
         sourceURL: URL?,
         mediaGroup: DownloadedMediaGroup? = nil,
+        sharedSaveFolderID: UUID? = nil,
+        savedFolderNameOverride: String? = nil,
         cleansTemporarySourceAfterSave: Bool = true
     ) {
         self.items = items
@@ -735,6 +804,8 @@ struct CompletedDownloadResult {
         self.titleHint = titleHint
         self.sourceURL = sourceURL
         self.mediaGroup = mediaGroup
+        self.sharedSaveFolderID = sharedSaveFolderID
+        self.savedFolderNameOverride = savedFolderNameOverride
         self.cleansTemporarySourceAfterSave = cleansTemporarySourceAfterSave
     }
 
@@ -763,31 +834,31 @@ struct CompletedDownloadResult {
             return (group, items)
         }
         let isMixedMedia = orderedGroups.count > 1
+        let sharedSaveFolderID = isMixedMedia ? UUID() : nil
+        let sharedSavedFolderName = isMixedMedia ? savedFolderName : nil
 
         return orderedGroups.map { group, groupedItems in
             let groupedPrimaryURL = primaryMediaURL.flatMap { primaryURL in
                 groupedItems.contains(primaryURL) ? primaryURL : nil
             } ?? groupedItems.first
-            let groupedTitleHint: String?
-            if isMixedMedia, let titleHint {
-                groupedTitleHint = "\(titleHint) - \(group.displayName)"
-            } else {
-                groupedTitleHint = titleHint
-            }
-
             return Self(
                 items: groupedItems,
                 primaryMediaURL: groupedPrimaryURL,
                 folderURL: folderURL,
-                titleHint: groupedTitleHint,
+                titleHint: titleHint,
                 sourceURL: sourceURL,
                 mediaGroup: group,
+                sharedSaveFolderID: sharedSaveFolderID,
+                savedFolderNameOverride: sharedSavedFolderName,
                 cleansTemporarySourceAfterSave: !isMixedMedia
             )
         }
     }
 
     var savedFolderName: String {
+        if let savedFolderNameOverride {
+            return savedFolderNameOverride
+        }
         if let titleHint = sanitizedFolderName(titleHint) {
             return titleHint
         }
