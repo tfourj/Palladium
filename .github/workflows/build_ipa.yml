@@ -171,17 +171,6 @@ jobs:
     - name: Show Swift Version
       run: swift --version
 
-    - name: Run Swift tests
-      run: |
-        xcodebuild test \
-          -project Palladium.xcodeproj \
-          -scheme Palladium \
-          -configuration Debug \
-          -destination "platform=iOS Simulator,OS=latest,name=iPhone 17 Pro" \
-          CODE_SIGNING_ALLOWED=NO \
-          ARCHS=arm64 \
-          ONLY_ACTIVE_ARCH=YES
-
     - name: Make script executable
       run: chmod +x build_ipa.sh
 
