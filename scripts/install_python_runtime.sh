@@ -14,7 +14,53 @@ if [ -z "$SIGN_IDENTITY_TRIMMED" ]; then
   export CODE_SIGNING_ALLOWED=NO
 fi
 
-source "$PROJECT_DIR/Frameworks/Python.xcframework/build/utils.sh"
+prepare_python_apple_support_utils() {
+  SOURCE_UTILS="$PROJECT_DIR/Frameworks/Python.xcframework/build/utils.sh"
+  PATCHED_UTILS="$TARGET_TEMP_DIR/python-apple-support-utils.sh"
+
+  if [ ! -f "$SOURCE_UTILS" ]; then
+    echo "Python Apple Support utilities not found: $SOURCE_UTILS"
+    exit 1
+  fi
+
+  mkdir -p "$TARGET_TEMP_DIR"
+  python3 - "$SOURCE_UTILS" "$PATCHED_UTILS" <<'PY'
+import sys
+
+source_path, patched_path = sys.argv[1:3]
+with open(source_path, "r", encoding="utf-8") as source_file:
+    text = source_file.read()
+
+signing_block = """    echo "Signing framework as $EXPANDED_CODE_SIGN_IDENTITY_NAME ($EXPANDED_CODE_SIGN_IDENTITY)..."
+    /usr/bin/codesign --force --sign "$EXPANDED_CODE_SIGN_IDENTITY" ${OTHER_CODE_SIGN_FLAGS:-} -o runtime --timestamp=none --preserve-metadata=identifier,entitlements,flags --generate-entitlement-der "$CODESIGNING_FOLDER_PATH/$FRAMEWORK_FOLDER"
+"""
+
+guarded_signing_block = """    SIGN_IDENTITY_TRIMMED=$(echo "${EXPANDED_CODE_SIGN_IDENTITY:-}" | tr -d '[:space:]')
+    if [ "$EFFECTIVE_PLATFORM_NAME" = "-iphonesimulator" ] || [ "${CODE_SIGNING_ALLOWED:-YES}" != "YES" ] || [ -z "$SIGN_IDENTITY_TRIMMED" ]; then
+        echo "Skipping framework signing for $FRAMEWORK_FOLDER (simulator, unsigned build, or missing identity)."
+    else
+        echo "Signing framework as $EXPANDED_CODE_SIGN_IDENTITY_NAME ($EXPANDED_CODE_SIGN_IDENTITY)..."
+        /usr/bin/codesign --force --sign "$EXPANDED_CODE_SIGN_IDENTITY" ${OTHER_CODE_SIGN_FLAGS:-} -o runtime --timestamp=none --preserve-metadata=identifier,entitlements,flags --generate-entitlement-der "$CODESIGNING_FOLDER_PATH/$FRAMEWORK_FOLDER"
+    fi
+"""
+
+if "Skipping framework signing for $FRAMEWORK_FOLDER" not in text:
+    if signing_block not in text:
+        print(
+            "Expected Python Apple Support signing block not found.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+    text = text.replace(signing_block, guarded_signing_block, 1)
+
+with open(patched_path, "w", encoding="utf-8") as patched_file:
+    patched_file.write(text)
+PY
+
+  source "$PATCHED_UTILS"
+}
+
+prepare_python_apple_support_utils
 
 max_version() {
   /usr/bin/awk -v a="$1" -v b="$2" '
