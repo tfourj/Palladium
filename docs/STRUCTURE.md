@@ -34,6 +34,7 @@ Palladium/
 | `build_ipa.sh` | Builds and exports an IPA outside Xcode. |
 | `scripts/install_python_runtime.sh` | Copies Python runtime files and privacy manifests into the app bundle during builds. |
 | `scripts/python_tests/` | Split Python unittest modules and shared helpers for package/runtime behavior. |
+| `scripts/swift_tests/` | Native XCTest sources synchronized with the `PalladiumTests` target. |
 | `scripts/update_build_metadata.sh` | Writes Git commit and final-build metadata into the built app Info.plist. |
 | `scripts/test_package_source_modes.py` | Compatibility runner for split Python package/runtime tests. |
 
@@ -149,9 +150,9 @@ Palladium/
 
 | Path | Purpose |
 | --- | --- |
-| `PalladiumTests/DownloadServiceDomainTests.swift` | Saved-download service-domain canonicalization tests. |
-| `PalladiumTests/DownloadQueueTests.swift` | Download queue parsing, state transition, ordering, and persistence tests. |
-| `PalladiumTests/TemporaryDownloadRetentionPolicyTests.swift` | Temporary-download cleanup policy tests. |
+| `scripts/swift_tests/DownloadServiceDomainTests.swift` | Saved-download service-domain canonicalization tests. |
+| `scripts/swift_tests/DownloadQueueTests.swift` | Download queue parsing, state transition, ordering, and persistence tests. |
+| `scripts/swift_tests/TemporaryDownloadRetentionPolicyTests.swift` | Temporary-download cleanup policy tests. |
 
 ## Other Files and Directories
 

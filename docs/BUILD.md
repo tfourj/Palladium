@@ -98,8 +98,8 @@ Frameworks/SwiftCurlCffi-iOS/Sources/SwiftCurlCffiIOS/Resources/curl_cffi_ios_pa
 
 ## Run Tests
 
-Swift tests use the `PalladiumTests` XCTest target. After installing the local
-dependencies above:
+Swift tests live in `scripts/swift_tests` and use the `PalladiumTests` XCTest
+target. After installing the local dependencies above:
 
 - Open `Palladium.xcodeproj`
 - Select scheme `Palladium`

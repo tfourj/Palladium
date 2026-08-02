@@ -8,7 +8,6 @@ on:
       - ".github/workflows/build_ipa.yml"
       - "Frameworks/**"
       - "Palladium/**"
-      - "PalladiumTests/**"
       - "Palladium.xcodeproj/**"
       - "build_ipa.sh"
       - "scripts/**"
