@@ -151,7 +151,9 @@ Palladium/
 
 | Path | Purpose |
 | --- | --- |
+| `PalladiumTests/DownloadServiceDomainTests.swift` | Saved-download service-domain canonicalization tests. |
 | `PalladiumTests/DownloadQueueTests.swift` | Download queue parsing, state transition, ordering, and persistence tests. |
+| `PalladiumTests/TemporaryDownloadRetentionPolicyTests.swift` | Temporary-download cleanup policy tests. |
 
 ## Other Files and Directories
 
