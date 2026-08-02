@@ -89,7 +89,14 @@ extension ContentView {
     }
 
     func resolvedSelectedCookieFilePath() -> String? {
-        let trimmedSelection = selectedCookieFileName.trimmingCharacters(in: .whitespacesAndNewlines)
+        resolvedCookieFilePath(named: selectedCookieFileName, clearsCurrentSelectionIfMissing: true)
+    }
+
+    func resolvedCookieFilePath(
+        named fileName: String,
+        clearsCurrentSelectionIfMissing: Bool
+    ) -> String? {
+        let trimmedSelection = fileName.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedSelection.isEmpty else { return nil }
         do {
             let files = try listImportedCookieFiles()
@@ -102,8 +109,10 @@ extension ContentView {
                         "[palladium] selected cookie file is invalid: \(error.localizedDescription)\n",
                         source: .app
                     )
-                    clearSelectedCookieFile()
-                    refreshImportedCookieFiles()
+                    if clearsCurrentSelectionIfMissing {
+                        clearSelectedCookieFile()
+                        refreshImportedCookieFiles()
+                    }
                     return nil
                 }
                 return match.fileURL.path
@@ -114,8 +123,10 @@ extension ContentView {
                 source: .app
             )
         }
-        appendConsoleText("[palladium] selected cookie file missing, clearing selection\n", source: .app)
-        clearSelectedCookieFile()
+        appendConsoleText("[palladium] selected cookie file is missing\n", source: .app)
+        if clearsCurrentSelectionIfMissing {
+            clearSelectedCookieFile()
+        }
         return nil
     }
 

@@ -124,10 +124,21 @@ extension ContentView {
             return
         }
         showDownloadActionSheet = false
+        if awaitingQueueItemID != nil {
+            handlePostDownloadAction(
+                action,
+                for: result,
+                completion: handleQueuePostDownloadActionCompletion
+            )
+            return
+        }
+
         switch action {
         case .saveToPhotos:
-            handlePostDownloadAction(action, for: result) {
-                advancePostDownloadPromptSequence()
+            handlePostDownloadAction(action, for: result) { succeeded in
+                if succeeded {
+                    advancePostDownloadPromptSequence()
+                }
             }
         case .openShareSheet:
             advancePostDownloadAfterSharing = true
@@ -207,6 +218,10 @@ extension ContentView {
     func dismissDownloadActionSheet() {
         advancePostDownloadAfterActionSheetDismissal = !pendingPostDownloadResults.isEmpty
         showDownloadActionSheet = false
+        if awaitingQueueItemID != nil {
+            completeAwaitingDownloadQueueItem()
+            return
+        }
         guard pendingPostDownloadResults.isEmpty else { return }
         resetPostDownloadPromptSequence()
     }
@@ -287,7 +302,7 @@ extension ContentView {
 
     func saveDownloadedFileToPhotos(
         _ url: URL,
-        onSuccess: (@MainActor () -> Void)? = nil
+        completion: ((Bool) -> Void)? = nil
     ) {
         Task {
             let compatibility = await evaluatePhotosCompatibility(for: url)
@@ -302,6 +317,7 @@ extension ContentView {
                     reopenDownloadActionAfterAlert = true
                     alertMessage = String(format: String(localized: "photos.error.import_reason"), reason)
                     showAlert = true
+                    completion?(false)
                 }
                 return
             }
@@ -312,6 +328,7 @@ extension ContentView {
                     reopenDownloadActionAfterAlert = true
                     alertMessage = String(localized: "photos.error.permission")
                     showAlert = true
+                    completion?(false)
                 }
                 return
             }
@@ -330,13 +347,14 @@ extension ContentView {
                     alertMessage = nil
                     showAlert = false
                     showTemporaryToast(String(localized: "photos.toast.saved"))
-                    onSuccess?()
+                    completion?(true)
                 }
             } catch {
                 await MainActor.run {
                     reopenDownloadActionAfterAlert = true
                     alertMessage = String(format: String(localized: "photos.error.save"), error.localizedDescription)
                     showAlert = true
+                    completion?(false)
                 }
             }
         }
@@ -344,7 +362,7 @@ extension ContentView {
 
     func saveDownloadedFilesToPhotos(
         _ urls: [URL],
-        onSuccess: (@MainActor () -> Void)? = nil
+        completion: ((Bool) -> Void)? = nil
     ) {
         Task {
             var compatible: [(URL, PhotosMediaType)] = []
@@ -359,6 +377,7 @@ extension ContentView {
                     reopenDownloadActionAfterAlert = true
                     alertMessage = String(localized: "photos.error.mixed_collection")
                     showAlert = true
+                    completion?(false)
                 }
                 return
             }
@@ -368,6 +387,7 @@ extension ContentView {
                     reopenDownloadActionAfterAlert = true
                     alertMessage = String(localized: "photos.error.permission")
                     showAlert = true
+                    completion?(false)
                 }
                 return
             }
@@ -384,13 +404,14 @@ extension ContentView {
                 }
                 await MainActor.run {
                     showTemporaryToast(String(localized: "photos.toast.saved"))
-                    onSuccess?()
+                    completion?(true)
                 }
             } catch {
                 await MainActor.run {
                     reopenDownloadActionAfterAlert = true
                     alertMessage = String(format: String(localized: "photos.error.save"), error.localizedDescription)
                     showAlert = true
+                    completion?(false)
                 }
             }
         }
@@ -702,27 +723,32 @@ extension ContentView {
     func handlePostDownloadAction(
         _ action: PostDownloadAction,
         for result: CompletedDownloadResult,
-        onSuccess: (@MainActor () -> Void)? = nil
+        completion: ((Bool) -> Void)? = nil
     ) {
         switch action {
         case .saveToPhotos:
             if result.isCollection {
-                saveDownloadedFilesToPhotos(result.items, onSuccess: onSuccess)
+                saveDownloadedFilesToPhotos(result.items, completion: completion)
                 return
             }
             guard let fileURL = result.photosCandidateURL else {
                 reopenDownloadActionAfterAlert = true
                 alertMessage = String(localized: "photos.error.single_only")
                 showAlert = true
+                completion?(false)
                 return
             }
-            saveDownloadedFileToPhotos(fileURL, onSuccess: onSuccess)
+            saveDownloadedFileToPhotos(fileURL, completion: completion)
         case .openShareSheet:
+            if let completion {
+                shareSheetCompletion = {
+                    completion(true)
+                }
+            }
             sharePayload = SharePayload(activityItems: result.shareActivityItems)
         case .saveToApplicationFolder:
-            if saveDownloadedFileToApplicationFolder(result) {
-                onSuccess?()
-            }
+            let succeeded = saveDownloadedFileToApplicationFolder(result)
+            completion?(succeeded)
         }
     }
 }

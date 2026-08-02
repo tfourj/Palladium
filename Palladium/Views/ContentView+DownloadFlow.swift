@@ -262,7 +262,10 @@ extension ContentView {
         presetOverride: DownloadPreset? = nil,
         afterDownloadOverride: AfterDownloadBehavior? = nil,
         gallerySelectionOverride: Set<Int>? = nil,
-        formatOverride: YTDLPFormat? = nil
+        formatOverride: YTDLPFormat? = nil,
+        queuedItemID: UUID? = nil,
+        queuedConfiguration: QueuedDownloadConfiguration? = nil,
+        shouldClearConsole: Bool = true
     ) {
         guard !isRunning, !isPackageRunning else { return }
         let targetURL = (urlOverride ?? urlText).trimmingCharacters(in: .whitespacesAndNewlines)
@@ -280,7 +283,9 @@ extension ContentView {
         }
         guard effectiveDownloadPreset != .images || !(gallerySelectionOverride ?? []).isEmpty else { return }
 
-        consoleLogStore.clearAll()
+        if shouldClearConsole {
+            consoleLogStore.clearAll()
+        }
         downloadErrorText = nil
         completedDownloadResult = nil
         pendingPostDownloadResults = []
@@ -305,6 +310,9 @@ extension ContentView {
             appendConsoleText("[palladium] failed to create run output folder: \(error.localizedDescription)\n")
             downloadErrorText = String(localized: "download.error.prepare_folder")
             progressText = String(localized: "download.status.failed")
+            if let queuedItemID {
+                queuedDownloadFailed(itemID: queuedItemID, errorMessage: downloadErrorText)
+            }
             return
         }
 
@@ -354,7 +362,8 @@ extension ContentView {
         }
         let gallerySelectionRangeAtStart = gallerySelectionOverride.map(gallerySelectionRange)
         let gallerySelectionCountAtStart = gallerySelectionOverride?.count ?? 0
-        let baseExtraArgs = extraArgsText.trimmingCharacters(in: .whitespacesAndNewlines)
+        let baseExtraArgs = queuedConfiguration?.extraArguments
+            ?? extraArgsText.trimmingCharacters(in: .whitespacesAndNewlines)
         let extraArgsAtStart: String
         if let formatOverride {
             let formatArguments = formatOverride.downloadOverrideArguments(
@@ -366,16 +375,30 @@ extension ContentView {
         } else {
             extraArgsAtStart = baseExtraArgs
         }
-        let presetArgsJSONAtStart = usesQualitySettings ? buildPresetArgumentsJSON() : "{}"
-        let afterDownloadBehaviorAtStart = afterDownloadOverride ?? afterDownloadBehavior
+        let presetArgsJSONAtStart = usesQualitySettings
+            ? queuedConfiguration?.presetArgumentsJSON ?? buildPresetArgumentsJSON()
+            : "{}"
+        let afterDownloadBehaviorAtStart = afterDownloadOverride
+            ?? queuedConfiguration?.afterDownloadBehavior
+            ?? afterDownloadBehavior
         let linkHistoryEnabledAtStart = linkHistoryEnabled
-        let downloadPlaylistAtStart = downloadPlaylist
-        let downloadSubtitlesAtStart = downloadSubtitles
-        let embedThumbnailAtStart = embedThumbnail
-        let autoRetryFailedDownloadsAtStart = autoRetryFailedDownloads
-        let subtitleLanguagePatternAtStart = resolvedSubtitleLanguagePattern
-        let useCookiesAtStart = useCookies
-        let cookieFilePathAtStart = useCookiesAtStart ? resolvedSelectedCookieFilePath() : nil
+        let downloadPlaylistAtStart = queuedConfiguration?.downloadPlaylist ?? downloadPlaylist
+        let downloadSubtitlesAtStart = queuedConfiguration?.downloadSubtitles ?? downloadSubtitles
+        let embedThumbnailAtStart = queuedConfiguration?.embedThumbnail ?? embedThumbnail
+        let autoRetryFailedDownloadsAtStart = queuedConfiguration?.autoRetryFailedDownloads
+            ?? autoRetryFailedDownloads
+        let subtitleLanguagePatternAtStart = queuedConfiguration?.subtitleLanguagePattern
+            ?? resolvedSubtitleLanguagePattern
+        let useCookiesAtStart = queuedConfiguration?.useCookies ?? useCookies
+        let cookieFilePathAtStart: String?
+        if let queuedConfiguration, useCookiesAtStart {
+            cookieFilePathAtStart = resolvedCookieFilePath(
+                named: queuedConfiguration.cookieFileName,
+                clearsCurrentSelectionIfMissing: false
+            )
+        } else {
+            cookieFilePathAtStart = useCookiesAtStart ? resolvedSelectedCookieFilePath() : nil
+        }
         var receivedPythonLiveOutput = false
         let liveLogDecoder = StreamingUTF8Decoder()
         let cancelMarker = makeCancelMarkerURL()
@@ -522,6 +545,9 @@ extension ContentView {
                 completedDownloadAllowsSaveToApplicationFolder = true
                 completedPhotosCompatibility = .checking
                 reopenDownloadActionAfterAlert = false
+                if let queuedItemID {
+                    queuedDownloadCancelled(itemID: queuedItemID)
+                }
             } else if finalResultKind == "partial" {
                 progressText = String(localized: "download.status.partial")
             } else {
@@ -565,10 +591,25 @@ extension ContentView {
                 }
                 completedDownloadResult = result
                 downloadErrorText = nil
+                if let queuedItemID {
+                    queuedDownloadAwaitingAction(
+                        itemID: queuedItemID,
+                        title: resultTitle,
+                        partial: finalResultKind == "partial"
+                    )
+                }
                 if let notificationTarget = result.notificationTargetURL {
                     notifyDownloadCompletionIfNeeded(fileURL: notificationTarget)
                 }
 
+                let queueActionCompletion: ((Bool) -> Void)?
+                if queuedItemID == nil {
+                    queueActionCompletion = nil
+                } else {
+                    queueActionCompletion = { succeeded in
+                        handleQueuePostDownloadActionCompletion(succeeded)
+                    }
+                }
                 if afterDownloadBehaviorAtStart == .ask {
                     let promptResults = effectiveDownloadPreset == .images
                         ? result.separatedByMediaGroup()
@@ -590,15 +631,31 @@ extension ContentView {
                     }
 
                     if !galleryNeedsPrompts, completedPhotosCompatibility.isCompatible {
-                        handlePostDownloadAction(.saveToPhotos, for: result)
+                        handlePostDownloadAction(
+                            .saveToPhotos,
+                            for: result,
+                            completion: queueActionCompletion
+                        )
                     } else if !galleryNeedsPrompts {
                         showDownloadActionSheet = true
                     }
                 } else if let action = afterDownloadBehaviorAtStart.postDownloadAction {
-                    handlePostDownloadAction(action, for: result)
+                    handlePostDownloadAction(
+                        action,
+                        for: result,
+                        completion: queueActionCompletion
+                    )
                 }
             } else if finalResultKind == "success" || finalResultKind == "partial" {
                 downloadErrorText = String(localized: "download.error.no_files_found")
+                if let queuedItemID {
+                    queuedDownloadFailed(itemID: queuedItemID, errorMessage: downloadErrorText)
+                }
+            } else if finalResultKind != "cancelled", let queuedItemID {
+                queuedDownloadFailed(
+                    itemID: queuedItemID,
+                    errorMessage: downloadErrorText ?? outcome.summaryText
+                )
             }
         }
         currentDownloadTask = task
@@ -820,6 +877,10 @@ extension ContentView {
 
     func cancelDownloadFlow() {
         guard isRunning else { return }
+        if downloadQueue.currentItem != nil {
+            downloadQueue.pause()
+            persistDownloadQueue()
+        }
         downloadCancelRequested = true
         requestActiveOperationCancellation()
         currentDownloadTask?.cancel()

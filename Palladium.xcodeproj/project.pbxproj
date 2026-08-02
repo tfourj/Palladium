@@ -23,6 +23,13 @@
 			remoteGlobalIDString = 8256E3AB2F57A8960067DF6E;
 			remoteInfo = ShareExtension;
 		};
+		D100000A2F80000100D10001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 82BF06B62F5761E800133331 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 82BF06BD2F5761E800133331;
+			remoteInfo = Palladium;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -56,6 +63,7 @@
 		82BF06CD2F5762BC00133331 /* Frameworks/Python.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = Frameworks/Python.xcframework; sourceTree = "<group>"; };
 		82BF06D42F5762DD00133331 /* Version.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Version.xcconfig; sourceTree = "<group>"; };
 		82FD7E012F5B666000E69220 /* FFmpeg.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = FFmpeg.xcframework; path = "Frameworks/SwiftFFmpeg-iOS/FFmpeg.xcframework"; sourceTree = "<group>"; };
+		D10000022F80000100D10001 /* PalladiumTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PalladiumTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -92,6 +100,11 @@
 			path = Palladium;
 			sourceTree = "<group>";
 		};
+		D10000032F80000100D10001 /* PalladiumTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = PalladiumTests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,6 +126,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D10000052F80000100D10001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -121,6 +141,7 @@
 			children = (
 				82BF06D42F5762DD00133331 /* Version.xcconfig */,
 				82BF06C02F5761E800133331 /* Palladium */,
+				D10000032F80000100D10001 /* PalladiumTests */,
 				8256E3AD2F57A8970067DF6E /* ShareExtension */,
 				82BF06CC2F5762BC00133331 /* Frameworks */,
 				82BF06BF2F5761E800133331 /* Products */,
@@ -131,6 +152,7 @@
 			isa = PBXGroup;
 			children = (
 				82BF06BE2F5761E800133331 /* Palladium.app */,
+				D10000022F80000100D10001 /* PalladiumTests.xctest */,
 				8256E3AC2F57A8960067DF6E /* ShareExtension.appex */,
 			);
 			name = Products;
@@ -200,6 +222,29 @@
 			productReference = 82BF06BE2F5761E800133331 /* Palladium.app */;
 			productType = "com.apple.product-type.application";
 		};
+		D10000012F80000100D10001 /* PalladiumTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D10000092F80000100D10001 /* Build configuration list for PBXNativeTarget "PalladiumTests" */;
+			buildPhases = (
+				D10000042F80000100D10001 /* Sources */,
+				D10000052F80000100D10001 /* Frameworks */,
+				D10000062F80000100D10001 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D100000B2F80000100D10001 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				D10000032F80000100D10001 /* PalladiumTests */,
+			);
+			name = PalladiumTests;
+			packageProductDependencies = (
+			);
+			productName = PalladiumTests;
+			productReference = D10000022F80000100D10001 /* PalladiumTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -215,6 +260,10 @@
 					};
 					82BF06BD2F5761E800133331 = {
 						CreatedOnToolsVersion = 26.2;
+					};
+					D10000012F80000100D10001 = {
+						CreatedOnToolsVersion = 26.2;
+						TestTargetID = 82BF06BD2F5761E800133331;
 					};
 				};
 			};
@@ -238,6 +287,7 @@
 			projectRoot = "";
 			targets = (
 				82BF06BD2F5761E800133331 /* Palladium */,
+				D10000012F80000100D10001 /* PalladiumTests */,
 				8256E3AB2F57A8960067DF6E /* ShareExtension */,
 			);
 		};
@@ -252,6 +302,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		82BF06BC2F5761E800133331 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D10000062F80000100D10001 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -319,6 +376,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D10000042F80000100D10001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -326,6 +390,11 @@
 			isa = PBXTargetDependency;
 			target = 8256E3AB2F57A8960067DF6E /* ShareExtension */;
 			targetProxy = 8256E3B42F57A8970067DF6E /* PBXContainerItemProxy */;
+		};
+		D100000B2F80000100D10001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 82BF06BD2F5761E800133331 /* Palladium */;
+			targetProxy = D100000A2F80000100D10001 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -632,6 +701,50 @@
 			};
 			name = Release;
 		};
+		D10000072F80000100D10001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 83KL373Z2M;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tfourj.PalladiumTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Palladium.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Palladium";
+			};
+			name = Debug;
+		};
+		D10000082F80000100D10001 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 83KL373Z2M;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tfourj.PalladiumTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Palladium.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Palladium";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -658,6 +771,15 @@
 			buildConfigurations = (
 				82BF06CA2F5761E900133331 /* Debug */,
 				82BF06CB2F5761E900133331 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D10000092F80000100D10001 /* Build configuration list for PBXNativeTarget "PalladiumTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D10000072F80000100D10001 /* Debug */,
+				D10000082F80000100D10001 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

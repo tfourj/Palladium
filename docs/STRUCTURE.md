@@ -51,6 +51,7 @@ Palladium/
 | `Models/AppAppearanceMode.swift` | Appearance-mode setting model. |
 | `Models/DownloadServiceDomain.swift` | Canonical source-service domain resolver for saved-download folders. |
 | `Models/DownloadOptions.swift` | Download option model and persisted settings. |
+| `Models/DownloadQueue.swift` | Sequential download queue models, state transitions, and persistence. |
 | `Models/ImportedCookieFile.swift` | Imported cookie-file model. |
 | `Models/LinkHistory.swift` | Previously used link model and history storage data. |
 | `Models/PackageSourceMode.swift` | Package-source selection model. |
@@ -64,6 +65,7 @@ Palladium/
 | `Views/ContentView.swift` | Root UI, tab layout, and shared view state. |
 | `Views/ContentView+Cookies.swift` | Cookie import and management UI logic. |
 | `Views/ContentView+DownloadFlow.swift` | Download initiation and progress flow. |
+| `Views/ContentView+DownloadQueue.swift` | Persistent sequential queue coordination and queue state actions. |
 | `Views/ContentView+History.swift` | Download and link history behavior. |
 | `Views/ContentView+Notifications.swift` | Local notification handling. |
 | `Views/ContentView+Packages.swift` | Python package management behavior. |
@@ -72,6 +74,7 @@ Palladium/
 | `Views/ContentView+Storage.swift` | Download storage and file-management behavior. |
 | `Views/ContentView+Support.swift` | Support, diagnostics, and helper UI behavior. |
 | `Views/Tabs/DownloadTabView.swift` | Main download screen. |
+| `Views/Tabs/DownloadQueueSheetView.swift` | Multiline queue editor, controls, ordering, and item statuses. |
 | `Views/Tabs/PackagesTabView.swift` | Python package management screen. |
 | `Views/Tabs/SavedDownloadsTabView.swift` | Saved-downloads browser. |
 | `Views/Tabs/ConsoleTabView.swift` | In-app log console. |
@@ -143,6 +146,12 @@ Palladium/
 | `Info.plist` | Share extension bundle metadata. |
 | `ShareExtension.entitlements` | Share extension signing capabilities and app-group access. |
 | `Base.lproj/MainInterface.storyboard` | Share extension interface definition. |
+
+## Tests
+
+| Path | Purpose |
+| --- | --- |
+| `PalladiumTests/DownloadQueueTests.swift` | Download queue parsing, state transition, ordering, and persistence tests. |
 
 ## Other Files and Directories
 
