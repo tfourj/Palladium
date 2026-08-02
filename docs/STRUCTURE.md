@@ -25,7 +25,7 @@ Palladium/
 | Path | Purpose |
 | --- | --- |
 | `.github/FUNDING.yml` | GitHub Sponsors configuration. |
-| `.github/workflows/build_ipa.yml` | GitHub Actions workflow that runs Python tests, downloads local dependencies, and builds the IPA. |
+| `.github/workflows/build_ipa.yml` | GitHub Actions workflow that runs Python and Swift tests, downloads dependencies, and builds the IPA. |
 | `.gitignore` | Files and local dependencies excluded from Git. |
 | `Palladium.xcodeproj/project.pbxproj` | Targets, build phases, build settings, and file references for Xcode. |
 | `Version.xcconfig` | Single source for the app version, build number, and final-build flag. |
@@ -34,8 +34,6 @@ Palladium/
 | `build_ipa.sh` | Builds and exports an IPA outside Xcode. |
 | `scripts/install_python_runtime.sh` | Copies Python runtime files and privacy manifests into the app bundle during builds. |
 | `scripts/python_tests/` | Split Python unittest modules and shared helpers for package/runtime behavior. |
-| `scripts/swift_tests/` | Standalone Swift model regression checks. |
-| `scripts/test_swift_models.sh` | Compiles and runs standalone Swift model tests. |
 | `scripts/update_build_metadata.sh` | Writes Git commit and final-build metadata into the built app Info.plist. |
 | `scripts/test_package_source_modes.py` | Compatibility runner for split Python package/runtime tests. |
 

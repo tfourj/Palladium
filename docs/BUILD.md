@@ -95,3 +95,26 @@ Frameworks/SwiftCurlCffi-iOS/Sources/SwiftCurlCffiIOS/Resources/curl_cffi_ios_pa
 - Set your signing team in Signing & Capabilities
 - Choose an iPhone or Generic iOS Device
 - Press `Run` or `Product -> Build`
+
+## Run Tests
+
+Swift tests use the `PalladiumTests` XCTest target. After installing the local
+dependencies above:
+
+- Open `Palladium.xcodeproj`
+- Select scheme `Palladium`
+- Choose an iOS Simulator
+- Press `Product -> Test`
+
+To run the same suite from the command line, replace the simulator name if needed:
+
+```bash
+xcodebuild test \
+  -project Palladium.xcodeproj \
+  -scheme Palladium \
+  -configuration Debug \
+  -destination "platform=iOS Simulator,OS=latest,name=iPhone 17 Pro" \
+  CODE_SIGNING_ALLOWED=NO \
+  ARCHS=arm64 \
+  ONLY_ACTIVE_ARCH=YES
+```
