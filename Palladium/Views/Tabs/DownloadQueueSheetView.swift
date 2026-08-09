@@ -185,6 +185,7 @@ struct DownloadQueueSheetView: View {
                                     Label("queue.retry", systemImage: "arrow.clockwise")
                                 }
                                 .tint(.blue)
+                                .disabled(isRetryDisabled)
                             }
                         }
                         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
@@ -236,12 +237,24 @@ struct DownloadQueueSheetView: View {
                         .foregroundStyle(.red)
                         .lineLimit(3)
                 }
+
+                if item.status == .failed {
+                    Button {
+                        onRetry(item.id)
+                    } label: {
+                        Label("queue.retry", systemImage: "arrow.clockwise")
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+                    .tint(.blue)
+                    .disabled(isRetryDisabled)
+                }
             }
 
             Spacer(minLength: 0)
         }
         .padding(.vertical, 4)
-        .accessibilityElement(children: .combine)
+        .accessibilityElement(children: item.status == .failed ? .contain : .combine)
     }
 
     private func deleteButton(for item: DownloadQueueItem) -> some View {
@@ -254,6 +267,10 @@ struct DownloadQueueSheetView: View {
 
     private var hasPreviouslyStartedItems: Bool {
         queue.items.contains { $0.status != .pending }
+    }
+
+    private var isRetryDisabled: Bool {
+        isOperationBusy || queue.currentItem != nil
     }
 
     private func statusText(for status: DownloadQueueItemStatus) -> String {

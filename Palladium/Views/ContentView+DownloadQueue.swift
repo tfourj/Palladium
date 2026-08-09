@@ -53,11 +53,22 @@ extension ContentView {
     }
 
     func retryDownloadQueueItem(_ id: UUID) {
-        downloadQueue.retry(id)
-        persistDownloadQueue()
-        if downloadQueue.isActive {
-            runNextQueuedDownloadIfNeeded()
+        guard !isRunning,
+              !isPackageRunning,
+              awaitingQueueItemID == nil,
+              completedDownloadResult == nil,
+              let item = downloadQueue.restart(id) else {
+            return
         }
+
+        if !queueConsoleInitialized {
+            consoleLogStore.clearAll()
+            queueConsoleInitialized = true
+        }
+        downloadErrorText = nil
+        playlistProgress = nil
+        persistDownloadQueue()
+        runQueuedDownload(item, logAction: "retrying")
     }
 
     func removeDownloadQueueItem(_ id: UUID) {
@@ -93,16 +104,20 @@ extension ContentView {
 
         downloadQueue.markRunning(nextItem.id)
         persistDownloadQueue()
+        runQueuedDownload(nextItem, logAction: "starting")
+    }
+
+    private func runQueuedDownload(_ item: DownloadQueueItem, logAction: String) {
         selectedTab = .download
-        urlText = nextItem.url
+        urlText = item.url
         appendConsoleText(
-            "\n[palladium][queue] starting \(nextItem.url) preset=\(nextItem.configuration.presetRawValue)\n"
+            "\n[palladium][queue] \(logAction) \(item.url) preset=\(item.configuration.presetRawValue)\n"
         )
         runDownloadFlow(
-            urlOverride: nextItem.url,
-            presetOverride: nextItem.configuration.preset,
-            queuedItemID: nextItem.id,
-            queuedConfiguration: nextItem.configuration,
+            urlOverride: item.url,
+            presetOverride: item.configuration.preset,
+            queuedItemID: item.id,
+            queuedConfiguration: item.configuration,
             shouldClearConsole: false
         )
     }

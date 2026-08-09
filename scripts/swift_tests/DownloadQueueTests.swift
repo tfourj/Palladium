@@ -64,7 +64,7 @@ final class DownloadQueueTests: XCTestCase {
         XCTAssertNil(queue.nextPendingItem)
     }
 
-    func testCancelPausesRemainingQueueAndRetryRestoresPendingState() throws {
+    func testCancelPausesRemainingQueueAndRestartRunsItemImmediately() throws {
         var queue = makeQueue()
         queue.start()
 
@@ -76,10 +76,28 @@ final class DownloadQueueTests: XCTestCase {
         XCTAssertEqual(queue.items.first?.status, .cancelled)
         XCTAssertEqual(queue.items.last?.status, .pending)
 
-        queue.retry(first.id)
+        let restarted = try XCTUnwrap(queue.restart(first.id))
 
-        XCTAssertEqual(queue.items.first?.status, .pending)
+        XCTAssertEqual(restarted.id, first.id)
+        XCTAssertEqual(queue.items.first?.status, .running)
+        XCTAssertEqual(queue.nextPendingItem?.url, "https://example.com/two")
         XCTAssertEqual(queue.outstandingCount, 2)
+    }
+
+    func testRestartDoesNothingWhileAnotherItemIsRunning() throws {
+        var queue = makeQueue()
+        queue.start()
+
+        let first = try XCTUnwrap(queue.nextPendingItem)
+        queue.markRunning(first.id)
+        queue.markFailed(first.id, errorMessage: "failed")
+
+        let second = try XCTUnwrap(queue.nextPendingItem)
+        queue.markRunning(second.id)
+
+        XCTAssertNil(queue.restart(first.id))
+        XCTAssertEqual(queue.items.first?.status, .failed)
+        XCTAssertEqual(queue.currentItem?.id, second.id)
     }
 
     func testFailureKeepsQueueActiveWhenAnotherItemIsPending() throws {
