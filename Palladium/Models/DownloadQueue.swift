@@ -188,16 +188,6 @@ struct DownloadQueue: Codable, Equatable {
         return items[index]
     }
 
-    mutating func retry(_ id: UUID) {
-        guard let index = index(of: id),
-              items[index].status == .failed || items[index].status == .cancelled else {
-            return
-        }
-        items[index].status = .pending
-        items[index].errorMessage = nil
-        items[index].completedAt = nil
-    }
-
     mutating func remove(_ id: UUID) {
         guard let index = index(of: id), !items[index].status.isActive else { return }
         items.remove(at: index)

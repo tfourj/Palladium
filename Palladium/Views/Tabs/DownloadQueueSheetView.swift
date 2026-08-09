@@ -185,6 +185,7 @@ struct DownloadQueueSheetView: View {
                                     Label("queue.retry", systemImage: "arrow.clockwise")
                                 }
                                 .tint(.blue)
+                                .disabled(isRetryDisabled)
                             }
                         }
                         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
@@ -246,6 +247,7 @@ struct DownloadQueueSheetView: View {
                     .buttonStyle(.bordered)
                     .controlSize(.small)
                     .tint(.blue)
+                    .disabled(isRetryDisabled)
                 }
             }
 
@@ -265,6 +267,10 @@ struct DownloadQueueSheetView: View {
 
     private var hasPreviouslyStartedItems: Bool {
         queue.items.contains { $0.status != .pending }
+    }
+
+    private var isRetryDisabled: Bool {
+        isOperationBusy || queue.currentItem != nil
     }
 
     private func statusText(for status: DownloadQueueItemStatus) -> String {
