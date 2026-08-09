@@ -236,12 +236,23 @@ struct DownloadQueueSheetView: View {
                         .foregroundStyle(.red)
                         .lineLimit(3)
                 }
+
+                if item.status == .failed {
+                    Button {
+                        onRetry(item.id)
+                    } label: {
+                        Label("queue.retry", systemImage: "arrow.clockwise")
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+                    .tint(.blue)
+                }
             }
 
             Spacer(minLength: 0)
         }
         .padding(.vertical, 4)
-        .accessibilityElement(children: .combine)
+        .accessibilityElement(children: item.status == .failed ? .contain : .combine)
     }
 
     private func deleteButton(for item: DownloadQueueItem) -> some View {
