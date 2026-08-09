@@ -175,6 +175,19 @@ struct DownloadQueue: Codable, Equatable {
         isActive = false
     }
 
+    @discardableResult
+    mutating func restart(_ id: UUID) -> DownloadQueueItem? {
+        guard let index = index(of: id),
+              currentItem == nil,
+              items[index].status == .failed || items[index].status == .cancelled else {
+            return nil
+        }
+        items[index].status = .running
+        items[index].errorMessage = nil
+        items[index].completedAt = nil
+        return items[index]
+    }
+
     mutating func retry(_ id: UUID) {
         guard let index = index(of: id),
               items[index].status == .failed || items[index].status == .cancelled else {
