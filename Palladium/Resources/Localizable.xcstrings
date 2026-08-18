@@ -3176,12 +3176,32 @@
         }
       }
     },
+    "settings.download_behavior.incomplete_history.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adds a link to history when a download starts, so failed, cancelled, or interrupted downloads remain available. Link history must be enabled."
+          }
+        }
+      }
+    },
+    "settings.download_behavior.incomplete_history.toggle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save unfinished downloads to history"
+          }
+        }
+      }
+    },
     "settings.download_behavior.subtitle" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Paste, retry, and progress behavior"
+            "value" : "Paste, history, retry, and progress behavior"
           }
         }
       }

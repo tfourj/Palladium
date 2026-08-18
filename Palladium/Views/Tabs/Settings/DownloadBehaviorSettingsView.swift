@@ -3,6 +3,7 @@ import SwiftUI
 struct DownloadBehaviorSettingsView: View {
     @Binding var autoDownloadOnPaste: Bool
     @Binding var autoRetryFailedDownloads: Bool
+    @Binding var saveIncompleteDownloadsToHistory: Bool
     @Binding var detailedProgressEnabled: Bool
 
     let isRunning: Bool
@@ -25,6 +26,18 @@ struct DownloadBehaviorSettingsView: View {
                 Text("settings.download_behavior.retry_section")
             } footer: {
                 Text("settings.ui.retry_failed.help")
+            }
+
+            Section {
+                Toggle(
+                    "settings.download_behavior.incomplete_history.toggle",
+                    isOn: $saveIncompleteDownloadsToHistory
+                )
+                .disabled(isRunning)
+            } header: {
+                Text("settings.ui.history.section")
+            } footer: {
+                Text("settings.download_behavior.incomplete_history.help")
             }
 
             Section {

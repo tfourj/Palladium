@@ -60,6 +60,7 @@ extension ContentView {
         defaults.set(defaultUseCookies, forKey: Self.defaultUseCookiesDefaultsKey)
         defaults.set(restoreDownloadDefaults, forKey: Self.restoreDownloadDefaultsDefaultsKey)
         defaults.set(autoRetryFailedDownloads, forKey: Self.autoRetryFailedDownloadsDefaultsKey)
+        defaults.set(saveIncompleteDownloadsToHistory, forKey: Self.saveIncompleteDownloadsToHistoryDefaultsKey)
         defaults.set(subtitleLanguagePattern, forKey: Self.subtitleLanguagePatternDefaultsKey)
         defaults.set(customSubtitleLanguagePattern, forKey: Self.customSubtitleLanguagePatternDefaultsKey)
         defaults.set(useCookies, forKey: Self.useCookiesDefaultsKey)
@@ -298,6 +299,10 @@ extension ContentView {
             return false
         }
         return UserDefaults.standard.bool(forKey: autoRetryFailedDownloadsDefaultsKey)
+    }
+
+    static func loadSaveIncompleteDownloadsToHistory() -> Bool {
+        UserDefaults.standard.bool(forKey: saveIncompleteDownloadsToHistoryDefaultsKey)
     }
 
     static func loadSubtitleLanguagePattern() -> String {
