@@ -382,6 +382,12 @@ extension ContentView {
             ?? queuedConfiguration?.afterDownloadBehavior
             ?? afterDownloadBehavior
         let linkHistoryEnabledAtStart = linkHistoryEnabled
+        if linkHistoryEnabledAtStart, saveIncompleteDownloadsToHistory {
+            addLinkHistoryEntry(
+                url: targetURL,
+                presetRawValue: presetAtStart
+            )
+        }
         let downloadPlaylistAtStart = queuedConfiguration?.downloadPlaylist ?? downloadPlaylist
         let downloadSubtitlesAtStart = queuedConfiguration?.downloadSubtitles ?? downloadSubtitles
         let embedThumbnailAtStart = queuedConfiguration?.embedThumbnail ?? embedThumbnail
