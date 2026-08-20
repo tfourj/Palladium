@@ -25,10 +25,10 @@ extension ContentView {
     func addLinkHistoryEntry(
         url: String,
         presetRawValue: String,
-        playlistTitle: String?,
-        downloadedPaths: [String],
-        primaryDownloadedPath: String?,
-        outputText: String
+        playlistTitle: String? = nil,
+        downloadedPaths: [String] = [],
+        primaryDownloadedPath: String? = nil,
+        outputText: String = ""
     ) {
         let trimmedURL = url.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedURL.isEmpty else { return }

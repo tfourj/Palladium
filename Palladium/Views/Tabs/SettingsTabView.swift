@@ -71,6 +71,7 @@ struct SettingsTabView: View {
     @Binding var rememberSelectedPreset: Bool
     @Binding var autoDownloadOnPaste: Bool
     @Binding var autoRetryFailedDownloads: Bool
+    @Binding var saveIncompleteDownloadsToHistory: Bool
     @Binding var detailedProgressEnabled: Bool
     @Binding var downloadPresetSettings: [DownloadPresetSetting]
     @Binding var shareSheetDownloadMode: ShareSheetDownloadMode
@@ -245,6 +246,7 @@ struct SettingsTabView: View {
             DownloadBehaviorSettingsView(
                 autoDownloadOnPaste: $autoDownloadOnPaste,
                 autoRetryFailedDownloads: $autoRetryFailedDownloads,
+                saveIncompleteDownloadsToHistory: $saveIncompleteDownloadsToHistory,
                 detailedProgressEnabled: $detailedProgressEnabled,
                 isRunning: isRunning
             )
@@ -645,6 +647,15 @@ struct SettingsTabView: View {
                 subtitle: "settings.ui.retry_failed.help"
             ) { title in
                 AnyView(searchToggle(title, isOn: $autoRetryFailedDownloads, disabled: isRunning))
+            },
+            controlSetting(
+                id: "saveIncompleteDownloadsToHistory",
+                menu: .downloadBehavior,
+                title: "settings.download_behavior.incomplete_history.toggle",
+                subtitle: "settings.download_behavior.incomplete_history.help",
+                keywords: [String(localized: "settings.ui.history.section")]
+            ) { title in
+                AnyView(searchToggle(title, isOn: $saveIncompleteDownloadsToHistory, disabled: isRunning))
             },
             controlSetting(
                 id: "detailedProgress",
