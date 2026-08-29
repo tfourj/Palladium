@@ -185,6 +185,7 @@ def run_gallery_dl_resolver(download_url_override=None, cookie_file_path_overrid
                 if pip_exit_code == 0:
                     captured = GalleryDLOutputCapture()
                     sys.argv = gallery_dl_args(url, cookie_file_path=cookie_file_path, resolve=True)
+                    print(f"[palladium] gallery-dl resolver argv: {' '.join(sys.argv)}")
                     try:
                         with contextlib.redirect_stdout(captured):
                             run_gallery_dl_module()
@@ -208,6 +209,8 @@ def run_gallery_dl_resolver(download_url_override=None, cookie_file_path_overrid
                                 "title": gallery_item_title(candidate, len(items) + 1, media_type),
                                 "media_type": media_type,
                             })
+                        for item in items:
+                            print(f"[palladium] gallery item {item['index']}: {item['media_type']} {item['url']}")
                         success = bool(items)
                         print(f"[palladium] gallery-dl resolved {len(items)} item(s)")
         except Exception:
@@ -292,6 +295,7 @@ def run_gallery_dl_flow(download_url_override=None, selection_range_override=Non
                     selection_range,
                 )
                 print(f"[palladium] running gallery-dl for selected range: {selection_range}")
+                print(f"[palladium] gallery-dl download argv: {' '.join(sys.argv)}")
                 try:
                     run_gallery_dl_module(progress_callback=emit_progress)
                     exit_code = 0
