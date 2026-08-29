@@ -307,6 +307,11 @@ struct ContentView: View {
                     isResolvingFormats: isResolvingFormats,
                     onDownloadFormat: { format in
                         runDownloadFlow(formatOverride: format)
+                    },
+                    onPreviewLoadFailure: { item, message in
+                        appendConsoleText(
+                            "[palladium] gallery preview failed to load item \(item.index): \(item.url) (\(message))\n"
+                        )
                     }
                 )
                 .tabItem {

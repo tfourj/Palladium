@@ -43,8 +43,10 @@ struct DownloadTabView: View {
     @Binding var showFormatPicker: Bool
     let isResolvingFormats: Bool
     let onDownloadFormat: (YTDLPFormat) -> Void
+    let onPreviewLoadFailure: (GalleryItem, String) -> Void
     @State private var showHistorySheet = false
     @State private var showDownloadOptions = false
+    @State private var loggedPreviewFailureIndices: Set<Int> = []
 
     var body: some View {
         ZStack {
@@ -523,13 +525,20 @@ struct DownloadTabView: View {
                                 ZStack {
                                     Color.secondary.opacity(0.15)
                                     if item.mediaType == .image {
-                                        AsyncImage(url: URL(string: item.url)) { image in
-                                            image
-                                                .resizable()
-                                                .scaledToFit()
-                                                .padding(4)
-                                        } placeholder: {
-                                            ProgressView()
+                                        AsyncImage(url: URL(string: item.url)) { phase in
+                                            switch phase {
+                                            case .success(let image):
+                                                image
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .padding(4)
+                                            case .failure(let error):
+                                                galleryPreviewFailureView(item: item, error: error)
+                                            case .empty:
+                                                ProgressView()
+                                            @unknown default:
+                                                ProgressView()
+                                            }
                                         }
                                     } else {
                                         VStack(spacing: 8) {
@@ -601,6 +610,21 @@ struct DownloadTabView: View {
                 }
                 .background(Color(uiColor: .systemBackground))
             }
+        }
+    }
+
+    private func galleryPreviewFailureView(item: GalleryItem, error: Error) -> some View {
+        VStack(spacing: 8) {
+            Image(systemName: "exclamationmark.triangle")
+                .font(.system(size: 34, weight: .semibold))
+            Text("Preview unavailable")
+                .font(.caption)
+                .fontWeight(.semibold)
+        }
+        .foregroundStyle(.secondary)
+        .onAppear {
+            guard loggedPreviewFailureIndices.insert(item.index).inserted else { return }
+            onPreviewLoadFailure(item, error.localizedDescription)
         }
     }
 
