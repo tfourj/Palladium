@@ -48,7 +48,7 @@ def gallery_dl_args(url, cookie_file_path=None, destination=None, selection_rang
         else:
             print(f"[palladium] cookie file missing, ignoring: {cookie_file_path}")
     if resolve:
-        args.append("--resolve-json")
+        args.append("--resolve-urls")
     if destination:
         args.extend(["--destination", destination])
     if selection_range:
@@ -192,6 +192,24 @@ def gallery_resolution_error_message(output):
     return None
 
 
+def gallery_items_from_url_records(records):
+    items = []
+    seen = set()
+    for url, metadata in records:
+        candidate = str(url or "").strip()
+        if not candidate.startswith(("http://", "https://")) or candidate in seen:
+            continue
+        seen.add(candidate)
+        media_type = gallery_item_media_type(candidate, metadata)
+        items.append({
+            "index": len(items) + 1,
+            "url": candidate,
+            "title": gallery_item_title(candidate, len(items) + 1, media_type, metadata),
+            "media_type": media_type,
+        })
+    return items
+
+
 def gallery_items_from_resolver_output(captured_output):
     items = []
     seen = set()
@@ -256,6 +274,7 @@ def run_gallery_dl_resolver(download_url_override=None, cookie_file_path_overrid
     success = False
     captured_output = ""
     gallery_dl_exit_code = None
+    url_records = []
 
     with contextlib.redirect_stdout(Tee(output, console_stdout, live_log_stream)), contextlib.redirect_stderr(Tee(output, console_stderr, live_log_stream)):
         try:
@@ -273,7 +292,7 @@ def run_gallery_dl_resolver(download_url_override=None, cookie_file_path_overrid
                     print(f"[palladium] gallery-dl resolver argv: {' '.join(sys.argv)}")
                     try:
                         with contextlib.redirect_stdout(captured):
-                            run_gallery_dl_module()
+                            run_gallery_dl_module(url_records=url_records)
                     except SystemExit as exc:
                         if exc.code not in (None, 0):
                             gallery_dl_exit_code = exc.code
@@ -281,11 +300,16 @@ def run_gallery_dl_resolver(download_url_override=None, cookie_file_path_overrid
                         captured_output = captured.getvalue()
 
                     if gallery_dl_exit_code is None:
-                        items = gallery_items_from_resolver_output(captured_output)
+                        items = gallery_items_from_url_records(url_records)
+                        if not items:
+                            items = gallery_items_from_resolver_output(captured_output)
                         for item in items:
                             print(f"[palladium] gallery item {item['index']}: {item['media_type']} {item['url']}")
                         success = bool(items)
-                        print(f"[palladium] gallery-dl resolved {len(items)} item(s)")
+                        if items:
+                            print(f"[palladium] gallery-dl resolved {len(items)} item(s)")
+                        else:
+                            print(f"[palladium] gallery-dl resolved 0 item(s) (records: {len(url_records)}, captured chars: {len(captured_output)})")
         except Exception:
             print("[palladium] gallery-dl resolution failed")
             traceback.print_exc()
