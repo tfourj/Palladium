@@ -634,6 +634,8 @@ struct DownloadTabView: View {
             return "Select Images"
         case .some(.audio):
             return "Select Audio"
+        case .some(.video):
+            return "Select Videos"
         case .some(.file):
             return "Select Files"
         case nil:
@@ -648,6 +650,8 @@ struct DownloadTabView: View {
             return "Download \(count) Image\(count == 1 ? "" : "s")"
         case .some(.audio):
             return "Download \(count) Audio"
+        case .some(.video):
+            return "Download \(count) Video\(count == 1 ? "" : "s")"
         case .some(.file):
             return "Download \(count) File\(count == 1 ? "" : "s")"
         case nil:
