@@ -53,13 +53,30 @@ def reset_gallery_dl_runtime():
     gc.collect()
 
 
-def run_gallery_dl_module(progress_callback=None):
+def install_gallery_dl_url_capture(job_module, records):
+    restores = []
+    for name in ("handle_url", "handle_url_fallback"):
+        original = getattr(job_module.UrlJob, name)
+
+        def wrapper(job_self, url, kwdict, _original=original, _records=records):
+            _records.append((url, dict(kwdict) if isinstance(kwdict, dict) else {}))
+            return _original(job_self, url, kwdict)
+
+        setattr(job_module.UrlJob, name, wrapper)
+        restores.append((job_module.UrlJob, name, original))
+    return restores
+
+
+def run_gallery_dl_module(progress_callback=None, url_records=None):
     reset_gallery_dl_runtime()
     original_handle_url = None
+    url_capture_restores = []
     try:
-        if progress_callback is not None:
-            from gallery_dl import job
+        from gallery_dl import job
 
+        if url_records is not None:
+            url_capture_restores.extend(install_gallery_dl_url_capture(job, url_records))
+        if progress_callback is not None:
             original_handle_url = job.DownloadJob.handle_url
 
             def handle_url_with_progress(download_job, url, kwdict):
@@ -83,6 +100,8 @@ def run_gallery_dl_module(progress_callback=None):
     finally:
         if original_handle_url is not None:
             job.DownloadJob.handle_url = original_handle_url
+        for target, name, original in url_capture_restores:
+            setattr(target, name, original)
         reset_gallery_dl_runtime()
 
 

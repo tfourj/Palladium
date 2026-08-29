@@ -87,6 +87,24 @@ GALLERY_IMAGE_EXTENSIONS = {
     ".webp",
 }
 
+GALLERY_VIDEO_EXTENSIONS = {
+    ".3gp",
+    ".avi",
+    ".flv",
+    ".m2ts",
+    ".m4v",
+    ".mkv",
+    ".mov",
+    ".mp4",
+    ".mpeg",
+    ".mpg",
+    ".ts",
+    ".webm",
+    ".wmv",
+}
+
+GALLERY_RESOLVER_URL_MESSAGE = 3
+
 GALLERY_AUDIO_URL_HINTS = (
     "audio_mpeg",
     "audio/mp",
@@ -113,7 +131,18 @@ def gallery_selection_count(selection_range):
     return len(selected)
 
 
-def gallery_item_media_type(url):
+def gallery_item_media_type(url, metadata=None):
+    metadata = metadata or {}
+    extension = str(metadata.get("extension") or "").strip().lower()
+    if extension and not extension.startswith("."):
+        extension = f".{extension}"
+    item_type = str(metadata.get("type") or "").strip().lower()
+    if item_type == "image" or extension in GALLERY_IMAGE_EXTENSIONS:
+        return "image"
+    if item_type == "audio" or extension in GALLERY_AUDIO_EXTENSIONS:
+        return "audio"
+    if item_type == "video" or extension in GALLERY_VIDEO_EXTENSIONS:
+        return "video"
     try:
         parsed = urllib.parse.urlparse(url)
         path = urllib.parse.unquote(parsed.path)
@@ -126,12 +155,18 @@ def gallery_item_media_type(url):
         return "audio"
     if extension in GALLERY_IMAGE_EXTENSIONS:
         return "image"
+    if extension in GALLERY_VIDEO_EXTENSIONS:
+        return "video"
     if any(hint in decoded_url for hint in GALLERY_AUDIO_URL_HINTS):
         return "audio"
     return "file"
 
 
-def gallery_item_title(url, index, media_type="image"):
+def gallery_item_title(url, index, media_type="image", metadata=None):
+    metadata = metadata or {}
+    filename = str(metadata.get("filename") or "").strip()
+    if filename:
+        return filename
     try:
         path = urllib.parse.unquote(urllib.parse.urlparse(url).path)
         name = os.path.basename(path)
@@ -141,6 +176,8 @@ def gallery_item_title(url, index, media_type="image"):
         pass
     if media_type == "audio":
         return f"Audio {index}"
+    if media_type == "video":
+        return f"Video {index}"
     if media_type == "file":
         return f"File {index}"
     return f"Image {index}"
@@ -153,6 +190,72 @@ def gallery_resolution_error_message(output):
         if match:
             return match.group(1)
     return None
+
+
+def gallery_items_from_url_records(records):
+    items = []
+    seen = set()
+    for url, metadata in records:
+        candidate = str(url or "").strip()
+        if not candidate.startswith(("http://", "https://")) or candidate in seen:
+            continue
+        seen.add(candidate)
+        media_type = gallery_item_media_type(candidate, metadata)
+        items.append({
+            "index": len(items) + 1,
+            "url": candidate,
+            "title": gallery_item_title(candidate, len(items) + 1, media_type, metadata),
+            "media_type": media_type,
+        })
+    return items
+
+
+def gallery_items_from_resolver_output(captured_output):
+    items = []
+    seen = set()
+
+    def add_item(url, metadata):
+        candidate = str(url or "").strip()
+        if not candidate.startswith(("http://", "https://")) or candidate in seen:
+            return
+        seen.add(candidate)
+        media_type = gallery_item_media_type(candidate, metadata)
+        items.append({
+            "index": len(items) + 1,
+            "url": candidate,
+            "title": gallery_item_title(candidate, len(items) + 1, media_type, metadata),
+            "media_type": media_type,
+        })
+
+    try:
+        entries = json.loads(captured_output)
+    except Exception:
+        entries = None
+    if isinstance(entries, list):
+        for entry in entries:
+            if not isinstance(entry, (list, tuple)) or not entry:
+                continue
+            if entry[0] == -1 and len(entry) >= 2 and isinstance(entry[1], dict):
+                message = str(entry[1].get("message") or entry[1].get("error") or "").strip()
+                if message:
+                    print(f"[palladium] gallery-dl error: {message}")
+                continue
+            if entry[0] != GALLERY_RESOLVER_URL_MESSAGE or len(entry) < 3:
+                continue
+            add_item(entry[1], entry[2] if isinstance(entry[2], dict) else {})
+        return items
+    for line in str(captured_output or "").splitlines():
+        line = line.strip()
+        if line.startswith("["):
+            try:
+                entry = json.loads(line)
+            except Exception:
+                continue
+            if isinstance(entry, (list, tuple)) and len(entry) >= 3 and entry[0] == GALLERY_RESOLVER_URL_MESSAGE:
+                add_item(entry[1], entry[2] if isinstance(entry[2], dict) else {})
+            continue
+        add_item(line, None)
+    return items
 
 
 def run_gallery_dl_resolver(download_url_override=None, cookie_file_path_override=None, live_log_fd_override=None, package_source_json_override=None):
@@ -171,6 +274,7 @@ def run_gallery_dl_resolver(download_url_override=None, cookie_file_path_overrid
     success = False
     captured_output = ""
     gallery_dl_exit_code = None
+    url_records = []
 
     with contextlib.redirect_stdout(Tee(output, console_stdout, live_log_stream)), contextlib.redirect_stderr(Tee(output, console_stderr, live_log_stream)):
         try:
@@ -185,9 +289,10 @@ def run_gallery_dl_resolver(download_url_override=None, cookie_file_path_overrid
                 if pip_exit_code == 0:
                     captured = GalleryDLOutputCapture()
                     sys.argv = gallery_dl_args(url, cookie_file_path=cookie_file_path, resolve=True)
+                    print(f"[palladium] gallery-dl resolver argv: {' '.join(sys.argv)}")
                     try:
                         with contextlib.redirect_stdout(captured):
-                            run_gallery_dl_module()
+                            run_gallery_dl_module(url_records=url_records)
                     except SystemExit as exc:
                         if exc.code not in (None, 0):
                             gallery_dl_exit_code = exc.code
@@ -195,21 +300,16 @@ def run_gallery_dl_resolver(download_url_override=None, cookie_file_path_overrid
                         captured_output = captured.getvalue()
 
                     if gallery_dl_exit_code is None:
-                        seen = set()
-                        for line in captured_output.splitlines():
-                            candidate = line.strip()
-                            if not candidate.startswith(("http://", "https://")) or candidate in seen:
-                                continue
-                            seen.add(candidate)
-                            media_type = gallery_item_media_type(candidate)
-                            items.append({
-                                "index": len(items) + 1,
-                                "url": candidate,
-                                "title": gallery_item_title(candidate, len(items) + 1, media_type),
-                                "media_type": media_type,
-                            })
+                        items = gallery_items_from_url_records(url_records)
+                        if not items:
+                            items = gallery_items_from_resolver_output(captured_output)
+                        for item in items:
+                            print(f"[palladium] gallery item {item['index']}: {item['media_type']} {item['url']}")
                         success = bool(items)
-                        print(f"[palladium] gallery-dl resolved {len(items)} item(s)")
+                        if items:
+                            print(f"[palladium] gallery-dl resolved {len(items)} item(s)")
+                        else:
+                            print(f"[palladium] gallery-dl resolved 0 item(s) (records: {len(url_records)}, captured chars: {len(captured_output)})")
         except Exception:
             print("[palladium] gallery-dl resolution failed")
             traceback.print_exc()
@@ -292,6 +392,7 @@ def run_gallery_dl_flow(download_url_override=None, selection_range_override=Non
                     selection_range,
                 )
                 print(f"[palladium] running gallery-dl for selected range: {selection_range}")
+                print(f"[palladium] gallery-dl download argv: {' '.join(sys.argv)}")
                 try:
                     run_gallery_dl_module(progress_callback=emit_progress)
                     exit_code = 0

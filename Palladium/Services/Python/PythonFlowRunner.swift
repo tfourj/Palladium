@@ -6,6 +6,7 @@ struct GalleryItem: Identifiable, Hashable, Sendable {
     enum MediaType: String, Sendable {
         case image
         case audio
+        case video
         case file
     }
 
@@ -22,6 +23,8 @@ struct GalleryItem: Identifiable, Hashable, Sendable {
             return "Image"
         case .audio:
             return "Audio"
+        case .video:
+            return "Video"
         case .file:
             return "File"
         }
@@ -33,6 +36,8 @@ struct GalleryItem: Identifiable, Hashable, Sendable {
             return "photo"
         case .audio:
             return "music.note"
+        case .video:
+            return "video.fill"
         case .file:
             return "doc"
         }
