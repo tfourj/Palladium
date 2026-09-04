@@ -117,6 +117,51 @@ struct YTDLPFormat: Identifiable, Hashable, Sendable {
     }
 }
 
+extension YTDLPFormat {
+    var displayHeight: Int {
+        guard let width, let height else {
+            return height ?? 0
+        }
+        return min(width, height)
+    }
+
+    var qualityHeading: String {
+        guard hasVideo else {
+            if let bitrate = audioBitrate, bitrate > 0 {
+                return "\(Int(bitrate.rounded())) kbps"
+            }
+            return fileExtension.uppercased()
+        }
+
+        let quality: String
+        switch displayHeight {
+        case 2160...:
+            quality = "4K"
+        case 1440...:
+            quality = "1440p"
+        case 1080...:
+            quality = "1080p"
+        case 720...:
+            quality = "720p"
+        case 480...:
+            quality = "480p"
+        case 360...:
+            quality = "360p"
+        case 240...:
+            quality = "240p"
+        case 144...:
+            quality = "144p"
+        default:
+            quality = note.isEmpty ? fileExtension.uppercased() : note
+        }
+
+        if let fps = framesPerSecond, fps > 30 {
+            return "\(quality) · \(Int(fps.rounded())) fps"
+        }
+        return quality
+    }
+}
+
 struct YTDLPFormatResolution: Sendable {
     let title: String
     let formats: [YTDLPFormat]

@@ -22,6 +22,12 @@ struct DownloadQualitySettingsView: View {
     @AppStorage(DownloadQualityPreferences.overrideFormatListExportKey)
     private var overrideFormatListExport = false
 
+    @AppStorage(QueuedQualityPreferences.selectionEnabledKey)
+    private var queuedQualitySelectionEnabled = true
+
+    @AppStorage(QueuedQualityPreferences.selectionModeKey)
+    private var queuedQualitySelectionMode = QueuedQualitySelectionMode.pickMaxQuality.rawValue
+
     let isRunning: Bool
 
     var body: some View {
@@ -75,6 +81,28 @@ struct DownloadQualitySettingsView: View {
                 Text("Audio")
             } footer: {
                 Text("download.quality.audio.best_help")
+            }
+
+            Section {
+                Toggle(
+                    "download.quality.queued.title",
+                    isOn: $queuedQualitySelectionEnabled
+                )
+
+                if queuedQualitySelectionEnabled {
+                    Picker(
+                        "download.quality.queued.mode.title",
+                        selection: $queuedQualitySelectionMode
+                    ) {
+                        ForEach(QueuedQualitySelectionMode.allCases) { mode in
+                            Text(mode.title).tag(mode.rawValue)
+                        }
+                    }
+                }
+            } header: {
+                Text("download.quality.queued.section")
+            } footer: {
+                Text("download.quality.queued.help")
             }
 
             Section {

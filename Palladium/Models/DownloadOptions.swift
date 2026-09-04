@@ -136,6 +136,41 @@ enum AudioDownloadQuality: String, CaseIterable, Identifiable {
     }
 }
 
+enum QueuedQualitySelectionMode: String, Codable, CaseIterable, Identifiable {
+    case pickMaxQuality = "pick_max"
+    case choosePerLink = "per_link"
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .pickMaxQuality:
+            return String(localized: "download.quality.queued.mode.pick_max")
+        case .choosePerLink:
+            return String(localized: "download.quality.queued.mode.per_link")
+        }
+    }
+}
+
+struct QueuedQualityPreferences {
+    static let selectionEnabledKey = "palladium.queueQualitySelectionEnabled"
+    static let selectionModeKey = "palladium.queueQualitySelectionMode"
+
+    var selectionEnabled: Bool
+    var selectionMode: QueuedQualitySelectionMode
+
+    static func load(from defaults: UserDefaults = .standard) -> Self {
+        Self(
+            selectionEnabled: defaults.object(forKey: selectionEnabledKey) == nil
+                ? true
+                : defaults.bool(forKey: selectionEnabledKey),
+            selectionMode: QueuedQualitySelectionMode(
+                rawValue: defaults.string(forKey: selectionModeKey) ?? ""
+            ) ?? .pickMaxQuality
+        )
+    }
+}
+
 struct DownloadQualityPreferences {
     static let videoQualityKey = "palladium.videoDownloadQuality"
     static let videoContainerKey = "palladium.videoDownloadContainer"

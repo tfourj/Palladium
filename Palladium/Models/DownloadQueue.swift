@@ -1,5 +1,69 @@
 import Foundation
 
+struct BatchQualitySelection: Codable, Equatable, Sendable {
+    enum Kind: String, Codable, Sendable {
+        case video
+        case audio
+    }
+
+    let kind: Kind
+    let height: Int?
+    let photosCompatible: Bool
+    let label: String
+
+    init(
+        kind: Kind,
+        height: Int?,
+        photosCompatible: Bool,
+        label: String
+    ) {
+        self.kind = kind
+        self.height = height
+        self.photosCompatible = photosCompatible
+        self.label = label
+    }
+
+    init(from format: YTDLPFormat) {
+        if format.hasVideo {
+            self.init(
+                kind: .video,
+                height: format.displayHeight,
+                photosCompatible: format.isPhotosCompatible,
+                label: format.qualityHeading
+            )
+        } else {
+            self.init(
+                kind: .audio,
+                height: nil,
+                photosCompatible: false,
+                label: format.qualityHeading
+            )
+        }
+    }
+
+    func formatArguments(usesQualitySettings: Bool) -> String {
+        var arguments: String
+        switch kind {
+        case .video:
+            let base = "bv*[height=\(height ?? 0)]"
+            let combined = photosCompatible
+                ? "\(base)+bestaudio[ext=m4a]/\(base)+bestaudio"
+                : "\(base)+bestaudio"
+            arguments = "--format \(combined)/b[height=\(height ?? 0)]"
+        case .audio:
+            arguments = "--format ba/b"
+        }
+        if kind == .audio, !usesQualitySettings {
+            arguments += " --extract-audio --audio-format best"
+        }
+        return arguments
+    }
+
+    static func outputIndicatesUnavailableFormat(_ output: String) -> Bool {
+        output.localizedCaseInsensitiveContains("requested format is not available")
+    }
+}
+
 struct QueuedDownloadConfiguration: Codable, Equatable {
     let presetRawValue: String
     let presetArgumentsJSON: String
@@ -12,6 +76,35 @@ struct QueuedDownloadConfiguration: Codable, Equatable {
     let useCookies: Bool
     let cookieFileName: String
     let afterDownloadBehaviorRawValue: String
+    var batchQuality: BatchQualitySelection?
+
+    init(
+        presetRawValue: String,
+        presetArgumentsJSON: String,
+        extraArguments: String,
+        downloadPlaylist: Bool,
+        downloadSubtitles: Bool,
+        embedThumbnail: Bool,
+        autoRetryFailedDownloads: Bool,
+        subtitleLanguagePattern: String,
+        useCookies: Bool,
+        cookieFileName: String,
+        afterDownloadBehaviorRawValue: String,
+        batchQuality: BatchQualitySelection? = nil
+    ) {
+        self.presetRawValue = presetRawValue
+        self.presetArgumentsJSON = presetArgumentsJSON
+        self.extraArguments = extraArguments
+        self.downloadPlaylist = downloadPlaylist
+        self.downloadSubtitles = downloadSubtitles
+        self.embedThumbnail = embedThumbnail
+        self.autoRetryFailedDownloads = autoRetryFailedDownloads
+        self.subtitleLanguagePattern = subtitleLanguagePattern
+        self.useCookies = useCookies
+        self.cookieFileName = cookieFileName
+        self.afterDownloadBehaviorRawValue = afterDownloadBehaviorRawValue
+        self.batchQuality = batchQuality
+    }
 
     var preset: DownloadPreset {
         DownloadPreset(rawValue: presetRawValue) ?? .autoVideo
@@ -47,7 +140,7 @@ enum DownloadQueueItemStatus: String, Codable, Equatable {
 struct DownloadQueueItem: Codable, Identifiable, Equatable {
     let id: UUID
     let url: String
-    let configuration: QueuedDownloadConfiguration
+    var configuration: QueuedDownloadConfiguration
     let createdAt: Date
     var status: DownloadQueueItemStatus
     var title: String?
@@ -111,6 +204,28 @@ struct DownloadQueue: Codable, Equatable {
         }
         items.append(contentsOf: newItems)
         return newItems
+    }
+
+    @discardableResult
+    mutating func applyBatchQualityToPending(_ selection: BatchQualitySelection) -> Int {
+        var updatedCount = 0
+        for index in items.indices where items[index].status == .pending {
+            items[index].configuration.batchQuality = selection
+            updatedCount += 1
+        }
+        return updatedCount
+    }
+
+    @discardableResult
+    mutating func clearBatchQualityFromPending() -> Int {
+        var clearedCount = 0
+        for index in items.indices where items[index].status == .pending {
+            if items[index].configuration.batchQuality != nil {
+                items[index].configuration.batchQuality = nil
+                clearedCount += 1
+            }
+        }
+        return clearedCount
     }
 
     mutating func start() {
@@ -186,6 +301,16 @@ struct DownloadQueue: Codable, Equatable {
         items[index].errorMessage = nil
         items[index].completedAt = nil
         return items[index]
+    }
+
+    mutating func requeue(_ id: UUID) {
+        guard let index = index(of: id), items[index].status == .running else {
+            return
+        }
+        items[index].status = .pending
+        items[index].title = nil
+        items[index].errorMessage = nil
+        items[index].completedAt = nil
     }
 
     mutating func remove(_ id: UUID) {

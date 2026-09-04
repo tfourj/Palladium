@@ -198,6 +198,13 @@ struct ContentView: View {
     @State var queueConsoleInitialized = false
     @State var shareSheetCompletion: (() -> Void)?
     @State var showDownloadQueueSheet = false
+    @State var isResolvingQueueQuality = false
+    @State var queueQualityFormats: [YTDLPFormat] = []
+    @State var queueQualityPickerTitle = ""
+    @State var showQueueQualityPicker = false
+    @State var pendingBatchRepickItemID: UUID?
+    @State var perLinkQualityActive = false
+    @State var pendingPerLinkQualityItemID: UUID?
 
     init() {
         let rememberPreset = Self.loadRememberSelectedPreset()
@@ -304,9 +311,9 @@ struct ContentView: View {
                     availableFormats: availableFormats,
                     formatPickerTitle: formatPickerTitle,
                     showFormatPicker: $showFormatPicker,
-                    isResolvingFormats: isResolvingFormats,
+                    isResolvingFormats: isResolvingFormats || isResolvingQueueQuality,
                     onDownloadFormat: { format in
-                        runDownloadFlow(formatOverride: format)
+                        handleDownloadFormatSelection(format)
                     },
                     onPreviewLoadFailure: { item, message in
                         appendConsoleText(
@@ -575,6 +582,12 @@ struct ContentView: View {
                 queue: downloadQueue,
                 selectedPreset: selectedPreset,
                 isOperationBusy: isRunning || isPackageRunning || completedDownloadResult != nil,
+                isResolvingQuality: isResolvingQueueQuality,
+                showQualityPicker: $showQueueQualityPicker,
+                qualityFormats: queueQualityFormats,
+                qualityPickerTitle: queueQualityPickerTitle,
+                onPickQualityStart: handlePickQualityAndStart,
+                onSelectQuality: applyQueueStartQuality,
                 onAddLinks: addLinksToDownloadQueue,
                 onStart: startDownloadQueue,
                 onPause: pauseDownloadQueue,

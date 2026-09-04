@@ -50,7 +50,7 @@ Palladium/
 | `Models/AppAppearanceMode.swift` | Appearance-mode setting model. |
 | `Models/DownloadServiceDomain.swift` | Canonical source-service domain resolver for saved-download folders. |
 | `Models/DownloadOptions.swift` | Download option model and persisted settings. |
-| `Models/DownloadQueue.swift` | Sequential download queue models, state transitions, and persistence. |
+| `Models/DownloadQueue.swift` | Sequential download queue models, batch quality selection, state transitions, and persistence. |
 | `Models/ImportedCookieFile.swift` | Imported cookie-file model. |
 | `Models/LinkHistory.swift` | Previously used link model and history storage data. |
 | `Models/PackageSourceMode.swift` | Package-source selection model. |
@@ -73,6 +73,7 @@ Palladium/
 | `Views/ContentView+Storage.swift` | Download storage and file-management behavior. |
 | `Views/ContentView+Support.swift` | Support, diagnostics, and helper UI behavior. |
 | `Views/Tabs/DownloadTabView.swift` | Main download screen. |
+| `Views/Tabs/FormatPickerSheetView.swift` | Shared yt-dlp format and quality picker sheet. |
 | `Views/Tabs/DownloadQueueSheetView.swift` | Multiline queue editor, controls, ordering, and item statuses. |
 | `Views/Tabs/PackagesTabView.swift` | Python package management screen. |
 | `Views/Tabs/SavedDownloadsTabView.swift` | Saved-downloads browser. |

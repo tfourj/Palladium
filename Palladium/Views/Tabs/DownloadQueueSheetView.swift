@@ -4,6 +4,12 @@ struct DownloadQueueSheetView: View {
     let queue: DownloadQueue
     let selectedPreset: DownloadPreset
     let isOperationBusy: Bool
+    let isResolvingQuality: Bool
+    @Binding var showQualityPicker: Bool
+    let qualityFormats: [YTDLPFormat]
+    let qualityPickerTitle: String
+    let onPickQualityStart: () -> Void
+    let onSelectQuality: (YTDLPFormat) -> Void
     let onAddLinks: (String) -> Int
     let onStart: () -> Void
     let onPause: () -> Void
@@ -13,6 +19,8 @@ struct DownloadQueueSheetView: View {
     let onClearFinished: () -> Void
 
     @Environment(\.dismiss) private var dismiss
+    @AppStorage(QueuedQualityPreferences.selectionEnabledKey)
+    private var queuedQualitySelectionEnabled = true
     @State private var linksText = ""
 
     var body: some View {
@@ -49,6 +57,16 @@ struct DownloadQueueSheetView: View {
                     }
                 }
             }
+        }
+        .sheet(isPresented: $showQualityPicker) {
+            FormatPickerSheetView(
+                title: qualityPickerTitle,
+                formats: qualityFormats,
+                onSelect: { format in
+                    showQualityPicker = false
+                    onSelectQuality(format)
+                }
+            )
         }
         .presentationDetents([.large])
     }
@@ -122,25 +140,45 @@ struct DownloadQueueSheetView: View {
                 }
                 .buttonStyle(.bordered)
             } else {
-                Button(action: onStart) {
-                    Label(
-                        hasPreviouslyStartedItems ? "queue.resume" : "queue.start",
-                        systemImage: "play.circle.fill"
-                    )
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
+                startQueueButton
+
+                if queuedQualitySelectionEnabled {
+                    pickQualityStartButton
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(.blue)
-                .disabled(isOperationBusy || !queue.hasPendingItems)
             }
         } footer: {
-            if isOperationBusy, !queue.isActive {
+            if isResolvingQuality {
+                Text("queue.quality.loading")
+            } else if isOperationBusy, !queue.isActive {
                 Text("queue.busy")
             } else if queue.isActive {
                 Text("queue.pause.help")
             }
         }
+    }
+
+    private var startQueueButton: some View {
+        Button(action: onStart) {
+            Label(
+                hasPreviouslyStartedItems ? "queue.resume" : "queue.start.download",
+                systemImage: "play.circle.fill"
+            )
+            .foregroundStyle(.white)
+            .frame(maxWidth: .infinity)
+        }
+        .buttonStyle(.borderedProminent)
+        .tint(.blue)
+        .disabled(isOperationBusy || !queue.hasPendingItems || isResolvingQuality)
+    }
+
+    private var pickQualityStartButton: some View {
+        Button(action: onPickQualityStart) {
+            Label("queue.pick_quality.start", systemImage: "slider.horizontal.3")
+                .frame(maxWidth: .infinity)
+        }
+        .buttonStyle(.bordered)
+        .tint(.blue)
+        .disabled(isOperationBusy || !queue.hasPendingItems || isResolvingQuality)
     }
 
     @ViewBuilder
