@@ -347,7 +347,8 @@ extension ContentView {
         let readHandle = logPipe.fileHandleForReading
         let writeFD = logPipe.fileHandleForWriting.fileDescriptor
         let liveLogFD: Int32? = writeFD
-        let isExplicitFormatSelection = formatOverride != nil
+        let queuedBatchQuality = queuedConfiguration?.batchQuality
+        let isExplicitFormatSelection = formatOverride != nil || queuedBatchQuality != nil
         let overrideFormatListExportAtStart = isExplicitFormatSelection
             && DownloadQualityPreferences.load().overrideFormatListExport
         let usesQualitySettings = !isExplicitFormatSelection || overrideFormatListExportAtStart
@@ -356,6 +357,11 @@ extension ContentView {
             let formatPreset: DownloadPreset = formatOverride.hasVideo ? .autoVideo : .audio
             presetAtStart = overrideFormatListExportAtStart
                 ? formatPreset.pythonValue
+                : DownloadPreset.custom.pythonValue
+        } else if let queuedBatchQuality {
+            let qualityPreset: DownloadPreset = queuedBatchQuality.kind == .video ? .autoVideo : .audio
+            presetAtStart = overrideFormatListExportAtStart
+                ? qualityPreset.pythonValue
                 : DownloadPreset.custom.pythonValue
         } else {
             presetAtStart = effectiveDownloadPreset.pythonValue
@@ -372,6 +378,13 @@ extension ContentView {
             extraArgsAtStart = baseExtraArgs.isEmpty
                 ? formatArguments
                 : "\(baseExtraArgs) \(formatArguments)"
+        } else if let queuedBatchQuality {
+            let qualityArguments = queuedBatchQuality.formatArguments(
+                usesQualitySettings: overrideFormatListExportAtStart
+            )
+            extraArgsAtStart = baseExtraArgs.isEmpty
+                ? qualityArguments
+                : "\(baseExtraArgs) \(qualityArguments)"
         } else {
             extraArgsAtStart = baseExtraArgs
         }
