@@ -586,7 +586,7 @@ struct ContentView: View {
                 showQualityPicker: $showQueueQualityPicker,
                 qualityFormats: queueQualityFormats,
                 qualityPickerTitle: queueQualityPickerTitle,
-                onChooseQuality: resolveQueueStartQuality,
+                onPickQualityStart: handlePickQualityAndStart,
                 onSelectQuality: applyQueueStartQuality,
                 onAddLinks: addLinksToDownloadQueue,
                 onStart: startDownloadQueue,

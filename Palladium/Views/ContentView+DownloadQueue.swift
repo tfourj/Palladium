@@ -77,6 +77,21 @@ extension ContentView {
         persistDownloadQueue()
     }
 
+    func handlePickQualityAndStart() {
+        guard !isResolvingQueueQuality,
+              !isRunning,
+              !isPackageRunning,
+              downloadQueue.hasPendingItems else {
+            return
+        }
+
+        if QueuedQualityPreferences.load().selectionMode == .choosePerLink {
+            startQueueWithPerLinkQuality()
+        } else {
+            resolveQueueStartQuality()
+        }
+    }
+
     func resolveQueueStartQuality() {
         guard !isResolvingQueueQuality,
               !isRunning,

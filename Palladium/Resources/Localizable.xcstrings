@@ -2892,6 +2892,17 @@
         }
       }
     },
+    "queue.pick_quality.start" : {
+      "comment" : "Queue button that resolves quality options and then starts the queue.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pick Quality and Start Download"
+          }
+        }
+      }
+    },
     "queue.progress.value" : {
       "localizations" : {
         "en" : {
@@ -2943,26 +2954,6 @@
         }
       }
     },
-    "queue.quality.toggle.help" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Resolve the first pending link and apply the chosen quality to all pending downloads."
-          }
-        }
-      }
-    },
-    "queue.quality.toggle.title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Select quality before start"
-          }
-        }
-      }
-    },
     "queue.resume" : {
       "localizations" : {
         "en" : {
@@ -2993,12 +2984,13 @@
         }
       }
     },
-    "queue.start" : {
+    "queue.start.download" : {
+      "comment" : "Queue button that starts the queue without a quality pick.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Start Queue"
+            "value" : "Start Download"
           }
         }
       }
