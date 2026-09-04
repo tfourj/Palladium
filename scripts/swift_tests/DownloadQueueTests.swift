@@ -246,11 +246,11 @@ final class DownloadQueueTests: XCTestCase {
 
         XCTAssertEqual(
             selection.formatArguments(usesQualitySettings: true),
-            "--format bv*[height=1080]+bestaudio/bv*[height=1080]+bestaudio/b[height=1080]"
+            "--format bv*[height=1080]+bestaudio/b[height=1080]"
         )
         XCTAssertEqual(
             selection.formatArguments(usesQualitySettings: false),
-            "--format bv*[height=1080]+bestaudio/bv*[height=1080]+bestaudio/b[height=1080]"
+            "--format bv*[height=1080]+bestaudio/b[height=1080]"
         )
     }
 
@@ -376,7 +376,7 @@ final class DownloadQueueTests: XCTestCase {
 
         XCTAssertEqual(
             decoded.items.compactMap(\.configuration.batchQuality),
-            [selection]
+            [selection, selection]
         )
     }
 

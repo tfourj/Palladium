@@ -46,8 +46,10 @@ struct BatchQualitySelection: Codable, Equatable, Sendable {
         switch kind {
         case .video:
             let base = "bv*[height=\(height ?? 0)]"
-            let audioPart = photosCompatible ? "bestaudio[ext=m4a]" : "bestaudio"
-            arguments = "--format \(base)+\(audioPart)/\(base)/b[height=\(height ?? 0)]"
+            let combined = photosCompatible
+                ? "\(base)+bestaudio[ext=m4a]/\(base)+bestaudio"
+                : "\(base)+bestaudio"
+            arguments = "--format \(combined)/b[height=\(height ?? 0)]"
         case .audio:
             arguments = "--format ba/b"
         }
