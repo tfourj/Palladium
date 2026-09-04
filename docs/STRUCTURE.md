@@ -153,6 +153,7 @@ Palladium/
 | --- | --- |
 | `scripts/swift_tests/DownloadServiceDomainTests.swift` | Saved-download service-domain canonicalization tests. |
 | `scripts/swift_tests/DownloadQueueTests.swift` | Download queue parsing, state transition, ordering, and persistence tests. |
+| `scripts/swift_tests/YTDLPFormatTests.swift` | Format picker output-container prediction and override argument tests. |
 | `scripts/swift_tests/TemporaryDownloadRetentionPolicyTests.swift` | Temporary-download cleanup policy tests. |
 
 ## Other Files and Directories
