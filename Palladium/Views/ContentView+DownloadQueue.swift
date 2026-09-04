@@ -94,6 +94,71 @@ extension ContentView {
         startDownloadQueue()
     }
 
+    func handleDownloadFormatSelection(_ format: YTDLPFormat) {
+        if pendingBatchRepickItemID == nil {
+            runDownloadFlow(formatOverride: format)
+            return
+        }
+
+        pendingBatchRepickItemID = nil
+        let selection = BatchQualitySelection(from: format)
+        downloadQueue.applyBatchQualityToPending(selection)
+        persistDownloadQueue()
+        appendConsoleText("[palladium][queue] batch quality re-selected: \(selection.label)\n")
+        startDownloadQueue()
+    }
+
+    func handleQueuedQualityUnavailable(itemID: UUID, url: String) {
+        downloadQueue.requeue(itemID)
+        downloadQueue.pause()
+        persistDownloadQueue()
+        appendConsoleText(
+            "[palladium][queue] requested quality unavailable for \(url); pausing for re-selection\n"
+        )
+        showDownloadQueueSheet = false
+        selectedTab = .download
+        urlText = url
+        pendingBatchRepickItemID = itemID
+        resolveQueuedQualityRepick(url: url)
+    }
+
+    func resolveQueuedQualityRepick(url: String) {
+        guard !isResolvingQueueQuality, !isResolvingFormats else {
+            pendingBatchRepickItemID = nil
+            return
+        }
+
+        isResolvingQueueQuality = true
+        downloadErrorText = nil
+        progressText = String(localized: "download.formats.loading")
+        let cookiePath = useCookies ? resolvedSelectedCookieFilePath() : nil
+        Task {
+            let resolution = await PythonFlowRunner.resolveFormats(url: url, cookieFilePath: cookiePath)
+            await MainActor.run {
+                isResolvingQueueQuality = false
+                progressText = String(localized: "download.prompt.idle")
+                guard !isRunning,
+                      !isPackageRunning,
+                      !isResolvingFormats else {
+                    pendingBatchRepickItemID = nil
+                    return
+                }
+                if resolution.success, !resolution.formats.isEmpty {
+                    availableFormats = resolution.formats
+                    formatPickerTitle = String(localized: "queue.quality.repick.title")
+                    showFormatPicker = true
+                } else {
+                    pendingBatchRepickItemID = nil
+                    downloadErrorText = resolution.errorMessage
+                        ?? String(localized: "download.formats.empty")
+                    if !resolution.outputText.isEmpty {
+                        appendConsoleText(resolution.outputText)
+                    }
+                }
+            }
+        }
+    }
+
     func retryDownloadQueueItem(_ id: UUID) {
         guard !isRunning,
               !isPackageRunning,

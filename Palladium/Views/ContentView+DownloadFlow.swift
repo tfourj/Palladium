@@ -671,10 +671,15 @@ extension ContentView {
                     queuedDownloadFailed(itemID: queuedItemID, errorMessage: downloadErrorText)
                 }
             } else if finalResultKind != "cancelled", let queuedItemID {
-                queuedDownloadFailed(
-                    itemID: queuedItemID,
-                    errorMessage: downloadErrorText ?? outcome.summaryText
-                )
+                if queuedConfiguration?.batchQuality != nil,
+                   BatchQualitySelection.outputIndicatesUnavailableFormat(outcome.outputText) {
+                    handleQueuedQualityUnavailable(itemID: queuedItemID, url: targetURL)
+                } else {
+                    queuedDownloadFailed(
+                        itemID: queuedItemID,
+                        errorMessage: downloadErrorText ?? outcome.summaryText
+                    )
+                }
             }
         }
         currentDownloadTask = task
@@ -691,7 +696,8 @@ extension ContentView {
         let targetURL = url.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !targetURL.isEmpty,
               !isRunning,
-              !isResolvingFormats else { return }
+              !isResolvingFormats,
+              pendingBatchRepickItemID == nil else { return }
         guard preset != .images else {
             runDownloadFlow(urlOverride: targetURL, presetOverride: preset)
             return

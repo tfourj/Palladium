@@ -202,6 +202,7 @@ struct ContentView: View {
     @State var queueQualityFormats: [YTDLPFormat] = []
     @State var queueQualityPickerTitle = ""
     @State var showQueueQualityPicker = false
+    @State var pendingBatchRepickItemID: UUID?
 
     init() {
         let rememberPreset = Self.loadRememberSelectedPreset()
@@ -308,9 +309,9 @@ struct ContentView: View {
                     availableFormats: availableFormats,
                     formatPickerTitle: formatPickerTitle,
                     showFormatPicker: $showFormatPicker,
-                    isResolvingFormats: isResolvingFormats,
+                    isResolvingFormats: isResolvingFormats || isResolvingQueueQuality,
                     onDownloadFormat: { format in
-                        runDownloadFlow(formatOverride: format)
+                        handleDownloadFormatSelection(format)
                     },
                     onPreviewLoadFailure: { item, message in
                         appendConsoleText(
