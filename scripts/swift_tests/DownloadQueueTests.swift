@@ -196,4 +196,223 @@ final class DownloadQueueTests: XCTestCase {
         )
         return queue
     }
+
+    private func makeVideoFormat(
+        id: String,
+        height: Int,
+        codec: String,
+        extension ext: String
+    ) -> YTDLPFormat {
+        YTDLPFormat(
+            id: id,
+            fileExtension: ext,
+            resolution: "\(height)p",
+            width: height * 16 / 9,
+            height: height,
+            framesPerSecond: nil,
+            videoBitrate: nil,
+            audioBitrate: nil,
+            videoCodec: codec,
+            audioCodec: "none",
+            fileSize: nil,
+            note: ""
+        )
+    }
+
+    private func makeAudioFormat(bitrate: Double?) -> YTDLPFormat {
+        YTDLPFormat(
+            id: "140",
+            fileExtension: "m4a",
+            resolution: "audio only",
+            width: nil,
+            height: nil,
+            framesPerSecond: nil,
+            videoBitrate: nil,
+            audioBitrate: bitrate,
+            videoCodec: "none",
+            audioCodec: "mp4a.40.2",
+            fileSize: nil,
+            note: ""
+        )
+    }
+
+    func testVideoQualitySelectorArgumentsMatchHeight() {
+        let selection = BatchQualitySelection(
+            kind: .video,
+            height: 1080,
+            photosCompatible: false,
+            label: "1080p"
+        )
+
+        XCTAssertEqual(
+            selection.formatArguments(usesQualitySettings: true),
+            "--format bv*[height=1080]+bestaudio/bv*[height=1080]+bestaudio/b[height=1080]"
+        )
+        XCTAssertEqual(
+            selection.formatArguments(usesQualitySettings: false),
+            "--format bv*[height=1080]+bestaudio/bv*[height=1080]+bestaudio/b[height=1080]"
+        )
+    }
+
+    func testPhotosCompatibleQualityPrefersM4AAudio() {
+        let selection = BatchQualitySelection(
+            kind: .video,
+            height: 720,
+            photosCompatible: true,
+            label: "720p"
+        )
+
+        XCTAssertEqual(
+            selection.formatArguments(usesQualitySettings: true),
+            "--format bv*[height=720]+bestaudio[ext=m4a]/bv*[height=720]+bestaudio/b[height=720]"
+        )
+    }
+
+    func testAudioQualityAddsExtractionOnlyWithoutQualitySettings() {
+        let selection = BatchQualitySelection(
+            kind: .audio,
+            height: nil,
+            photosCompatible: false,
+            label: "192 kbps"
+        )
+
+        XCTAssertEqual(selection.formatArguments(usesQualitySettings: true), "--format ba/b")
+        XCTAssertEqual(
+            selection.formatArguments(usesQualitySettings: false),
+            "--format ba/b --extract-audio --audio-format best"
+        )
+    }
+
+    func testQualitySelectionDerivedFromVideoFormat() {
+        let format = makeVideoFormat(
+            id: "137",
+            height: 1080,
+            codec: "avc1.640028",
+            extension: "mp4"
+        )
+
+        let selection = BatchQualitySelection(from: format)
+
+        XCTAssertEqual(selection.kind, .video)
+        XCTAssertEqual(selection.height, 1080)
+        XCTAssertTrue(selection.photosCompatible)
+        XCTAssertEqual(selection.label, "1080p")
+    }
+
+    func testQualitySelectionDerivedFromAudioFormat() {
+        let format = makeAudioFormat(bitrate: 128)
+
+        let selection = BatchQualitySelection(from: format)
+
+        XCTAssertEqual(selection.kind, .audio)
+        XCTAssertNil(selection.height)
+        XCTAssertFalse(selection.photosCompatible)
+        XCTAssertEqual(selection.label, "128 kbps")
+    }
+
+    func testUnavailableFormatOutputDetection() {
+        XCTAssertTrue(
+            BatchQualitySelection.outputIndicatesUnavailableFormat(
+                "ERROR: Requested format is not available. Use --list-formats for a list of available formats"
+            )
+        )
+        XCTAssertFalse(
+            BatchQualitySelection.outputIndicatesUnavailableFormat(
+                "ERROR: [youtube] jNQXAC9IVRw: Private video. Sign in if you've been granted access"
+            )
+        )
+    }
+
+    func testApplyBatchQualityUpdatesOnlyPendingItems() throws {
+        var queue = makeQueue()
+        queue.start()
+        let first = try XCTUnwrap(queue.nextPendingItem)
+        queue.markRunning(first.id)
+        let selection = BatchQualitySelection(
+            kind: .video,
+            height: 1080,
+            photosCompatible: false,
+            label: "1080p"
+        )
+
+        let updatedCount = queue.applyBatchQualityToPending(selection)
+
+        XCTAssertEqual(updatedCount, 1)
+        XCTAssertEqual(
+            queue.pendingItems.compactMap(\.configuration.batchQuality),
+            [selection]
+        )
+        XCTAssertNil(
+            queue.items.first(where: { $0.id == first.id })?.configuration.batchQuality
+        )
+    }
+
+    func testRequeueRestoresRunningItemToPending() throws {
+        var queue = makeQueue()
+        queue.start()
+        let first = try XCTUnwrap(queue.nextPendingItem)
+        queue.markRunning(first.id)
+
+        queue.requeue(first.id)
+
+        let requeued = try XCTUnwrap(queue.items.first(where: { $0.id == first.id }))
+        XCTAssertEqual(requeued.status, .pending)
+        XCTAssertNil(queue.currentItem)
+        XCTAssertEqual(queue.nextPendingItem?.id, first.id)
+    }
+
+    func testBatchQualitySurvivesPersistenceRoundTrip() throws {
+        var queue = makeQueue()
+        let selection = BatchQualitySelection(
+            kind: .video,
+            height: 1080,
+            photosCompatible: false,
+            label: "1080p"
+        )
+        queue.applyBatchQualityToPending(selection)
+
+        let data = try JSONEncoder().encode(queue.persistableState())
+        let decoded = try JSONDecoder().decode(DownloadQueue.self, from: data)
+
+        XCTAssertEqual(
+            decoded.items.compactMap(\.configuration.batchQuality),
+            [selection]
+        )
+    }
+
+    func testLegacyQueueJSONWithoutBatchQualityDecodes() throws {
+        let legacyJSON = """
+        {
+          "items" : [
+            {
+              "id" : "11111111-1111-1111-1111-111111111111",
+              "url" : "https://example.com/one",
+              "configuration" : {
+                "presetRawValue" : "audio",
+                "presetArgumentsJSON" : "{}",
+                "extraArguments" : "",
+                "downloadPlaylist" : false,
+                "downloadSubtitles" : false,
+                "embedThumbnail" : false,
+                "autoRetryFailedDownloads" : false,
+                "subtitleLanguagePattern" : "en",
+                "useCookies" : false,
+                "cookieFileName" : "",
+                "afterDownloadBehaviorRawValue" : "ask"
+              },
+              "createdAt" : 0,
+              "status" : "pending"
+            }
+          ],
+          "isActive" : false
+        }
+        """
+        let data = try XCTUnwrap(legacyJSON.data(using: .utf8))
+
+        let decoded = try JSONDecoder().decode(DownloadQueue.self, from: data)
+
+        XCTAssertEqual(decoded.items.count, 1)
+        XCTAssertEqual(decoded.items.first?.url, "https://example.com/one")
+        XCTAssertNil(decoded.items.first?.configuration.batchQuality)
+    }
 }
