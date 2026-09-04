@@ -100,7 +100,7 @@ struct FormatPickerSheetView: View {
     }
 
     private func formatDetails(_ format: YTDLPFormat) -> String {
-        var details = [format.fileExtension.uppercased()].filter { !$0.isEmpty }
+        var details = [format.predictedOutputExtension.uppercased()].filter { !$0.isEmpty }
         if let fileSize = format.fileSize {
             details.append(ByteCountFormatter.string(fromByteCount: fileSize, countStyle: .file))
         }
