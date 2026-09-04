@@ -671,7 +671,8 @@ extension ContentView {
                     queuedDownloadFailed(itemID: queuedItemID, errorMessage: downloadErrorText)
                 }
             } else if finalResultKind != "cancelled", let queuedItemID {
-                if queuedConfiguration?.batchQuality != nil,
+                if formatOverride == nil,
+                   queuedConfiguration?.batchQuality != nil,
                    BatchQualitySelection.outputIndicatesUnavailableFormat(outcome.outputText) {
                     handleQueuedQualityUnavailable(itemID: queuedItemID, url: targetURL)
                 } else {
@@ -697,7 +698,8 @@ extension ContentView {
         guard !targetURL.isEmpty,
               !isRunning,
               !isResolvingFormats,
-              pendingBatchRepickItemID == nil else { return }
+              pendingBatchRepickItemID == nil,
+              pendingPerLinkQualityItemID == nil else { return }
         guard preset != .images else {
             runDownloadFlow(urlOverride: targetURL, presetOverride: preset)
             return

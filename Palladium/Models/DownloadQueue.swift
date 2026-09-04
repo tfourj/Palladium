@@ -216,6 +216,18 @@ struct DownloadQueue: Codable, Equatable {
         return updatedCount
     }
 
+    @discardableResult
+    mutating func clearBatchQualityFromPending() -> Int {
+        var clearedCount = 0
+        for index in items.indices where items[index].status == .pending {
+            if items[index].configuration.batchQuality != nil {
+                items[index].configuration.batchQuality = nil
+                clearedCount += 1
+            }
+        }
+        return clearedCount
+    }
+
     mutating func start() {
         guard hasPendingItems else {
             isActive = false

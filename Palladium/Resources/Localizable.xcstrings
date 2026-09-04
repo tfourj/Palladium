@@ -2912,6 +2912,17 @@
         }
       }
     },
+    "queue.quality.per_link.picker.title" : {
+      "comment" : "Title of the quality picker shown before each queued link downloads.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose quality for this link"
+          }
+        }
+      }
+    },
     "queue.quality.picker.title" : {
       "localizations" : {
         "en" : {

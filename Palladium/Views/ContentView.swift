@@ -203,6 +203,8 @@ struct ContentView: View {
     @State var queueQualityPickerTitle = ""
     @State var showQueueQualityPicker = false
     @State var pendingBatchRepickItemID: UUID?
+    @State var perLinkQualityActive = false
+    @State var pendingPerLinkQualityItemID: UUID?
 
     init() {
         let rememberPreset = Self.loadRememberSelectedPreset()

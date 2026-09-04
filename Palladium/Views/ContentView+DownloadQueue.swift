@@ -42,9 +42,34 @@ extension ContentView {
         }
         downloadErrorText = nil
         playlistProgress = nil
+        perLinkQualityActive = false
+        pendingPerLinkQualityItemID = nil
         downloadQueue.start()
         persistDownloadQueue()
         runNextQueuedDownloadIfNeeded()
+    }
+
+    func startQueueWithPerLinkQuality() {
+        guard !isRunning,
+              !isPackageRunning,
+              completedDownloadResult == nil,
+              downloadQueue.hasPendingItems else {
+            return
+        }
+
+        if !queueConsoleInitialized {
+            consoleLogStore.clearAll()
+            queueConsoleInitialized = true
+        }
+        downloadErrorText = nil
+        playlistProgress = nil
+        perLinkQualityActive = true
+        pendingPerLinkQualityItemID = nil
+        downloadQueue.clearBatchQualityFromPending()
+        downloadQueue.start()
+        persistDownloadQueue()
+        guard let nextItem = downloadQueue.nextPendingItem else { return }
+        offerPerLinkQuality(for: nextItem)
     }
 
     func pauseDownloadQueue() {
@@ -95,6 +120,11 @@ extension ContentView {
     }
 
     func handleDownloadFormatSelection(_ format: YTDLPFormat) {
+        if pendingPerLinkQualityItemID != nil {
+            startQueuedDownloadWithSelectedFormat(format)
+            return
+        }
+
         if pendingBatchRepickItemID == nil {
             runDownloadFlow(formatOverride: format)
             return
@@ -106,6 +136,76 @@ extension ContentView {
         persistDownloadQueue()
         appendConsoleText("[palladium][queue] batch quality re-selected: \(selection.label)\n")
         startDownloadQueue()
+    }
+
+    func startQueuedDownloadWithSelectedFormat(_ format: YTDLPFormat) {
+        guard let itemID = pendingPerLinkQualityItemID,
+              let item = downloadQueue.items.first(where: { $0.id == itemID }) else {
+            pendingPerLinkQualityItemID = nil
+            return
+        }
+
+        pendingPerLinkQualityItemID = nil
+        downloadQueue.markRunning(itemID)
+        persistDownloadQueue()
+        appendConsoleText(
+            "[palladium][queue] quality selected for \(item.url): \(format.qualityHeading)\n"
+        )
+        selectedTab = .download
+        urlText = item.url
+        runDownloadFlow(
+            urlOverride: item.url,
+            presetOverride: item.configuration.preset,
+            formatOverride: format,
+            queuedItemID: item.id,
+            queuedConfiguration: item.configuration,
+            shouldClearConsole: false
+        )
+    }
+
+    func offerPerLinkQuality(for item: DownloadQueueItem) {
+        guard !isResolvingQueueQuality,
+              !isResolvingFormats,
+              pendingBatchRepickItemID == nil else {
+            return
+        }
+
+        pendingPerLinkQualityItemID = item.id
+        isResolvingQueueQuality = true
+        progressText = String(localized: "download.formats.loading")
+        let cookiePath = useCookies ? resolvedSelectedCookieFilePath() : nil
+        appendConsoleText("[palladium][queue] resolving quality options for \(item.url)\n")
+        Task {
+            let resolution = await PythonFlowRunner.resolveFormats(url: item.url, cookieFilePath: cookiePath)
+            await MainActor.run {
+                isResolvingQueueQuality = false
+                progressText = String(localized: "download.prompt.idle")
+                guard !isRunning,
+                      !isPackageRunning,
+                      pendingPerLinkQualityItemID == item.id,
+                      !isResolvingFormats else {
+                    pendingPerLinkQualityItemID = nil
+                    return
+                }
+                if resolution.success, !resolution.formats.isEmpty {
+                    availableFormats = resolution.formats
+                    formatPickerTitle = String(localized: "queue.quality.per_link.picker.title")
+                    showDownloadQueueSheet = false
+                    selectedTab = .download
+                    urlText = item.url
+                    showFormatPicker = true
+                } else {
+                    pendingPerLinkQualityItemID = nil
+                    downloadQueue.pause()
+                    persistDownloadQueue()
+                    downloadErrorText = resolution.errorMessage
+                        ?? String(localized: "download.formats.empty")
+                    if !resolution.outputText.isEmpty {
+                        appendConsoleText(resolution.outputText)
+                    }
+                }
+            }
+        }
     }
 
     func handleQueuedQualityUnavailable(itemID: UUID, url: String) {
@@ -206,6 +306,11 @@ extension ContentView {
               awaitingQueueItemID == nil,
               completedDownloadResult == nil,
               let nextItem = downloadQueue.nextPendingItem else {
+            return
+        }
+
+        if perLinkQualityActive {
+            offerPerLinkQuality(for: nextItem)
             return
         }
 
