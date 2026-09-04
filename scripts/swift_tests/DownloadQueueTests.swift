@@ -188,6 +188,56 @@ final class DownloadQueueTests: XCTestCase {
         XCTAssertEqual(restored.items.first?.status, .failed)
     }
 
+    func testClearBatchQualityOnlyAffectsPendingItems() throws {
+        var queue = makeQueue()
+        let selection = BatchQualitySelection(
+            kind: .video,
+            height: 1080,
+            photosCompatible: false,
+            label: "1080p"
+        )
+        queue.applyBatchQualityToPending(selection)
+        queue.start()
+        let first = try XCTUnwrap(queue.nextPendingItem)
+        queue.markRunning(first.id)
+
+        let clearedCount = queue.clearBatchQualityFromPending()
+
+        XCTAssertEqual(clearedCount, 1)
+        XCTAssertEqual(
+            queue.items.first(where: { $0.id == first.id })?.configuration.batchQuality,
+            selection
+        )
+        XCTAssertNil(queue.pendingItems.first?.configuration.batchQuality)
+    }
+
+    func testQueuedQualityPreferencesDefaultToEnabledPickMax() throws {
+        let suiteName = "DownloadQueueTests.\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let preferences = QueuedQualityPreferences.load(from: defaults)
+
+        XCTAssertTrue(preferences.selectionEnabled)
+        XCTAssertEqual(preferences.selectionMode, .pickMaxQuality)
+    }
+
+    func testQueuedQualityPreferencesRoundTrip() throws {
+        let suiteName = "DownloadQueueTests.\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        defaults.set(false, forKey: QueuedQualityPreferences.selectionEnabledKey)
+        defaults.set(
+            QueuedQualitySelectionMode.choosePerLink.rawValue,
+            forKey: QueuedQualityPreferences.selectionModeKey
+        )
+
+        let preferences = QueuedQualityPreferences.load(from: defaults)
+
+        XCTAssertFalse(preferences.selectionEnabled)
+        XCTAssertEqual(preferences.selectionMode, .choosePerLink)
+    }
+
     private func makeQueue() -> DownloadQueue {
         var queue = DownloadQueue()
         queue.append(
