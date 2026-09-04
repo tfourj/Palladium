@@ -108,8 +108,25 @@ struct YTDLPFormat: Identifiable, Hashable, Sendable {
         return "\(id)+bestaudio/best"
     }
 
+    var predictedOutputExtension: String {
+        guard hasVideo, !hasAudio else { return fileExtension }
+        return isPhotosCompatible ? "mp4" : "mkv"
+    }
+
+    var mergeOutputArgument: String? {
+        guard hasVideo, !hasAudio else { return nil }
+        return Self.mergeOutputArgument(photosCompatible: isPhotosCompatible)
+    }
+
+    static func mergeOutputArgument(photosCompatible: Bool) -> String {
+        "--merge-output-format \(photosCompatible ? "mp4" : "mkv")"
+    }
+
     func downloadOverrideArguments(usesQualitySettings: Bool) -> String {
         var arguments = "--format \(downloadSelector)"
+        if let mergeOutputArgument {
+            arguments += " \(mergeOutputArgument)"
+        }
         if hasAudio && !hasVideo && !usesQualitySettings {
             arguments += " --extract-audio --audio-format best"
         }
