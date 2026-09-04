@@ -296,11 +296,11 @@ final class DownloadQueueTests: XCTestCase {
 
         XCTAssertEqual(
             selection.formatArguments(usesQualitySettings: true),
-            "--format bv*[height=1080]+bestaudio/b[height=1080] --merge-output-format mkv"
+            "--format bv*[height=1080]+bestaudio/b[height=1080]"
         )
         XCTAssertEqual(
             selection.formatArguments(usesQualitySettings: false),
-            "--format bv*[height=1080]+bestaudio/b[height=1080] --merge-output-format mkv"
+            "--format bv*[height=1080]+bestaudio/b[height=1080]"
         )
     }
 
@@ -314,7 +314,7 @@ final class DownloadQueueTests: XCTestCase {
 
         XCTAssertEqual(
             selection.formatArguments(usesQualitySettings: true),
-            "--format bv*[height=720]+bestaudio[ext=m4a]/bv*[height=720]+bestaudio/b[height=720] --merge-output-format mp4"
+            "--format bv*[height=720]+bestaudio[ext=m4a]/bv*[height=720]+bestaudio/b[height=720]"
         )
     }
 

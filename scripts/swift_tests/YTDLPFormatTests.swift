@@ -34,14 +34,23 @@ final class YTDLPFormatTests: XCTestCase {
         makeFormat(id: id, ext: ext, videoCodec: codec, audioCodec: "none", height: height)
     }
 
-    func testIssue54VP9VideoOnlyPredictsMKVContainer() {
+    func testIssue54VP9HLSVideoOnlyPredictsMKVContainer() {
         let format = makeVideoOnly(id: "628", ext: "mp4", codec: "vp09.00.51.08", height: 2160)
 
         XCTAssertEqual(format.predictedOutputExtension, "mkv")
-        XCTAssertEqual(format.mergeOutputArgument, "--merge-output-format mkv")
         XCTAssertEqual(
             format.downloadOverrideArguments(usesQualitySettings: false),
-            "--format 628+bestaudio/best --merge-output-format mkv"
+            "--format 628+bestaudio/best"
+        )
+    }
+
+    func testWebMVideoOnlyPredictsWebMContainer() {
+        let format = makeVideoOnly(id: "303", ext: "webm", codec: "vp09.00.51.08", height: 2160)
+
+        XCTAssertEqual(format.predictedOutputExtension, "webm")
+        XCTAssertEqual(
+            format.downloadOverrideArguments(usesQualitySettings: false),
+            "--format 303+bestaudio/best"
         )
     }
 
@@ -50,10 +59,9 @@ final class YTDLPFormatTests: XCTestCase {
 
         XCTAssertTrue(format.isPhotosCompatible)
         XCTAssertEqual(format.predictedOutputExtension, "mp4")
-        XCTAssertEqual(format.mergeOutputArgument, "--merge-output-format mp4")
         XCTAssertEqual(
             format.downloadOverrideArguments(usesQualitySettings: true),
-            "--format 137+bestaudio[ext=m4a]/137+bestaudio/best --merge-output-format mp4"
+            "--format 137+bestaudio[ext=m4a]/137+bestaudio/best"
         )
     }
 

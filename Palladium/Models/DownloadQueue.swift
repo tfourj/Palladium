@@ -43,7 +43,6 @@ struct BatchQualitySelection: Codable, Equatable, Sendable {
 
     func formatArguments(usesQualitySettings: Bool) -> String {
         var arguments: String
-        var mergeArguments = ""
         switch kind {
         case .video:
             let base = "bv*[height=\(height ?? 0)]"
@@ -51,14 +50,13 @@ struct BatchQualitySelection: Codable, Equatable, Sendable {
                 ? "\(base)+bestaudio[ext=m4a]/\(base)+bestaudio"
                 : "\(base)+bestaudio"
             arguments = "--format \(combined)/b[height=\(height ?? 0)]"
-            mergeArguments = " \(YTDLPFormat.mergeOutputArgument(photosCompatible: photosCompatible))"
         case .audio:
             arguments = "--format ba/b"
         }
         if kind == .audio, !usesQualitySettings {
             arguments += " --extract-audio --audio-format best"
         }
-        return arguments + mergeArguments
+        return arguments
     }
 
     static func outputIndicatesUnavailableFormat(_ output: String) -> Bool {
