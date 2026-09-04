@@ -2836,6 +2836,56 @@
         }
       }
     },
+    "queue.quality.loading" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resolving quality options..."
+          }
+        }
+      }
+    },
+    "queue.quality.picker.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose quality for all pending links"
+          }
+        }
+      }
+    },
+    "queue.quality.repick.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quality unavailable. Choose another"
+          }
+        }
+      }
+    },
+    "queue.quality.toggle.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resolve the first pending link and apply the chosen quality to all pending downloads."
+          }
+        }
+      }
+    },
+    "queue.quality.toggle.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select quality before start"
+          }
+        }
+      }
+    },
     "queue.resume" : {
       "localizations" : {
         "en" : {
