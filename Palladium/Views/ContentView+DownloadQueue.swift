@@ -52,6 +52,48 @@ extension ContentView {
         persistDownloadQueue()
     }
 
+    func resolveQueueStartQuality() {
+        guard !isResolvingQueueQuality,
+              !isRunning,
+              !isPackageRunning,
+              let firstPendingItem = downloadQueue.pendingItems.first else {
+            return
+        }
+
+        isResolvingQueueQuality = true
+        let cookiePath = useCookies ? resolvedSelectedCookieFilePath() : nil
+        appendConsoleText("[palladium][queue] resolving quality options for \(firstPendingItem.url)\n")
+        Task {
+            let resolution = await PythonFlowRunner.resolveFormats(
+                url: firstPendingItem.url,
+                cookieFilePath: cookiePath
+            )
+            await MainActor.run {
+                isResolvingQueueQuality = false
+                guard !isRunning, !isPackageRunning else { return }
+                if resolution.success, !resolution.formats.isEmpty {
+                    queueQualityFormats = resolution.formats
+                    queueQualityPickerTitle = String(localized: "queue.quality.picker.title")
+                    showQueueQualityPicker = true
+                } else {
+                    alertMessage = resolution.errorMessage ?? String(localized: "download.formats.empty")
+                    showAlert = true
+                    if !resolution.outputText.isEmpty {
+                        appendConsoleText(resolution.outputText)
+                    }
+                }
+            }
+        }
+    }
+
+    func applyQueueStartQuality(_ format: YTDLPFormat) {
+        let selection = BatchQualitySelection(from: format)
+        downloadQueue.applyBatchQualityToPending(selection)
+        persistDownloadQueue()
+        appendConsoleText("[palladium][queue] batch quality applied: \(selection.label)\n")
+        startDownloadQueue()
+    }
+
     func retryDownloadQueueItem(_ id: UUID) {
         guard !isRunning,
               !isPackageRunning,

@@ -198,6 +198,10 @@ struct ContentView: View {
     @State var queueConsoleInitialized = false
     @State var shareSheetCompletion: (() -> Void)?
     @State var showDownloadQueueSheet = false
+    @State var isResolvingQueueQuality = false
+    @State var queueQualityFormats: [YTDLPFormat] = []
+    @State var queueQualityPickerTitle = ""
+    @State var showQueueQualityPicker = false
 
     init() {
         let rememberPreset = Self.loadRememberSelectedPreset()
@@ -575,6 +579,12 @@ struct ContentView: View {
                 queue: downloadQueue,
                 selectedPreset: selectedPreset,
                 isOperationBusy: isRunning || isPackageRunning || completedDownloadResult != nil,
+                isResolvingQuality: isResolvingQueueQuality,
+                showQualityPicker: $showQueueQualityPicker,
+                qualityFormats: queueQualityFormats,
+                qualityPickerTitle: queueQualityPickerTitle,
+                onChooseQuality: resolveQueueStartQuality,
+                onSelectQuality: applyQueueStartQuality,
                 onAddLinks: addLinksToDownloadQueue,
                 onStart: startDownloadQueue,
                 onPause: pauseDownloadQueue,

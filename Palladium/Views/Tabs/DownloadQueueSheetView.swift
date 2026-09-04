@@ -4,6 +4,12 @@ struct DownloadQueueSheetView: View {
     let queue: DownloadQueue
     let selectedPreset: DownloadPreset
     let isOperationBusy: Bool
+    let isResolvingQuality: Bool
+    @Binding var showQualityPicker: Bool
+    let qualityFormats: [YTDLPFormat]
+    let qualityPickerTitle: String
+    let onChooseQuality: () -> Void
+    let onSelectQuality: (YTDLPFormat) -> Void
     let onAddLinks: (String) -> Int
     let onStart: () -> Void
     let onPause: () -> Void
@@ -13,6 +19,7 @@ struct DownloadQueueSheetView: View {
     let onClearFinished: () -> Void
 
     @Environment(\.dismiss) private var dismiss
+    @AppStorage("palladium.queueChooseQuality") private var chooseQualityBeforeStart = false
     @State private var linksText = ""
 
     var body: some View {
@@ -49,6 +56,16 @@ struct DownloadQueueSheetView: View {
                     }
                 }
             }
+        }
+        .sheet(isPresented: $showQualityPicker) {
+            FormatPickerSheetView(
+                title: qualityPickerTitle,
+                formats: qualityFormats,
+                onSelect: { format in
+                    showQualityPicker = false
+                    onSelectQuality(format)
+                }
+            )
         }
         .presentationDetents([.large])
     }
@@ -115,6 +132,19 @@ struct DownloadQueueSheetView: View {
 
     private var queueControlsSection: some View {
         Section {
+            if !queue.pendingItems.isEmpty {
+                Toggle(isOn: $chooseQualityBeforeStart) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("queue.quality.toggle.title")
+                            .font(.subheadline.weight(.semibold))
+                        Text("queue.quality.toggle.help")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .disabled(isOperationBusy || isResolvingQuality)
+            }
+
             if queue.isActive {
                 Button(action: onPause) {
                     Label("queue.pause", systemImage: "pause.circle")
@@ -122,7 +152,7 @@ struct DownloadQueueSheetView: View {
                 }
                 .buttonStyle(.bordered)
             } else {
-                Button(action: onStart) {
+                Button(action: startQueueAction) {
                     Label(
                         hasPreviouslyStartedItems ? "queue.resume" : "queue.start",
                         systemImage: "play.circle.fill"
@@ -132,14 +162,24 @@ struct DownloadQueueSheetView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(.blue)
-                .disabled(isOperationBusy || !queue.hasPendingItems)
+                .disabled(isOperationBusy || !queue.hasPendingItems || isResolvingQuality)
             }
         } footer: {
-            if isOperationBusy, !queue.isActive {
+            if isResolvingQuality {
+                Text("queue.quality.loading")
+            } else if isOperationBusy, !queue.isActive {
                 Text("queue.busy")
             } else if queue.isActive {
                 Text("queue.pause.help")
             }
+        }
+    }
+
+    private func startQueueAction() {
+        if chooseQualityBeforeStart {
+            onChooseQuality()
+        } else {
+            onStart()
         }
     }
 
