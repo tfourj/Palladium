@@ -1280,6 +1280,72 @@
         }
       }
     },
+    "download.quality.queued.help" : {
+      "comment" : "Explains how quality selection behaves for queued downloads.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pick max quality applies one choice to every pending download and asks again if a link lacks it. Choose for every link asks for each link before it downloads."
+          }
+        }
+      }
+    },
+    "download.quality.queued.mode.per_link" : {
+      "comment" : "Queued quality mode that asks for a quality pick before each link.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose for every link"
+          }
+        }
+      }
+    },
+    "download.quality.queued.mode.pick_max" : {
+      "comment" : "Queued quality mode that applies one chosen quality to the whole batch.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pick max quality"
+          }
+        }
+      }
+    },
+    "download.quality.queued.mode.title" : {
+      "comment" : "Picker for the queued quality selection mode.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selection"
+          }
+        }
+      }
+    },
+    "download.quality.queued.section" : {
+      "comment" : "Settings section header for queued download quality options.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Queued Downloads"
+          }
+        }
+      }
+    },
+    "download.quality.queued.title" : {
+      "comment" : "Toggle that enables quality selection for queued downloads.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select quality for queued downloads"
+          }
+        }
+      }
+    },
     "download.quality.video.audio_preset.best_compatible" : {
       "comment" : "The video audio preset that favors broad playback compatibility.",
       "localizations" : {
