@@ -74,6 +74,7 @@ Palladium/
 | `Views/ContentView+Storage.swift` | Download storage and file-management behavior. |
 | `Views/ContentView+Support.swift` | Support, diagnostics, and helper UI behavior. |
 | `Views/Tabs/DownloadTabView.swift` | Main download screen. |
+| `Views/Tabs/GalleryVideoPreview.swift` | Gallery picker video thumbnail, loading state, and fallback icon. |
 | `Views/Tabs/FormatPickerSheetView.swift` | Shared yt-dlp format and quality picker sheet. |
 | `Views/Tabs/DownloadQueueSheetView.swift` | Multiline queue editor, controls, ordering, and item statuses. |
 | `Views/Tabs/PackagesTabView.swift` | Python package management screen. |
