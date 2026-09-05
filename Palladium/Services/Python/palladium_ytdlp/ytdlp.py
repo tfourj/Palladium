@@ -147,8 +147,38 @@ def filter_embedded_playlist_entries(enabled):
         yt_dlp.YoutubeDL.process_ie_result = original
 
 
+def resolve_picker_formats(downloader, info):
+    """Resolve each video with audio using yt-dlp's already sorted format list."""
+    source_formats = info.get("formats") or []
+    resolved_formats = []
+    for item in source_formats:
+        format_id = str(item.get("format_id") or "").strip()
+        video_codec = str(item.get("vcodec") or "none").lower()
+        audio_codec = str(item.get("acodec") or "none").lower()
+        if not format_id or (video_codec == "none" and audio_codec == "none"):
+            continue
+
+        if video_codec != "none" and audio_codec == "none":
+            # Keep the existing preference for M4A audio with Photos-compatible
+            # video. yt-dlp decides the audio ID and container, including fallback.
+            prefers_m4a = (
+                str(item.get("ext") or "").lower() in {"mp4", "mov", "m4v"}
+                and video_codec.startswith(("avc1", "avc3", "h264", "hvc1", "hev1", "hevc", "h265"))
+            )
+            selector = f"{format_id}+bestaudio/{format_id}"
+            if prefers_m4a:
+                selector = f"{format_id}+bestaudio[ext=m4a]/{selector}"
+            selected = downloader._select_formats(source_formats, downloader.build_format_selector(selector))
+            if not selected:
+                continue
+            resolved_formats.append(selected[0])
+        else:
+            resolved_formats.append(item)
+    return resolved_formats
+
+
 def list_yt_dlp_formats(download_url, cookie_file_path=""):
-    """Return the formats exposed by yt-dlp without downloading any media."""
+    """Return resolved download selections without downloading any media."""
     output = TailBuffer()
     try:
         import yt_dlp
@@ -157,6 +187,7 @@ def list_yt_dlp_formats(download_url, cookie_file_path=""):
             "quiet": True,
             "no_warnings": True,
             "skip_download": True,
+            "check_formats": False,
             "noplaylist": True,
             "nocheckcertificate": True,
         }
@@ -167,9 +198,10 @@ def list_yt_dlp_formats(download_url, cookie_file_path=""):
         with contextlib.redirect_stdout(output), contextlib.redirect_stderr(output):
             with yt_dlp.YoutubeDL(options) as downloader:
                 info = downloader.extract_info(str(download_url).strip(), download=False)
+                resolved_formats = resolve_picker_formats(downloader, info)
 
         formats = []
-        for item in info.get("formats") or []:
+        for item in resolved_formats:
             format_id = str(item.get("format_id") or "").strip()
             if not format_id:
                 continue
