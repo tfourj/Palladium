@@ -108,7 +108,7 @@ class FormatResolutionTests(unittest.TestCase):
         ]), [])
         self.assertEqual(self.resolve([]), [])
 
-    def test_format_list_serializes_resolved_metadata_after_one_extraction(self):
+    def test_format_list_keeps_source_metadata_separate_from_download_selection(self):
         info = {"title": "Example", "formats": [
             self.format("251", "webm", acodec="opus", size=500),
             self.format("628", "mp4", vcodec="vp09.00.51.08", size=1000),
@@ -120,10 +120,38 @@ class FormatResolutionTests(unittest.TestCase):
         self.assertTrue(result["success"])
         self.assertEqual(result["title"], "Example")
         selected = result["formats"][-1]
-        self.assertEqual(selected["id"], "628+251")
-        self.assertEqual(selected["extension"], "webm")
-        self.assertEqual(selected["audio_codec"], "opus")
-        self.assertEqual(selected["filesize"], 1500)
+        self.assertEqual(selected["id"], "628")
+        self.assertEqual(selected["extension"], "mp4")
+        self.assertEqual(selected["audio_codec"], "none")
+        self.assertEqual(selected["filesize"], 1000)
+        self.assertFalse(selected["filesize_is_approximate"])
+        self.assertEqual(selected["note"], "628")
+        self.assertEqual(selected["download_id"], "628+251")
+        self.assertEqual(selected["output_extension"], "webm")
+        self.assertEqual(selected["selected_audio_codec"], "opus")
+
+    def test_unknown_video_size_does_not_become_audio_size(self):
+        audio = self.format("251", "webm", acodec="opus", size=191000)
+        audio["format_note"] = "medium"
+        video = self.format("628", "mp4", vcodec="vp9", size=None)
+        video["format_note"] = ""
+        with mock.patch.object(yt_dlp.YoutubeDL, "extract_info", return_value={"formats": [audio, video]}):
+            selected = json.loads(list_yt_dlp_formats("https://example.com/watch"))["formats"][-1]
+
+        self.assertIsNone(selected["filesize"])
+        self.assertFalse(selected["filesize_is_approximate"])
+        self.assertEqual(selected["note"], "")
+        self.assertEqual(selected["id"], "628")
+        self.assertEqual(selected["download_id"], "628+251")
+
+    def test_source_size_estimates_are_marked_approximate(self):
+        video = self.format("18", "mp4", vcodec="avc1", acodec="mp4a.40.2", size=None)
+        video["filesize_approx"] = 1024000
+        with mock.patch.object(yt_dlp.YoutubeDL, "extract_info", return_value={"formats": [video]}):
+            selected = json.loads(list_yt_dlp_formats("https://example.com/watch"))["formats"][0]
+
+        self.assertEqual(selected["filesize"], 1024000)
+        self.assertTrue(selected["filesize_is_approximate"])
 
     def test_resolution_error_is_reported_instead_of_guessing_a_container(self):
         with mock.patch.object(yt_dlp.YoutubeDL, "extract_info", side_effect=ValueError("Unavailable")):

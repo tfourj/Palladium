@@ -178,7 +178,7 @@ def resolve_picker_formats(downloader, info):
 
 
 def list_yt_dlp_formats(download_url, cookie_file_path=""):
-    """Return resolved download selections without downloading any media."""
+    """Return source rows as in -F, with resolved download selections alongside."""
     output = TailBuffer()
     try:
         import yt_dlp
@@ -187,6 +187,7 @@ def list_yt_dlp_formats(download_url, cookie_file_path=""):
             "quiet": True,
             "no_warnings": True,
             "skip_download": True,
+            "listformats": True,
             "check_formats": False,
             "noplaylist": True,
             "nocheckcertificate": True,
@@ -202,22 +203,32 @@ def list_yt_dlp_formats(download_url, cookie_file_path=""):
 
         formats = []
         for item in resolved_formats:
-            format_id = str(item.get("format_id") or "").strip()
+            # A merge's size can include only the known audio size, and its note
+            # combines video and audio labels. Display the original -F row instead.
+            source = next((
+                stream for stream in item.get("requested_formats") or []
+                if stream.get("vcodec") not in (None, "", "none")
+            ), item)
+            format_id = str(source.get("format_id") or "").strip()
             if not format_id:
                 continue
             formats.append({
                 "id": format_id,
-                "extension": str(item.get("ext") or "").strip(),
-                "resolution": str(item.get("resolution") or "").strip(),
-                "width": item.get("width"),
-                "height": item.get("height"),
-                "fps": item.get("fps"),
-                "video_bitrate": item.get("vbr"),
-                "audio_bitrate": item.get("abr"),
-                "video_codec": str(item.get("vcodec") or "").strip(),
-                "audio_codec": str(item.get("acodec") or "").strip(),
-                "filesize": item.get("filesize") or item.get("filesize_approx"),
-                "note": str(item.get("format_note") or "").strip(),
+                "extension": str(source.get("ext") or "").strip(),
+                "resolution": str(source.get("resolution") or "").strip(),
+                "width": source.get("width"),
+                "height": source.get("height"),
+                "fps": source.get("fps"),
+                "video_bitrate": source.get("vbr"),
+                "audio_bitrate": source.get("abr"),
+                "video_codec": str(source.get("vcodec") or "").strip(),
+                "audio_codec": str(source.get("acodec") or "").strip(),
+                "filesize": source.get("filesize") or source.get("filesize_approx"),
+                "filesize_is_approximate": not source.get("filesize") and bool(source.get("filesize_approx")),
+                "note": str(source.get("format_note") or "").strip(),
+                "download_id": str(item.get("format_id") or "").strip(),
+                "output_extension": str(item.get("ext") or "").strip(),
+                "selected_audio_codec": str(item.get("acodec") or "").strip(),
             })
 
         return json.dumps({
