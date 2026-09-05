@@ -46,6 +46,26 @@ final class YTDLPFormatTests: XCTestCase {
         XCTAssertEqual(opus.downloadOverrideArguments(usesQualitySettings: false), "--format 137+251")
     }
 
+    func testSourceIDStaysSeparateFromResolvedDownload() {
+        var format = makeFormat(id: "628", ext: "mp4", videoCodec: "vp09.00.51.08", audioCodec: "none")
+        format.resolvedDownloadID = "628+251"
+        format.resolvedOutputExtension = "webm"
+        format.resolvedAudioCodec = "opus"
+
+        XCTAssertEqual(format.id, "628")
+        XCTAssertEqual(format.fileExtension, "mp4")
+        XCTAssertNil(format.fileSize)
+        XCTAssertEqual(format.downloadOverrideArguments(usesQualitySettings: false), "--format 628+251")
+    }
+
+    func testSourceMP4DoesNotImplyPhotosCompatibleMergedOutput() {
+        var format = makeFormat(id: "137", ext: "mp4", videoCodec: "avc1.640028", audioCodec: "none")
+        format.resolvedOutputExtension = "mkv"
+        format.resolvedAudioCodec = "opus"
+
+        XCTAssertFalse(format.isPhotosCompatible)
+    }
+
     func testProgressiveSelectionKeepsExactFormat() {
         let format = makeFormat(id: "22", ext: "mp4", videoCodec: "avc1.64001f", audioCodec: "mp4a.40.2")
 
