@@ -129,6 +129,9 @@ class FormatResolutionTests(unittest.TestCase):
         self.assertEqual(selected["download_id"], "628+251")
         self.assertEqual(selected["output_extension"], "webm")
         self.assertEqual(selected["selected_audio_codec"], "opus")
+        self.assertEqual(selected["selected_audio"]["id"], "251")
+        self.assertEqual(selected["selected_audio"]["extension"], "webm")
+        self.assertEqual(selected["selected_audio"]["filesize"], 500)
 
     def test_unknown_video_size_does_not_become_audio_size(self):
         audio = self.format("251", "webm", acodec="opus", size=191000)
@@ -143,6 +146,18 @@ class FormatResolutionTests(unittest.TestCase):
         self.assertEqual(selected["note"], "")
         self.assertEqual(selected["id"], "628")
         self.assertEqual(selected["download_id"], "628+251")
+        self.assertEqual(selected["selected_audio"]["filesize"], 191000)
+
+    def test_available_thumbnail_is_exposed_for_final_container_display(self):
+        info = {
+            "thumbnails": [{"url": "https://example.com/thumbnail.jpg"}],
+            "formats": [self.format("137", "mp4", vcodec="avc1")],
+        }
+        with mock.patch.object(yt_dlp.YoutubeDL, "extract_info", return_value=info):
+            selected = json.loads(list_yt_dlp_formats("https://example.com/watch"))["formats"][0]
+
+        self.assertTrue(selected["has_thumbnail"])
+        self.assertIsNone(selected["selected_audio"])
 
     def test_source_size_estimates_are_marked_approximate(self):
         video = self.format("18", "mp4", vcodec="avc1", acodec="mp4a.40.2", size=None)

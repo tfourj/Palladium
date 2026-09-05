@@ -212,6 +212,10 @@ def list_yt_dlp_formats(download_url, cookie_file_path=""):
             format_id = str(source.get("format_id") or "").strip()
             if not format_id:
                 continue
+            audio = next((
+                stream for stream in item.get("requested_formats") or [item]
+                if stream.get("acodec") not in (None, "", "none")
+            ), None)
             formats.append({
                 "id": format_id,
                 "extension": str(source.get("ext") or "").strip(),
@@ -229,6 +233,14 @@ def list_yt_dlp_formats(download_url, cookie_file_path=""):
                 "download_id": str(item.get("format_id") or "").strip(),
                 "output_extension": str(item.get("ext") or "").strip(),
                 "selected_audio_codec": str(item.get("acodec") or "").strip(),
+                "selected_audio": {
+                    "id": str(audio.get("format_id") or ""),
+                    "extension": str(audio.get("ext") or ""),
+                    "codec": str(audio.get("acodec") or ""),
+                    "filesize": audio.get("filesize") or audio.get("filesize_approx"),
+                    "filesize_is_approximate": not audio.get("filesize") and bool(audio.get("filesize_approx")),
+                } if audio else None,
+                "has_thumbnail": bool(info.get("thumbnails")),
             })
 
         return json.dumps({

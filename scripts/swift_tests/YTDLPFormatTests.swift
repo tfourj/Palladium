@@ -66,6 +66,22 @@ final class YTDLPFormatTests: XCTestCase {
         XCTAssertFalse(format.isPhotosCompatible)
     }
 
+    func testFinalContainerIncludesThumbnailHandlingOnlyForMergedVideo() {
+        var format = makeFormat(id: "628", ext: "mp4", videoCodec: "vp9", audioCodec: "none")
+        format.resolvedDownloadID = "628+251"
+        format.resolvedOutputExtension = "webm"
+
+        XCTAssertEqual(format.finalVideoExtension(embedThumbnail: true), "webm")
+        format.hasThumbnail = true
+        XCTAssertEqual(format.finalVideoExtension(embedThumbnail: false), "webm")
+        XCTAssertEqual(format.finalVideoExtension(embedThumbnail: true), "mkv")
+        format.resolvedDownloadID = "628"
+        XCTAssertEqual(format.finalVideoExtension(embedThumbnail: true), "webm")
+        format.resolvedDownloadID = "628+251"
+        format.resolvedOutputExtension = "mp4"
+        XCTAssertEqual(format.finalVideoExtension(embedThumbnail: true), "mp4")
+    }
+
     func testProgressiveSelectionKeepsExactFormat() {
         let format = makeFormat(id: "22", ext: "mp4", videoCodec: "avc1.64001f", audioCodec: "mp4a.40.2")
 

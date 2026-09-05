@@ -51,6 +51,14 @@ struct GalleryResolution: Sendable {
     let errorMessage: String?
 }
 
+struct YTDLPSelectedAudio: Hashable, Sendable {
+    let id: String
+    let fileExtension: String
+    let codec: String
+    let fileSize: Int64?
+    let fileSizeIsApproximate: Bool
+}
+
 struct YTDLPFormat: Identifiable, Hashable, Sendable {
     let id: String
     let fileExtension: String
@@ -68,6 +76,18 @@ struct YTDLPFormat: Identifiable, Hashable, Sendable {
     var resolvedOutputExtension: String? = nil
     var resolvedAudioCodec: String? = nil
     var fileSizeIsApproximate: Bool = false
+    var selectedAudio: YTDLPSelectedAudio? = nil
+    var hasThumbnail: Bool = false
+
+    func finalVideoExtension(embedThumbnail: Bool) -> String {
+        let container = resolvedOutputExtension ?? fileExtension
+        // yt-dlp switches merged WEBM to MKV when embedding an available thumbnail.
+        if hasVideo, embedThumbnail, hasThumbnail, container.lowercased() == "webm",
+           let resolvedDownloadID, resolvedDownloadID != id {
+            return "mkv"
+        }
+        return container
+    }
 
     var hasVideo: Bool { !videoCodec.isEmpty && videoCodec != "none" }
     var hasAudio: Bool { !audioCodec.isEmpty && audioCodec != "none" }
@@ -510,6 +530,15 @@ enum PythonFlowRunner {
         let formats = ((result["formats"] as? [[String: Any]]) ?? []).compactMap { item -> YTDLPFormat? in
             guard let id = item["id"] as? String, !id.isEmpty else { return nil }
             let sizeNumber = item["filesize"] as? NSNumber
+            let selectedAudio = (item["selected_audio"] as? [String: Any]).map { audio in
+                YTDLPSelectedAudio(
+                    id: audio["id"] as? String ?? "",
+                    fileExtension: audio["extension"] as? String ?? "",
+                    codec: audio["codec"] as? String ?? "",
+                    fileSize: (audio["filesize"] as? NSNumber)?.int64Value,
+                    fileSizeIsApproximate: audio["filesize_is_approximate"] as? Bool ?? false
+                )
+            }
             return YTDLPFormat(
                 id: id,
                 fileExtension: item["extension"] as? String ?? "",
@@ -526,7 +555,9 @@ enum PythonFlowRunner {
                 resolvedDownloadID: item["download_id"] as? String,
                 resolvedOutputExtension: item["output_extension"] as? String,
                 resolvedAudioCodec: item["selected_audio_codec"] as? String,
-                fileSizeIsApproximate: item["filesize_is_approximate"] as? Bool ?? false
+                fileSizeIsApproximate: item["filesize_is_approximate"] as? Bool ?? false,
+                selectedAudio: selectedAudio,
+                hasThumbnail: item["has_thumbnail"] as? Bool ?? false
             )
         }
         return YTDLPFormatResolution(
