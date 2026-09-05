@@ -90,6 +90,7 @@ Palladium/
 | `Views/Tabs/Settings/DownloadModesSettingsView.swift` | Download-mode settings screen. |
 | `Views/Tabs/Settings/DownloadOptionsSettingsView.swift` | Download option settings screen. |
 | `Views/Tabs/Settings/DownloadQualitySettingsView.swift` | Default video and audio quality settings screen. |
+| `Views/Tabs/Settings/PostProcessingSettingsView.swift` | Optional final video re-encoding and remux settings. |
 | `Views/Tabs/Settings/DownloadsTabSettingsView.swift` | Downloads-tab settings screen. |
 | `Views/Tabs/Settings/HistorySettingsView.swift` | History settings screen. |
 | `Views/Tabs/Settings/NotificationsSettingsView.swift` | Notification settings screen. |
