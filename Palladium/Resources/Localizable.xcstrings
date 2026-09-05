@@ -797,6 +797,16 @@
         }
       }
     },
+    "download.formats.webm_thumbnail_warning" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Embedding thumbnails may change WEBM output to MKV."
+          }
+        }
+      }
+    },
     "download.formats.photos_compatible" : {
       "localizations" : {
         "en" : {
