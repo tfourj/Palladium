@@ -24,6 +24,10 @@ struct FormatPickerSheetView: View {
                 }
                 .font(.caption)
 
+                Text("download.formats.source_help")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
                 if !videoFormats.isEmpty {
                     Section("download.formats.video_section") {
                         ForEach(videoFormats) { format in
@@ -90,7 +94,7 @@ struct FormatPickerSheetView: View {
                 Text(formatDetails(format))
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                if embedThumbnail && format.fileExtension.lowercased() == "webm" {
+                if embedThumbnail && (format.resolvedOutputExtension ?? format.fileExtension).lowercased() == "webm" {
                     Label("download.formats.webm_thumbnail_warning", systemImage: "exclamationmark.triangle.fill")
                         .font(.caption)
                         .foregroundStyle(.orange)
@@ -109,7 +113,10 @@ struct FormatPickerSheetView: View {
     private func formatDetails(_ format: YTDLPFormat) -> String {
         var details = [format.fileExtension.uppercased()].filter { !$0.isEmpty }
         if let fileSize = format.fileSize {
-            details.append(ByteCountFormatter.string(fromByteCount: fileSize, countStyle: .file))
+            let size = ByteCountFormatter.string(fromByteCount: fileSize, countStyle: .binary)
+            details.append(format.fileSizeIsApproximate ? "≈\(size)" : size)
+        } else {
+            details.append(String(localized: "download.formats.size_unknown"))
         }
         if !format.note.isEmpty, format.note != format.resolution {
             details.append(format.note)
@@ -121,9 +128,13 @@ struct FormatPickerSheetView: View {
         var codecs: [String] = []
         if format.hasVideo {
             codecs.append("Video: \(format.videoCodecDisplayName)")
-            codecs.append(format.hasAudio
-                ? "Audio: \(format.audioCodec)"
-                : String(localized: "download.formats.no_audio"))
+            if format.hasAudio {
+                codecs.append("Audio: \(format.audioCodec)")
+            } else if let audio = format.resolvedAudioCodec, !audio.isEmpty, audio != "none" {
+                codecs.append(String(localized: "download.formats.audio_added"))
+            } else {
+                codecs.append(String(localized: "download.formats.no_audio"))
+            }
         } else if format.hasAudio {
             codecs.append("Audio: \(format.audioCodec)")
         }

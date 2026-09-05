@@ -767,6 +767,36 @@
         }
       }
     },
+    "download.formats.audio_added" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio added automatically"
+          }
+        }
+      }
+    },
+    "download.formats.source_help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Formats and sizes describe the source streams. Separate audio is added when available; the merged file may use a different container."
+          }
+        }
+      }
+    },
+    "download.formats.size_unknown" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Size unknown"
+          }
+        }
+      }
+    },
     "download.formats.choose" : {
       "localizations" : {
         "en" : {
