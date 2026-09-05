@@ -90,7 +90,7 @@ struct FormatPickerSheetView: View {
                 Text(formatDetails(format))
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                if embedThumbnail && format.predictedOutputExtension.lowercased() == "webm" {
+                if embedThumbnail && format.fileExtension.lowercased() == "webm" {
                     Label("download.formats.webm_thumbnail_warning", systemImage: "exclamationmark.triangle.fill")
                         .font(.caption)
                         .foregroundStyle(.orange)
@@ -107,7 +107,7 @@ struct FormatPickerSheetView: View {
     }
 
     private func formatDetails(_ format: YTDLPFormat) -> String {
-        var details = [format.predictedOutputExtension.uppercased()].filter { !$0.isEmpty }
+        var details = [format.fileExtension.uppercased()].filter { !$0.isEmpty }
         if let fileSize = format.fileSize {
             details.append(ByteCountFormatter.string(fromByteCount: fileSize, countStyle: .file))
         }
@@ -123,7 +123,7 @@ struct FormatPickerSheetView: View {
             codecs.append("Video: \(format.videoCodecDisplayName)")
             codecs.append(format.hasAudio
                 ? "Audio: \(format.audioCodec)"
-                : String(localized: "download.formats.best_audio"))
+                : String(localized: "download.formats.no_audio"))
         } else if format.hasAudio {
             codecs.append("Audio: \(format.audioCodec)")
         }

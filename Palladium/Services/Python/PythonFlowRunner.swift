@@ -100,23 +100,9 @@ struct YTDLPFormat: Identifiable, Hashable, Sendable {
         return audio.hasPrefix("mp4a") || audio.hasPrefix("aac")
     }
 
-    var downloadSelector: String {
-        guard hasVideo && !hasAudio else { return id }
-        if isPhotosCompatible {
-            return "\(id)+bestaudio[ext=m4a]/\(id)+bestaudio/best"
-        }
-        return "\(id)+bestaudio/best"
-    }
-
-    var predictedOutputExtension: String {
-        guard hasVideo, !hasAudio else { return fileExtension }
-        if isPhotosCompatible { return "mp4" }
-        if fileExtension.lowercased() == "webm" { return "webm" }
-        return "mkv"
-    }
-
     func downloadOverrideArguments(usesQualitySettings: Bool) -> String {
-        var arguments = "--format \(downloadSelector)"
+        // The resolver supplies either a native ID or the exact video+audio IDs.
+        var arguments = "--format \(id)"
         if hasAudio && !hasVideo && !usesQualitySettings {
             arguments += " --extract-audio --audio-format best"
         }

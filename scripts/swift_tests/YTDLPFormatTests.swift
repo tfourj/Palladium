@@ -25,68 +25,47 @@ final class YTDLPFormatTests: XCTestCase {
         )
     }
 
-    private func makeVideoOnly(
-        id: String,
-        ext: String,
-        codec: String,
-        height: Int
-    ) -> YTDLPFormat {
-        makeFormat(id: id, ext: ext, videoCodec: codec, audioCodec: "none", height: height)
+    func testResolvedCombinationDownloadsExactVideoAndAudio() {
+        let format = makeFormat(id: "628+251", ext: "webm", videoCodec: "vp09.00.51.08", audioCodec: "opus")
+
+        XCTAssertEqual(format.downloadOverrideArguments(usesQualitySettings: false), "--format 628+251")
+        XCTAssertTrue(format.hasVideo)
+        XCTAssertTrue(format.hasAudio)
+        XCTAssertFalse(format.isPhotosCompatible)
     }
 
-    func testIssue54VP9HLSVideoOnlyPredictsMKVContainer() {
-        let format = makeVideoOnly(id: "628", ext: "mp4", codec: "vp09.00.51.08", height: 2160)
+    func testPhotosCompatibilityUsesResolvedAudio() {
+        let aac = makeFormat(id: "137+140", ext: "mp4", videoCodec: "avc1.640028", audioCodec: "mp4a.40.2")
+        let opus = makeFormat(id: "137+251", ext: "mkv", videoCodec: "avc1.640028", audioCodec: "opus")
+        let opusMP4 = makeFormat(id: "137+251", ext: "mp4", videoCodec: "avc1.640028", audioCodec: "opus")
 
-        XCTAssertEqual(format.predictedOutputExtension, "mkv")
+        XCTAssertTrue(aac.isPhotosCompatible)
+        XCTAssertFalse(opus.isPhotosCompatible)
+        XCTAssertFalse(opusMP4.isPhotosCompatible)
+        XCTAssertEqual(aac.downloadOverrideArguments(usesQualitySettings: true), "--format 137+140")
+        XCTAssertEqual(opus.downloadOverrideArguments(usesQualitySettings: false), "--format 137+251")
+    }
+
+    func testProgressiveSelectionKeepsExactFormat() {
+        let format = makeFormat(id: "22", ext: "mp4", videoCodec: "avc1.64001f", audioCodec: "mp4a.40.2")
+
+        XCTAssertEqual(format.downloadOverrideArguments(usesQualitySettings: false), "--format 22")
+    }
+
+    func testVideoWithoutAvailableAudioDoesNotChooseAnotherVideo() {
+        let format = makeFormat(id: "137", ext: "mp4", videoCodec: "avc1.640028", audioCodec: "none")
+
+        XCTAssertFalse(format.hasAudio)
+        XCTAssertEqual(format.downloadOverrideArguments(usesQualitySettings: false), "--format 137")
+    }
+
+    func testAudioSelectionPreservesExistingExtractionBehavior() {
+        let format = makeFormat(id: "251", ext: "webm", videoCodec: "none", audioCodec: "opus")
+
+        XCTAssertEqual(format.downloadOverrideArguments(usesQualitySettings: true), "--format 251")
         XCTAssertEqual(
             format.downloadOverrideArguments(usesQualitySettings: false),
-            "--format 628+bestaudio/best"
-        )
-    }
-
-    func testWebMVideoOnlyPredictsWebMContainer() {
-        let format = makeVideoOnly(id: "303", ext: "webm", codec: "vp09.00.51.08", height: 2160)
-
-        XCTAssertEqual(format.predictedOutputExtension, "webm")
-        XCTAssertEqual(
-            format.downloadOverrideArguments(usesQualitySettings: false),
-            "--format 303+bestaudio/best"
-        )
-    }
-
-    func testPhotosCompatibleVideoOnlyPredictsMP4Container() {
-        let format = makeVideoOnly(id: "137", ext: "mp4", codec: "avc1.640028", height: 1080)
-
-        XCTAssertTrue(format.isPhotosCompatible)
-        XCTAssertEqual(format.predictedOutputExtension, "mp4")
-        XCTAssertEqual(
-            format.downloadOverrideArguments(usesQualitySettings: true),
-            "--format 137+bestaudio[ext=m4a]/137+bestaudio/best"
-        )
-    }
-
-    func testProgressiveFormatsKeepNativeExtensionWithoutMergeArgument() {
-        let mp4 = makeFormat(id: "22", ext: "mp4", videoCodec: "avc1.64001f", audioCodec: "mp4a.40.2", height: 720)
-        let webm = makeFormat(id: "247", ext: "webm", videoCodec: "vp9", audioCodec: "opus", height: 1080)
-
-        XCTAssertEqual(mp4.predictedOutputExtension, "mp4")
-        XCTAssertNil(mp4.mergeOutputArgument)
-        XCTAssertEqual(mp4.downloadOverrideArguments(usesQualitySettings: true), "--format 22")
-
-        XCTAssertEqual(webm.predictedOutputExtension, "webm")
-        XCTAssertNil(webm.mergeOutputArgument)
-        XCTAssertEqual(webm.downloadOverrideArguments(usesQualitySettings: true), "--format 247")
-    }
-
-    func testAudioOnlyFormatsKeepNativeExtensionAndExtraction() {
-        let format = makeFormat(id: "140", ext: "m4a", videoCodec: "none", audioCodec: "mp4a.40.2")
-
-        XCTAssertEqual(format.predictedOutputExtension, "m4a")
-        XCTAssertNil(format.mergeOutputArgument)
-        XCTAssertEqual(format.downloadOverrideArguments(usesQualitySettings: true), "--format 140")
-        XCTAssertEqual(
-            format.downloadOverrideArguments(usesQualitySettings: false),
-            "--format 140 --extract-audio --audio-format best"
+            "--format 251 --extract-audio --audio-format best"
         )
     }
 }

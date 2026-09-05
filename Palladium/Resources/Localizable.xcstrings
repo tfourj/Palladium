@@ -757,12 +757,12 @@
         }
       }
     },
-    "download.formats.best_audio" : {
+    "download.formats.no_audio" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Audio: best compatible"
+            "value" : "Audio: none available"
           }
         }
       }
