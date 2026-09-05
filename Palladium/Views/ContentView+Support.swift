@@ -107,10 +107,10 @@ extension ContentView {
     }
 
     func requestActiveOperationCancellation() {
-        FFmpegBridgeControl.requestCancellation()
         if let markerURL = cancelMarkerURL {
             try? "cancel".write(to: markerURL, atomically: true, encoding: .utf8)
         }
+        FFmpegBridgeControl.requestCancellation()
         PythonFlowRunner.interruptActiveFlow()
     }
 }
