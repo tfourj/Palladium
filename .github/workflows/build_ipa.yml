@@ -29,6 +29,10 @@ jobs:
       run: |
         PYTHONDONTWRITEBYTECODE=1 python3 -m unittest scripts.test_package_source_modes
         PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s scripts/python_tests -t .
+        python_test_env="$RUNNER_TEMP/palladium-python-tests"
+        python3 -m venv "$python_test_env"
+        "$python_test_env/bin/python" -m pip install yt-dlp==2026.8.19
+        PYTHONDONTWRITEBYTECODE=1 "$python_test_env/bin/python" -m unittest scripts.test_format_resolution
 
     - name: Download Python Apple Support
       uses: robinraju/release-downloader@v1
