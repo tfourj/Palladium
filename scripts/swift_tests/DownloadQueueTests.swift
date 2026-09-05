@@ -34,6 +34,29 @@ final class DownloadQueueTests: XCTestCase {
         )
     }
 
+    func testPostProcessingSurvivesQueuePersistence() throws {
+        var snapshot = configuration
+        snapshot.postProcessing = PostProcessingPreferences(enabled: true, method: .remux, format: .webm)
+        var queue = DownloadQueue()
+        queue.append(linksText: "https://example.com/video", configuration: snapshot)
+
+        let restored = try JSONDecoder().decode(DownloadQueue.self, from: JSONEncoder().encode(queue))
+
+        XCTAssertEqual(restored.items.first?.configuration.postProcessing, snapshot.postProcessing)
+    }
+
+    func testLegacyQueueConfigurationDecodesWithoutPostProcessing() throws {
+        let data = try JSONEncoder().encode(configuration)
+        var json = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        json.removeValue(forKey: "postProcessing")
+        let legacyData = try JSONSerialization.data(withJSONObject: json)
+
+        let restored = try JSONDecoder().decode(QueuedDownloadConfiguration.self, from: legacyData)
+
+        XCTAssertNil(restored.postProcessing)
+        XCTAssertEqual(restored.presetRawValue, configuration.presetRawValue)
+    }
+
     func testBatchUsesConfigurationSnapshotForEveryItem() {
         var queue = DownloadQueue()
 
