@@ -50,6 +50,7 @@ Palladium/
 | `Models/AppAppearanceMode.swift` | Appearance-mode setting model. |
 | `Models/DownloadServiceDomain.swift` | Canonical source-service domain resolver for saved-download folders. |
 | `Models/DownloadOptions.swift` | Download option model and persisted settings. |
+| `Models/PostProcessingPreferences.swift` | Persisted video conversion settings and download configuration snapshots. |
 | `Models/DownloadQueue.swift` | Sequential download queue models, batch quality selection, state transitions, and persistence. |
 | `Models/ImportedCookieFile.swift` | Imported cookie-file model. |
 | `Models/LinkHistory.swift` | Previously used link model and history storage data. |
@@ -111,7 +112,7 @@ Palladium/
 | `Services/Python/PythonScripts.swift` | Locates and prepares bundled Python scripts. |
 | `Services/Python/yt_dlp_flow.py` | Python flow that invokes yt-dlp for downloads. |
 | `Services/Python/palladium_ytdlp/__init__.py` | Python package marker and exports. |
-| `Services/Python/palladium_ytdlp/args.py` | Builds yt-dlp command arguments. |
+| `Services/Python/palladium_ytdlp/args.py` | Builds yt-dlp command arguments, including final video conversion overrides. |
 | `Services/Python/palladium_ytdlp/entrypoints.py` | Stable public Python entry point facade used by Swift. |
 | `Services/Python/palladium_ytdlp/ffmpeg_bridge.py` | Connects Python download work to FFmpeg. |
 | `Services/Python/palladium_ytdlp/files.py` | Download file and path helpers. |

@@ -77,6 +77,7 @@ struct QueuedDownloadConfiguration: Codable, Equatable {
     let cookieFileName: String
     let afterDownloadBehaviorRawValue: String
     var batchQuality: BatchQualitySelection?
+    var postProcessing: PostProcessingPreferences?
 
     init(
         presetRawValue: String,
@@ -90,7 +91,8 @@ struct QueuedDownloadConfiguration: Codable, Equatable {
         useCookies: Bool,
         cookieFileName: String,
         afterDownloadBehaviorRawValue: String,
-        batchQuality: BatchQualitySelection? = nil
+        batchQuality: BatchQualitySelection? = nil,
+        postProcessing: PostProcessingPreferences? = nil
     ) {
         self.presetRawValue = presetRawValue
         self.presetArgumentsJSON = presetArgumentsJSON
@@ -104,6 +106,7 @@ struct QueuedDownloadConfiguration: Codable, Equatable {
         self.cookieFileName = cookieFileName
         self.afterDownloadBehaviorRawValue = afterDownloadBehaviorRawValue
         self.batchQuality = batchQuality
+        self.postProcessing = postProcessing
     }
 
     var preset: DownloadPreset {

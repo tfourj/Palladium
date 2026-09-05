@@ -8,6 +8,7 @@ import traceback
 import urllib.parse
 
 from .args import (
+    apply_post_processing_args,
     build_preset_args,
     has_custom_output_template,
     parse_custom_args,
@@ -617,6 +618,7 @@ def run_yt_dlp_flow(
     run_output_dir_override=None,
     live_log_fd_override=None,
     package_source_json_override=None,
+    post_processing_json_override=None,
 ):
     output = TailBuffer()
     console_stdout = sys.__stdout__ if sys.__stdout__ is not None else None
@@ -810,6 +812,9 @@ def run_yt_dlp_flow(
                             preset_args = build_preset_args(download_preset)
                         preset_args = strip_checkbox_owned_download_args(preset_args)
                         extra_args = strip_checkbox_owned_download_args(parse_extra_args(extra_args_text))
+                        preset_args, extra_args = apply_post_processing_args(
+                            preset_args, extra_args, post_processing_json_override
+                        )
                         raise_if_cancel_requested(cancel_file_path, "[palladium] cancellation requested before yt-dlp invocation")
                         output_args = []
                         download_behavior_args = []

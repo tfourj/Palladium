@@ -196,6 +196,7 @@ enum PythonFlowRunner {
         preset: String,
         presetArgsJSON: String,
         extraArgs: String,
+        postProcessingJSON: String,
         downloadPlaylist: Bool,
         downloadSubtitles: Bool,
         embedThumbnail: Bool,
@@ -226,7 +227,8 @@ enum PythonFlowRunner {
                         cookieFilePath ?? "",
                         runOutputDir,
                         liveLogArgument,
-                        packageSourceJSON
+                        packageSourceJSON,
+                        postProcessingJSON
                     ]
                 )
                 payload = String(result) ?? ""
