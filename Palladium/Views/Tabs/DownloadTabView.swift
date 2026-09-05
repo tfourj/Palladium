@@ -395,6 +395,8 @@ struct DownloadTabView: View {
                                                 ProgressView()
                                             }
                                         }
+                                    } else if item.mediaType == .video {
+                                        GalleryVideoPreview(item: item)
                                     } else {
                                         VStack(spacing: 8) {
                                             Image(systemName: item.placeholderIconName)

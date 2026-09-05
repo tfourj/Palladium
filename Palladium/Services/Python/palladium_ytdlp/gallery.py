@@ -192,6 +192,26 @@ def gallery_resolution_error_message(output):
     return None
 
 
+def gallery_item_thumbnail_url(metadata):
+    """Read item-level preview URLs without adding previews to the download list."""
+    if not isinstance(metadata, dict):
+        return None
+    for key in ("thumbnail", "thumbnail_url", "display_url", "preview_url"):
+        value = metadata.get(key)
+        if isinstance(value, dict):
+            value = value.get("url")
+        if not isinstance(value, str):
+            continue
+        value = value.strip()
+        try:
+            parsed = urllib.parse.urlparse(value)
+            if parsed.scheme in ("http", "https") and parsed.hostname:
+                return value
+        except ValueError:
+            continue
+    return None
+
+
 def gallery_items_from_url_records(records):
     items = []
     seen = set()
@@ -206,6 +226,7 @@ def gallery_items_from_url_records(records):
             "url": candidate,
             "title": gallery_item_title(candidate, len(items) + 1, media_type, metadata),
             "media_type": media_type,
+            "thumbnail_url": gallery_item_thumbnail_url(metadata) if media_type == "video" else None,
         })
     return items
 
@@ -225,6 +246,7 @@ def gallery_items_from_resolver_output(captured_output):
             "url": candidate,
             "title": gallery_item_title(candidate, len(items) + 1, media_type, metadata),
             "media_type": media_type,
+            "thumbnail_url": gallery_item_thumbnail_url(metadata) if media_type == "video" else None,
         })
 
     try:

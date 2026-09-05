@@ -14,6 +14,7 @@ struct GalleryItem: Identifiable, Hashable, Sendable {
     let url: String
     let title: String
     let mediaType: MediaType
+    var thumbnailURL: String? = nil
 
     var id: Int { index }
 
@@ -508,7 +509,13 @@ enum PythonFlowRunner {
                   let title = item["title"] as? String else { return nil }
             let mediaTypeValue = item["media_type"] as? String ?? "image"
             let mediaType = GalleryItem.MediaType(rawValue: mediaTypeValue) ?? .file
-            return GalleryItem(index: index, url: url, title: title, mediaType: mediaType)
+            return GalleryItem(
+                index: index,
+                url: url,
+                title: title,
+                mediaType: mediaType,
+                thumbnailURL: item["thumbnail_url"] as? String
+            )
         }
         return GalleryResolution(
             items: items,
