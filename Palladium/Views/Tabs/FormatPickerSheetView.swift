@@ -8,6 +8,7 @@ import SwiftUI
 struct FormatPickerSheetView: View {
     let title: String
     let formats: [YTDLPFormat]
+    let embedThumbnail: Bool
     let onSelect: (YTDLPFormat) -> Void
 
     @Environment(\.dismiss) private var dismiss
@@ -89,6 +90,12 @@ struct FormatPickerSheetView: View {
                 Text(formatDetails(format))
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                if embedThumbnail && format.predictedOutputExtension.lowercased() == "webm" {
+                    Label("download.formats.webm_thumbnail_warning", systemImage: "exclamationmark.triangle.fill")
+                        .font(.caption)
+                        .foregroundStyle(.orange)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
                 Text(codecDetails(format))
                     .font(.caption2.monospaced())
                     .foregroundStyle(.secondary)

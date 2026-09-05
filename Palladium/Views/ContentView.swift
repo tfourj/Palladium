@@ -310,6 +310,7 @@ struct ContentView: View {
                     onDownloadGallerySelection: { runDownloadFlow(gallerySelectionOverride: selectedGalleryItemIndices) },
                     availableFormats: availableFormats,
                     formatPickerTitle: formatPickerTitle,
+                    formatPickerEmbedsThumbnail: formatPickerEmbedsThumbnail,
                     showFormatPicker: $showFormatPicker,
                     isResolvingFormats: isResolvingFormats || isResolvingQueueQuality,
                     onDownloadFormat: { format in

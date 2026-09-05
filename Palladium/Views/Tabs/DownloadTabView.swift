@@ -40,6 +40,7 @@ struct DownloadTabView: View {
     let onDownloadGallerySelection: () -> Void
     let availableFormats: [YTDLPFormat]
     let formatPickerTitle: String
+    let formatPickerEmbedsThumbnail: Bool
     @Binding var showFormatPicker: Bool
     let isResolvingFormats: Bool
     let onDownloadFormat: (YTDLPFormat) -> Void
@@ -307,6 +308,7 @@ struct DownloadTabView: View {
                     ? String(localized: "download.formats.title")
                     : formatPickerTitle,
                 formats: availableFormats,
+                embedThumbnail: formatPickerEmbedsThumbnail,
                 onSelect: { format in
                     showFormatPicker = false
                     onDownloadFormat(format)

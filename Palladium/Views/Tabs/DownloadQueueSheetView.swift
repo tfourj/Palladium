@@ -62,6 +62,7 @@ struct DownloadQueueSheetView: View {
             FormatPickerSheetView(
                 title: qualityPickerTitle,
                 formats: qualityFormats,
+                embedThumbnail: queue.pendingItems.contains { $0.configuration.embedThumbnail },
                 onSelect: { format in
                     showQualityPicker = false
                     onSelectQuality(format)

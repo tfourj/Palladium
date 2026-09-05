@@ -1,6 +1,17 @@
 import Foundation
 
 extension ContentView {
+    var formatPickerEmbedsThumbnail: Bool {
+        if let itemID = pendingPerLinkQualityItemID,
+           let item = downloadQueue.items.first(where: { $0.id == itemID }) {
+            return item.configuration.embedThumbnail
+        }
+        if pendingBatchRepickItemID != nil {
+            return downloadQueue.pendingItems.contains { $0.configuration.embedThumbnail }
+        }
+        return embedThumbnail
+    }
+
     func makeQueuedDownloadConfiguration() -> QueuedDownloadConfiguration {
         QueuedDownloadConfiguration(
             presetRawValue: selectedPreset.rawValue,
