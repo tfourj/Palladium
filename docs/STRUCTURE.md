@@ -108,6 +108,7 @@ Palladium/
 | `Services/Cookies/NetscapeCookieExporter.swift` | Converts browser cookies into Netscape cookie-file records. |
 | `Services/FFmpeg/SwiftFFmpegBridge.swift` | Swift interface to bundled FFmpeg functionality. |
 | `Services/Logging/ConsoleLogStore.swift` | Store backing the in-app console. |
+| `Services/Media/GalleryVideoThumbnailLoader.swift` | Cached remote video previews using metadata thumbnails or generated frames. |
 | `Services/Shortcuts/ShortcutDownloadRequestStore.swift` | Transfers download requests from App Shortcuts into the app. |
 | `Services/Python/PythonFlowRunner.swift` | Runs bundled Python flows from Swift. |
 | `Services/Python/PythonScripts.swift` | Locates and prepares bundled Python scripts. |
