@@ -762,17 +762,67 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Audio: none available"
+            "value" : "None available"
           }
         }
       }
     },
-    "download.formats.audio_added" : {
+    "download.formats.audio_included" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Audio added automatically"
+            "value" : "Included in video"
+          }
+        }
+      }
+    },
+    "download.formats.video_label" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video:"
+          }
+        }
+      }
+    },
+    "download.formats.audio_label" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio:"
+          }
+        }
+      }
+    },
+    "download.formats.final_label" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Final:"
+          }
+        }
+      }
+    },
+    "download.formats.thumbnail_mkv_help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MKV is used to embed the thumbnail."
+          }
+        }
+      }
+    },
+    "download.formats.export_override_help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export settings are enabled and may change the final container."
           }
         }
       }
@@ -782,7 +832,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Formats and sizes describe the source streams. Separate audio is added when available; the merged file may use a different container."
+            "value" : "Video and audio show the source streams and their sizes. Final shows the merged container, including thumbnail handling."
           }
         }
       }
@@ -832,7 +882,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Embedding thumbnails may change WEBM output to MKV."
+            "value" : "WEBM does not support embedded thumbnails."
           }
         }
       }
