@@ -51,6 +51,14 @@ struct GalleryResolution: Sendable {
     let errorMessage: String?
 }
 
+struct YTDLPSelectedAudio: Hashable, Sendable {
+    let id: String
+    let fileExtension: String
+    let codec: String
+    let fileSize: Int64?
+    let fileSizeIsApproximate: Bool
+}
+
 struct YTDLPFormat: Identifiable, Hashable, Sendable {
     let id: String
     let fileExtension: String
@@ -64,6 +72,22 @@ struct YTDLPFormat: Identifiable, Hashable, Sendable {
     let audioCodec: String
     let fileSize: Int64?
     let note: String
+    var resolvedDownloadID: String? = nil
+    var resolvedOutputExtension: String? = nil
+    var resolvedAudioCodec: String? = nil
+    var fileSizeIsApproximate: Bool = false
+    var selectedAudio: YTDLPSelectedAudio? = nil
+    var hasThumbnail: Bool = false
+
+    func finalVideoExtension(embedThumbnail: Bool) -> String {
+        let container = resolvedOutputExtension ?? fileExtension
+        // yt-dlp switches merged WEBM to MKV when embedding an available thumbnail.
+        if hasVideo, embedThumbnail, hasThumbnail, container.lowercased() == "webm",
+           let resolvedDownloadID, resolvedDownloadID != id {
+            return "mkv"
+        }
+        return container
+    }
 
     var hasVideo: Bool { !videoCodec.isEmpty && videoCodec != "none" }
     var hasAudio: Bool { !audioCodec.isEmpty && audioCodec != "none" }
@@ -83,7 +107,8 @@ struct YTDLPFormat: Identifiable, Hashable, Sendable {
     }
 
     var isPhotosCompatible: Bool {
-        guard hasVideo, ["mp4", "mov", "m4v"].contains(fileExtension.lowercased()) else {
+        let outputExtension = resolvedOutputExtension ?? fileExtension
+        guard hasVideo, ["mp4", "mov", "m4v"].contains(outputExtension.lowercased()) else {
             return false
         }
         let codec = videoCodec.lowercased()
@@ -95,21 +120,14 @@ struct YTDLPFormat: Identifiable, Hashable, Sendable {
             || codec.hasPrefix("hevc")
             || codec.hasPrefix("h265")
         guard hasCompatibleVideoCodec else { return false }
-        guard hasAudio else { return true }
-        let audio = audioCodec.lowercased()
+        let audio = (resolvedAudioCodec ?? audioCodec).lowercased()
+        guard !audio.isEmpty, audio != "none" else { return true }
         return audio.hasPrefix("mp4a") || audio.hasPrefix("aac")
     }
 
-    var downloadSelector: String {
-        guard hasVideo && !hasAudio else { return id }
-        if isPhotosCompatible {
-            return "\(id)+bestaudio[ext=m4a]/\(id)+bestaudio/best"
-        }
-        return "\(id)+bestaudio/best"
-    }
-
     func downloadOverrideArguments(usesQualitySettings: Bool) -> String {
-        var arguments = "--format \(downloadSelector)"
+        // Source metadata stays separate from the exact video+audio selection.
+        var arguments = "--format \(resolvedDownloadID ?? id)"
         if hasAudio && !hasVideo && !usesQualitySettings {
             arguments += " --extract-audio --audio-format best"
         }
@@ -512,6 +530,15 @@ enum PythonFlowRunner {
         let formats = ((result["formats"] as? [[String: Any]]) ?? []).compactMap { item -> YTDLPFormat? in
             guard let id = item["id"] as? String, !id.isEmpty else { return nil }
             let sizeNumber = item["filesize"] as? NSNumber
+            let selectedAudio = (item["selected_audio"] as? [String: Any]).map { audio in
+                YTDLPSelectedAudio(
+                    id: audio["id"] as? String ?? "",
+                    fileExtension: audio["extension"] as? String ?? "",
+                    codec: audio["codec"] as? String ?? "",
+                    fileSize: (audio["filesize"] as? NSNumber)?.int64Value,
+                    fileSizeIsApproximate: audio["filesize_is_approximate"] as? Bool ?? false
+                )
+            }
             return YTDLPFormat(
                 id: id,
                 fileExtension: item["extension"] as? String ?? "",
@@ -524,7 +551,13 @@ enum PythonFlowRunner {
                 videoCodec: item["video_codec"] as? String ?? "",
                 audioCodec: item["audio_codec"] as? String ?? "",
                 fileSize: sizeNumber?.int64Value,
-                note: item["note"] as? String ?? ""
+                note: item["note"] as? String ?? "",
+                resolvedDownloadID: item["download_id"] as? String,
+                resolvedOutputExtension: item["output_extension"] as? String,
+                resolvedAudioCodec: item["selected_audio_codec"] as? String,
+                fileSizeIsApproximate: item["filesize_is_approximate"] as? Bool ?? false,
+                selectedAudio: selectedAudio,
+                hasThumbnail: item["has_thumbnail"] as? Bool ?? false
             )
         }
         return YTDLPFormatResolution(

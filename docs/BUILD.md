@@ -98,6 +98,18 @@ Frameworks/SwiftCurlCffi-iOS/Sources/SwiftCurlCffiIOS/Resources/curl_cffi_ios_pa
 
 ## Run Tests
 
+Run the Python package/runtime tests without installing yt-dlp. The separate
+format-resolution tests use the real yt-dlp selector with offline fixtures, in an
+isolated environment with the same yt-dlp version as CI:
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s scripts/python_tests -t .
+python_test_env="$(mktemp -d)/venv"
+python3 -m venv "$python_test_env"
+"$python_test_env/bin/python" -m pip install yt-dlp==2026.8.19
+PYTHONDONTWRITEBYTECODE=1 "$python_test_env/bin/python" -m unittest scripts.test_format_resolution
+```
+
 Swift tests live in `scripts/swift_tests` and use the `PalladiumTests` XCTest
 target. After installing the local dependencies above:
 

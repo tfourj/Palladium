@@ -147,8 +147,38 @@ def filter_embedded_playlist_entries(enabled):
         yt_dlp.YoutubeDL.process_ie_result = original
 
 
+def resolve_picker_formats(downloader, info):
+    """Resolve each video with audio using yt-dlp's already sorted format list."""
+    source_formats = info.get("formats") or []
+    resolved_formats = []
+    for item in source_formats:
+        format_id = str(item.get("format_id") or "").strip()
+        video_codec = str(item.get("vcodec") or "none").lower()
+        audio_codec = str(item.get("acodec") or "none").lower()
+        if not format_id or (video_codec == "none" and audio_codec == "none"):
+            continue
+
+        if video_codec != "none" and audio_codec == "none":
+            # Keep the existing preference for M4A audio with Photos-compatible
+            # video. yt-dlp decides the audio ID and container, including fallback.
+            prefers_m4a = (
+                str(item.get("ext") or "").lower() in {"mp4", "mov", "m4v"}
+                and video_codec.startswith(("avc1", "avc3", "h264", "hvc1", "hev1", "hevc", "h265"))
+            )
+            selector = f"{format_id}+bestaudio/{format_id}"
+            if prefers_m4a:
+                selector = f"{format_id}+bestaudio[ext=m4a]/{selector}"
+            selected = downloader._select_formats(source_formats, downloader.build_format_selector(selector))
+            if not selected:
+                continue
+            resolved_formats.append(selected[0])
+        else:
+            resolved_formats.append(item)
+    return resolved_formats
+
+
 def list_yt_dlp_formats(download_url, cookie_file_path=""):
-    """Return the formats exposed by yt-dlp without downloading any media."""
+    """Return source rows as in -F, with resolved download selections alongside."""
     output = TailBuffer()
     try:
         import yt_dlp
@@ -157,6 +187,8 @@ def list_yt_dlp_formats(download_url, cookie_file_path=""):
             "quiet": True,
             "no_warnings": True,
             "skip_download": True,
+            "listformats": True,
+            "check_formats": False,
             "noplaylist": True,
             "nocheckcertificate": True,
         }
@@ -167,25 +199,48 @@ def list_yt_dlp_formats(download_url, cookie_file_path=""):
         with contextlib.redirect_stdout(output), contextlib.redirect_stderr(output):
             with yt_dlp.YoutubeDL(options) as downloader:
                 info = downloader.extract_info(str(download_url).strip(), download=False)
+                resolved_formats = resolve_picker_formats(downloader, info)
 
         formats = []
-        for item in info.get("formats") or []:
-            format_id = str(item.get("format_id") or "").strip()
+        for item in resolved_formats:
+            # A merge's size can include only the known audio size, and its note
+            # combines video and audio labels. Display the original -F row instead.
+            source = next((
+                stream for stream in item.get("requested_formats") or []
+                if stream.get("vcodec") not in (None, "", "none")
+            ), item)
+            format_id = str(source.get("format_id") or "").strip()
             if not format_id:
                 continue
+            audio = next((
+                stream for stream in item.get("requested_formats") or [item]
+                if stream.get("acodec") not in (None, "", "none")
+            ), None)
             formats.append({
                 "id": format_id,
-                "extension": str(item.get("ext") or "").strip(),
-                "resolution": str(item.get("resolution") or "").strip(),
-                "width": item.get("width"),
-                "height": item.get("height"),
-                "fps": item.get("fps"),
-                "video_bitrate": item.get("vbr"),
-                "audio_bitrate": item.get("abr"),
-                "video_codec": str(item.get("vcodec") or "").strip(),
-                "audio_codec": str(item.get("acodec") or "").strip(),
-                "filesize": item.get("filesize") or item.get("filesize_approx"),
-                "note": str(item.get("format_note") or "").strip(),
+                "extension": str(source.get("ext") or "").strip(),
+                "resolution": str(source.get("resolution") or "").strip(),
+                "width": source.get("width"),
+                "height": source.get("height"),
+                "fps": source.get("fps"),
+                "video_bitrate": source.get("vbr"),
+                "audio_bitrate": source.get("abr"),
+                "video_codec": str(source.get("vcodec") or "").strip(),
+                "audio_codec": str(source.get("acodec") or "").strip(),
+                "filesize": source.get("filesize") or source.get("filesize_approx"),
+                "filesize_is_approximate": not source.get("filesize") and bool(source.get("filesize_approx")),
+                "note": str(source.get("format_note") or "").strip(),
+                "download_id": str(item.get("format_id") or "").strip(),
+                "output_extension": str(item.get("ext") or "").strip(),
+                "selected_audio_codec": str(item.get("acodec") or "").strip(),
+                "selected_audio": {
+                    "id": str(audio.get("format_id") or ""),
+                    "extension": str(audio.get("ext") or ""),
+                    "codec": str(audio.get("acodec") or ""),
+                    "filesize": audio.get("filesize") or audio.get("filesize_approx"),
+                    "filesize_is_approximate": not audio.get("filesize") and bool(audio.get("filesize_approx")),
+                } if audio else None,
+                "has_thumbnail": bool(info.get("thumbnails")),
             })
 
         return json.dumps({

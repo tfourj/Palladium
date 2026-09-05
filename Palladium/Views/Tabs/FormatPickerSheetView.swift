@@ -8,9 +8,12 @@ import SwiftUI
 struct FormatPickerSheetView: View {
     let title: String
     let formats: [YTDLPFormat]
+    let embedThumbnail: Bool
     let onSelect: (YTDLPFormat) -> Void
 
     @Environment(\.dismiss) private var dismiss
+    @AppStorage(DownloadQualityPreferences.overrideFormatListExportKey)
+    private var overrideFormatListExport = false
 
     var body: some View {
         NavigationStack {
@@ -22,6 +25,16 @@ struct FormatPickerSheetView: View {
                         .foregroundStyle(.secondary)
                 }
                 .font(.caption)
+
+                Text("download.formats.source_help")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                if overrideFormatListExport {
+                    Text("download.formats.export_override_help")
+                        .font(.caption)
+                        .foregroundStyle(.orange)
+                }
 
                 if !videoFormats.isEmpty {
                     Section("download.formats.video_section") {
@@ -86,12 +99,33 @@ struct FormatPickerSheetView: View {
                         .font(.caption.monospaced())
                         .foregroundStyle(.secondary)
                 }
-                Text(formatDetails(format))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                Text(codecDetails(format))
-                    .font(.caption2.monospaced())
-                    .foregroundStyle(.secondary)
+                if !format.note.isEmpty, format.note != format.resolution {
+                    Text(format.note)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                if format.hasVideo {
+                    formatLine("download.formats.video_label", value: sourceDetails(format))
+                    formatLine("download.formats.audio_label", value: selectedAudioDetails(format))
+                    formatLine(
+                        "download.formats.final_label",
+                        value: format.finalVideoExtension(embedThumbnail: embedThumbnail).uppercased(),
+                        emphasized: true
+                    )
+                    if embedThumbnail && (format.resolvedOutputExtension ?? format.fileExtension) == "webm" {
+                        Label(
+                            format.finalVideoExtension(embedThumbnail: embedThumbnail) == "mkv"
+                                ? "download.formats.thumbnail_mkv_help"
+                                : "download.formats.webm_thumbnail_warning",
+                            systemImage: "exclamationmark.triangle.fill"
+                        )
+                        .font(.caption)
+                        .foregroundStyle(.orange)
+                        .fixedSize(horizontal: false, vertical: true)
+                    }
+                } else {
+                    formatLine("download.formats.audio_label", value: sourceDetails(format))
+                }
             }
             .padding(.vertical, 3)
             .contentShape(Rectangle())
@@ -99,27 +133,45 @@ struct FormatPickerSheetView: View {
         .buttonStyle(.plain)
     }
 
-    private func formatDetails(_ format: YTDLPFormat) -> String {
-        var details = [format.fileExtension.uppercased()].filter { !$0.isEmpty }
-        if let fileSize = format.fileSize {
-            details.append(ByteCountFormatter.string(fromByteCount: fileSize, countStyle: .file))
+    private func formatLine(_ title: LocalizedStringKey, value: String, emphasized: Bool = false) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 6) {
+            Text(title)
+                .fontWeight(.semibold)
+            Text(value)
+                .fixedSize(horizontal: false, vertical: true)
         }
-        if !format.note.isEmpty, format.note != format.resolution {
-            details.append(format.note)
-        }
-        return details.joined(separator: " · ")
+        .font(.caption)
+        .foregroundStyle(emphasized ? .primary : .secondary)
     }
 
-    private func codecDetails(_ format: YTDLPFormat) -> String {
-        var codecs: [String] = []
-        if format.hasVideo {
-            codecs.append("Video: \(format.videoCodecDisplayName)")
-            codecs.append(format.hasAudio
-                ? "Audio: \(format.audioCodec)"
-                : String(localized: "download.formats.best_audio"))
-        } else if format.hasAudio {
-            codecs.append("Audio: \(format.audioCodec)")
+    private func sizeDescription(_ bytes: Int64?, approximate: Bool) -> String {
+        guard let bytes else {
+            return String(localized: "download.formats.size_unknown")
         }
-        return codecs.joined(separator: " · ")
+        let size = ByteCountFormatter.string(fromByteCount: bytes, countStyle: .binary)
+        return approximate ? "≈\(size)" : size
+    }
+
+    private func sourceDetails(_ format: YTDLPFormat) -> String {
+        [
+            format.fileExtension.uppercased(),
+            format.hasVideo ? format.videoCodecDisplayName : format.audioCodec,
+            sizeDescription(format.fileSize, approximate: format.fileSizeIsApproximate)
+        ].filter { !$0.isEmpty }.joined(separator: " · ")
+    }
+
+    private func selectedAudioDetails(_ format: YTDLPFormat) -> String {
+        if format.hasAudio {
+            return "\(format.audioCodec) · \(String(localized: "download.formats.audio_included"))"
+        }
+        if let audio = format.selectedAudio {
+            return [
+                audio.fileExtension.uppercased(),
+                audio.codec,
+                sizeDescription(audio.fileSize, approximate: audio.fileSizeIsApproximate),
+                "#\(audio.id)"
+            ].filter { !$0.isEmpty }.joined(separator: " · ")
+        }
+        return String(localized: "download.formats.no_audio")
     }
 }

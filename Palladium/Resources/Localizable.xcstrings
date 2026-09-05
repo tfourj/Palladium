@@ -757,12 +757,92 @@
         }
       }
     },
-    "download.formats.best_audio" : {
+    "download.formats.no_audio" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Audio: best compatible"
+            "value" : "None available"
+          }
+        }
+      }
+    },
+    "download.formats.audio_included" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Included in video"
+          }
+        }
+      }
+    },
+    "download.formats.video_label" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video:"
+          }
+        }
+      }
+    },
+    "download.formats.audio_label" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio:"
+          }
+        }
+      }
+    },
+    "download.formats.final_label" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Final:"
+          }
+        }
+      }
+    },
+    "download.formats.thumbnail_mkv_help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MKV is used to embed the thumbnail."
+          }
+        }
+      }
+    },
+    "download.formats.export_override_help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export settings are enabled and may change the final container."
+          }
+        }
+      }
+    },
+    "download.formats.source_help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video and audio show the source streams and their sizes. Final shows the merged container, including thumbnail handling."
+          }
+        }
+      }
+    },
+    "download.formats.size_unknown" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Size unknown"
           }
         }
       }
@@ -793,6 +873,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Loading formats..."
+          }
+        }
+      }
+    },
+    "download.formats.webm_thumbnail_warning" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WEBM does not support embedded thumbnails."
           }
         }
       }
