@@ -15,8 +15,6 @@ class PostProcessingIntegrationTests(unittest.TestCase):
     def test_all_supported_targets_produce_exactly_one_conversion_processor(self):
         for method in ("recode", "remux"):
             for target in ("mp4", "webm", "avi", "mkv", "mov"):
-                if method == "recode" and target == "webm":
-                    continue
                 with self.subTest(method=method, target=target):
                     preset, extra = apply_post_processing_args(
                         ["--remux-video", "mp4"],
@@ -39,7 +37,11 @@ class PostProcessingIntegrationTests(unittest.TestCase):
                     processor = next(pp for pp in downloader._pps["post_process"] if pp.pp_key() == expected[6:])
                     arguments = processor._configuration_args("ffmpeg", ["_o1", "_o", ""])
                     if method == "recode":
-                        self.assertIn("mpeg4" if target == "avi" else "h264_videotoolbox", arguments)
+                        if target == "webm":
+                            self.assertEqual(arguments[arguments.index("-c:v") + 1], "libvpx-vp9")
+                            self.assertEqual(arguments[arguments.index("-c:a") + 1], "libopus")
+                        else:
+                            self.assertIn("mpeg4" if target == "avi" else "h264_videotoolbox", arguments)
                     else:
                         self.assertEqual(arguments, [])
 

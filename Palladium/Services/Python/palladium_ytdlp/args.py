@@ -165,8 +165,6 @@ def apply_post_processing_args(preset_args, extra_args, configuration_json):
     target = configuration.get("format")
     if method not in ("recode", "remux") or target not in ("mp4", "webm", "avi", "mkv", "mov"):
         raise ValueError("Unsupported video post-processing settings")
-    if method == "recode" and target == "webm":
-        raise ValueError("WebM re-encoding is unavailable in bundled FFmpeg; use remuxing instead")
 
     def strip_conversion_options(args):
         output = []
@@ -188,11 +186,12 @@ def apply_post_processing_args(preset_args, extra_args, configuration_json):
     if method == "recode":
         # yt-dlp defaults to libxvid for AVI and desktop encoders for other formats.
         # Use encoders included in the iOS FFmpeg framework instead.
-        codecs = (
-            "-c:v mpeg4 -q:v 3 -c:a pcm_s16le"
-            if target == "avi"
-            else "-c:v h264_videotoolbox -b:v 8M -pix_fmt yuv420p -c:a aac -b:a 192k"
-        )
+        if target == "webm":
+            codecs = "-c:v libvpx-vp9 -crf 32 -b:v 0 -pix_fmt yuv420p -c:a libopus -b:a 128k"
+        elif target == "avi":
+            codecs = "-c:v mpeg4 -q:v 3 -c:a pcm_s16le"
+        else:
+            codecs = "-c:v h264_videotoolbox -b:v 8M -pix_fmt yuv420p -c:a aac -b:a 192k"
         extra_args.extend(["--postprocessor-args", f"VideoConvertor+ffmpeg_o:{codecs}"])
     return preset_args, extra_args
 

@@ -32,7 +32,7 @@ class PostProcessingTests(unittest.TestCase):
                 )
 
     def test_unsupported_configuration_is_rejected(self):
-        for method, target in (("unknown", "mp4"), ("recode", "webm"), ("remux", "invalid")):
+        for method, target in (("unknown", "mp4"), ("recode", "invalid"), ("remux", "invalid")):
             with self.subTest(method=method, target=target), self.assertRaises(ValueError):
                 apply_post_processing_args([], [], self.configuration(method, target))
 
