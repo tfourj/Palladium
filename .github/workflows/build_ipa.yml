@@ -1,6 +1,15 @@
 name: Build Palladium .ipa (Unsigned)
 
 on:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/build_ipa.yml"
+      - "Frameworks/**"
+      - "Palladium/**"
+      - "Palladium.xcodeproj/**"
+      - "build_ipa.sh"
+      - "scripts/**"
   push:
     branches: [main]
     tags: ["*"]
