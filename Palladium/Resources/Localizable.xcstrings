@@ -3269,16 +3269,6 @@
         }
       }
     },
-    "settings.post_processing.webm_help" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "WebM is available with Remux only. This app’s bundled FFmpeg does not include a WebM video encoder."
-          }
-        }
-      }
-    },
     "settings.about.subtitle" : {
       "localizations" : {
         "en" : {

@@ -32,11 +32,13 @@ final class PostProcessingPreferencesTests: XCTestCase {
         XCTAssertEqual(preferences.configurationJSON(for: .images), "{}")
     }
 
-    func testUnsupportedWebMReencodingIsExcluded() {
-        XCTAssertFalse(VideoPostProcessingFormat.available(for: .recode).contains(.webm))
-        XCTAssertTrue(VideoPostProcessingFormat.available(for: .remux).contains(.webm))
-        let preferences = PostProcessingPreferences(enabled: true, method: .recode, format: .webm)
-        XCTAssertEqual(preferences.configurationJSON(for: .autoVideo), "{}")
+    func testWebMConversionConfigurationSupportsBothMethods() throws {
+        XCTAssertTrue(VideoPostProcessingFormat.allCases.contains(.webm))
+        for method in VideoPostProcessingMethod.allCases {
+            let preferences = PostProcessingPreferences(enabled: true, method: method, format: .webm)
+            let data = Data(preferences.configurationJSON(for: .autoVideo).utf8)
+            XCTAssertEqual(try JSONDecoder().decode(PostProcessingPreferences.self, from: data), preferences)
+        }
     }
 
     func testInvalidStoredValuesUseSafeDefaults() throws {

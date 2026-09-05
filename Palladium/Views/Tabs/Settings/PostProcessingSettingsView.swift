@@ -20,7 +20,7 @@ struct PostProcessingSettingsView: View {
                     }
 
                     Picker("settings.post_processing.format", selection: $format) {
-                        ForEach(VideoPostProcessingFormat.available(for: method)) { format in
+                        ForEach(VideoPostProcessingFormat.allCases) { format in
                             Text(format.title).tag(format)
                         }
                     }
@@ -42,18 +42,9 @@ struct PostProcessingSettingsView: View {
                 Text("settings.post_processing.remux_help")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
-
-                Text("settings.post_processing.webm_help")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
             }
         }
         .disabled(isRunning)
-        .onChange(of: method) { _, newMethod in
-            if !VideoPostProcessingFormat.available(for: newMethod).contains(format) {
-                format = .mp4
-            }
-        }
         .navigationTitle("settings.post_processing.title")
         .navigationBarTitleDisplayMode(.inline)
     }

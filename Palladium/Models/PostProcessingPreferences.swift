@@ -24,9 +24,6 @@ enum VideoPostProcessingFormat: String, Codable, CaseIterable, Identifiable {
     var id: String { rawValue }
     var title: String { rawValue.uppercased() }
 
-    static func available(for method: VideoPostProcessingMethod) -> [Self] {
-        allCases.filter { method == .remux || $0 != .webm }
-    }
 }
 
 struct PostProcessingPreferences: Codable, Equatable {
@@ -48,7 +45,6 @@ struct PostProcessingPreferences: Codable, Equatable {
 
     func configurationJSON(for preset: DownloadPreset) -> String {
         guard enabled, preset != .audio, preset != .images,
-              VideoPostProcessingFormat.available(for: method).contains(format),
               let data = try? JSONEncoder().encode(self),
               let json = String(data: data, encoding: .utf8) else {
             return "{}"
