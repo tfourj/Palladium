@@ -150,6 +150,52 @@ def has_custom_output_template(args):
     return False
 
 
+def apply_post_processing_args(preset_args, extra_args, configuration_json):
+    if not configuration_json:
+        return preset_args, extra_args
+    configuration = json.loads(str(configuration_json))
+    if not isinstance(configuration, dict) or configuration.get("enabled") is not True:
+        return preset_args, extra_args
+
+    # Custom audio extraction must also remain an audio-only operation.
+    if any(arg in ("-x", "--extract-audio") for arg in [*preset_args, *extra_args]):
+        return preset_args, extra_args
+
+    method = configuration.get("method")
+    target = configuration.get("format")
+    if method not in ("recode", "remux") or target not in ("mp4", "webm", "avi", "mkv", "mov"):
+        raise ValueError("Unsupported video post-processing settings")
+
+    def strip_conversion_options(args):
+        output = []
+        index = 0
+        while index < len(args):
+            arg = args[index]
+            if arg.split("=", 1)[0] in ("--recode-video", "--remux-video", "--merge-output-format"):
+                index += 1 if "=" in arg else 2
+            else:
+                output.append(arg)
+                index += 1
+        return output
+
+    preset_args = strip_conversion_options(preset_args)
+    extra_args = strip_conversion_options(extra_args)
+    # Merge into a broad container before converting; AVI is not a merge format,
+    # and forcing WebM before conversion would reject H.264/AAC source streams.
+    extra_args.extend(["--merge-output-format", "mkv", f"--{method}-video", target])
+    if method == "recode":
+        # yt-dlp defaults to libxvid for AVI and desktop encoders for other formats.
+        # Use encoders included in the iOS FFmpeg framework instead.
+        if target == "webm":
+            codecs = "-c:v libvpx-vp9 -crf 32 -b:v 0 -pix_fmt yuv420p -c:a libopus -b:a 128k"
+        elif target == "avi":
+            codecs = "-c:v mpeg4 -q:v 3 -c:a pcm_s16le"
+        else:
+            codecs = "-c:v h264_videotoolbox -b:v 8M -pix_fmt yuv420p -c:a aac -b:a 192k"
+        extra_args.extend(["--postprocessor-args", f"VideoConvertor+ffmpeg_o:{codecs}"])
+    return preset_args, extra_args
+
+
 def strip_checkbox_owned_download_args(args):
     normalized = [str(arg) for arg in (args or [])]
     stripped = []

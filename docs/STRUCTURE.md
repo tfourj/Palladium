@@ -50,6 +50,7 @@ Palladium/
 | `Models/AppAppearanceMode.swift` | Appearance-mode setting model. |
 | `Models/DownloadServiceDomain.swift` | Canonical source-service domain resolver for saved-download folders. |
 | `Models/DownloadOptions.swift` | Download option model and persisted settings. |
+| `Models/PostProcessingPreferences.swift` | Persisted video conversion settings and download configuration snapshots. |
 | `Models/DownloadQueue.swift` | Sequential download queue models, batch quality selection, state transitions, and persistence. |
 | `Models/ImportedCookieFile.swift` | Imported cookie-file model. |
 | `Models/LinkHistory.swift` | Previously used link model and history storage data. |
@@ -89,6 +90,7 @@ Palladium/
 | `Views/Tabs/Settings/DownloadModesSettingsView.swift` | Download-mode settings screen. |
 | `Views/Tabs/Settings/DownloadOptionsSettingsView.swift` | Download option settings screen. |
 | `Views/Tabs/Settings/DownloadQualitySettingsView.swift` | Default video and audio quality settings screen. |
+| `Views/Tabs/Settings/PostProcessingSettingsView.swift` | Optional final video re-encoding and remux settings. |
 | `Views/Tabs/Settings/DownloadsTabSettingsView.swift` | Downloads-tab settings screen. |
 | `Views/Tabs/Settings/HistorySettingsView.swift` | History settings screen. |
 | `Views/Tabs/Settings/NotificationsSettingsView.swift` | Notification settings screen. |
@@ -111,7 +113,7 @@ Palladium/
 | `Services/Python/PythonScripts.swift` | Locates and prepares bundled Python scripts. |
 | `Services/Python/yt_dlp_flow.py` | Python flow that invokes yt-dlp for downloads. |
 | `Services/Python/palladium_ytdlp/__init__.py` | Python package marker and exports. |
-| `Services/Python/palladium_ytdlp/args.py` | Builds yt-dlp command arguments. |
+| `Services/Python/palladium_ytdlp/args.py` | Builds yt-dlp command arguments, including final video conversion overrides. |
 | `Services/Python/palladium_ytdlp/entrypoints.py` | Stable public Python entry point facade used by Swift. |
 | `Services/Python/palladium_ytdlp/ffmpeg_bridge.py` | Connects Python download work to FFmpeg. |
 | `Services/Python/palladium_ytdlp/files.py` | Download file and path helpers. |
@@ -151,7 +153,9 @@ Palladium/
 
 | Path | Purpose |
 | --- | --- |
-| `scripts/test_format_resolution.py` | Offline integration tests for yt-dlp audio pairing, merge containers, and format-list metadata. |
+| `scripts/test_format_resolution.py` | Offline yt-dlp integration tests for format resolution, conversion processors, and output paths. |
+| `scripts/python_tests/test_post_processing.py` | Conversion override, disabled-default, and audio extraction regression tests. |
+| `scripts/swift_tests/PostProcessingPreferencesTests.swift` | Video conversion preference defaults, persistence, and supported formats. |
 | `scripts/swift_tests/DownloadServiceDomainTests.swift` | Saved-download service-domain canonicalization tests. |
 | `scripts/swift_tests/DownloadQueueTests.swift` | Download queue parsing, state transition, ordering, and persistence tests. |
 | `scripts/swift_tests/YTDLPFormatTests.swift` | Resolved format selection, Photos compatibility, and exact download argument tests. |

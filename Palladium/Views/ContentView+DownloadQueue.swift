@@ -24,7 +24,8 @@ extension ContentView {
             subtitleLanguagePattern: resolvedSubtitleLanguagePattern,
             useCookies: useCookies,
             cookieFileName: selectedCookieFileName,
-            afterDownloadBehaviorRawValue: afterDownloadBehavior.rawValue
+            afterDownloadBehaviorRawValue: afterDownloadBehavior.rawValue,
+            postProcessing: PostProcessingPreferences.load()
         )
     }
 

@@ -391,6 +391,17 @@ extension ContentView {
         let presetArgsJSONAtStart = usesQualitySettings
             ? queuedConfiguration?.presetArgumentsJSON ?? buildPresetArgumentsJSON()
             : "{}"
+        let postProcessing = queuedConfiguration.map { $0.postProcessing ?? PostProcessingPreferences() }
+            ?? PostProcessingPreferences.load()
+        let postProcessingPreset: DownloadPreset
+        if let formatOverride {
+            postProcessingPreset = formatOverride.hasVideo ? .autoVideo : .audio
+        } else if let queuedBatchQuality {
+            postProcessingPreset = queuedBatchQuality.kind == .video ? .autoVideo : .audio
+        } else {
+            postProcessingPreset = effectiveDownloadPreset
+        }
+        let postProcessingJSONAtStart = postProcessing.configurationJSON(for: postProcessingPreset)
         let afterDownloadBehaviorAtStart = afterDownloadOverride
             ?? queuedConfiguration?.afterDownloadBehavior
             ?? afterDownloadBehavior
@@ -470,6 +481,7 @@ extension ContentView {
                     preset: presetAtStart,
                     presetArgsJSON: presetArgsJSONAtStart,
                     extraArgs: extraArgsAtStart,
+                    postProcessingJSON: postProcessingJSONAtStart,
                     downloadPlaylist: downloadPlaylistAtStart,
                     downloadSubtitles: downloadSubtitlesAtStart,
                     embedThumbnail: embedThumbnailAtStart,

@@ -196,6 +196,7 @@ enum PythonFlowRunner {
         preset: String,
         presetArgsJSON: String,
         extraArgs: String,
+        postProcessingJSON: String,
         downloadPlaylist: Bool,
         downloadSubtitles: Bool,
         embedThumbnail: Bool,
@@ -226,7 +227,8 @@ enum PythonFlowRunner {
                         cookieFilePath ?? "",
                         runOutputDir,
                         liveLogArgument,
-                        packageSourceJSON
+                        packageSourceJSON,
+                        postProcessingJSON
                     ]
                 )
                 payload = String(result) ?? ""
@@ -821,6 +823,7 @@ private final class PythonExecutor: NSObject {
     private let stateLock = NSLock()
     private var pythonThread: Thread!
     private var activePythonThreadID: UInt = 0
+    private var activeWorkGeneration: UInt64 = 0
 
     private override init() {
         super.init()
@@ -859,23 +862,33 @@ private final class PythonExecutor: NSObject {
     }
 
     func interruptActiveWork() {
-        let threadID: UInt = stateLock.withLock {
-            activePythonThreadID
+        let (threadID, generation) = stateLock.withLock {
+            (activePythonThreadID, activeWorkGeneration)
         }
         guard threadID != 0 else { return }
 
-        let gilState = PythonCAPI.gilEnsure()
-        defer { PythonCAPI.gilRelease(gilState) }
+        // A native extension may hold the GIL while it shuts down. Never wait
+        // for that lock on the UI thread handling the Cancel button.
+        DispatchQueue.global(qos: .userInitiated).async { [self] in
+            let gilState = PythonCAPI.gilEnsure()
+            defer { PythonCAPI.gilRelease(gilState) }
 
-        let result = PythonCAPI.setAsyncException(threadID, PythonCAPI.keyboardInterruptException)
-        if result > 1 {
-            _ = PythonCAPI.setAsyncException(threadID, nil)
+            stateLock.withLock {
+                // The cancelled task may have finished while we waited. Do not
+                // inject its interrupt into the next task on the same thread.
+                guard activePythonThreadID == threadID, activeWorkGeneration == generation else { return }
+                let result = PythonCAPI.setAsyncException(threadID, PythonCAPI.keyboardInterruptException)
+                if result > 1 {
+                    _ = PythonCAPI.setAsyncException(threadID, nil)
+                }
+            }
         }
     }
 
     private func setActivePythonThreadID(_ threadID: UInt) {
         stateLock.withLock {
             activePythonThreadID = threadID
+            activeWorkGeneration &+= 1
         }
     }
 }

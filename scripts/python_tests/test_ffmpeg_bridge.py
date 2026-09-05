@@ -8,6 +8,7 @@ from scripts.python_tests import helpers  # noqa: F401
 from palladium_ytdlp.ffmpeg_bridge import (  # noqa: E402
     BridgeCommandResult,
     SwiftFFmpegBridge,
+    YTDLPFFmpegBridgeAdapter,
     audio_codec_from_metadata,
     bridge_ffmpeg_output_path,
     parse_bridge_json_object,
@@ -15,6 +16,30 @@ from palladium_ytdlp.ffmpeg_bridge import (  # noqa: E402
 
 
 class FFmpegBridgeTests(unittest.TestCase):
+    def test_cancelled_native_run_does_not_report_output_or_retry_errors(self):
+        for result in (BridgeCommandResult(255, "", "frame=100"), RuntimeError("native failure")):
+            with self.subTest(result=result):
+                bridge = mock.Mock()
+                if isinstance(result, Exception):
+                    bridge.run_ffmpeg.side_effect = result
+                else:
+                    bridge.run_ffmpeg.return_value = result
+                adapter = YTDLPFFmpegBridgeAdapter(bridge, cancel_file_path="cancel-marker")
+                with mock.patch(
+                    "palladium_ytdlp.ffmpeg_bridge.is_cancel_requested", side_effect=[False, True]
+                ), mock.patch("palladium_ytdlp.ffmpeg_bridge.log_bridge_output") as log_output:
+                    with self.assertRaises(KeyboardInterrupt):
+                        adapter.run_tool("ffmpeg", ["-i", "input.mp4", "output.webm"])
+                log_output.assert_not_called()
+
+    def test_cancellation_prevents_starting_another_native_run(self):
+        bridge = mock.Mock()
+        adapter = YTDLPFFmpegBridgeAdapter(bridge, cancel_file_path="cancel-marker")
+        with mock.patch("palladium_ytdlp.ffmpeg_bridge.is_cancel_requested", return_value=True):
+            with self.assertRaises(KeyboardInterrupt):
+                adapter.run_tool("ffmpeg", ["-i", "input.mp4", "output.webm"])
+        bridge.run_ffmpeg.assert_not_called()
+
     def make_bridge(self, ffmpeg_outputs, ffprobe_output="ffprobe version 8.0"):
         bridge = SwiftFFmpegBridge.__new__(SwiftFFmpegBridge)
         bridge._capabilities = None

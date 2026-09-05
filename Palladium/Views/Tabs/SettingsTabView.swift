@@ -7,6 +7,7 @@ struct SettingsTabView: View {
         case downloadModes
         case shareSheet
         case downloadQuality
+        case postProcessing
         case downloadOptions
         case afterDownload
         case downloadBehavior
@@ -228,6 +229,8 @@ struct SettingsTabView: View {
             )
         case .downloadQuality:
             DownloadQualitySettingsView(isRunning: isRunning)
+        case .postProcessing:
+            PostProcessingSettingsView(isRunning: isRunning)
         case .downloadOptions:
             DownloadOptionsSettingsView(
                 defaultDownloadPlaylist: $defaultDownloadPlaylist,
@@ -372,6 +375,7 @@ struct SettingsTabView: View {
             settingsNavigationLink(for: .downloadModes)
             settingsNavigationLink(for: .shareSheet)
             settingsNavigationLink(for: .downloadQuality)
+            settingsNavigationLink(for: .postProcessing)
             settingsNavigationLink(for: .afterDownload)
             settingsNavigationLink(for: .downloadBehavior)
             settingsNavigationLink(for: .downloadArguments)
@@ -885,6 +889,7 @@ struct SettingsTabView: View {
             .downloadModes,
             .shareSheet,
             .downloadQuality,
+            .postProcessing,
             .customizeDownloadOptions,
             .downloadOptions,
             .afterDownload,
@@ -942,6 +947,14 @@ struct SettingsTabView: View {
                 subtitle: "Default video and audio formats, codecs, and quality",
                 icon: "4k.tv.fill",
                 color: .purple
+            )
+        case .postProcessing:
+            return SearchableSetting(
+                route: route,
+                title: String(localized: "settings.post_processing.title"),
+                subtitle: String(localized: "settings.post_processing.subtitle"),
+                icon: "arrow.triangle.2.circlepath",
+                color: .orange
             )
         case .customizeDownloadOptions:
             return SearchableSetting(

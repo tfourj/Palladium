@@ -19,10 +19,12 @@ private struct FFmpegBridgeResponse: Encodable {
 enum FFmpegBridgeControl {
     private static let stateLock = NSLock()
     private static var activeLiveLogFD: Int32?
+    private static var cancellationRequested = false
 
     static func setLiveLogFD(_ fd: Int32?) {
         stateLock.lock()
         activeLiveLogFD = fd
+        cancellationRequested = false
         stateLock.unlock()
     }
 
@@ -34,7 +36,32 @@ enum FFmpegBridgeControl {
     }
 
     static func requestCancellation() {
+        stateLock.lock()
+        cancellationRequested = true
         SwiftFFmpeg.requestCancel()
+        stateLock.unlock()
+    }
+
+    static var isCancellationRequested: Bool {
+        stateLock.lock()
+        defer { stateLock.unlock() }
+        return cancellationRequested
+    }
+
+    static func cancellationMonitor() -> DispatchSourceTimer {
+        let timer = DispatchSource.makeTimerSource(queue: .global(qos: .userInitiated))
+        timer.schedule(deadline: .now(), repeating: .milliseconds(20))
+        timer.setEventHandler {
+            // The native wrapper resets its per-call flag on entry. Keep the
+            // operation-level request latched across that boundary.
+            stateLock.lock()
+            if cancellationRequested {
+                SwiftFFmpeg.requestCancel()
+            }
+            stateLock.unlock()
+        }
+        timer.resume()
+        return timer
     }
 }
 
@@ -79,6 +106,7 @@ private final class FFmpegLiveLogForwarder {
     }
 
     private func emitIfRelevant(_ line: String) {
+        guard !FFmpegBridgeControl.isCancellationRequested else { return }
         let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
 
@@ -158,6 +186,18 @@ public func palladium_ffmpeg_bridge_run(_ jsonPtr: UnsafePointer<CChar>?) -> Uns
         }
 
         let liveLogForwarder = tool == .ffmpeg ? FFmpegLiveLogForwarder() : nil
+        if FFmpegBridgeControl.isCancellationRequested {
+            return makeCString(FFmpegBridgeResponse(
+                ok: false,
+                executed: false,
+                exit_code: 130,
+                output: "",
+                stderr: "",
+                error: "cancel requested"
+            ))
+        }
+        let cancellationMonitor = FFmpegBridgeControl.cancellationMonitor()
+        defer { cancellationMonitor.cancel() }
         do {
             SwiftFFmpeg.setLogHandler { _, message in
                 liveLogForwarder?.ingest(message)

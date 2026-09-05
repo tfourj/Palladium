@@ -7,6 +7,61 @@ import yt_dlp
 from scripts.python_tests import helpers  # noqa: F401
 
 from palladium_ytdlp.ytdlp import list_yt_dlp_formats, resolve_picker_formats  # noqa: E402
+from palladium_ytdlp.args import apply_post_processing_args  # noqa: E402
+from yt_dlp.postprocessor.ffmpeg import FFmpegVideoConvertorPP, FFmpegVideoRemuxerPP
+
+
+class PostProcessingIntegrationTests(unittest.TestCase):
+    def test_all_supported_targets_produce_exactly_one_conversion_processor(self):
+        for method in ("recode", "remux"):
+            for target in ("mp4", "webm", "avi", "mkv", "mov"):
+                with self.subTest(method=method, target=target):
+                    preset, extra = apply_post_processing_args(
+                        ["--remux-video", "mp4"],
+                        ["--recode-video=mov", "--format", "137+140"],
+                        json.dumps({"enabled": True, "method": method, "format": target}),
+                    )
+                    options = yt_dlp.parse_options(["--ignore-config", *preset, *extra]).ydl_opts
+                    processors = [
+                        pp for pp in options["postprocessors"]
+                        if pp["key"] in ("FFmpegVideoConvertor", "FFmpegVideoRemuxer")
+                    ]
+                    expected = "FFmpegVideoConvertor" if method == "recode" else "FFmpegVideoRemuxer"
+                    self.assertEqual(len(processors), 1)
+                    self.assertEqual(processors[0]["key"], expected)
+                    self.assertEqual(processors[0]["preferedformat"], target)
+                    self.assertEqual(options["merge_output_format"], "mkv")
+                    self.assertEqual(options["format"], "137+140")
+
+                    downloader = yt_dlp.YoutubeDL(options)
+                    processor = next(pp for pp in downloader._pps["post_process"] if pp.pp_key() == expected[6:])
+                    arguments = processor._configuration_args("ffmpeg", ["_o1", "_o", ""])
+                    if method == "recode":
+                        if target == "webm":
+                            self.assertEqual(arguments[arguments.index("-c:v") + 1], "libvpx-vp9")
+                            self.assertEqual(arguments[arguments.index("-c:a") + 1], "libopus")
+                        else:
+                            self.assertIn("mpeg4" if target == "avi" else "h264_videotoolbox", arguments)
+                    else:
+                        self.assertEqual(arguments, [])
+
+    def test_converted_path_is_returned_and_original_is_marked_for_cleanup(self):
+        for processor_type in (FFmpegVideoConvertorPP, FFmpegVideoRemuxerPP):
+            processor = processor_type(yt_dlp.YoutubeDL({"quiet": True}), preferedformat="avi")
+            with mock.patch.object(processor, "run_ffmpeg") as run:
+                deleted, result = processor.run({"filepath": "/tmp/video.mp4", "ext": "mp4"})
+            run.assert_called_once()
+            self.assertEqual(deleted, ["/tmp/video.mp4"])
+            self.assertEqual(result["filepath"], "/tmp/video.avi")
+            self.assertEqual(result["ext"], "avi")
+
+    def test_matching_container_is_not_reencoded(self):
+        processor = FFmpegVideoConvertorPP(yt_dlp.YoutubeDL({"quiet": True}), preferedformat="mp4")
+        with mock.patch.object(processor, "run_ffmpeg") as run:
+            deleted, result = processor.run({"filepath": "/tmp/video.mp4", "ext": "mp4"})
+        run.assert_not_called()
+        self.assertEqual(deleted, [])
+        self.assertEqual(result["filepath"], "/tmp/video.mp4")
 
 
 class FormatResolutionTests(unittest.TestCase):

@@ -345,7 +345,12 @@ class YTDLPFFmpegBridgeAdapter:
         args = [str(arg) for arg in raw_args]
         started_at = time.time()
         print(f"[palladium][ffmpeg-bridge] yt-dlp Popen running {tool} with {len(args)} arg(s)")
-        result = self.bridge.run_ffprobe(args) if tool == "ffprobe" else self.bridge.run_ffmpeg(args)
+        try:
+            result = self.bridge.run_ffprobe(args) if tool == "ffprobe" else self.bridge.run_ffmpeg(args)
+        finally:
+            # Treat native failures during cancellation as cancellation too, so
+            # yt-dlp cannot retry or start another postprocessor.
+            self.maybe_cancel()
         elapsed = time.time() - started_at
         print(f"[palladium][ffmpeg-bridge] yt-dlp Popen {tool} finished in {elapsed:.2f}s")
         log_bridge_output(result.stderr)
