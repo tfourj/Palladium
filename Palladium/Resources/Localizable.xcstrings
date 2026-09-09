@@ -47,8 +47,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Developer"
+            "state" : "translated",
+            "value" : "開発者"
           }
         }
       }
@@ -63,8 +63,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Links"
+            "state" : "translated",
+            "value" : "リンク"
           }
         }
       }
@@ -79,7 +79,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Powered by yt-dlp and ffmpeg"
           }
         }
@@ -95,7 +95,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Palladium"
           }
         }
@@ -111,8 +111,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Dark Mode"
+            "state" : "translated",
+            "value" : "ダークモード"
           }
         }
       }
@@ -127,8 +127,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Light Mode"
+            "state" : "translated",
+            "value" : "ライトモード"
           }
         }
       }
