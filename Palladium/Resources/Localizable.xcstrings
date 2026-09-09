@@ -5,7 +5,7 @@
       "localizations" : {
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "%lld"
           }
         }
@@ -15,7 +15,7 @@
       "localizations" : {
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "0"
           }
         }
@@ -31,7 +31,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "TfourJ"
           }
         }
@@ -640,7 +640,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "%@ • %@"
           }
         }
