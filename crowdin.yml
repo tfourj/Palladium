@@ -1,0 +1,4 @@
+files:
+  - source: /Palladium/Resources/Localizable.xcstrings
+    translation: /Palladium/Resources/Localizable.xcstrings
+    multilingual: true
