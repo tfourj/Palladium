@@ -465,7 +465,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "アプリ"
+            "value" : "App"
           }
         }
       }
@@ -673,7 +673,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cookie名"
+            "value" : "Cookie名称"
           }
         }
       }
@@ -769,7 +769,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "アプリフォルダ"
+            "value" : "App フォルダ"
           }
         }
       }
@@ -1574,8 +1574,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Video without audio"
+            "state" : "translated",
+            "value" : "音声なしのビデオ"
           }
         }
       }
@@ -1590,8 +1590,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Video (Muted)"
+            "state" : "translated",
+            "value" : "ビデオ (ミュート)"
           }
         }
       }
@@ -1606,8 +1606,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "How would you like to download this content?"
+            "state" : "translated",
+            "value" : "このコンテンツをダウンロードしますか？"
           }
         }
       }
@@ -1622,8 +1622,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Choose Download Mode"
+            "state" : "translated",
+            "value" : "ダウンロードモードを選択"
           }
         }
       }
@@ -1638,8 +1638,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Best quality available"
+            "state" : "translated",
+            "value" : "利用可能な最高品質"
           }
         }
       }
@@ -1654,8 +1654,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Import a cookie file in Settings before enabling this option."
+            "state" : "translated",
+            "value" : "このオプションを有効にする前に、設定で Cookie ファイルをインポートします。"
           }
         }
       }
@@ -1670,8 +1670,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Use one imported Netscape cookie file for this download"
+            "state" : "translated",
+            "value" : "インポートされた Netscape Cookie ファイルをこのダウンロードに使用する"
           }
         }
       }
@@ -1686,8 +1686,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Cookie file"
+            "state" : "translated",
+            "value" : "Cookieファイル"
           }
         }
       }
@@ -1718,8 +1718,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Cookies: %@"
+            "state" : "translated",
+            "value" : "Cookie: %@"
           }
         }
       }
@@ -1734,8 +1734,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Allow yt-dlp to fetch multiple items"
+            "state" : "translated",
+            "value" : "複数の項目を取得することをyt-dlpに許可"
           }
         }
       }
@@ -1766,8 +1766,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download playlist"
+            "state" : "translated",
+            "value" : "プレイリストをダウンロード"
           }
         }
       }
@@ -1782,8 +1782,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Save subtitle sidecars with the media"
+            "state" : "translated",
+            "value" : "字幕ファイルをメディアと同じ場所に保存"
           }
         }
       }
@@ -1798,8 +1798,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Subtitle language"
+            "state" : "translated",
+            "value" : "字幕の言語"
           }
         }
       }
@@ -1830,8 +1830,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download subtitles"
+            "state" : "translated",
+            "value" : "字幕をダウンロード"
           }
         }
       }
@@ -1846,8 +1846,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Subtitles: %@"
+            "state" : "translated",
+            "value" : "字幕: %@"
           }
         }
       }
@@ -1862,8 +1862,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Playlist, subtitles, and thumbnail settings"
+            "state" : "translated",
+            "value" : "プレイリスト、字幕、サムネイルの設定"
           }
         }
       }
@@ -1878,8 +1878,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Attach artwork to supported media files"
+            "state" : "translated",
+            "value" : "サポートされているメディアファイルにアートワークを添付"
           }
         }
       }
@@ -1894,8 +1894,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Embed thumbnail"
+            "state" : "translated",
+            "value" : "埋め込みサムネイル"
           }
         }
       }
@@ -1910,8 +1910,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "More options"
+            "state" : "translated",
+            "value" : "その他のオプション"
           }
         }
       }
@@ -1926,8 +1926,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Completed"
+            "state" : "translated",
+            "value" : "完了"
           }
         }
       }
@@ -1942,8 +1942,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Current item: %d"
+            "state" : "translated",
+            "value" : "現在のアイテム: %d"
           }
         }
       }
@@ -1958,8 +1958,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Current item %d: %@"
+            "state" : "translated",
+            "value" : "現在の項目 %d: %@"
           }
         }
       }
@@ -1974,8 +1974,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Failed"
+            "state" : "translated",
+            "value" : "失敗"
           }
         }
       }
@@ -1990,8 +1990,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "%d of %d downloaded before cancellation"
+            "state" : "translated",
+            "value" : "%d の %d キャンセル前にダウンロードされました"
           }
         }
       }
@@ -2006,8 +2006,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "%d of %d items failed"
+            "state" : "translated",
+            "value" : "%d の %d 項目に失敗しました"
           }
         }
       }
@@ -2022,8 +2022,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "%d of %d downloaded, %d failed"
+            "state" : "translated",
+            "value" : "%d の %d がダウンロードされました。 %d が失敗しました"
           }
         }
       }
@@ -2054,8 +2054,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "%d of %d downloaded"
+            "state" : "translated",
+            "value" : "%d / %d ダウンロード済み"
           }
         }
       }
@@ -2134,8 +2134,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Preset"
+            "state" : "translated",
+            "value" : "プリセット"
           }
         }
       }
@@ -2166,8 +2166,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Enter a URL and tap Download."
+            "state" : "translated",
+            "value" : "URLを入力し、ダウンロードをタップ。"
           }
         }
       }
@@ -2183,8 +2183,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Format and bitrate choices apply when using the Audio preset."
+            "state" : "translated",
+            "value" : "オーディオプリセットを使用する場合、フォーマットとビットレートの選択が適用されます。"
           }
         }
       }
@@ -2200,8 +2200,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Apply the video and audio Quality Settings when exporting a format selected from the format list."
+            "state" : "translated",
+            "value" : "フォーマットリストから選択したフォーマットをエクスポートする際に、ビデオとオーディオの品質設定を適用します。"
           }
         }
       }
@@ -2217,8 +2217,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Override format-list export"
+            "state" : "translated",
+            "value" : "フォーマットリストのエクスポートを上書きする"
           }
         }
       }
@@ -2234,8 +2234,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Pick max quality applies one choice to every pending download and asks again if a link lacks it. Choose for every link asks for each link before it downloads."
+            "state" : "translated",
+            "value" : "「最高画質を選択」を適用：保留中のすべてのダウンロードに同じ設定を一括適用し、最高画質が存在しないリンクについては改めて確認します。"
           }
         }
       }
@@ -2251,8 +2251,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Choose for every link"
+            "state" : "translated",
+            "value" : "リンクごとに選択"
           }
         }
       }
@@ -2268,8 +2268,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Pick max quality"
+            "state" : "translated",
+            "value" : "最高画質を選択"
           }
         }
       }
@@ -2285,8 +2285,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Selection"
+            "state" : "translated",
+            "value" : "選択"
           }
         }
       }
@@ -2302,8 +2302,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Queued Downloads"
+            "state" : "translated",
+            "value" : "待機中のダウンロード"
           }
         }
       }
@@ -2319,8 +2319,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Select quality for queued downloads"
+            "state" : "translated",
+            "value" : "待機中ダウンロードの画質を選択"
           }
         }
       }
@@ -2336,8 +2336,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Best Compatible"
+            "state" : "translated",
+            "value" : "最適な互換性"
           }
         }
       }
@@ -2353,8 +2353,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Best Quality"
+            "state" : "translated",
+            "value" : "最高品質"
           }
         }
       }
@@ -2370,8 +2370,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Best Compatible prefers AAC audio for broader playback support. Best Quality keeps the best available source audio without preferring a codec."
+            "state" : "translated",
+            "value" : "互換性重視：再生互換性を高めるため、AACオーディオを優先します。\n高音質重視：特定のコーデックを優先せず、利用可能な最高のソース音質をそのまま維持します。"
           }
         }
       }
@@ -2387,8 +2387,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Audio Preset"
+            "state" : "translated",
+            "value" : "オーディオプリセット"
           }
         }
       }
@@ -2404,8 +2404,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "H.264 and H.265/HEVC in MP4 are compatible with the Photos app. H.264 is preferred when both are available."
+            "state" : "translated",
+            "value" : "MP4形式のH.264およびH.265/HEVCは、「写真」アプリに対応しています。両方を利用可能な場合は、H.264が優先されます。"
           }
         }
       }
@@ -2420,8 +2420,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Fill URL"
+            "state" : "translated",
+            "value" : "URL を入力"
           }
         }
       }
@@ -2436,8 +2436,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Open without downloading"
+            "state" : "translated",
+            "value" : "ダウンロードせずに開く"
           }
         }
       }
@@ -2452,8 +2452,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "download cancelled"
+            "state" : "translated",
+            "value" : "ダウンロードがキャンセルされました"
           }
         }
       }
@@ -2484,8 +2484,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "download complete"
+            "state" : "translated",
+            "value" : "ダウンロード完了"
           }
         }
       }
@@ -2500,8 +2500,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "download failed"
+            "state" : "translated",
+            "value" : "ダウンロード失敗"
           }
         }
       }
@@ -2516,8 +2516,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Merge finished"
+            "state" : "translated",
+            "value" : "統合完了"
           }
         }
       }
@@ -2532,8 +2532,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "completed with issues"
+            "state" : "translated",
+            "value" : "一部問題ありで完了"
           }
         }
       }
@@ -2580,8 +2580,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Enter video URL"
+            "state" : "translated",
+            "value" : "動画の URL を入力"
           }
         }
       }
@@ -2596,8 +2596,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "—format best —no-playlist"
+            "state" : "translated",
+            "value" : "—最適なフォーマット — プレイリストなし"
           }
         }
       }
@@ -2612,8 +2612,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "--embed-subs --write-subs"
+            "state" : "translated",
+            "value" : "—字幕を埋め込む — 字幕を保存"
           }
         }
       }
@@ -2628,8 +2628,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Media saved to Palladium/Saved will appear here."
+            "state" : "translated",
+            "value" : "Palladium/Savedに保存されたメディアがここに表示されます。"
           }
         }
       }
@@ -2644,8 +2644,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "No saved downloads"
+            "state" : "translated",
+            "value" : "保存されたダウンロードはありません"
           }
         }
       }
@@ -2660,8 +2660,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Could not load downloads"
+            "state" : "translated",
+            "value" : "ダウンロードを読み込むことができませんでした"
           }
         }
       }
@@ -2676,8 +2676,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "%lld media items"
+            "state" : "translated",
+            "value" : "%lld メディア項目"
           }
         }
       }
@@ -2692,8 +2692,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "This saved folder does not contain any supported media."
+            "state" : "translated",
+            "value" : "この保存フォルダにはサポートされているメディアが含まれていません。"
           }
         }
       }
@@ -2708,8 +2708,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "No media in this folder"
+            "state" : "translated",
+            "value" : "このフォルダにメディアがありません"
           }
         }
       }
@@ -2724,8 +2724,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Saved"
+            "state" : "translated",
+            "value" : "保存済"
           }
         }
       }
@@ -2740,8 +2740,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Temporary"
+            "state" : "translated",
+            "value" : "一時的"
           }
         }
       }
@@ -2772,8 +2772,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Refresh Downloads"
+            "state" : "translated",
+            "value" : "ダウンロードの更新"
           }
         }
       }
@@ -2804,8 +2804,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Folder"
+            "state" : "translated",
+            "value" : "フォルダ"
           }
         }
       }
@@ -2820,8 +2820,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Image"
+            "state" : "translated",
+            "value" : "画像"
           }
         }
       }
@@ -2836,8 +2836,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Video"
+            "state" : "translated",
+            "value" : "ビデオ"
           }
         }
       }
@@ -2847,8 +2847,8 @@
       "localizations" : {
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Format"
+            "state" : "translated",
+            "value" : "フォーマット"
           }
         }
       }
@@ -2863,8 +2863,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "No supported items were found for this URL."
+            "state" : "translated",
+            "value" : "このURLのサポートされているアイテムが見つかりませんでした。"
           }
         }
       }
@@ -2879,8 +2879,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Downloaded links will appear here."
+            "state" : "translated",
+            "value" : "ダウンロードしたリンクがここに表示されます。"
           }
         }
       }
@@ -2895,8 +2895,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "No history yet"
+            "state" : "translated",
+            "value" : "履歴はまだありません"
           }
         }
       }
@@ -2911,8 +2911,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Open link history"
+            "state" : "translated",
+            "value" : "リンク履歴を開く"
           }
         }
       }
@@ -2927,8 +2927,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Link History"
+            "state" : "translated",
+            "value" : "リンク履歴"
           }
         }
       }
@@ -2943,8 +2943,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Actions"
+            "state" : "translated",
+            "value" : "アクション"
           }
         }
       }
@@ -2959,8 +2959,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Please wait while package updates are installed."
+            "state" : "translated",
+            "value" : "パッケージの更新がインストールされるまでお待ちください。"
           }
         }
       }
@@ -2975,8 +2975,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Updating: %@"
+            "state" : "translated",
+            "value" : "アップデート中: %@"
           }
         }
       }
@@ -2991,8 +2991,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Updating packages"
+            "state" : "translated",
+            "value" : "パッケージを更新中"
           }
         }
       }
@@ -3007,8 +3007,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Check for Updates"
+            "state" : "translated",
+            "value" : "アップデートの確認"
           }
         }
       }
@@ -3023,8 +3023,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Add Custom Package"
+            "state" : "translated",
+            "value" : "カスタムパッケージを追加"
           }
         }
       }
@@ -3039,8 +3039,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Add and Install"
+            "state" : "translated",
+            "value" : "追加とインストール"
           }
         }
       }
@@ -3071,8 +3071,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Package name"
+            "state" : "translated",
+            "value" : "パッケージ名称"
           }
         }
       }
@@ -3087,8 +3087,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Add Custom Package"
+            "state" : "translated",
+            "value" : "カスタムパッケージを追加"
           }
         }
       }
@@ -3103,8 +3103,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Select a version to update or downgrade. Use the lock button to keep a package on that version during future updates."
+            "state" : "translated",
+            "value" : "アップデートまたはダウングレードするバージョンを選択します。今後のアップデート時にパッケージを保持するにはロックボタンを使用してください。"
           }
         }
       }
@@ -3119,8 +3119,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Lock %@ to selected version"
+            "state" : "translated",
+            "value" : "選択したバージョンに %@ をロック"
           }
         }
       }
@@ -3135,8 +3135,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Stop managing %@"
+            "state" : "translated",
+            "value" : "%@ の管理を停止"
           }
         }
       }
@@ -3151,8 +3151,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Version Source"
+            "state" : "translated",
+            "value" : "バージョンのソース"
           }
         }
       }
@@ -3167,8 +3167,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Uses pip index versions for each package."
+            "state" : "translated",
+            "value" : "各パッケージに pip インデックスのバージョンを使用します。"
           }
         }
       }
@@ -3183,8 +3183,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Target Versions"
+            "state" : "translated",
+            "value" : "対象のバージョン"
           }
         }
       }
@@ -3199,8 +3199,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Custom Update"
+            "state" : "translated",
+            "value" : "カスタムアップデート"
           }
         }
       }
@@ -3215,8 +3215,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Unlock %@"
+            "state" : "translated",
+            "value" : "%@ のロックを解除"
           }
         }
       }
@@ -3231,8 +3231,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Installed Versions"
+            "state" : "translated",
+            "value" : "インストールされているバージョン"
           }
         }
       }
@@ -3247,8 +3247,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Latest"
+            "state" : "translated",
+            "value" : "最新"
           }
         }
       }
@@ -3279,8 +3279,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Locked Versions"
+            "state" : "translated",
+            "value" : "ロックされたバージョン"
           }
         }
       }
@@ -3295,8 +3295,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Installs a local payload bundle from a ZIP or .whl file."
+            "state" : "translated",
+            "value" : "ZIP または .whl ファイルからローカル ペイロードバンドルをインストールします。"
           }
         }
       }
@@ -3311,8 +3311,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Import Payload Bundle"
+            "state" : "translated",
+            "value" : "ペイロードバンドルをインポート"
           }
         }
       }
@@ -3327,8 +3327,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Failed to import payload bundle: %@"
+            "state" : "translated",
+            "value" : "ペイロードバンドルのインポートに失敗しました: %@"
           }
         }
       }
@@ -3343,8 +3343,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Payload Bundle Import Failed"
+            "state" : "translated",
+            "value" : "ペイロードバンドルのインポートに失敗しました"
           }
         }
       }
@@ -3359,8 +3359,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Reload Available Versions"
+            "state" : "translated",
+            "value" : "利用可能なバージョンを再読み込み"
           }
         }
       }
@@ -3375,8 +3375,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Restore Pip Packages"
+            "state" : "translated",
+            "value" : "Pip パッケージを復元"
           }
         }
       }
@@ -3391,8 +3391,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Restore"
+            "state" : "translated",
+            "value" : "復元"
           }
         }
       }
@@ -3407,8 +3407,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "This removes imported payload packages and user-added managed packages, then reinstalls the remaining packages from the configured source."
+            "state" : "translated",
+            "value" : "これにより、インポートされたペイロードパッケージとユーザーが追加した管理パッケージが削除され、構成されたソースから残りのパッケージが再インストールされます。"
           }
         }
       }
@@ -3423,8 +3423,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Restore Pip Packages?"
+            "state" : "translated",
+            "value" : "Pip パッケージを復元しますか？"
           }
         }
       }
@@ -3455,8 +3455,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Active source: %@"
+            "state" : "translated",
+            "value" : "有効なソース: %@"
           }
         }
       }
@@ -3471,8 +3471,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Custom"
+            "state" : "translated",
+            "value" : "カスタム"
           }
         }
       }
@@ -3519,8 +3519,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Reset to Palladium Default"
+            "state" : "translated",
+            "value" : "Palladiumのデフォルトにリセット"
           }
         }
       }
@@ -3535,8 +3535,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Custom Requirements"
+            "state" : "translated",
+            "value" : "カスタム要件"
           }
         }
       }
@@ -3551,8 +3551,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Installs the package requirements listed below and skips the built-in webkit-js patch."
+            "state" : "translated",
+            "value" : "以下に示すパッケージ要件をインストールし、組み込みの webkit-js パッチをスキップします。"
           }
         }
       }
@@ -3567,7 +3567,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Nightly"
           }
         }
@@ -3583,8 +3583,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Enable Nightly"
+            "state" : "translated",
+            "value" : "Nightlyを有効化"
           }
         }
       }
@@ -3615,8 +3615,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Nightly packages may be unstable or break downloads. You can switch back to stable packages at any time."
+            "state" : "translated",
+            "value" : "Nightlyパッケージは不安定または中断する可能性があります。いつでも安定したパッケージに切り替えることができます。"
           }
         }
       }
@@ -3631,8 +3631,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Use Nightly Packages?"
+            "state" : "translated",
+            "value" : "Nightly パッケージを使用しますか？"
           }
         }
       }
@@ -3647,8 +3647,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Package Source"
+            "state" : "translated",
+            "value" : "パッケージのソース"
           }
         }
       }
@@ -3663,7 +3663,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Stable"
           }
         }
@@ -3695,8 +3695,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Package Source"
+            "state" : "translated",
+            "value" : "パッケージのソース"
           }
         }
       }
@@ -3807,8 +3807,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Status"
+            "state" : "translated",
+            "value" : "ステータス"
           }
         }
       }
@@ -3839,8 +3839,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "status: %@"
+            "state" : "translated",
+            "value" : "ステータス: %@"
           }
         }
       }
@@ -3855,8 +3855,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Updates not checked yet."
+            "state" : "translated",
+            "value" : "アップデートはまだ確認されていません。"
           }
         }
       }
@@ -3871,8 +3871,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Update Summary"
+            "state" : "translated",
+            "value" : "アップデートの概要"
           }
         }
       }
@@ -3887,8 +3887,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "package manager"
+            "state" : "translated",
+            "value" : "パッケージマネージャー"
           }
         }
       }
@@ -3903,8 +3903,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Update Packages"
+            "state" : "translated",
+            "value" : "パッケージの更新"
           }
         }
       }
@@ -3919,8 +3919,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Long press Update Packages to set custom package versions."
+            "state" : "translated",
+            "value" : "カスタムパッケージのバージョンを設定するには、「パッケージをアップデート」を長押ししてください。"
           }
         }
       }
@@ -3935,8 +3935,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Import image into Photos library"
+            "state" : "translated",
+            "value" : "画像をフォトライブラリにインポート"
           }
         }
       }
@@ -3951,8 +3951,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Import video into Photos library"
+            "state" : "translated",
+            "value" : "フォトライブラリにビデオをインポート"
           }
         }
       }
@@ -3967,8 +3967,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Save to Photos"
+            "state" : "translated",
+            "value" : "写真に保存"
           }
         }
       }
@@ -3999,8 +3999,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Could not verify media compatibility."
+            "state" : "translated",
+            "value" : "メディアの互換性を確認できませんでした。"
           }
         }
       }
@@ -4015,8 +4015,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Video codec must be H.264 or H.265."
+            "state" : "translated",
+            "value" : "ビデオコーデックはH.264またはH.265でなければなりません。"
           }
         }
       }
@@ -4031,8 +4031,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "iOS Photos cannot import this file: %@"
+            "state" : "translated",
+            "value" : "iOSの写真はこのファイルをインポートできません: %@"
           }
         }
       }
@@ -4047,8 +4047,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Failed to inspect media codec."
+            "state" : "translated",
+            "value" : "メディアコーデックの検査に失敗しました。"
           }
         }
       }
@@ -4063,8 +4063,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Every file in this group must be compatible with Photos."
+            "state" : "translated",
+            "value" : "このグループのすべてのファイルは写真と互換性がなければなりません。"
           }
         }
       }
@@ -4079,8 +4079,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "No video track found."
+            "state" : "translated",
+            "value" : "ビデオトラックが見つかりません。"
           }
         }
       }
@@ -4095,8 +4095,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Photo library permission was denied."
+            "state" : "translated",
+            "value" : "フォトライブラリのアクセスが拒否されました。"
           }
         }
       }
@@ -4111,8 +4111,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Failed to save to Photos: %@"
+            "state" : "translated",
+            "value" : "写真に保存できませんでした: %@"
           }
         }
       }
@@ -4127,8 +4127,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Photos is only available for a single media file."
+            "state" : "translated",
+            "value" : "写真は単一のメディア ファイルでのみ使用できます。"
           }
         }
       }
@@ -4175,8 +4175,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Audio and other files cannot be saved to Photos."
+            "state" : "translated",
+            "value" : "オーディオやその他のファイルは写真に保存できません。"
           }
         }
       }
@@ -4191,8 +4191,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Only MP4, MOV, or M4V can be saved."
+            "state" : "translated",
+            "value" : "MP4、MOV、またはM4Vのみ保存できます。"
           }
         }
       }
@@ -4207,8 +4207,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Saved to Photos"
+            "state" : "translated",
+            "value" : "写真に保存"
           }
         }
       }
@@ -4223,8 +4223,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Keep the whole download folder in Palladium/Saved"
+            "state" : "translated",
+            "value" : "ダウンロードフォルダ全体を Palladium/Saved に維持します"
           }
         }
       }
@@ -4239,8 +4239,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Keep a copy in Palladium/Saved"
+            "state" : "translated",
+            "value" : "Palladium/Saved にコピーを保存する"
           }
         }
       }
@@ -4255,8 +4255,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Save to App Folder"
+            "state" : "translated",
+            "value" : "App フォルダに保存"
           }
         }
       }
@@ -4271,8 +4271,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Share every downloaded file"
+            "state" : "translated",
+            "value" : "ダウンロードしたすべてのファイルを共有"
           }
         }
       }
@@ -4287,8 +4287,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Share All"
+            "state" : "translated",
+            "value" : "全て共有"
           }
         }
       }
@@ -4303,8 +4303,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Share or save with other apps"
+            "state" : "translated",
+            "value" : "他のアプリと共有または保存"
           }
         }
       }
@@ -4319,8 +4319,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Open Share Sheet"
+            "state" : "translated",
+            "value" : "共有シートを開く"
           }
         }
       }
@@ -4335,8 +4335,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Skip"
+            "state" : "translated",
+            "value" : "スキップ"
           }
         }
       }
@@ -4351,8 +4351,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "The source service could not be determined from the download address."
+            "state" : "translated",
+            "value" : "ダウンロードアドレスからソースサービスが見つかりませんでした。"
           }
         }
       }
@@ -4367,8 +4367,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "No downloaded files were available."
+            "state" : "translated",
+            "value" : "ダウンロードしたファイルはありません。"
           }
         }
       }
@@ -4383,8 +4383,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Failed to save to app folder: %@"
+            "state" : "translated",
+            "value" : "写真に保存できませんでした: %@"
           }
         }
       }
@@ -4399,8 +4399,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Choose what to do with the downloaded files."
+            "state" : "translated",
+            "value" : "ダウンロードしたファイルの操作を選択します。"
           }
         }
       }
@@ -4415,8 +4415,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Choose what to do with these %lld downloaded files."
+            "state" : "translated",
+            "value" : "これらの %lld ダウンロードしたファイルの操作を選択してください。"
           }
         }
       }
@@ -4431,8 +4431,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Choose what to do with the downloaded file."
+            "state" : "translated",
+            "value" : "ダウンロードしたファイルの操作を選択します。"
           }
         }
       }
@@ -4447,8 +4447,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download Complete"
+            "state" : "translated",
+            "value" : "ダウンロード完了"
           }
         }
       }
@@ -4463,8 +4463,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Audio Downloaded"
+            "state" : "translated",
+            "value" : "オーディオのダウンロード完了"
           }
         }
       }
@@ -4479,8 +4479,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Files Downloaded"
+            "state" : "translated",
+            "value" : "ファイルのダウンロード完了"
           }
         }
       }
@@ -4495,8 +4495,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Images Downloaded"
+            "state" : "translated",
+            "value" : "イメージのダウンロード完了"
           }
         }
       }
@@ -4511,8 +4511,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Videos Downloaded"
+            "state" : "translated",
+            "value" : "ビデオのダウンロード完了"
           }
         }
       }
@@ -4527,8 +4527,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Saved to app folder: %@"
+            "state" : "translated",
+            "value" : "Appフォルダに保存しました: %@"
           }
         }
       }
@@ -4543,8 +4543,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Saved folder: %@"
+            "state" : "translated",
+            "value" : "保存されたフォルダ: %@"
           }
         }
       }
@@ -4554,8 +4554,8 @@
       "localizations" : {
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Preview unavailable"
+            "state" : "translated",
+            "value" : "プレビューが利用できません"
           }
         }
       }
@@ -4564,8 +4564,8 @@
       "localizations" : {
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Quality"
+            "state" : "translated",
+            "value" : "品質"
           }
         }
       }
@@ -4580,8 +4580,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Add Links"
+            "state" : "translated",
+            "value" : "リンクを追加"
           }
         }
       }
@@ -4596,8 +4596,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Finish the current operation before starting the queue."
+            "state" : "translated",
+            "value" : "キューを開始する前に現在の操作を終了します。"
           }
         }
       }
@@ -4612,8 +4612,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Clear Finished"
+            "state" : "translated",
+            "value" : "完了済みをクリア"
           }
         }
       }
@@ -4628,8 +4628,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Current"
+            "state" : "translated",
+            "value" : "現在"
           }
         }
       }
@@ -4660,8 +4660,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "No queued links"
+            "state" : "translated",
+            "value" : "キューに登録されたリンクがありません"
           }
         }
       }
@@ -4676,8 +4676,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Finished"
+            "state" : "translated",
+            "value" : "完了"
           }
         }
       }
@@ -4692,8 +4692,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Images uses an item picker and cannot be queued yet. Choose another download mode."
+            "state" : "translated",
+            "value" : "画像はアイテムピッカーを使用しており、キューに入れることができません。別のダウンロードモードを選択してください。"
           }
         }
       }
@@ -4708,8 +4708,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Blank lines are ignored. Links are kept in the order entered."
+            "state" : "translated",
+            "value" : "空白行は無視されます。リンクは入力された順序で保持されます。"
           }
         }
       }
@@ -4724,7 +4724,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "https://example.com/video-one\nhttps://example.com/video-two"
           }
         }
@@ -4740,8 +4740,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Links"
+            "state" : "translated",
+            "value" : "リンク"
           }
         }
       }
@@ -4756,8 +4756,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Open download queue"
+            "state" : "translated",
+            "value" : "ダウンロードキューを開く"
           }
         }
       }
@@ -4772,8 +4772,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Pause After Current"
+            "state" : "translated",
+            "value" : "現在のダウンロード完了後に一時停止"
           }
         }
       }
@@ -4788,8 +4788,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Pausing lets the current item finish and prevents the next one from starting."
+            "state" : "translated",
+            "value" : "一時停止すると、現在のアイテムが終了し、次のアイテムが開始されないようになります。"
           }
         }
       }
@@ -4804,8 +4804,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Pending"
+            "state" : "translated",
+            "value" : "保留中"
           }
         }
       }
@@ -4821,8 +4821,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Pick Quality and Start Download"
+            "state" : "translated",
+            "value" : "品質を選択してダウンロードを開始"
           }
         }
       }
@@ -4837,8 +4837,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Queue %lld of %lld"
+            "state" : "translated",
+            "value" : "キュー: %lld / %lld"
           }
         }
       }
@@ -4870,8 +4870,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Choose quality for this link"
+            "state" : "translated",
+            "value" : "このリンクの画質を選択"
           }
         }
       }
@@ -4886,8 +4886,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Choose quality for all pending links"
+            "state" : "translated",
+            "value" : "保留中のすべてのリンクの画質を選択"
           }
         }
       }
@@ -4918,8 +4918,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Resume Queue"
+            "state" : "translated",
+            "value" : "キューの再開"
           }
         }
       }
@@ -4934,8 +4934,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Retry"
+            "state" : "translated",
+            "value" : "再試行"
           }
         }
       }
@@ -4950,8 +4950,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "New links will use the current %@ options."
+            "state" : "translated",
+            "value" : "新しいリンクは現在の %@ オプションを使用します。"
           }
         }
       }
@@ -4967,8 +4967,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Start Download"
+            "state" : "translated",
+            "value" : "ダウンロードを開始"
           }
         }
       }
@@ -4983,8 +4983,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Waiting for action"
+            "state" : "translated",
+            "value" : "アクションを待機中"
           }
         }
       }
@@ -4999,8 +4999,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Cancelled"
+            "state" : "translated",
+            "value" : "キャンセル済み"
           }
         }
       }
@@ -5015,8 +5015,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Failed"
+            "state" : "translated",
+            "value" : "失敗"
           }
         }
       }
@@ -5031,8 +5031,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Partially completed"
+            "state" : "translated",
+            "value" : "一部完了"
           }
         }
       }
@@ -5047,8 +5047,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Pending"
+            "state" : "translated",
+            "value" : "保留中"
           }
         }
       }
@@ -5063,8 +5063,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Downloading"
+            "state" : "translated",
+            "value" : "ダウンロード中"
           }
         }
       }
@@ -5079,8 +5079,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Completed"
+            "state" : "translated",
+            "value" : "完了"
           }
         }
       }
@@ -5095,8 +5095,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download Queue"
+            "state" : "translated",
+            "value" : "ダウンロードキュー"
           }
         }
       }
@@ -5106,8 +5106,8 @@
       "localizations" : {
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Select All"
+            "state" : "translated",
+            "value" : "全てを選択"
           }
         }
       }
@@ -5122,8 +5122,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Convert final video"
+            "state" : "translated",
+            "value" : "最終ビデオを変換する"
           }
         }
       }
@@ -5138,8 +5138,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Output format"
+            "state" : "translated",
+            "value" : "出力フォーマット"
           }
         }
       }
@@ -5154,8 +5154,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Conversion method"
+            "state" : "translated",
+            "value" : "変換方法"
           }
         }
       }
@@ -5170,8 +5170,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Re-encode"
+            "state" : "translated",
+            "value" : "再エンコード"
           }
         }
       }
