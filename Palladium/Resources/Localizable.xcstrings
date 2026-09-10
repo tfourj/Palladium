@@ -155,7 +155,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "オーディオ"
+            "value" : "音声"
           }
         }
       }
@@ -753,7 +753,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ドキュメント/Cookie"
+            "value" : "Documents/Cookie"
           }
         }
       }
@@ -1126,8 +1126,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Appended for every run."
+            "state" : "translated",
+            "value" : "実行ごとに追加されます。"
           }
         }
       }
@@ -1142,8 +1142,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Global Extra Args"
+            "state" : "translated",
+            "value" : "グローバルの追加引数"
           }
         }
       }
@@ -1158,8 +1158,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Custom: %@"
+            "state" : "translated",
+            "value" : "カスタム: %@"
           }
         }
       }
@@ -1174,8 +1174,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Last Error"
+            "state" : "translated",
+            "value" : "最後のエラー"
           }
         }
       }
@@ -1190,8 +1190,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download finished but no files were found."
+            "state" : "translated",
+            "value" : "ダウンロードは完了しましたが、ファイルが見つかりませんでした。"
           }
         }
       }
@@ -1206,8 +1206,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Failed to prepare download folder."
+            "state" : "translated",
+            "value" : "ダウンロードフォルダの準備に失敗しました。"
           }
         }
       }
@@ -1239,7 +1239,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "オーディオ"
+            "value" : "音声"
           }
         }
       }
@@ -1254,8 +1254,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "None available"
+            "state" : "translated",
+            "value" : "利用可能なものはありません"
           }
         }
       }
@@ -1270,8 +1270,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Included in video"
+            "state" : "translated",
+            "value" : "動画に含める"
           }
         }
       }
@@ -1286,8 +1286,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Video:"
+            "state" : "translated",
+            "value" : "動画:"
           }
         }
       }
@@ -1302,8 +1302,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Audio:"
+            "state" : "translated",
+            "value" : "音声:"
           }
         }
       }
@@ -1318,8 +1318,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Final:"
+            "state" : "translated",
+            "value" : "完了："
           }
         }
       }
@@ -1334,8 +1334,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "MKV is used to embed the thumbnail."
+            "state" : "translated",
+            "value" : "サムネイルの埋め込みに MKV を使用します。"
           }
         }
       }
@@ -1350,8 +1350,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Export settings are enabled and may change the final container."
+            "state" : "translated",
+            "value" : "エクスポート設定は有効になっており、最終コンテナを変更することができます。"
           }
         }
       }
@@ -1366,8 +1366,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Video and audio show the source streams and their sizes. Final shows the merged container, including thumbnail handling."
+            "state" : "translated",
+            "value" : "動画と音質には、ソースストリームとそのサイズが表示されます。最後に、サムネイルの処理を含むマージされたコンテナが表示されます。"
           }
         }
       }
@@ -1382,8 +1382,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Size unknown"
+            "state" : "translated",
+            "value" : "サイズが不明です"
           }
         }
       }
@@ -1398,8 +1398,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Choose download format"
+            "state" : "translated",
+            "value" : "ダウンロードフォーマットを選択"
           }
         }
       }
@@ -1414,8 +1414,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "No downloadable formats were found."
+            "state" : "translated",
+            "value" : "ダウンロード可能なフォーマットが見つかりません。"
           }
         }
       }
@@ -1430,8 +1430,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Loading formats..."
+            "state" : "translated",
+            "value" : "フォーマットを読み込み中..."
           }
         }
       }
@@ -1446,8 +1446,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "WEBM does not support embedded thumbnails."
+            "state" : "translated",
+            "value" : "WEBMは埋め込みサムネイルをサポートしていません。"
           }
         }
       }
@@ -1462,8 +1462,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Compatible with Save to Photos"
+            "state" : "translated",
+            "value" : "写真への保存との互換性"
           }
         }
       }
@@ -1478,8 +1478,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Pick a specific format"
+            "state" : "translated",
+            "value" : "特定のフォーマットを選択"
           }
         }
       }
@@ -1494,8 +1494,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Choose Format"
+            "state" : "translated",
+            "value" : "フォーマットを選択"
           }
         }
       }
@@ -1510,8 +1510,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Video with Audio"
+            "state" : "translated",
+            "value" : "音声付きの動画"
           }
         }
       }
@@ -1526,8 +1526,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Extract audio track"
+            "state" : "translated",
+            "value" : "音声トラックを抽出"
           }
         }
       }
@@ -1543,7 +1543,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "オーディオのみ"
+            "value" : "音声のみ"
           }
         }
       }
@@ -1558,8 +1558,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Use custom preset arguments"
+            "state" : "translated",
+            "value" : "カスタムプリセット引数を使用"
           }
         }
       }
@@ -1591,7 +1591,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ビデオ (ミュート)"
+            "value" : "動画 (ミュート)"
           }
         }
       }
@@ -1814,8 +1814,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Subtitle pattern, e.g. en.*, es.*, zh-Hans"
+            "state" : "translated",
+            "value" : "字幕のパターン（例：en.*、es.*、zh-Hansなど）"
           }
         }
       }
@@ -2038,8 +2038,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "%d completed of %d, %d failed so far"
+            "state" : "translated",
+            "value" : "%d / %d 完了（これまでに %d 件失敗）"
           }
         }
       }
@@ -2087,7 +2087,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "オーディオ"
+            "value" : "音声"
           }
         }
       }
@@ -2151,7 +2151,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ビデオ"
+            "value" : "動画"
           }
         }
       }
@@ -2184,7 +2184,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "オーディオプリセットを使用する場合、フォーマットとビットレートの選択が適用されます。"
+            "value" : "音声プリセットを使用する場合、フォーマットとビットレートの選択が適用されます。"
           }
         }
       }
@@ -2201,7 +2201,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "フォーマットリストから選択したフォーマットをエクスポートする際に、ビデオとオーディオの品質設定を適用します。"
+            "value" : "フォーマットリストから選択したフォーマットをエクスポートする際に、動画と音声の品質設定を適用します。"
           }
         }
       }
@@ -2371,7 +2371,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "互換性重視：再生互換性を高めるため、AACオーディオを優先します。\n高音質重視：特定のコーデックを優先せず、利用可能な最高のソース音質をそのまま維持します。"
+            "value" : "互換性重視：再生互換性を高めるため、AAC音声を優先します。\n高音質重視：特定のコーデックを優先せず、利用可能な最高のソース音質をそのまま維持します。"
           }
         }
       }
@@ -2388,7 +2388,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "オーディオプリセット"
+            "value" : "音声プリセット"
           }
         }
       }
@@ -2468,8 +2468,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Cancelling..."
+            "state" : "translated",
+            "value" : "キャンセル中..."
           }
         }
       }
@@ -2548,8 +2548,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Processing with ffmpeg..."
+            "state" : "translated",
+            "value" : "ffmpegで処理中..."
           }
         }
       }
@@ -2564,8 +2564,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Downloading..."
+            "state" : "translated",
+            "value" : "ダウンロード中"
           }
         }
       }
@@ -2788,8 +2788,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Audio"
+            "state" : "translated",
+            "value" : "オーディオ"
           }
         }
       }
@@ -2837,7 +2837,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ビデオ"
+            "value" : "動画氷魚d"
           }
         }
       }
@@ -3055,8 +3055,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Enter a pip package name. The package will be installed now and managed during future updates."
+            "state" : "translated",
+            "value" : "pip パッケージ名を入力してください。今後の更新時にパッケージがインストールされ管理されます。"
           }
         }
       }
@@ -3263,8 +3263,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Loading versions..."
+            "state" : "translated",
+            "value" : "バージョンを読み込み中..."
           }
         }
       }
@@ -3439,8 +3439,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Removes payload-installed and user-added managed packages, then reinstalls the remaining runtime packages with pip."
+            "state" : "translated",
+            "value" : "payload-installed と user-added managed パッケージを削除し、残りのランタイムパッケージを pip で再インストールします。"
           }
         }
       }
@@ -3487,8 +3487,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Add at least one custom package requirement before updating."
+            "state" : "translated",
+            "value" : "更新前に少なくとも1つのカスタムパッケージ要件を追加します。"
           }
         }
       }
@@ -3503,8 +3503,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Enter one pip requirement per line. Requirement pins, package names, and package @ URL specs are supported."
+            "state" : "translated",
+            "value" : "1行に1つのpip要件を入力してください。要件ピン、パッケージ名、@URL仕様がサポートされています。"
           }
         }
       }
@@ -3599,8 +3599,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Uses prerelease package versions when pip offers them."
+            "state" : "translated",
+            "value" : "pip がそれらを提供するときに、事前リリースパッケージを使用します。"
           }
         }
       }
@@ -3679,8 +3679,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Uses the default stable package releases from pip."
+            "state" : "translated",
+            "value" : "pipからのデフォルトの安定したパッケージリリースを使用します。"
           }
         }
       }
@@ -3711,8 +3711,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Checking versions..."
+            "state" : "translated",
+            "value" : "バージョンを確認中..."
           }
         }
       }
@@ -3727,8 +3727,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Installing payload bundle..."
+            "state" : "translated",
+            "value" : "ペイロードバンドルをインストール中..."
           }
         }
       }
@@ -3743,8 +3743,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Loading package versions..."
+            "state" : "translated",
+            "value" : "パッケージのバージョンを読み込み中..."
           }
         }
       }
@@ -3759,8 +3759,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Removing package..."
+            "state" : "translated",
+            "value" : "パッケージを削除中..."
           }
         }
       }
@@ -3775,8 +3775,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Restoring pip packages..."
+            "state" : "translated",
+            "value" : "Pip パッケージを復元中..."
           }
         }
       }
@@ -3791,8 +3791,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Running..."
+            "state" : "translated",
+            "value" : "実行中..."
           }
         }
       }
@@ -3823,8 +3823,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Updating packages..."
+            "state" : "translated",
+            "value" : "パッケージを更新中..."
           }
         }
       }
@@ -3952,7 +3952,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "フォトライブラリにビデオをインポート"
+            "value" : "フォトライブラリに動画をインポート"
           }
         }
       }
@@ -3983,8 +3983,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Checking compatibility..."
+            "state" : "translated",
+            "value" : "互換性を確認中..."
           }
         }
       }
@@ -4016,7 +4016,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ビデオコーデックはH.264またはH.265でなければなりません。"
+            "value" : "動画コーデックはH.264またはH.265でなければなりません。"
           }
         }
       }
@@ -4080,7 +4080,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ビデオトラックが見つかりません。"
+            "value" : "動画トラックが見つかりません。"
           }
         }
       }
@@ -4143,8 +4143,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Unsupported format (%@)."
+            "state" : "translated",
+            "value" : "サポートされていないフォーマット (%@)."
           }
         }
       }
@@ -4159,8 +4159,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Unsupported image format (%@)."
+            "state" : "translated",
+            "value" : "サポートされていない画像フォーマット (%@)."
           }
         }
       }
@@ -4176,7 +4176,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "オーディオやその他のファイルは写真に保存できません。"
+            "value" : "音声やその他のファイルは写真に保存できません。"
           }
         }
       }
@@ -4464,7 +4464,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "オーディオのダウンロード完了"
+            "value" : "音声のダウンロード完了"
           }
         }
       }
@@ -4512,7 +4512,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ビデオのダウンロード完了"
+            "value" : "動画のダウンロード完了"
           }
         }
       }
@@ -4644,8 +4644,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Add one link per line to create a download queue."
+            "state" : "translated",
+            "value" : "ダウンロードキューを作成するには、1行に1つのリンクを追加してください。"
           }
         }
       }
@@ -4853,8 +4853,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Resolving quality options..."
+            "state" : "translated",
+            "value" : "画質オプションを解決中..."
           }
         }
       }
@@ -4902,8 +4902,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Quality unavailable. Choose another"
+            "state" : "translated",
+            "value" : "この画質は利用できません。別のものを選択してください。"
           }
         }
       }
@@ -5123,7 +5123,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "最終ビデオを変換する"
+            "value" : "最終動画を変換する"
           }
         }
       }
@@ -5186,8 +5186,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Remux"
+            "state" : "translated",
+            "value" : "リマックス（再多重化）"
           }
         }
       }
@@ -5202,8 +5202,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Remuxing changes the container without re-encoding, so it is faster and preserves quality. It can fail if the selected container does not support the original codecs."
+            "state" : "translated",
+            "value" : "再多重化は、再エンコードせずに容器を変更するので、より速く、品質を維持します。 選択したコンテナが元のコーデックをサポートしていない場合、失敗する可能性があります。"
           }
         }
       }
@@ -5218,8 +5218,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Applies to video downloads, including format selections. Audio-only and image downloads are unchanged. Enabled conversion overrides video container and conversion arguments. Queued downloads keep the settings chosen when added."
+            "state" : "translated",
+            "value" : "フォーマット選択を含む動画ダウンロードに適用されます。音声のみと画像のダウンロードは変更されません。 変換を有効にすると、動画コンテナと変換引数が上書きされます。キューに追加されたダウンロードは、追加時に選択された設定を維持します。"
           }
         }
       }
@@ -5234,8 +5234,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Re-encode or remux downloaded videos into another format"
+            "state" : "translated",
+            "value" : "動画を別のフォーマットにエンコードまたは再多重化する"
           }
         }
       }
@@ -5250,8 +5250,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Post Processing"
+            "state" : "translated",
+            "value" : "ポスト処理中"
           }
         }
       }
@@ -5266,8 +5266,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Off by default. Re-encoding increases CPU usage, battery use, and processing time, and may reduce quality. Videos already in the chosen format are not re-encoded."
+            "state" : "translated",
+            "value" : "デフォルトではオフです。再エンコードするとCPUの使用率、バッテリー使用率、処理時間が増加し、品質が低下する可能性があります。選択したフォーマットの動画は再エンコードされません。"
           }
         }
       }
@@ -5282,8 +5282,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Version and quick help"
+            "state" : "translated",
+            "value" : "バージョンとヘルプ"
           }
         }
       }
@@ -5298,8 +5298,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "About"
+            "state" : "translated",
+            "value" : "情報"
           }
         }
       }
@@ -5314,8 +5314,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Some installed runtime files still use a different YouTube patch mode. Review the package log and reinstall packages before downloading."
+            "state" : "translated",
+            "value" : "インストールされている一部のランタイムファイルは、まだ別のYouTubeパッチモードを使用しています。パッケージログを確認し、ダウンロードする前にパッケージを再インストールしてください。"
           }
         }
       }
@@ -5330,8 +5330,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Reinstall packages"
+            "state" : "translated",
+            "value" : "パッケージの再インストール"
           }
         }
       }
@@ -5346,8 +5346,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Reinstall the yt-dlp packages now so the installed runtime uses this setting."
+            "state" : "translated",
+            "value" : "インストールされたランタイムがこの設定を使用するように、今すぐyt-dlpパッケージを再インストールします。"
           }
         }
       }
@@ -5362,8 +5362,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Reinstall packages?"
+            "state" : "translated",
+            "value" : "パッケージを再インストールしますか？"
           }
         }
       }
@@ -5378,8 +5378,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Restart Palladium to apply the patch setting safely."
+            "state" : "translated",
+            "value" : "パッチ設定を安全に適用するには、Palladiumを再起動してください。"
           }
         }
       }
@@ -5394,8 +5394,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Runtime compatibility controls"
+            "state" : "translated",
+            "value" : "ランタイム互換コントロール"
           }
         }
       }
@@ -5410,8 +5410,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Advanced"
+            "state" : "translated",
+            "value" : "高度な設定"
           }
         }
       }
@@ -5426,8 +5426,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Patch target"
+            "state" : "translated",
+            "value" : "パッチのターゲット"
           }
         }
       }
@@ -5442,8 +5442,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "EJS scripts"
+            "state" : "translated",
+            "value" : "EJSスクリプト"
           }
         }
       }
@@ -5458,8 +5458,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Reinstall packages to apply a changed runtime patch mode."
+            "state" : "translated",
+            "value" : "変更されたランタイムパッチモードを適用するためにパッケージを再インストールします。"
           }
         }
       }
@@ -5474,8 +5474,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Disabled"
+            "state" : "translated",
+            "value" : "無効"
           }
         }
       }
@@ -5490,8 +5490,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "WebKit JSI runtime (default)"
+            "state" : "translated",
+            "value" : "WebKit JSIランタイム（デフォルト）"
           }
         }
       }
@@ -5506,8 +5506,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Choose what happens after a download finishes"
+            "state" : "translated",
+            "value" : "ダウンロードが終了した後の動作を選択してください"
           }
         }
       }
@@ -5522,8 +5522,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Theme and display mode"
+            "state" : "translated",
+            "value" : "テーマとディスプレイモード"
           }
         }
       }
@@ -5538,8 +5538,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "%lld imported cookie files"
+            "state" : "translated",
+            "value" : "%lld インポートされた Cookie ファイル"
           }
         }
       }
@@ -5554,8 +5554,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Import Netscape cookie files"
+            "state" : "translated",
+            "value" : "Netscape Cookie ファイルをインポート"
           }
         }
       }
@@ -5570,7 +5570,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Cookies"
           }
         }
@@ -5586,8 +5586,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Custom and global yt-dlp args"
+            "state" : "translated",
+            "value" : "カスタムおよびグローバル yt-dlp 引数"
           }
         }
       }
@@ -5602,8 +5602,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download Arguments"
+            "state" : "translated",
+            "value" : "引数をダウンロード"
           }
         }
       }
@@ -5618,8 +5618,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Adds a link to history when a download starts, so failed, cancelled, or interrupted downloads remain available. Link history must be enabled."
+            "state" : "translated",
+            "value" : "ダウンロードの開始時に履歴へのリンクを追加します。そのため、失敗、キャンセル、または中断されたダウンロードは引き続き利用可能です。リンク履歴を有効にする必要があります。"
           }
         }
       }
@@ -5634,8 +5634,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Save unfinished downloads to history"
+            "state" : "translated",
+            "value" : "未完了のダウンロードを履歴に保存"
           }
         }
       }
@@ -5650,8 +5650,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Retry Failed Downloads"
+            "state" : "translated",
+            "value" : "失敗したダウンロードの再試行"
           }
         }
       }
@@ -5666,8 +5666,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Paste, history, retry, and progress behavior"
+            "state" : "translated",
+            "value" : "貼り付け、履歴、再試行、進行状況の動作"
           }
         }
       }
@@ -5682,8 +5682,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download Behavior"
+            "state" : "translated",
+            "value" : "ダウンロードの挙動"
           }
         }
       }
@@ -5698,8 +5698,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Use Cookies"
+            "state" : "translated",
+            "value" : "Cookieを使用"
           }
         }
       }
@@ -5714,8 +5714,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Default Values"
+            "state" : "translated",
+            "value" : "デフォルトの値"
           }
         }
       }
@@ -5730,8 +5730,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download Playlist"
+            "state" : "translated",
+            "value" : "プレイリストのダウンロード"
           }
         }
       }
@@ -5746,8 +5746,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Restore defaults after download"
+            "state" : "translated",
+            "value" : "ダウンロード後にデフォルトに戻す"
           }
         }
       }
@@ -5762,8 +5762,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "When on, options reset to their default values after each download."
+            "state" : "translated",
+            "value" : "オンの場合、オプションはダウンロードごとにデフォルト値にリセットされます。"
           }
         }
       }
@@ -5778,8 +5778,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Reset After Download"
+            "state" : "translated",
+            "value" : "ダウンロード後にリセット"
           }
         }
       }
@@ -5794,8 +5794,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download Subtitles"
+            "state" : "translated",
+            "value" : "字幕をダウンロード"
           }
         }
       }
@@ -5810,8 +5810,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Embed Thumbnail"
+            "state" : "translated",
+            "value" : "埋め込みサムネイル"
           }
         }
       }
@@ -5826,8 +5826,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Default Download Options"
+            "state" : "translated",
+            "value" : "デフォルトのダウンロードオプション"
           }
         }
       }
@@ -5842,8 +5842,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Customize Options"
+            "state" : "translated",
+            "value" : "オプションをカスタマイズ"
           }
         }
       }
@@ -5858,8 +5858,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Drag to reorder. Turn an option off to hide it from the download pickers. At least one option must stay visible."
+            "state" : "translated",
+            "value" : "ドラッグして並べ替えます。ダウンロードピッカーから非表示にするにはオプションをオフにしてください。少なくとも1つのオプションが表示されたままにする必要があります。"
           }
         }
       }
@@ -5874,8 +5874,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Customize Options"
+            "state" : "translated",
+            "value" : "オプションをカスタマイズ"
           }
         }
       }
@@ -5890,8 +5890,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Controls the default picker on the Download tab. If remembering is off, the app starts with Video selected."
+            "state" : "translated",
+            "value" : "「ダウンロード」タブのデフォルトの選択肢を制御します。記憶機能がオフの場合、アプリの起動時は「動画」が選択された状態になります。"
           }
         }
       }
@@ -5906,8 +5906,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download Tab"
+            "state" : "translated",
+            "value" : "ダウンロードタブ"
           }
         }
       }
@@ -5922,8 +5922,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Controls the mode used when a link is sent to Palladium from another app."
+            "state" : "translated",
+            "value" : "リンクが別のアプリからPalladium に送信されるときに使用されるモードを制御します。"
           }
         }
       }
@@ -5938,8 +5938,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Default mode and visible download options"
+            "state" : "translated",
+            "value" : "デフォルトのモードと表示されるダウンロードオプション"
           }
         }
       }
@@ -5954,8 +5954,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download Modes"
+            "state" : "translated",
+            "value" : "ダウンロードモード"
           }
         }
       }
@@ -5970,8 +5970,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Modes, actions, behavior, arguments, and cookies"
+            "state" : "translated",
+            "value" : "モード、アクション、動作、引数、Cookie"
           }
         }
       }
@@ -5986,8 +5986,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download Settings"
+            "state" : "translated",
+            "value" : "ダウンロードの設定"
           }
         }
       }
@@ -6002,8 +6002,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Control what appears in Downloads"
+            "state" : "translated",
+            "value" : "ダウンロード中に表示されるものを制御する"
           }
         }
       }
@@ -6018,8 +6018,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Downloads Tab"
+            "state" : "translated",
+            "value" : "ダウンロードタブ"
           }
         }
       }
@@ -6034,8 +6034,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "General"
+            "state" : "translated",
+            "value" : "全般"
           }
         }
       }
@@ -6050,8 +6050,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Recent links and history limit"
+            "state" : "translated",
+            "value" : "最近のリンクと履歴の上限"
           }
         }
       }
@@ -6066,8 +6066,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Maintenance"
+            "state" : "translated",
+            "value" : "メンテナンス"
           }
         }
       }
@@ -6082,8 +6082,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "A notification is sent when a download finishes and the app is not active."
+            "state" : "translated",
+            "value" : "ダウンロードが終了し、アプリがアクティブでない場合に通知が送信されます。"
           }
         }
       }
@@ -6098,8 +6098,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download Notifications"
+            "state" : "translated",
+            "value" : "ダウンロード通知"
           }
         }
       }
@@ -6114,8 +6114,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Background completion alerts"
+            "state" : "translated",
+            "value" : "バックグラウンドでの完了アラート"
           }
         }
       }
@@ -6130,8 +6130,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Notifications"
+            "state" : "translated",
+            "value" : "通知"
           }
         }
       }
@@ -6146,8 +6146,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Notify when downloads finish in background"
+            "state" : "translated",
+            "value" : "ダウンロードがバックグラウンドで終了したときに通知します"
           }
         }
       }
@@ -6162,8 +6162,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Notify when download completes in background"
+            "state" : "translated",
+            "value" : "ダウンロードが完了したら通知します"
           }
         }
       }
@@ -6178,8 +6178,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Package Manager Settings"
+            "state" : "translated",
+            "value" : "パッケージマネージャーの設定"
           }
         }
       }
@@ -6194,8 +6194,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Check and update yt-dlp and pip"
+            "state" : "translated",
+            "value" : "yt-dlpとpipを確認して更新する"
           }
         }
       }
@@ -6210,8 +6210,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Updates available!"
+            "state" : "translated",
+            "value" : "アップデートがあります！"
           }
         }
       }
@@ -6226,8 +6226,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Package Manager"
+            "state" : "translated",
+            "value" : "パッケージマネージャー"
           }
         }
       }
@@ -6242,8 +6242,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Update Checks"
+            "state" : "translated",
+            "value" : "アップデートの確認"
           }
         }
       }
@@ -6258,8 +6258,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Always create a folder"
+            "state" : "translated",
+            "value" : "常にフォルダを作成"
           }
         }
       }
@@ -6274,8 +6274,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Service folders add a parent based on the source service. Subdomains and known short-link domains share one folder. Collections still use their own folder; single downloads use one only when Always create a folder is enabled."
+            "state" : "translated",
+            "value" : "サービスフォルダは、ソースサービスに基づいて親を追加します。サブドメインと既知のショートカットドメインは、1 つのフォルダを共有します。 コレクションはまだ独自のフォルダを使用します。単一のダウンロードは、常にフォルダを作成が有効になっている場合にのみ使用します。"
           }
         }
       }
@@ -6290,8 +6290,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Organize by service"
+            "state" : "translated",
+            "value" : "サービス別に整理"
           }
         }
       }
@@ -6306,8 +6306,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Saved downloads"
+            "state" : "translated",
+            "value" : "保存済みのダウンロード"
           }
         }
       }
@@ -6322,8 +6322,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Menus"
+            "state" : "translated",
+            "value" : "メニュー"
           }
         }
       }
@@ -6338,8 +6338,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Search Settings"
+            "state" : "translated",
+            "value" : "検索の設定"
           }
         }
       }
@@ -6354,8 +6354,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "These buttons appear when Share Sheet Mode is set to Ask."
+            "state" : "translated",
+            "value" : "共有シートモードが「確認」に設定されている場合、これらのボタンが表示されます。"
           }
         }
       }
@@ -6370,8 +6370,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Ask Picker Buttons"
+            "state" : "translated",
+            "value" : "ピッカーボタンを確認する"
           }
         }
       }
@@ -6386,8 +6386,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Incoming Links"
+            "state" : "translated",
+            "value" : "受信リンク"
           }
         }
       }
@@ -6402,8 +6402,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Show Fill URL"
+            "state" : "translated",
+            "value" : "入力用URLを表示"
           }
         }
       }
@@ -6418,8 +6418,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Show Choose Format"
+            "state" : "translated",
+            "value" : "選択フォーマットを表示"
           }
         }
       }
@@ -6434,8 +6434,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Incoming link behavior and picker buttons"
+            "state" : "translated",
+            "value" : "受信リンクの動作とピッカーボタン"
           }
         }
       }
@@ -6450,8 +6450,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Share Sheet"
+            "state" : "translated",
+            "value" : "共有シート"
           }
         }
       }
@@ -6466,8 +6466,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "The cache stores yt-dlp metadata and web assets. Clearing it may make the next run a little slower."
+            "state" : "translated",
+            "value" : "キャッシュには、yt-dlpメタデータとWebアセットが保存されます。クリアすると、次の実行が少し遅くなる可能性があります。"
           }
         }
       }
@@ -6482,7 +6482,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "yt-dlp Cache"
           }
         }
@@ -6498,8 +6498,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Storage actions are disabled while a download or package task is running."
+            "state" : "translated",
+            "value" : "ダウンロードまたはパッケージタスクの実行中にストレージアクションが無効になります。"
           }
         }
       }
@@ -6514,8 +6514,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "This only affects Palladium's temporary download folder. Use it to remove stale run folders without touching Saved Files."
+            "state" : "translated",
+            "value" : "これはPalladiumの一時的なダウンロードフォルダにのみ影響します。保存されたファイルに触れずに古い実行フォルダを削除するために使用します。"
           }
         }
       }
@@ -6530,8 +6530,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Temporary Downloads"
+            "state" : "translated",
+            "value" : "一時ダウンロード"
           }
         }
       }
@@ -6546,8 +6546,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Temporary Downloads stores active and recent run folders. Saved Files keeps copies made with Save to App Folder."
+            "state" : "translated",
+            "value" : "「Temporary Downloads」には、実行中および最近完了したダウンロードのフォルダが保存されます。「Saved Files」には、「Save to App Folder」機能で保存したファイルのコピーが保存されます。"
           }
         }
       }
@@ -6562,8 +6562,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Overview"
+            "state" : "translated",
+            "value" : "概要"
           }
         }
       }
@@ -6578,8 +6578,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Refresh Usage"
+            "state" : "translated",
+            "value" : "使用状況を更新"
           }
         }
       }
@@ -6594,8 +6594,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Saved Files contains downloads you explicitly kept. Clearing this section removes those copies from Palladium storage."
+            "state" : "translated",
+            "value" : "保存されたファイルには、明示的に保存したダウンロードが含まれています。このセクションをクリアすると、Palladiumストレージからそれらのコピーが削除されます。"
           }
         }
       }
@@ -6610,8 +6610,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Saved Files"
+            "state" : "translated",
+            "value" : "保存されたファイル"
           }
         }
       }
@@ -6626,8 +6626,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Storage"
+            "state" : "translated",
+            "value" : "ストレージ"
           }
         }
       }
@@ -6642,8 +6642,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "%@ across temp, saved, and cache"
+            "state" : "translated",
+            "value" : "%@（一時保存・保存済み・キャッシュの合計）"
           }
         }
       }
@@ -6658,8 +6658,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download Storage"
+            "state" : "translated",
+            "value" : "ダウンロードストレージ"
           }
         }
       }
@@ -6674,8 +6674,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Total"
+            "state" : "translated",
+            "value" : "合計"
           }
         }
       }
@@ -6690,8 +6690,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Ask shows the same action picker after each successful download. Other options run automatically."
+            "state" : "translated",
+            "value" : "「Ask」は、ダウンロードが成功するたびに同じアクションピッカーを表示します。その他のオプションは自動的に実行されます。"
           }
         }
       }
@@ -6706,8 +6706,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "After download"
+            "state" : "translated",
+            "value" : "ダウンロード後"
           }
         }
       }
@@ -6722,8 +6722,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "After Download"
+            "state" : "translated",
+            "value" : "ダウンロード後"
           }
         }
       }
@@ -6738,8 +6738,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "System uses the phone setting by default."
+            "state" : "translated",
+            "value" : "システムはデフォルトで電話設定を使用します。"
           }
         }
       }
@@ -6754,8 +6754,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "App theme"
+            "state" : "translated",
+            "value" : "アプリのテーマ"
           }
         }
       }
@@ -6770,8 +6770,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Appearance"
+            "state" : "translated",
+            "value" : "外観"
           }
         }
       }
@@ -6786,8 +6786,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "When enabled, Palladium keeps completed downloads in Palladium/Temp and shows them in the Downloads tab. Saving to Saved Files copies them without removing the temporary originals."
+            "state" : "translated",
+            "value" : "有効にすると、Palladiumは完了したダウンロードをPalladium/Tempフォルダに保持し、ダウンロードタブに表示します。Saved Filesへの保存は、一時保存されたオリジナルファイルを削除せずにコピーします。"
           }
         }
       }
@@ -6802,8 +6802,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Downloads Tab"
+            "state" : "translated",
+            "value" : "ダウンロードタブ"
           }
         }
       }
@@ -6818,8 +6818,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Show temporary downloads"
+            "state" : "translated",
+            "value" : "一時ダウンロードを表示"
           }
         }
       }
@@ -6834,8 +6834,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Enable link history"
+            "state" : "translated",
+            "value" : "リンク履歴を有効化"
           }
         }
       }
@@ -6850,8 +6850,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Stores recent links with mode and title. Set it from 0 to 50."
+            "state" : "translated",
+            "value" : "最近のリンクをモードとタイトルで保存します。0から50に設定してください。"
           }
         }
       }
@@ -6866,8 +6866,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Hide history count"
+            "state" : "translated",
+            "value" : "履歴数を非表示"
           }
         }
       }
@@ -6882,8 +6882,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Links to keep"
+            "state" : "translated",
+            "value" : "保持するためのリンク"
           }
         }
       }
@@ -6898,8 +6898,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "History"
+            "state" : "translated",
+            "value" : "履歴"
           }
         }
       }
@@ -6914,8 +6914,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Normal download mode matches the main picker on the Download tab. If memory is off, it resets to Video when the app launches."
+            "state" : "translated",
+            "value" : "通常のダウンロードモードは、ダウンロードタブのメインピッカーと一致します。メモリがオフの場合、アプリが起動するとビデオにリセットされます。"
           }
         }
       }
@@ -6930,8 +6930,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Normal download mode"
+            "state" : "translated",
+            "value" : "通常のダウンロードモード"
           }
         }
       }
@@ -6946,8 +6946,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Remember picker options"
+            "state" : "translated",
+            "value" : "ピッカーオプションを保存"
           }
         }
       }
@@ -6962,8 +6962,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download Modes"
+            "state" : "translated",
+            "value" : "ダウンロードモード"
           }
         }
       }
@@ -6978,8 +6978,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Share sheet mode"
+            "state" : "translated",
+            "value" : "シートモードを共有"
           }
         }
       }
@@ -6994,8 +6994,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Check for package updates on launch"
+            "state" : "translated",
+            "value" : "起動時にパッケージのアップデートを確認"
           }
         }
       }
@@ -7010,8 +7010,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Automatically checks for yt-dlp and pip updates when the app opens."
+            "state" : "translated",
+            "value" : "アプリが開いたら自動的に yt-dlp と pip のアップデートをチェックします。"
           }
         }
       }
@@ -7026,8 +7026,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Automatically install package updates"
+            "state" : "translated",
+            "value" : "パッケージのアップデートを自動的にインストールする"
           }
         }
       }
@@ -7042,8 +7042,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Installs available package updates after the launch-time check completes."
+            "state" : "translated",
+            "value" : "起動時のチェックが完了した後に利用可能なパッケージのアップデートをインストールします。"
           }
         }
       }
@@ -7058,8 +7058,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Auto download on paste"
+            "state" : "translated",
+            "value" : "貼り付け時に自動ダウンロード"
           }
         }
       }
@@ -7074,8 +7074,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Starts download immediately after pasting a URL from the Download tab."
+            "state" : "translated",
+            "value" : "ダウンロードタブからURLを貼り付けた直後にダウンロードを開始します。"
           }
         }
       }
@@ -7090,8 +7090,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Paste"
+            "state" : "translated",
+            "value" : "貼り付け"
           }
         }
       }
@@ -7106,8 +7106,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Shows most live yt-dlp, Palladium, and downloader log lines in the main progress label while a download is running."
+            "state" : "translated",
+            "value" : "ダウンロードが実行されている間、ほとんどのyt-dlp、Palladium、およびダウンローダーのログ行をメインの進行ラベルに表示します。"
           }
         }
       }
@@ -7122,8 +7122,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Progress"
+            "state" : "translated",
+            "value" : "進捗状況"
           }
         }
       }
@@ -7138,8 +7138,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Show verbose progress lines"
+            "state" : "translated",
+            "value" : "詳細な進行行を表示"
           }
         }
       }
@@ -7154,8 +7154,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Automatically retries playlist items that fail because of thumbnail download or thumbnail embedding by rerunning them once without thumbnail options."
+            "state" : "translated",
+            "value" : "サムネイルのダウンロードやサムネイル埋め込みで失敗したプレイリストの項目を、サムネイルオプションなしで一度再起動すると自動的に再試行します。"
           }
         }
       }
@@ -7170,8 +7170,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Automatically retry failed downloads"
+            "state" : "translated",
+            "value" : "自動的に失敗したダウンロードを再試行する"
           }
         }
       }
@@ -7186,8 +7186,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download behavior and share sheet flow"
+            "state" : "translated",
+            "value" : "動作をダウンロードしてシートフローを共有"
           }
         }
       }
@@ -7202,8 +7202,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "User Interface"
+            "state" : "translated",
+            "value" : "ユーザーインターフェイス"
           }
         }
       }
@@ -7218,8 +7218,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "What to Download"
+            "state" : "translated",
+            "value" : "ダウンロードするもの"
           }
         }
       }
@@ -7234,8 +7234,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Another download or package task is already running. Palladium filled in the shortcut URL, but you need to start it again after the current task finishes."
+            "state" : "translated",
+            "value" : "別のダウンロードまたはパッケージタスクが既に実行されています。 ショートカットURLに記入されたPalladium ですが、現在のタスクが完了した後に再度起動する必要があります。"
           }
         }
       }
@@ -7250,8 +7250,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "What to Download"
+            "state" : "translated",
+            "value" : "ダウンロードするもの"
           }
         }
       }
@@ -7266,8 +7266,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Where to Save"
+            "state" : "translated",
+            "value" : "保存先"
           }
         }
       }
@@ -7282,7 +7282,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "URL"
           }
         }
@@ -7298,8 +7298,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Where to Save"
+            "state" : "translated",
+            "value" : "保存先"
           }
         }
       }
@@ -7314,8 +7314,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Open Palladium and start a download with the selected preset and save destination."
+            "state" : "translated",
+            "value" : "Palladium を開き、選択したプリセットでダウンロードを開始し、保存先を保存します。"
           }
         }
       }
@@ -7330,8 +7330,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Opening Palladium to start the download."
+            "state" : "translated",
+            "value" : "Palladium を開いてダウンロードを開始します。"
           }
         }
       }
@@ -7346,8 +7346,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Start Download"
+            "state" : "translated",
+            "value" : "ダウンロードを開始"
           }
         }
       }
@@ -7362,8 +7362,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Shortcut URL loaded into Palladium."
+            "state" : "translated",
+            "value" : "Palladiumに読み込まれたショートカットURL。"
           }
         }
       }
@@ -7378,8 +7378,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Clear cache"
+            "state" : "translated",
+            "value" : "キャッシュをクリア"
           }
         }
       }
@@ -7394,8 +7394,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Clear download folder"
+            "state" : "translated",
+            "value" : "ダウンロードフォルダをクリア"
           }
         }
       }
@@ -7410,8 +7410,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Clear saved folder"
+            "state" : "translated",
+            "value" : "保存済みフォルダをクリア"
           }
         }
       }
@@ -7426,8 +7426,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "This removes everything in Palladium/Documents/Temp, including old run folders."
+            "state" : "translated",
+            "value" : "これは古いランフォルダを含むPalladium/Documents/Tempのすべてを削除します。"
           }
         }
       }
@@ -7442,8 +7442,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Clear the temporary download folder?"
+            "state" : "translated",
+            "value" : "一時的なダウンロードフォルダをクリアしますか？"
           }
         }
       }
@@ -7458,8 +7458,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "This removes everything in Palladium/Documents/Saved."
+            "state" : "translated",
+            "value" : "これは、Palladium/Documents/Savedのすべてを削除します。"
           }
         }
       }
@@ -7474,8 +7474,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Clear the saved folder?"
+            "state" : "translated",
+            "value" : "保存したフォルダをクリアしますか？"
           }
         }
       }
@@ -7490,8 +7490,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Failed to clear cache: %@"
+            "state" : "translated",
+            "value" : "キャッシュのクリアに失敗しました: %@"
           }
         }
       }
@@ -7506,8 +7506,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Failed to clear download folder: %@"
+            "state" : "translated",
+            "value" : "ダウンロードフォルダのクリアに失敗しました: %@"
           }
         }
       }
@@ -7522,8 +7522,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Failed to clear saved folder: %@"
+            "state" : "translated",
+            "value" : "保存したフォルダのクリアに失敗しました: %@"
           }
         }
       }
@@ -7538,8 +7538,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Failed to remove old cache files: %@"
+            "state" : "translated",
+            "value" : "古いキャッシュファイルの削除に失敗しました: %@"
           }
         }
       }
@@ -7554,8 +7554,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Failed to remove old downloads: %@"
+            "state" : "translated",
+            "value" : "古いダウンロードの削除に失敗しました: %@"
           }
         }
       }
@@ -7570,8 +7570,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Failed to remove old saved files: %@"
+            "state" : "translated",
+            "value" : "古い保存されたファイルの削除に失敗しました: %@"
           }
         }
       }
@@ -7586,8 +7586,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Failed to refresh storage summary: %@"
+            "state" : "translated",
+            "value" : "ストレージの概要を更新できませんでした: %@"
           }
         }
       }
@@ -7602,8 +7602,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "%lld items"
+            "state" : "translated",
+            "value" : "%lld 件のアイテム"
           }
         }
       }
@@ -7618,8 +7618,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "1 item"
+            "state" : "translated",
+            "value" : "1つのアイテム"
           }
         }
       }
@@ -7634,7 +7634,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Library/Caches/yt-dlp"
           }
         }
@@ -7650,7 +7650,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Documents/Saved"
           }
         }
@@ -7666,7 +7666,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Documents/Temp"
           }
         }
@@ -7682,8 +7682,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "1 day"
+            "state" : "translated",
+            "value" : "1日"
           }
         }
       }
@@ -7698,8 +7698,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "7 days"
+            "state" : "translated",
+            "value" : "7 日間"
           }
         }
       }
@@ -7714,8 +7714,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "30 days"
+            "state" : "translated",
+            "value" : "30 日間"
           }
         }
       }
@@ -7730,8 +7730,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "90 days"
+            "state" : "translated",
+            "value" : "90 日間"
           }
         }
       }
@@ -7746,8 +7746,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Remove older than"
+            "state" : "translated",
+            "value" : "古いものを削除する"
           }
         }
       }
@@ -7762,8 +7762,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Cleared cache"
+            "state" : "translated",
+            "value" : "キャッシュをクリアしました"
           }
         }
       }
@@ -7778,8 +7778,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Cache already empty"
+            "state" : "translated",
+            "value" : "キャッシュはすでに空です"
           }
         }
       }
@@ -7794,8 +7794,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Cleared download folder"
+            "state" : "translated",
+            "value" : "ダウンロードフォルダをクリアしました"
           }
         }
       }
@@ -7810,8 +7810,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download folder already empty"
+            "state" : "translated",
+            "value" : "ダウンロードフォルダはすでに空です"
           }
         }
       }
@@ -7826,8 +7826,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Nothing to remove"
+            "state" : "translated",
+            "value" : "削除するものがありません"
           }
         }
       }
@@ -7842,8 +7842,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Removed %lld old item(s)"
+            "state" : "translated",
+            "value" : "%lld 件の古いアイテムを削除しました"
           }
         }
       }
@@ -7858,8 +7858,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Cleared saved folder"
+            "state" : "translated",
+            "value" : "保存フォルダを消去しました"
           }
         }
       }
@@ -7874,8 +7874,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Saved folder already empty"
+            "state" : "translated",
+            "value" : "ダウンロードフォルダはすでに空です"
           }
         }
       }
@@ -7890,8 +7890,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "All Available"
+            "state" : "translated",
+            "value" : "すべて利用可能"
           }
         }
       }
@@ -7906,7 +7906,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Arabic"
           }
         }
@@ -7922,7 +7922,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Chinese"
           }
         }
@@ -7938,7 +7938,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "English"
           }
         }
@@ -7954,7 +7954,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "French"
           }
         }
@@ -7970,7 +7970,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "German"
           }
         }
@@ -7986,7 +7986,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Italian"
           }
         }
@@ -8002,7 +8002,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Japanese"
           }
         }
@@ -8018,7 +8018,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Korean"
           }
         }
@@ -8034,7 +8034,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Portuguese"
           }
         }
@@ -8050,7 +8050,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Russian"
           }
         }
@@ -8066,7 +8066,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Spanish"
           }
         }
@@ -8082,8 +8082,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Console"
+            "state" : "translated",
+            "value" : "コンソール"
           }
         }
       }
@@ -8098,8 +8098,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download"
+            "state" : "translated",
+            "value" : "ダウンロード"
           }
         }
       }
@@ -8114,8 +8114,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Downloads"
+            "state" : "translated",
+            "value" : "ダウンロード"
           }
         }
       }
@@ -8130,8 +8130,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Settings"
+            "state" : "translated",
+            "value" : "設定"
           }
         }
       }
@@ -8141,8 +8141,8 @@
       "localizations" : {
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Video"
+            "state" : "translated",
+            "value" : "動画"
           }
         }
       }
