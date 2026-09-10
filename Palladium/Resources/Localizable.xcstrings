@@ -832,8 +832,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Imported cookie file: %@"
+            "state" : "translated",
+            "value" : "インポートされた Cookie ファイル: %@"
           }
         }
       }
@@ -848,8 +848,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Renamed cookie file: %@"
+            "state" : "translated",
+            "value" : "名前が変更されたクッキーファイル: %@"
           }
         }
       }
@@ -864,8 +864,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Sign in, then tap Import to save this private browser session as a Netscape cookie file."
+            "state" : "translated",
+            "value" : "サインインし、「インポート」をタップして、このプライベートブラウザーのセッションをNetscape cookie ファイルとして保存します。"
           }
         }
       }
@@ -880,8 +880,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Website Login"
+            "state" : "translated",
+            "value" : "ウェブサイトのログイン"
           }
         }
       }
@@ -896,8 +896,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Import from Website"
+            "state" : "translated",
+            "value" : "ウェブサイトからのインポート"
           }
         }
       }
@@ -912,8 +912,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Import"
+            "state" : "translated",
+            "value" : "インポート"
           }
         }
       }
@@ -928,8 +928,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Open Login Page"
+            "state" : "translated",
+            "value" : "ログインページを開く"
           }
         }
       }
@@ -944,8 +944,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "The login opens in a private browser session. Palladium saves its cookies only when you tap Import."
+            "state" : "translated",
+            "value" : "ログイン画面はプライベートブラウザセッションで開きます。Palladiumは、「インポート」をタップしたときにのみ、Cookieを保存します。"
           }
         }
       }
@@ -960,8 +960,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Enter the website where you want to sign in."
+            "state" : "translated",
+            "value" : "サインインするウェブサイトを入力してください。"
           }
         }
       }
@@ -976,7 +976,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "example.com"
           }
         }
@@ -992,8 +992,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Import Website Cookies"
+            "state" : "translated",
+            "value" : "ウェブサイトCookieをインポート"
           }
         }
       }
@@ -1003,8 +1003,8 @@
       "localizations" : {
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Deselect All"
+            "state" : "translated",
+            "value" : "全て選択解除"
           }
         }
       }
@@ -1014,8 +1014,8 @@
       "localizations" : {
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download Quality"
+            "state" : "translated",
+            "value" : "ダウンロード品質"
           }
         }
       }
@@ -1030,8 +1030,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Used only when Preset is Custom."
+            "state" : "translated",
+            "value" : "プリセットがカスタムの場合にのみ使用します。"
           }
         }
       }
@@ -1046,8 +1046,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Custom Preset Args"
+            "state" : "translated",
+            "value" : "カスタムプリセット引数"
           }
         }
       }
@@ -1062,7 +1062,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "mp3"
           }
         }
@@ -1078,7 +1078,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "mp4"
           }
         }
@@ -1094,8 +1094,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "mute"
+            "state" : "translated",
+            "value" : "ミュート"
           }
         }
       }
@@ -1110,8 +1110,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Examples"
+            "state" : "translated",
+            "value" : "例"
           }
         }
       }
@@ -1222,8 +1222,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "download"
+            "state" : "translated",
+            "value" : "ダウンロード"
           }
         }
       }
@@ -1238,8 +1238,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Audio"
+            "state" : "translated",
+            "value" : "オーディオ"
           }
         }
       }
@@ -1542,8 +1542,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Audio Only"
+            "state" : "translated",
+            "value" : "オーディオのみ"
           }
         }
       }
@@ -1702,7 +1702,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Cookies"
           }
         }
@@ -1750,8 +1750,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Playlist"
+            "state" : "translated",
+            "value" : "プレイリスト"
           }
         }
       }
@@ -2070,8 +2070,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Total"
+            "state" : "translated",
+            "value" : "トータル"
           }
         }
       }
@@ -2086,8 +2086,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Audio"
+            "state" : "translated",
+            "value" : "オーディオ"
           }
         }
       }
@@ -2102,8 +2102,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Gallery"
+            "state" : "translated",
+            "value" : "ギャラリー"
           }
         }
       }
@@ -2118,8 +2118,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Mute"
+            "state" : "translated",
+            "value" : "ミュート"
           }
         }
       }
@@ -2150,8 +2150,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Video"
+            "state" : "translated",
+            "value" : "ビデオ"
           }
         }
       }
@@ -2756,8 +2756,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Options"
+            "state" : "translated",
+            "value" : "オプション"
           }
         }
       }
