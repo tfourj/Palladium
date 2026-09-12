@@ -65,7 +65,7 @@ private struct CookieWebsiteURLView: View {
                 }
             }
         }
-        .alert(String(localized: "common.result"), isPresented: Binding(
+        .alert(String(localized: "common.result", bundle: .app), isPresented: Binding(
             get: { errorMessage != nil },
             set: { isPresented in
                 if !isPresented {
@@ -73,7 +73,7 @@ private struct CookieWebsiteURLView: View {
                 }
             }
         )) {
-            Button(String(localized: "common.ok"), role: .cancel) {
+            Button(String(localized: "common.ok", bundle: .app), role: .cancel) {
                 errorMessage = nil
             }
         } message: {
@@ -86,7 +86,7 @@ private struct CookieWebsiteURLView: View {
 
     private func openWebsite() {
         guard let sourceURL = normalizedWebsiteURL(from: urlText) else {
-            errorMessage = String(localized: "cookies.error.invalid_url")
+            errorMessage = String(localized: "cookies.error.invalid_url", bundle: .app)
             return
         }
         isURLFieldFocused = false
@@ -154,7 +154,7 @@ private struct CookieLoginBrowserView: View {
                         .disabled(isImporting)
                 }
             }
-            .alert(String(localized: "common.result"), isPresented: Binding(
+            .alert(String(localized: "common.result", bundle: .app), isPresented: Binding(
                 get: { errorMessage != nil },
                 set: { isPresented in
                     if !isPresented {
@@ -162,7 +162,7 @@ private struct CookieLoginBrowserView: View {
                     }
                 }
             )) {
-                Button(String(localized: "common.ok"), role: .cancel) {
+                Button(String(localized: "common.ok", bundle: .app), role: .cancel) {
                     errorMessage = nil
                 }
             } message: {

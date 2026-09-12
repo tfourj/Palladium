@@ -79,8 +79,8 @@ enum VideoDownloadAudioPreset: String, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .bestCompatible:
-            return String(localized: "download.quality.video.audio_preset.best_compatible")
-        case .bestQuality: return String(localized: "download.quality.video.audio_preset.best_quality")
+            return String(localized: "download.quality.video.audio_preset.best_compatible", bundle: .app)
+        case .bestQuality: return String(localized: "download.quality.video.audio_preset.best_quality", bundle: .app)
         }
     }
     var sortPreference: String? {
@@ -145,9 +145,9 @@ enum QueuedQualitySelectionMode: String, Codable, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .pickMaxQuality:
-            return String(localized: "download.quality.queued.mode.pick_max")
+            return String(localized: "download.quality.queued.mode.pick_max", bundle: .app)
         case .choosePerLink:
-            return String(localized: "download.quality.queued.mode.per_link")
+            return String(localized: "download.quality.queued.mode.per_link", bundle: .app)
         }
     }
 }
@@ -264,11 +264,11 @@ enum DownloadPreset: String, Codable, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .autoVideo: return String(localized: "download.preset.video")
-        case .mute: return String(localized: "download.preset.mute")
-        case .audio: return String(localized: "download.preset.audio")
-        case .images: return String(localized: "download.preset.images")
-        case .custom: return String(localized: "common.custom")
+        case .autoVideo: return String(localized: "download.preset.video", bundle: .app)
+        case .mute: return String(localized: "download.preset.mute", bundle: .app)
+        case .audio: return String(localized: "download.preset.audio", bundle: .app)
+        case .images: return String(localized: "download.preset.images", bundle: .app)
+        case .custom: return String(localized: "common.custom", bundle: .app)
         }
     }
 
@@ -316,9 +316,9 @@ enum PostDownloadAction: String, Codable, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .saveToPhotos: return String(localized: "photos.action.save")
-        case .openShareSheet: return String(localized: "post_download.action.share.title")
-        case .saveToApplicationFolder: return String(localized: "post_download.action.save_folder.title")
+        case .saveToPhotos: return String(localized: "photos.action.save", bundle: .app)
+        case .openShareSheet: return String(localized: "post_download.action.share.title", bundle: .app)
+        case .saveToApplicationFolder: return String(localized: "post_download.action.save_folder.title", bundle: .app)
         }
     }
 
@@ -341,10 +341,10 @@ enum AfterDownloadBehavior: String, Codable, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .ask: return String(localized: "common.ask")
-        case .openShareSheet: return String(localized: "post_download.action.share.title")
-        case .saveToPhotos: return String(localized: "photos.action.save")
-        case .saveToApplicationFolder: return String(localized: "post_download.action.save_folder.title")
+        case .ask: return String(localized: "common.ask", bundle: .app)
+        case .openShareSheet: return String(localized: "post_download.action.share.title", bundle: .app)
+        case .saveToPhotos: return String(localized: "photos.action.save", bundle: .app)
+        case .saveToApplicationFolder: return String(localized: "post_download.action.save_folder.title", bundle: .app)
         }
     }
 
@@ -383,12 +383,12 @@ enum ShareSheetDownloadMode: String, Codable, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .ask: return String(localized: "common.ask")
-        case .autoVideo: return String(localized: "download.preset.video")
-        case .audio: return String(localized: "download.preset.audio")
-        case .mute: return String(localized: "download.preset.mute")
-        case .custom: return String(localized: "common.custom")
-        case .images: return String(localized: "download.preset.images")
+        case .ask: return String(localized: "common.ask", bundle: .app)
+        case .autoVideo: return String(localized: "download.preset.video", bundle: .app)
+        case .audio: return String(localized: "download.preset.audio", bundle: .app)
+        case .mute: return String(localized: "download.preset.mute", bundle: .app)
+        case .custom: return String(localized: "common.custom", bundle: .app)
+        case .images: return String(localized: "download.preset.images", bundle: .app)
         }
     }
 
@@ -430,31 +430,31 @@ enum SubtitleLanguageOption: String, Codable, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .english:
-            return String(localized: "subtitle.language.english")
+            return String(localized: "subtitle.language.english", bundle: .app)
         case .spanish:
-            return String(localized: "subtitle.language.spanish")
+            return String(localized: "subtitle.language.spanish", bundle: .app)
         case .french:
-            return String(localized: "subtitle.language.french")
+            return String(localized: "subtitle.language.french", bundle: .app)
         case .german:
-            return String(localized: "subtitle.language.german")
+            return String(localized: "subtitle.language.german", bundle: .app)
         case .italian:
-            return String(localized: "subtitle.language.italian")
+            return String(localized: "subtitle.language.italian", bundle: .app)
         case .portuguese:
-            return String(localized: "subtitle.language.portuguese")
+            return String(localized: "subtitle.language.portuguese", bundle: .app)
         case .japanese:
-            return String(localized: "subtitle.language.japanese")
+            return String(localized: "subtitle.language.japanese", bundle: .app)
         case .korean:
-            return String(localized: "subtitle.language.korean")
+            return String(localized: "subtitle.language.korean", bundle: .app)
         case .chinese:
-            return String(localized: "subtitle.language.chinese")
+            return String(localized: "subtitle.language.chinese", bundle: .app)
         case .arabic:
-            return String(localized: "subtitle.language.arabic")
+            return String(localized: "subtitle.language.arabic", bundle: .app)
         case .russian:
-            return String(localized: "subtitle.language.russian")
+            return String(localized: "subtitle.language.russian", bundle: .app)
         case .custom:
-            return String(localized: "common.custom")
+            return String(localized: "common.custom", bundle: .app)
         case .allAvailable:
-            return String(localized: "subtitle.language.all")
+            return String(localized: "subtitle.language.all", bundle: .app)
         }
     }
 

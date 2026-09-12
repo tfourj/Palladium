@@ -18,13 +18,13 @@ struct SavedDownloadsTabView: View {
             Group {
                 if let loadError {
                     ContentUnavailableView(
-                        String(localized: "downloads.error.title"),
+                        String(localized: "downloads.error.title", bundle: .app),
                         systemImage: "exclamationmark.triangle",
                         description: Text(loadError)
                     )
                 } else if items.isEmpty {
                     ContentUnavailableView(
-                        String(localized: "downloads.empty.title"),
+                        String(localized: "downloads.empty.title", bundle: .app),
                         systemImage: "tray",
                         description: Text("downloads.empty.message")
                     )
@@ -149,13 +149,13 @@ private struct SavedDownloadsFolderView: View {
         Group {
             if let loadError {
                 ContentUnavailableView(
-                    String(localized: "downloads.error.title"),
+                    String(localized: "downloads.error.title", bundle: .app),
                     systemImage: "exclamationmark.triangle",
                     description: Text(loadError)
                 )
             } else if items.isEmpty {
                 ContentUnavailableView(
-                    String(localized: "downloads.folder.empty.title"),
+                    String(localized: "downloads.folder.empty.title", bundle: .app),
                     systemImage: "folder",
                     description: Text("downloads.folder.empty.message")
                 )
@@ -449,7 +449,7 @@ struct SavedDownloadItem: Identifiable, Hashable {
         case .folder(let mediaCount):
             return [
                 locationTitle,
-                String(format: String(localized: "downloads.folder.count"), mediaCount)
+                String(format: String(localized: "downloads.folder.count", bundle: .app), mediaCount)
             ].joined(separator: " • ")
         case .video, .audio, .image:
             var parts: [String] = [locationTitle, mediaTypeTitle]
@@ -466,22 +466,22 @@ struct SavedDownloadItem: Identifiable, Hashable {
     var locationTitle: String {
         switch location {
         case .saved:
-            return String(localized: "downloads.location.saved")
+            return String(localized: "downloads.location.saved", bundle: .app)
         case .temporary:
-            return String(localized: "downloads.location.temporary")
+            return String(localized: "downloads.location.temporary", bundle: .app)
         }
     }
 
     var mediaTypeTitle: String {
         switch kind {
         case .folder:
-            return String(localized: "downloads.type.folder")
+            return String(localized: "downloads.type.folder", bundle: .app)
         case .video:
-            return String(localized: "downloads.type.video")
+            return String(localized: "downloads.type.video", bundle: .app)
         case .audio:
-            return String(localized: "downloads.type.audio")
+            return String(localized: "downloads.type.audio", bundle: .app)
         case .image:
-            return String(localized: "downloads.type.image")
+            return String(localized: "downloads.type.image", bundle: .app)
         }
     }
 

@@ -8,8 +8,8 @@ enum VideoPostProcessingMethod: String, Codable, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .recode: return String(localized: "settings.post_processing.recode")
-        case .remux: return String(localized: "settings.post_processing.remux")
+        case .recode: return String(localized: "settings.post_processing.recode", bundle: .app)
+        case .remux: return String(localized: "settings.post_processing.remux", bundle: .app)
         }
     }
 }

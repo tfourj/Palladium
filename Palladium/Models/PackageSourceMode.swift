@@ -38,11 +38,11 @@ enum PackageSourceMode: String, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .stable:
-            return String(localized: "packages.source.stable")
+            return String(localized: "packages.source.stable", bundle: .app)
         case .nightly:
-            return String(localized: "packages.source.nightly")
+            return String(localized: "packages.source.nightly", bundle: .app)
         case .custom:
-            return String(localized: "packages.source.custom")
+            return String(localized: "packages.source.custom", bundle: .app)
         }
     }
 }

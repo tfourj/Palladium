@@ -10,11 +10,11 @@ enum YouTubePatchMode: String, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .webkit:
-            return String(localized: "settings.advanced.youtube_patch_mode.webkit")
+            return String(localized: "settings.advanced.youtube_patch_mode.webkit", bundle: .app)
         case .ejs:
-            return String(localized: "settings.advanced.youtube_patch_mode.ejs")
+            return String(localized: "settings.advanced.youtube_patch_mode.ejs", bundle: .app)
         case .off:
-            return String(localized: "settings.advanced.youtube_patch_mode.off")
+            return String(localized: "settings.advanced.youtube_patch_mode.off", bundle: .app)
         }
     }
 }

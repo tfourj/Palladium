@@ -19,7 +19,7 @@ struct StorageSettingsView: View {
         Form {
             Section {
                 summaryRow(
-                    title: String(localized: "settings.storage.downloads.title"),
+                    title: String(localized: "settings.storage.downloads.title", bundle: .app),
                     subtitle: summary.downloads.locationLabel,
                     systemImage: "tray.full.fill",
                     accentColor: .blue,
@@ -27,7 +27,7 @@ struct StorageSettingsView: View {
                 )
 
                 summaryRow(
-                    title: String(localized: "settings.storage.saved.title"),
+                    title: String(localized: "settings.storage.saved.title", bundle: .app),
                     subtitle: summary.saved.locationLabel,
                     systemImage: "folder.fill",
                     accentColor: .green,
@@ -35,7 +35,7 @@ struct StorageSettingsView: View {
                 )
 
                 summaryRow(
-                    title: String(localized: "settings.storage.cache.title"),
+                    title: String(localized: "settings.storage.cache.title", bundle: .app),
                     subtitle: summary.cache.locationLabel,
                     systemImage: "internaldrive.fill",
                     accentColor: .orange,
@@ -183,9 +183,9 @@ struct StorageManagementSummary {
     let cache: StorageLocationSummary
 
     static let empty = StorageManagementSummary(
-        downloads: .empty(locationLabel: String(localized: "storage.path.temp")),
-        saved: .empty(locationLabel: String(localized: "storage.path.saved")),
-        cache: .empty(locationLabel: String(localized: "storage.path.cache"))
+        downloads: .empty(locationLabel: String(localized: "storage.path.temp", bundle: .app)),
+        saved: .empty(locationLabel: String(localized: "storage.path.saved", bundle: .app)),
+        cache: .empty(locationLabel: String(localized: "storage.path.cache", bundle: .app))
     )
 
     var totalBytes: Int64 {
@@ -221,9 +221,9 @@ struct StorageLocationSummary {
 
     var itemDescription: String {
         if itemCount == 1 {
-            return String(localized: "storage.items.one")
+            return String(localized: "storage.items.one", bundle: .app)
         }
-        return String(format: String(localized: "storage.items.many"), itemCount)
+        return String(format: String(localized: "storage.items.many", bundle: .app), itemCount)
     }
 }
 
@@ -238,13 +238,13 @@ enum StoragePruneWindow: String, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .oneDay:
-            return String(localized: "storage.prune.day_1")
+            return String(localized: "storage.prune.day_1", bundle: .app)
         case .sevenDays:
-            return String(localized: "storage.prune.day_7")
+            return String(localized: "storage.prune.day_7", bundle: .app)
         case .thirtyDays:
-            return String(localized: "storage.prune.day_30")
+            return String(localized: "storage.prune.day_30", bundle: .app)
         case .ninetyDays:
-            return String(localized: "storage.prune.day_90")
+            return String(localized: "storage.prune.day_90", bundle: .app)
         }
     }
 

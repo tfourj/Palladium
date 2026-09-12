@@ -52,7 +52,7 @@ struct PackagesSettingsView: View {
             }
 
             Section("packages.status.title") {
-                Text(String(format: String(localized: "packages.status.value"), packageStatusText))
+                Text(String(format: String(localized: "packages.status.value", bundle: .app), packageStatusText))
                     .font(.subheadline.monospaced())
 
                 if isRunning {
@@ -342,7 +342,7 @@ struct PackagesSettingsView: View {
                 .buttonStyle(.borderless)
                 .disabled(isRunning)
                 .accessibilityLabel(
-                    String(format: String(localized: "packages.custom_update.remove_package"), packageName)
+                    String(format: String(localized: "packages.custom_update.remove_package", bundle: .app), packageName)
                 )
             }
         }
@@ -373,7 +373,7 @@ struct PackagesSettingsView: View {
                 .buttonStyle(.borderless)
                 .disabled(isRunning)
                 .accessibilityLabel(
-                    String(format: String(localized: "packages.custom_update.unlock_package"), packageName)
+                    String(format: String(localized: "packages.custom_update.unlock_package", bundle: .app), packageName)
                 )
             }
         }
@@ -445,9 +445,9 @@ struct PackagesSettingsView: View {
 
     private func lockAccessibilityLabel(for packageName: String) -> String {
         if selectedLockedPackages.contains(packageName) {
-            return String(format: String(localized: "packages.custom_update.unlock_package"), packageName)
+            return String(format: String(localized: "packages.custom_update.unlock_package", bundle: .app), packageName)
         }
-        return String(format: String(localized: "packages.custom_update.lock_package"), packageName)
+        return String(format: String(localized: "packages.custom_update.lock_package", bundle: .app), packageName)
     }
 
     private var customUpdatePackageNames: [String] {
@@ -478,20 +478,20 @@ struct PackagesSettingsView: View {
 
     private var progressStatusMessage: String {
         if packageStatusText == "updating" {
-            return String(localized: "packages.status.updating")
+            return String(localized: "packages.status.updating", bundle: .app)
         }
         if packageStatusText == "installing" {
-            return String(localized: "packages.status.installing")
+            return String(localized: "packages.status.installing", bundle: .app)
         }
         if packageStatusText == "restoring" {
-            return String(localized: "packages.status.restoring")
+            return String(localized: "packages.status.restoring", bundle: .app)
         }
         if packageStatusText == "removing" {
-            return String(localized: "packages.status.removing")
+            return String(localized: "packages.status.removing", bundle: .app)
         }
         if packageStatusText == "indexing" {
-            return String(localized: "packages.status.loading_index")
+            return String(localized: "packages.status.loading_index", bundle: .app)
         }
-        return String(localized: "packages.status.checking")
+        return String(localized: "packages.status.checking", bundle: .app)
     }
 }

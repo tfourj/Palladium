@@ -33,9 +33,9 @@ struct DownloadArgumentsSettingsView: View {
 
             Section("download.args.examples") {
                 HStack {
-                    exampleButton(String(localized: "download.args.example.mp4"), value: DownloadPreset.autoVideo.defaultArguments)
-                    exampleButton(String(localized: "download.args.example.mp3"), value: DownloadPreset.audio.defaultArguments)
-                    exampleButton(String(localized: "download.args.example.mute"), value: DownloadPreset.mute.defaultArguments)
+                    exampleButton(String(localized: "download.args.example.mp4", bundle: .app), value: DownloadPreset.autoVideo.defaultArguments)
+                    exampleButton(String(localized: "download.args.example.mp3", bundle: .app), value: DownloadPreset.audio.defaultArguments)
+                    exampleButton(String(localized: "download.args.example.mute", bundle: .app), value: DownloadPreset.mute.defaultArguments)
                 }
             }
         }

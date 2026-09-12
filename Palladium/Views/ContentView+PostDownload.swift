@@ -33,8 +33,8 @@ extension ContentView {
 
             VStack(spacing: 14) {
                 downloadCompleteActionButton(
-                    title: completedResultIsCollection ? String(localized: "post_download.action.share_all.title") : String(localized: "post_download.action.share.title"),
-                    subtitle: completedResultIsCollection ? String(localized: "post_download.action.share_all.help") : String(localized: "post_download.action.share.help"),
+                    title: completedResultIsCollection ? String(localized: "post_download.action.share_all.title", bundle: .app) : String(localized: "post_download.action.share.title", bundle: .app),
+                    subtitle: completedResultIsCollection ? String(localized: "post_download.action.share_all.help", bundle: .app) : String(localized: "post_download.action.share.help", bundle: .app),
                     icon: "square.and.arrow.up",
                     color: .blue
                 ) {
@@ -43,7 +43,7 @@ extension ContentView {
 
                 if shouldOfferPhotosAction {
                     downloadCompleteActionButton(
-                        title: String(localized: "photos.action.save"),
+                        title: String(localized: "photos.action.save", bundle: .app),
                         subtitle: saveToPhotosButtonSubtitle,
                         icon: "photo.on.rectangle",
                         color: .green,
@@ -55,10 +55,10 @@ extension ContentView {
 
                 if completedDownloadAllowsSaveToApplicationFolder {
                     downloadCompleteActionButton(
-                        title: String(localized: "post_download.action.save_folder.title"),
+                        title: String(localized: "post_download.action.save_folder.title", bundle: .app),
                         subtitle: completedResultIsCollection
-                            ? String(localized: "post_download.action.save_folder.collection_help")
-                            : String(localized: "post_download.action.save_folder.help"),
+                            ? String(localized: "post_download.action.save_folder.collection_help", bundle: .app)
+                            : String(localized: "post_download.action.save_folder.help", bundle: .app),
                         icon: "folder.badge.plus",
                         color: .orange
                     ) {
@@ -154,7 +154,7 @@ extension ContentView {
 
     var downloadCompleteTitle: String {
         completedDownloadResult?.mediaGroup?.completionTitle
-            ?? String(localized: "post_download.title")
+            ?? String(localized: "post_download.title", bundle: .app)
     }
 
     var completedResultDisplayTitle: String? {
@@ -185,24 +185,24 @@ extension ContentView {
 
     var downloadCompleteSummaryText: String {
         guard let result = completedDownloadResult else {
-            return String(localized: "post_download.summary.collection")
+            return String(localized: "post_download.summary.collection", bundle: .app)
         }
         if result.isCollection {
-            return String(format: String(localized: "post_download.summary.collection_count"), result.items.count)
+            return String(format: String(localized: "post_download.summary.collection_count", bundle: .app), result.items.count)
         }
-        return String(localized: "post_download.summary.single")
+        return String(localized: "post_download.summary.single", bundle: .app)
     }
 
     var saveToPhotosButtonSubtitle: String {
         switch completedPhotosCompatibility {
         case .checking:
-            return String(localized: "photos.compatibility.checking")
+            return String(localized: "photos.compatibility.checking", bundle: .app)
         case .compatible(let mediaType):
             switch mediaType {
             case .video:
-                return String(localized: "photos.action.import_video")
+                return String(localized: "photos.action.import_video", bundle: .app)
             case .image:
-                return String(localized: "photos.action.import_image")
+                return String(localized: "photos.action.import_image", bundle: .app)
             }
         case .incompatible(let reason):
             return reason
@@ -211,8 +211,8 @@ extension ContentView {
 
     var postDownloadDismissButtonTitle: String {
         pendingPostDownloadResults.isEmpty
-            ? String(localized: "common.cancel")
-            : String(localized: "post_download.action.skip")
+            ? String(localized: "common.cancel", bundle: .app)
+            : String(localized: "post_download.action.skip", bundle: .app)
     }
 
     func dismissDownloadActionSheet() {
@@ -251,7 +251,7 @@ extension ContentView {
 
         guard result.mediaGroup?.supportsPhotos != false else {
             completedPhotosCompatibility = .incompatible(
-                String(localized: "photos.error.unsupported_media_group")
+                String(localized: "photos.error.unsupported_media_group", bundle: .app)
             )
             return
         }
@@ -311,11 +311,11 @@ extension ContentView {
                 if case .incompatible(let details) = compatibility {
                     reason = details
                 } else {
-                    reason = String(localized: "photos.compatibility.unknown")
+                    reason = String(localized: "photos.compatibility.unknown", bundle: .app)
                 }
                 await MainActor.run {
                     reopenDownloadActionAfterAlert = true
-                    alertMessage = String(format: String(localized: "photos.error.import_reason"), reason)
+                    alertMessage = String(format: String(localized: "photos.error.import_reason", bundle: .app), reason)
                     showAlert = true
                     completion?(false)
                 }
@@ -326,7 +326,7 @@ extension ContentView {
             guard permission == .authorized || permission == .limited else {
                 await MainActor.run {
                     reopenDownloadActionAfterAlert = true
-                    alertMessage = String(localized: "photos.error.permission")
+                    alertMessage = String(localized: "photos.error.permission", bundle: .app)
                     showAlert = true
                     completion?(false)
                 }
@@ -346,13 +346,13 @@ extension ContentView {
                     reopenDownloadActionAfterAlert = false
                     alertMessage = nil
                     showAlert = false
-                    showTemporaryToast(String(localized: "photos.toast.saved"))
+                    showTemporaryToast(String(localized: "photos.toast.saved", bundle: .app))
                     completion?(true)
                 }
             } catch {
                 await MainActor.run {
                     reopenDownloadActionAfterAlert = true
-                    alertMessage = String(format: String(localized: "photos.error.save"), error.localizedDescription)
+                    alertMessage = String(format: String(localized: "photos.error.save", bundle: .app), error.localizedDescription)
                     showAlert = true
                     completion?(false)
                 }
@@ -375,7 +375,7 @@ extension ContentView {
             guard compatible.count == urls.count else {
                 await MainActor.run {
                     reopenDownloadActionAfterAlert = true
-                    alertMessage = String(localized: "photos.error.mixed_collection")
+                    alertMessage = String(localized: "photos.error.mixed_collection", bundle: .app)
                     showAlert = true
                     completion?(false)
                 }
@@ -385,7 +385,7 @@ extension ContentView {
             guard permission == .authorized || permission == .limited else {
                 await MainActor.run {
                     reopenDownloadActionAfterAlert = true
-                    alertMessage = String(localized: "photos.error.permission")
+                    alertMessage = String(localized: "photos.error.permission", bundle: .app)
                     showAlert = true
                     completion?(false)
                 }
@@ -403,13 +403,13 @@ extension ContentView {
                     }
                 }
                 await MainActor.run {
-                    showTemporaryToast(String(localized: "photos.toast.saved"))
+                    showTemporaryToast(String(localized: "photos.toast.saved", bundle: .app))
                     completion?(true)
                 }
             } catch {
                 await MainActor.run {
                     reopenDownloadActionAfterAlert = true
-                    alertMessage = String(format: String(localized: "photos.error.save"), error.localizedDescription)
+                    alertMessage = String(format: String(localized: "photos.error.save", bundle: .app), error.localizedDescription)
                     showAlert = true
                     completion?(false)
                 }
@@ -419,7 +419,7 @@ extension ContentView {
 
     func evaluatePhotosCompatibility(for result: CompletedDownloadResult) async -> PhotosCompatibilityState {
         guard let firstItem = result.items.first else {
-            return .incompatible(String(localized: "post_download.error.no_files"))
+            return .incompatible(String(localized: "post_download.error.no_files", bundle: .app))
         }
 
         let firstCompatibility = await evaluatePhotosCompatibility(for: firstItem)
@@ -433,7 +433,7 @@ extension ContentView {
                 return compatibility
             }
             guard mediaType == expectedMediaType else {
-                return .incompatible(String(localized: "photos.error.mixed_collection"))
+                return .incompatible(String(localized: "photos.error.mixed_collection", bundle: .app))
             }
         }
         return .compatible(expectedMediaType)
@@ -447,7 +447,7 @@ extension ContentView {
         if imageExtensions.contains(ext) {
             return isImageIOSCompatible(fileURL)
                 ? .compatible(.image)
-                : .incompatible(String(format: String(localized: "photos.error.unsupported_image_format"), ext))
+                : .incompatible(String(format: String(localized: "photos.error.unsupported_image_format", bundle: .app), ext))
         }
 
         if videoExtensions.contains(ext) {
@@ -464,7 +464,7 @@ extension ContentView {
         }
 
         return .incompatible(
-            String(format: String(localized: "photos.error.unsupported_format"), ext.isEmpty ? "unknown" : ext)
+            String(format: String(localized: "photos.error.unsupported_format", bundle: .app), ext.isEmpty ? "unknown" : ext)
         )
     }
 
@@ -472,7 +472,7 @@ extension ContentView {
         let ext = fileURL.pathExtension.lowercased()
         let compatibleExtensions: Set<String> = ["mp4", "mov", "m4v"]
         guard compatibleExtensions.contains(ext) else {
-            return .incompatible(String(localized: "photos.error.video_format"))
+            return .incompatible(String(localized: "photos.error.video_format", bundle: .app))
         }
 
         if UIVideoAtPathIsCompatibleWithSavedPhotosAlbum(fileURL.path) {
@@ -483,7 +483,7 @@ extension ContentView {
             let asset = AVAsset(url: fileURL)
             let tracks = try await asset.loadTracks(withMediaType: .video)
             guard !tracks.isEmpty else {
-                return .incompatible(String(localized: "photos.error.no_video_track"))
+                return .incompatible(String(localized: "photos.error.no_video_track", bundle: .app))
             }
 
             for track in tracks {
@@ -498,9 +498,9 @@ extension ContentView {
                 }
             }
 
-            return .incompatible(String(localized: "photos.error.codec"))
+            return .incompatible(String(localized: "photos.error.codec", bundle: .app))
         } catch {
-            return .incompatible(String(localized: "photos.error.inspect_codec"))
+            return .incompatible(String(localized: "photos.error.inspect_codec", bundle: .app))
         }
     }
 
@@ -530,7 +530,7 @@ extension ContentView {
                     throw NSError(
                         domain: "Palladium",
                         code: 2,
-                        userInfo: [NSLocalizedDescriptionKey: String(localized: "post_download.error.missing_service")]
+                        userInfo: [NSLocalizedDescriptionKey: String(localized: "post_download.error.missing_service", bundle: .app)]
                     )
                 }
                 appFolder.appendPathComponent(serviceFolderName, isDirectory: true)
@@ -568,7 +568,7 @@ extension ContentView {
                 showAlert = false
                 showTemporaryToast(
                     String(
-                        format: String(localized: "post_download.toast.saved_folder_name"),
+                        format: String(localized: "post_download.toast.saved_folder_name", bundle: .app),
                         destinationFolder.lastPathComponent
                     )
                 )
@@ -586,19 +586,19 @@ extension ContentView {
                 alertMessage = nil
                 showAlert = false
                 showTemporaryToast(
-                    String(format: String(localized: "post_download.toast.saved_folder"), destination.lastPathComponent)
+                    String(format: String(localized: "post_download.toast.saved_folder", bundle: .app), destination.lastPathComponent)
                 )
                 return true
             } else {
                 throw NSError(
                     domain: "Palladium",
                     code: 1,
-                    userInfo: [NSLocalizedDescriptionKey: String(localized: "post_download.error.no_files")]
+                    userInfo: [NSLocalizedDescriptionKey: String(localized: "post_download.error.no_files", bundle: .app)]
                 )
             }
 
         } catch {
-            alertMessage = String(format: String(localized: "post_download.error.save_folder"), error.localizedDescription)
+            alertMessage = String(format: String(localized: "post_download.error.save_folder", bundle: .app), error.localizedDescription)
             showAlert = true
             return false
         }
@@ -733,7 +733,7 @@ extension ContentView {
             }
             guard let fileURL = result.photosCandidateURL else {
                 reopenDownloadActionAfterAlert = true
-                alertMessage = String(localized: "photos.error.single_only")
+                alertMessage = String(localized: "photos.error.single_only", bundle: .app)
                 showAlert = true
                 completion?(false)
                 return
@@ -790,13 +790,13 @@ enum DownloadedMediaGroup: Int, CaseIterable {
     var completionTitle: String {
         switch self {
         case .image:
-            return String(localized: "post_download.title.images")
+            return String(localized: "post_download.title.images", bundle: .app)
         case .video:
-            return String(localized: "post_download.title.videos")
+            return String(localized: "post_download.title.videos", bundle: .app)
         case .audio:
-            return String(localized: "post_download.title.audio")
+            return String(localized: "post_download.title.audio", bundle: .app)
         case .file:
-            return String(localized: "post_download.title.files")
+            return String(localized: "post_download.title.files", bundle: .app)
         }
     }
 }
@@ -898,7 +898,7 @@ struct CompletedDownloadResult {
            let sanitized = sanitizedFolderName(folderURL.lastPathComponent) {
             return sanitized
         }
-        return String(localized: "download.fallback_title")
+        return String(localized: "download.fallback_title", bundle: .app)
     }
 
     var serviceFolderName: String? {

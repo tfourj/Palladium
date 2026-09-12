@@ -26,7 +26,7 @@ struct CookiesSettingsView: View {
     var body: some View {
         Form {
             Section {
-                LabeledContent(String(localized: "cookies.path.title")) {
+                LabeledContent(String(localized: "cookies.path.title", bundle: .app)) {
                     Text("cookies.path.documents")
                         .foregroundStyle(.secondary)
                 }
@@ -77,7 +77,7 @@ struct CookiesSettingsView: View {
                                         .foregroundStyle(.secondary)
                                     Text(
                                         String(
-                                            format: String(localized: "cookies.file.meta"),
+                                            format: String(localized: "cookies.file.meta", bundle: .app),
                                             cookieFile.formattedSize,
                                             cookieFile.modifiedAt.formatted(date: .abbreviated, time: .shortened)
                                         )
@@ -230,7 +230,7 @@ struct CookiesSettingsView: View {
             }
             .presentationDetents([.medium])
         }
-        .alert(String(localized: "common.result"), isPresented: Binding(
+        .alert(String(localized: "common.result", bundle: .app), isPresented: Binding(
             get: { errorMessage != nil },
             set: { newValue in
                 if !newValue {
@@ -238,7 +238,7 @@ struct CookiesSettingsView: View {
                 }
             }
         )) {
-            Button(String(localized: "common.ok"), role: .cancel) {
+            Button(String(localized: "common.ok", bundle: .app), role: .cancel) {
                 errorMessage = nil
             }
         } message: {

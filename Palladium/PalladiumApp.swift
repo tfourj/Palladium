@@ -10,6 +10,8 @@ import Foundation
 
 @main
 struct PalladiumApp: App {
+    @Environment(\.scenePhase) private var scenePhase
+
     init() {
         retainFFmpegBridgeExports()
         PythonRuntimeBootstrap.configure()
@@ -18,6 +20,13 @@ struct PalladiumApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environment(\.locale, AppLanguageSettings.shared.locale)
+                .onChange(of: scenePhase) { _, phase in
+                    if phase == .active { AppLanguageSettings.shared.refreshSystemLanguage() }
+                }
+                .onReceive(NotificationCenter.default.publisher(for: NSLocale.currentLocaleDidChangeNotification)) { _ in
+                    AppLanguageSettings.shared.refreshSystemLanguage()
+                }
         }
     }
 }

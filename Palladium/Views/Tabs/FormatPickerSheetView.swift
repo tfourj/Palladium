@@ -146,7 +146,7 @@ struct FormatPickerSheetView: View {
 
     private func sizeDescription(_ bytes: Int64?, approximate: Bool) -> String {
         guard let bytes else {
-            return String(localized: "download.formats.size_unknown")
+            return String(localized: "download.formats.size_unknown", bundle: .app)
         }
         let size = ByteCountFormatter.string(fromByteCount: bytes, countStyle: .binary)
         return approximate ? "≈\(size)" : size
@@ -162,7 +162,7 @@ struct FormatPickerSheetView: View {
 
     private func selectedAudioDetails(_ format: YTDLPFormat) -> String {
         if format.hasAudio {
-            return "\(format.audioCodec) · \(String(localized: "download.formats.audio_included"))"
+            return "\(format.audioCodec) · \(String(localized: "download.formats.audio_included", bundle: .app))"
         }
         if let audio = format.selectedAudio {
             return [
@@ -172,6 +172,6 @@ struct FormatPickerSheetView: View {
                 "#\(audio.id)"
             ].filter { !$0.isEmpty }.joined(separator: " · ")
         }
-        return String(localized: "download.formats.no_audio")
+        return String(localized: "download.formats.no_audio", bundle: .app)
     }
 }
