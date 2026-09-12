@@ -160,6 +160,7 @@ Palladium/
 | `scripts/test_format_resolution.py` | Offline yt-dlp integration tests for format resolution, conversion processors, and output paths. |
 | `scripts/python_tests/test_post_processing.py` | Conversion override, disabled-default, and audio extraction regression tests. |
 | `scripts/swift_tests/PostProcessingPreferencesTests.swift` | Video conversion preference defaults, persistence, and supported formats. |
+| `scripts/swift_tests/AppLanguageSettingsTests.swift` | Language persistence, regional matching, English fallback, and view invalidation. |
 | `scripts/swift_tests/DownloadServiceDomainTests.swift` | Saved-download service-domain canonicalization tests. |
 | `scripts/swift_tests/DownloadQueueTests.swift` | Download queue parsing, state transition, ordering, and persistence tests. |
 | `scripts/swift_tests/YTDLPFormatTests.swift` | Resolved format selection, Photos compatibility, and exact download argument tests. |
