@@ -6034,8 +6034,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Language"
+            "state" : "translated",
+            "value" : "言語"
           }
         }
       }
@@ -6050,8 +6050,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "App language and system default"
+            "state" : "translated",
+            "value" : "アプリの言語とシステム設定"
           }
         }
       }
@@ -6066,8 +6066,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "System"
+            "state" : "translated",
+            "value" : "システム"
           }
         }
       }
@@ -6082,8 +6082,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "System uses your preferred supported language, or English when no translation is available."
+            "state" : "translated",
+            "value" : "「システム」は対応する優先言語を使用します。対応する翻訳がない場合は英語を使用します。"
           }
         }
       }
