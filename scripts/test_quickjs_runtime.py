@@ -208,6 +208,19 @@ class ProviderIntegrationTests(unittest.TestCase):
             director.register_preference(preference)
         return director, webkit
 
+    def test_default_webkit_selection_skips_quickjs(self):
+        with helpers.temporary_env(PALLADIUM_JS_RUNTIME=None), yt_dlp.YoutubeDL({
+            **quickjs_bridge.runtime_default_options(), "quiet": True, "cachedir": False,
+        }) as downloader:
+            self.provider = QuickJSJCP(YoutubeIE(downloader), self.logger, {})
+            self.assertFalse(self.provider.is_available())
+            director, webkit = self.director_with_webkit()
+            with mock.patch.object(quickjs_bridge.QuickJSBridge, "evaluate") as evaluate:
+                responses = director.bulk_solve(self.requests)
+            self.assertEqual(len(responses), 2)
+            webkit.bulk_solve.assert_called_once()
+            evaluate.assert_not_called()
+
     def test_quickjs_is_preferred_to_webkit(self):
         director, webkit = self.director_with_webkit()
         player = (helpers.ROOT / "scripts/fixtures/quickjs_player.js").read_text()
@@ -245,12 +258,15 @@ class ProviderIntegrationTests(unittest.TestCase):
 
 
 class InvocationTests(unittest.TestCase):
+    runtime = "quickjs"
+
     def setUp(self):
         self.flow = importlib.import_module("palladium_ytdlp.ytdlp")
         self.directory = self.enterContext(tempfile.TemporaryDirectory())
         self.enterContext(helpers.temporary_env(
             PALLADIUM_CACHE_DIR=self.directory, PALLADIUM_DOWNLOADS=self.directory,
             PALLADIUM_PYTHON_PACKAGES=None, PALLADIUM_CANCEL_FILE=None,
+            PALLADIUM_JS_RUNTIME=self.runtime,
         ))
         self.enterContext(mock.patch.object(sys, "argv", ["palladium-test"]))
         self.enterContext(mock.patch.object(sys, "__stdout__", io.StringIO()))
@@ -261,7 +277,7 @@ class InvocationTests(unittest.TestCase):
 
     def run_module(self, *args, **kwargs):
         options = yt_dlp.parse_options(["--ignore-config", *sys.argv[1:]]).ydl_opts
-        self.assertEqual(options["js_runtimes"], {"quickjs": {"path": None}})
+        self.assertEqual(options["js_runtimes"], {"quickjs": {"path": None}} if self.runtime == "quickjs" else {})
         self.assertIn("ejs:github", options["remote_components"])
         self.assertEqual(QuickJsRuntime().info.name, "quickjs-ng")
         self.invocations.append(options)
@@ -293,13 +309,18 @@ class InvocationTests(unittest.TestCase):
 
     def test_format_discovery_activates_embedded_runtime(self):
         def extract(downloader, url, download):
-            self.assertEqual(downloader.params["js_runtimes"], {"quickjs": {}})
+            self.assertEqual(downloader.params["js_runtimes"], {"quickjs": {}} if self.runtime == "quickjs" else {})
             self.assertIn("ejs:github", downloader.params["remote_components"])
-            self.assertEqual(downloader._js_runtimes["quickjs"].info.name, "quickjs-ng")
+            if self.runtime == "quickjs":
+                self.assertEqual(downloader._js_runtimes["quickjs"].info.name, "quickjs-ng")
             return {"id": "fixture", "title": "fixture", "formats": []}
         with mock.patch.object(yt_dlp.YoutubeDL, "extract_info", autospec=True, side_effect=extract):
             result = json.loads(self.flow.list_yt_dlp_formats("https://example.com/watch"))
         self.assertTrue(result["success"], result["output"])
+
+
+class WebKitInvocationTests(InvocationTests):
+    runtime = "webkit"
 
 
 class AdapterLifecycleTests(unittest.TestCase):

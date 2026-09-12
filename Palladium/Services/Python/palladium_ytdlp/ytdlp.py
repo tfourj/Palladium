@@ -33,7 +33,7 @@ from .packages import (
     runtime_package_names,
 )
 from .patching import apply_youtube_patches
-from .quickjs_bridge import QUICKJS_DEFAULT_ARGS, embedded_quickjs, quickjs_default_options
+from .quickjs_bridge import embedded_quickjs, runtime_default_args, runtime_default_options
 from .runtime import raise_if_cancel_requested
 from .shared import TailBuffer, Tee, open_live_log_stream
 
@@ -186,7 +186,7 @@ def list_yt_dlp_formats(download_url, cookie_file_path=""):
         import yt_dlp
 
         options = {
-            **quickjs_default_options(),
+            **runtime_default_options(),
             "quiet": True,
             "no_warnings": True,
             "skip_download": True,
@@ -577,7 +577,7 @@ def run_retry_without_thumbnails(
         "--no-check-certificate",
         "--remote-components",
         "ejs:github",
-        *QUICKJS_DEFAULT_ARGS,
+        *runtime_default_args(),
         "--cache-dir",
         cache_dir if cache_dir else os.path.join(".", ".cache"),
         "--force-overwrites",
@@ -856,7 +856,7 @@ def run_yt_dlp_flow(
                             "--no-check-certificate",
                             "--remote-components",
                             "ejs:github",
-                            *QUICKJS_DEFAULT_ARGS,
+                            *runtime_default_args(),
                             "--cache-dir",
                             cache_dir if cache_dir else os.path.join(downloads_dir if downloads_dir else ".", ".cache"),
                             "--force-overwrites",

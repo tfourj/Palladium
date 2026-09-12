@@ -6,7 +6,7 @@ import unittest
 from unittest import mock
 
 from . import helpers  # noqa: F401
-from palladium_ytdlp.quickjs_bridge import QuickJSBridge, quickjs_default_options
+from palladium_ytdlp.quickjs_bridge import QuickJSBridge, quickjs_default_options, runtime_default_args, runtime_default_options
 
 
 class QuickJSBridgeTests(unittest.TestCase):
@@ -56,3 +56,18 @@ class QuickJSBridgeTests(unittest.TestCase):
         self.assertEqual(options["cachedir"], "/tmp/app-cache")
         self.assertEqual(options["js_runtimes"], {"quickjs": {}})
         self.assertEqual(options["remote_components"], {"ejs:github"})
+
+
+class RuntimeSelectionTests(unittest.TestCase):
+    def test_webkit_is_default_and_unknown_values_use_webkit(self):
+        for value in (None, "webkit", "unknown"):
+            with self.subTest(value=value), helpers.temporary_env(PALLADIUM_JS_RUNTIME=value):
+                self.assertEqual(runtime_default_args(), ("--no-js-runtimes",))
+                self.assertEqual(runtime_default_options()["js_runtimes"], {})
+
+    def test_selection_is_read_again_for_each_operation(self):
+        for value in ("quickjs", "webkit", "quickjs"):
+            with helpers.temporary_env(PALLADIUM_JS_RUNTIME=value):
+                expected = {"quickjs": {}} if value == "quickjs" else {}
+                self.assertEqual(runtime_default_options()["js_runtimes"], expected)
+                self.assertEqual("quickjs" in runtime_default_args(), value == "quickjs")

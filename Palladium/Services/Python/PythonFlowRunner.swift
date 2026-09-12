@@ -355,6 +355,13 @@ enum PythonFlowRunner {
     }
 
     private static func loadYtDlpModule() throws -> PythonObject {
+        let os = try Python.attemptImport("os")
+        let environment = try pythonMember(os, named: "environ")
+        let setEnvironment = try pythonMember(environment, named: "__setitem__")
+        _ = try setEnvironment.throwing.dynamicallyCall(withArguments: [
+            "PALLADIUM_JS_RUNTIME", JavaScriptRuntime.selected.rawValue
+        ])
+
         let scriptURL = PythonScripts.ytDlpScriptURL
         let scriptPath = scriptURL.path
         let scriptDirectoryPath = scriptURL.deletingLastPathComponent().path

@@ -9,6 +9,19 @@ import os
 QUICKJS_DEFAULT_ARGS = ("--no-js-runtimes", "--js-runtimes", "quickjs")
 
 
+def runtime_default_args():
+    if os.environ.get("PALLADIUM_JS_RUNTIME") == "quickjs":
+        return QUICKJS_DEFAULT_ARGS
+    return ("--no-js-runtimes",)
+
+
+def runtime_default_options():
+    options = quickjs_default_options()
+    if os.environ.get("PALLADIUM_JS_RUNTIME") != "quickjs":
+        options["js_runtimes"] = {}
+    return options
+
+
 def quickjs_default_options():
     options = {"js_runtimes": {"quickjs": {}}, "remote_components": {"ejs:github"}}
     cache_dir = os.environ.get("PALLADIUM_CACHE_DIR", "").strip()
@@ -105,7 +118,7 @@ def embedded_quickjs(cancel_file=None):
             name="quickjs-ng", path="embedded", version=bridge.version,
             version_tuple=bridge.version_tuple, supported=True,
         )
-        print(f"[palladium][quickjs] embedded QuickJS-NG {bridge.version}; WebKit fallback enabled")
+        print(f"[palladium][quickjs] embedded QuickJS-NG {bridge.version} available")
     except Exception as error:
         print(f"[palladium][quickjs] engine unavailable; retaining WebKit: {error}")
 
