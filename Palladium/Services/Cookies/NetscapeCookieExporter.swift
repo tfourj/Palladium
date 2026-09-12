@@ -14,7 +14,7 @@ enum NetscapeCookieExporter {
             throw NSError(
                 domain: "PalladiumCookies",
                 code: 4,
-                userInfo: [NSLocalizedDescriptionKey: String(localized: "cookies.error.web_no_cookies")]
+                userInfo: [NSLocalizedDescriptionKey: String(localized: "cookies.error.web_no_cookies", bundle: .app)]
             )
         }
 

@@ -125,10 +125,10 @@ extension ContentView {
                 guard !isRunning, !isPackageRunning else { return }
                 if resolution.success, !resolution.formats.isEmpty {
                     queueQualityFormats = resolution.formats
-                    queueQualityPickerTitle = String(localized: "queue.quality.picker.title")
+                    queueQualityPickerTitle = String(localized: "queue.quality.picker.title", bundle: .app)
                     showQueueQualityPicker = true
                 } else {
-                    alertMessage = resolution.errorMessage ?? String(localized: "download.formats.empty")
+                    alertMessage = resolution.errorMessage ?? String(localized: "download.formats.empty", bundle: .app)
                     showAlert = true
                     if !resolution.outputText.isEmpty {
                         appendConsoleText(resolution.outputText)
@@ -199,14 +199,14 @@ extension ContentView {
 
         pendingPerLinkQualityItemID = item.id
         isResolvingQueueQuality = true
-        progressText = String(localized: "download.formats.loading")
+        progressText = String(localized: "download.formats.loading", bundle: .app)
         let cookiePath = useCookies ? resolvedSelectedCookieFilePath() : nil
         appendConsoleText("[palladium][queue] resolving quality options for \(item.url)\n")
         Task {
             let resolution = await PythonFlowRunner.resolveFormats(url: item.url, cookieFilePath: cookiePath)
             await MainActor.run {
                 isResolvingQueueQuality = false
-                progressText = String(localized: "download.prompt.idle")
+                progressText = String(localized: "download.prompt.idle", bundle: .app)
                 guard !isRunning,
                       !isPackageRunning,
                       pendingPerLinkQualityItemID == item.id,
@@ -216,7 +216,7 @@ extension ContentView {
                 }
                 if resolution.success, !resolution.formats.isEmpty {
                     availableFormats = resolution.formats
-                    formatPickerTitle = String(localized: "queue.quality.per_link.picker.title")
+                    formatPickerTitle = String(localized: "queue.quality.per_link.picker.title", bundle: .app)
                     showDownloadQueueSheet = false
                     selectedTab = .download
                     urlText = item.url
@@ -226,7 +226,7 @@ extension ContentView {
                     downloadQueue.pause()
                     persistDownloadQueue()
                     downloadErrorText = resolution.errorMessage
-                        ?? String(localized: "download.formats.empty")
+                        ?? String(localized: "download.formats.empty", bundle: .app)
                     if !resolution.outputText.isEmpty {
                         appendConsoleText(resolution.outputText)
                     }
@@ -257,13 +257,13 @@ extension ContentView {
 
         isResolvingQueueQuality = true
         downloadErrorText = nil
-        progressText = String(localized: "download.formats.loading")
+        progressText = String(localized: "download.formats.loading", bundle: .app)
         let cookiePath = useCookies ? resolvedSelectedCookieFilePath() : nil
         Task {
             let resolution = await PythonFlowRunner.resolveFormats(url: url, cookieFilePath: cookiePath)
             await MainActor.run {
                 isResolvingQueueQuality = false
-                progressText = String(localized: "download.prompt.idle")
+                progressText = String(localized: "download.prompt.idle", bundle: .app)
                 guard !isRunning,
                       !isPackageRunning,
                       !isResolvingFormats else {
@@ -272,12 +272,12 @@ extension ContentView {
                 }
                 if resolution.success, !resolution.formats.isEmpty {
                     availableFormats = resolution.formats
-                    formatPickerTitle = String(localized: "queue.quality.repick.title")
+                    formatPickerTitle = String(localized: "queue.quality.repick.title", bundle: .app)
                     showFormatPicker = true
                 } else {
                     pendingBatchRepickItemID = nil
                     downloadErrorText = resolution.errorMessage
-                        ?? String(localized: "download.formats.empty")
+                        ?? String(localized: "download.formats.empty", bundle: .app)
                     if !resolution.outputText.isEmpty {
                         appendConsoleText(resolution.outputText)
                     }

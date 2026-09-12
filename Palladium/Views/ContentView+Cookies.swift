@@ -71,7 +71,7 @@ extension ContentView {
             throw NSError(
                 domain: "PalladiumCookies",
                 code: 3,
-                userInfo: [NSLocalizedDescriptionKey: String(localized: "cookies.error.name_conflict")]
+                userInfo: [NSLocalizedDescriptionKey: String(localized: "cookies.error.name_conflict", bundle: .app)]
             )
         }
 
@@ -84,7 +84,7 @@ extension ContentView {
             useCookies = true
         }
         showTemporaryToast(
-            String(format: String(localized: "cookies.toast.renamed"), destinationName)
+            String(format: String(localized: "cookies.toast.renamed", bundle: .app), destinationName)
         )
     }
 
@@ -153,7 +153,7 @@ extension ContentView {
         defaultUseCookies = true
         useCookies = true
         showTemporaryToast(
-            String(format: String(localized: "cookies.toast.imported"), destinationURL.lastPathComponent)
+            String(format: String(localized: "cookies.toast.imported", bundle: .app), destinationURL.lastPathComponent)
         )
     }
 
@@ -198,7 +198,7 @@ extension ContentView {
             throw NSError(
                 domain: "PalladiumCookies",
                 code: 1,
-                userInfo: [NSLocalizedDescriptionKey: String(localized: "cookies.error.unreadable")]
+                userInfo: [NSLocalizedDescriptionKey: String(localized: "cookies.error.unreadable", bundle: .app)]
             )
         }
         return text
@@ -372,7 +372,7 @@ extension ContentView {
         NSError(
             domain: "PalladiumCookies",
             code: 2,
-            userInfo: [NSLocalizedDescriptionKey: String(localized: "cookies.error.invalid_format")]
+            userInfo: [NSLocalizedDescriptionKey: String(localized: "cookies.error.invalid_format", bundle: .app)]
         )
     }
 
@@ -419,7 +419,7 @@ extension ContentView {
             throw NSError(
                 domain: "PalladiumCookies",
                 code: 3,
-                userInfo: [NSLocalizedDescriptionKey: String(localized: "cookies.error.name_conflict")]
+                userInfo: [NSLocalizedDescriptionKey: String(localized: "cookies.error.name_conflict", bundle: .app)]
             )
         }
         return baseURL

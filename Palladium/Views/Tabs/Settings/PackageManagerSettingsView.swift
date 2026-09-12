@@ -25,7 +25,7 @@ struct PackageManagerSettingsView: View {
                 .pickerStyle(.segmented)
                 .disabled(isRunning)
 
-                Text(String(format: String(localized: "packages.source.active"), packageSourceMode.title))
+                Text(String(format: String(localized: "packages.source.active", bundle: .app), packageSourceMode.title))
                     .font(.caption)
                     .foregroundStyle(packageSourceMode == .nightly ? .orange : .secondary)
 

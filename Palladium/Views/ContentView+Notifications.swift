@@ -85,7 +85,7 @@ extension ContentView {
         debugNotification("scheduling notification file=\(fileURL.lastPathComponent)")
 
         let content = UNMutableNotificationContent()
-        content.title = String(localized: "post_download.title")
+        content.title = String(localized: "post_download.title", bundle: .app)
         content.body = fileURL.lastPathComponent
         content.sound = .default
         content.interruptionLevel = .active

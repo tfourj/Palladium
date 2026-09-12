@@ -14,7 +14,7 @@ struct PackagesTabView: View {
             Text("packages.tab_title")
                 .font(.title2.bold())
 
-            Text(String(format: String(localized: "packages.status.value"), packageStatusText))
+            Text(String(format: String(localized: "packages.status.value", bundle: .app), packageStatusText))
                 .font(.subheadline.monospaced())
 
             if isRunning {

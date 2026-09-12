@@ -410,8 +410,8 @@ struct SettingsTabView: View {
 
     private var searchableControlSettings: [SearchableControlSetting] {
         var settings = baseSearchableControlSettings
-        let customizeHelp = String(localized: "settings.download_modes.customize_options.footer")
-        let customizeTitle = String(localized: "settings.download_modes.customize_options.title")
+        let customizeHelp = String(localized: "settings.download_modes.customize_options.footer", bundle: .app)
+        let customizeTitle = String(localized: "settings.download_modes.customize_options.title", bundle: .app)
 
         settings.insert(
             contentsOf: downloadPresetSettings.map { setting in
@@ -421,7 +421,7 @@ struct SettingsTabView: View {
                     menu: .customizeDownloadOptions,
                     title: title,
                     subtitle: customizeHelp,
-                    keywords: [customizeTitle, String(localized: "settings.download_modes.title")],
+                    keywords: [customizeTitle, String(localized: "settings.download_modes.title", bundle: .app)],
                     makeControl: {
                         AnyView(
                             searchToggle(
@@ -470,7 +470,7 @@ struct SettingsTabView: View {
                 menu: .history,
                 title: "settings.ui.history.enable",
                 subtitle: "settings.ui.history.help",
-                keywords: [String(localized: "settings.ui.history.section")]
+                keywords: [String(localized: "settings.ui.history.section", bundle: .app)]
             ) { title in
                 AnyView(searchToggle(title, isOn: $linkHistoryEnabled, disabled: isRunning))
             },
@@ -657,7 +657,7 @@ struct SettingsTabView: View {
                 menu: .downloadBehavior,
                 title: "settings.download_behavior.incomplete_history.toggle",
                 subtitle: "settings.download_behavior.incomplete_history.help",
-                keywords: [String(localized: "settings.ui.history.section")]
+                keywords: [String(localized: "settings.ui.history.section", bundle: .app)]
             ) { title in
                 AnyView(searchToggle(title, isOn: $saveIncompleteDownloadsToHistory, disabled: isRunning))
             },
@@ -772,7 +772,7 @@ struct SettingsTabView: View {
                 menu: .advanced,
                 title: "settings.advanced.youtube_patch_mode",
                 subtitle: "settings.advanced.youtube_patch_mode.help",
-                keywords: YouTubePatchMode.allCases.map(\.title) + [String(localized: "settings.advanced.title")]
+                keywords: YouTubePatchMode.allCases.map(\.title) + [String(localized: "settings.advanced.title", bundle: .app)]
             ) { title in
                 AnyView(
                     Picker(title, selection: $youtubePatchMode) {
@@ -798,12 +798,12 @@ struct SettingsTabView: View {
         keywords: [String] = [],
         makeControl: @escaping (_ title: String) -> AnyView
     ) -> SearchableControlSetting {
-        let localizedTitle = String(localized: title)
+        let localizedTitle = String(localized: title, bundle: .app)
         return SearchableControlSetting(
             id: id,
             menu: menu,
             title: localizedTitle,
-            subtitle: String(localized: subtitle),
+            subtitle: String(localized: subtitle, bundle: .app),
             keywords: keywords,
             makeControl: { makeControl(localizedTitle) }
         )
@@ -911,32 +911,32 @@ struct SettingsTabView: View {
         case .userInterface:
             return SearchableSetting(
                 route: route,
-                title: String(localized: "settings.ui.title"),
-                subtitle: String(localized: "settings.ui.subtitle"),
+                title: String(localized: "settings.ui.title", bundle: .app),
+                subtitle: String(localized: "settings.ui.subtitle", bundle: .app),
                 icon: "switch.2",
                 color: .indigo
             )
         case .downloadSettings:
             return SearchableSetting(
                 route: route,
-                title: String(localized: "settings.download_settings.title"),
-                subtitle: String(localized: "settings.download_settings.subtitle"),
+                title: String(localized: "settings.download_settings.title", bundle: .app),
+                subtitle: String(localized: "settings.download_settings.subtitle", bundle: .app),
                 icon: "arrow.down.circle.fill",
                 color: .blue
             )
         case .downloadModes:
             return SearchableSetting(
                 route: route,
-                title: String(localized: "settings.download_modes.title"),
-                subtitle: String(localized: "settings.download_modes.subtitle"),
+                title: String(localized: "settings.download_modes.title", bundle: .app),
+                subtitle: String(localized: "settings.download_modes.subtitle", bundle: .app),
                 icon: "arrow.down.circle.fill",
                 color: .blue
             )
         case .shareSheet:
             return SearchableSetting(
                 route: route,
-                title: String(localized: "settings.share_sheet.title"),
-                subtitle: String(localized: "settings.share_sheet.subtitle"),
+                title: String(localized: "settings.share_sheet.title", bundle: .app),
+                subtitle: String(localized: "settings.share_sheet.subtitle", bundle: .app),
                 icon: "square.and.arrow.up.fill",
                 color: .teal
             )
@@ -951,59 +951,59 @@ struct SettingsTabView: View {
         case .postProcessing:
             return SearchableSetting(
                 route: route,
-                title: String(localized: "settings.post_processing.title"),
-                subtitle: String(localized: "settings.post_processing.subtitle"),
+                title: String(localized: "settings.post_processing.title", bundle: .app),
+                subtitle: String(localized: "settings.post_processing.subtitle", bundle: .app),
                 icon: "arrow.triangle.2.circlepath",
                 color: .orange
             )
         case .customizeDownloadOptions:
             return SearchableSetting(
                 route: route,
-                title: String(localized: "settings.download_modes.customize_options.title"),
-                subtitle: String(localized: "settings.download_modes.customize_options.footer"),
+                title: String(localized: "settings.download_modes.customize_options.title", bundle: .app),
+                subtitle: String(localized: "settings.download_modes.customize_options.footer", bundle: .app),
                 icon: "line.3.horizontal.decrease",
                 color: .blue
             )
         case .downloadOptions:
             return SearchableSetting(
                 route: route,
-                title: String(localized: "settings.download_defaults.title"),
-                subtitle: String(localized: "download.options.summary.default"),
+                title: String(localized: "settings.download_defaults.title", bundle: .app),
+                subtitle: String(localized: "download.options.summary.default", bundle: .app),
                 icon: "slider.horizontal.3",
                 color: .blue
             )
         case .afterDownload:
             return SearchableSetting(
                 route: route,
-                title: String(localized: "settings.ui.after_download.title"),
-                subtitle: String(localized: "settings.after_download.subtitle"),
+                title: String(localized: "settings.ui.after_download.title", bundle: .app),
+                subtitle: String(localized: "settings.after_download.subtitle", bundle: .app),
                 icon: "checkmark.circle.fill",
                 color: .green
             )
         case .downloadBehavior:
             return SearchableSetting(
                 route: route,
-                title: String(localized: "settings.download_behavior.title"),
-                subtitle: String(localized: "settings.download_behavior.subtitle"),
+                title: String(localized: "settings.download_behavior.title", bundle: .app),
+                subtitle: String(localized: "settings.download_behavior.subtitle", bundle: .app),
                 icon: "bolt.fill",
                 color: .yellow
             )
         case .downloadArguments:
             return SearchableSetting(
                 route: route,
-                title: String(localized: "settings.download_args.title"),
-                subtitle: String(localized: "settings.download_args.subtitle"),
+                title: String(localized: "settings.download_args.title", bundle: .app),
+                subtitle: String(localized: "settings.download_args.subtitle", bundle: .app),
                 icon: "terminal",
                 color: .blue
             )
         case .cookies:
             return SearchableSetting(
                 route: route,
-                title: String(localized: "settings.cookies.title"),
+                title: String(localized: "settings.cookies.title", bundle: .app),
                 subtitle: importedCookieFiles.isEmpty
-                    ? String(localized: "settings.cookies.subtitle_empty")
+                    ? String(localized: "settings.cookies.subtitle_empty", bundle: .app)
                     : String(
-                        format: String(localized: "settings.cookies.subtitle_count"),
+                        format: String(localized: "settings.cookies.subtitle_count", bundle: .app),
                         importedCookieFiles.count
                     ),
                 icon: "lock.doc.fill",
@@ -1012,41 +1012,41 @@ struct SettingsTabView: View {
         case .appearance:
             return SearchableSetting(
                 route: route,
-                title: String(localized: "settings.ui.appearance.section"),
-                subtitle: String(localized: "settings.appearance.subtitle"),
+                title: String(localized: "settings.ui.appearance.section", bundle: .app),
+                subtitle: String(localized: "settings.appearance.subtitle", bundle: .app),
                 icon: "paintbrush.fill",
                 color: .purple
             )
         case .downloadsTab:
             return SearchableSetting(
                 route: route,
-                title: String(localized: "settings.downloads_tab.title"),
-                subtitle: String(localized: "settings.downloads_tab.subtitle"),
+                title: String(localized: "settings.downloads_tab.title", bundle: .app),
+                subtitle: String(localized: "settings.downloads_tab.subtitle", bundle: .app),
                 icon: "tray.and.arrow.down.fill",
                 color: .teal
             )
         case .history:
             return SearchableSetting(
                 route: route,
-                title: String(localized: "settings.ui.history.section"),
-                subtitle: String(localized: "settings.history.subtitle"),
+                title: String(localized: "settings.ui.history.section", bundle: .app),
+                subtitle: String(localized: "settings.history.subtitle", bundle: .app),
                 icon: "clock.arrow.circlepath",
                 color: .orange
             )
         case .notifications:
             return SearchableSetting(
                 route: route,
-                title: String(localized: "settings.notifications.title"),
-                subtitle: String(localized: "settings.notifications.subtitle"),
+                title: String(localized: "settings.notifications.title", bundle: .app),
+                subtitle: String(localized: "settings.notifications.subtitle", bundle: .app),
                 icon: "bell.badge.fill",
                 color: .red
             )
         case .storage:
             return SearchableSetting(
                 route: route,
-                title: String(localized: "settings.storage.title"),
+                title: String(localized: "settings.storage.title", bundle: .app),
                 subtitle: String(
-                    format: String(localized: "settings.storage.summary.total"),
+                    format: String(localized: "settings.storage.summary.total", bundle: .app),
                     storageSummary.formattedTotalSize
                 ),
                 icon: "internaldrive.fill",
@@ -1055,34 +1055,34 @@ struct SettingsTabView: View {
         case .packages:
             return SearchableSetting(
                 route: route,
-                title: String(localized: "settings.packages.title"),
+                title: String(localized: "settings.packages.title", bundle: .app),
                 subtitle: updatesAvailable
-                    ? String(localized: "settings.packages.subtitle.updates_available")
-                    : String(localized: "settings.packages.subtitle"),
+                    ? String(localized: "settings.packages.subtitle.updates_available", bundle: .app)
+                    : String(localized: "settings.packages.subtitle", bundle: .app),
                 icon: "shippingbox.fill",
                 color: updatesAvailable ? .red : .indigo
             )
         case .packageManager:
             return SearchableSetting(
                 route: route,
-                title: String(localized: "settings.packages.manager.title"),
-                subtitle: String(localized: "settings.packages.subtitle"),
+                title: String(localized: "settings.packages.manager.title", bundle: .app),
+                subtitle: String(localized: "settings.packages.subtitle", bundle: .app),
                 icon: "gearshape.fill",
                 color: .indigo
             )
         case .advanced:
             return SearchableSetting(
                 route: route,
-                title: String(localized: "settings.advanced.title"),
-                subtitle: String(localized: "settings.advanced.subtitle"),
+                title: String(localized: "settings.advanced.title", bundle: .app),
+                subtitle: String(localized: "settings.advanced.subtitle", bundle: .app),
                 icon: "gearshape.2.fill",
                 color: .gray
             )
         case .about:
             return SearchableSetting(
                 route: route,
-                title: String(localized: "settings.about.title"),
-                subtitle: String(localized: "settings.about.subtitle"),
+                title: String(localized: "settings.about.title", bundle: .app),
+                subtitle: String(localized: "settings.about.subtitle", bundle: .app),
                 icon: "info.circle.fill",
                 color: .orange
             )

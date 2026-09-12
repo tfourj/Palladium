@@ -123,10 +123,10 @@ extension ContentView {
                 self.availablePackageVersions = availableVersions
             }
             if outcome.restartRequired {
-                alertMessage = String(localized: "settings.advanced.restart_required")
+                alertMessage = String(localized: "settings.advanced.restart_required", bundle: .app)
                 showAlert = true
             } else if outcome.patchStateWarning {
-                alertMessage = String(localized: "settings.advanced.patch_state_warning")
+                alertMessage = String(localized: "settings.advanced.patch_state_warning", bundle: .app)
                 showAlert = true
             }
             self.hasLoadedPackageStatus = true
@@ -157,7 +157,7 @@ extension ContentView {
 
     func updatePackages() {
         if packageSourceMode == .custom && customPackageSpecs().isEmpty {
-            alertMessage = String(localized: "packages.source.custom_specs.empty")
+            alertMessage = String(localized: "packages.source.custom_specs.empty", bundle: .app)
             showAlert = true
             return
         }
@@ -166,7 +166,7 @@ extension ContentView {
 
     func reinstallPackages() {
         if packageSourceMode == .custom && customPackageSpecs().isEmpty {
-            alertMessage = String(localized: "packages.source.custom_specs.empty")
+            alertMessage = String(localized: "packages.source.custom_specs.empty", bundle: .app)
             showAlert = true
             return
         }
@@ -175,7 +175,7 @@ extension ContentView {
 
     func restorePipPackages() {
         if packageSourceMode == .custom && customPackageSpecs().isEmpty {
-            alertMessage = String(localized: "packages.source.custom_specs.empty")
+            alertMessage = String(localized: "packages.source.custom_specs.empty", bundle: .app)
             showAlert = true
             return
         }
@@ -205,7 +205,7 @@ extension ContentView {
             )
         } catch {
             alertMessage = String(
-                format: String(localized: "packages.payload.import_failed"),
+                format: String(localized: "packages.payload.import_failed", bundle: .app),
                 error.localizedDescription
             )
             showAlert = true

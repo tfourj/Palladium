@@ -28,10 +28,10 @@ struct ConsoleTabView: View {
             }
             .pickerStyle(.segmented)
 
-            TextField(String(localized: "console.search.placeholder"), text: $searchText)
+            TextField(String(localized: "console.search.placeholder", bundle: .app), text: $searchText)
                 .textFieldStyle(.roundedBorder)
 
-            Text(String(format: String(localized: "console.lines.visible"), searchedEntries.count, logStore.entryCount))
+            Text(String(format: String(localized: "console.lines.visible", bundle: .app), searchedEntries.count, logStore.entryCount))
                 .font(.caption)
                 .foregroundStyle(.secondary)
 

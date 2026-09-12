@@ -98,7 +98,7 @@ struct DownloadQueueSheetView: View {
                 Label {
                     Text(
                         String(
-                            format: String(localized: "queue.snapshot.value"),
+                            format: String(localized: "queue.snapshot.value", bundle: .app),
                             selectedPreset.title
                         )
                     )
@@ -315,19 +315,19 @@ struct DownloadQueueSheetView: View {
     private func statusText(for status: DownloadQueueItemStatus) -> String {
         switch status {
         case .pending:
-            String(localized: "queue.status.pending")
+            String(localized: "queue.status.pending", bundle: .app)
         case .running:
-            String(localized: "queue.status.running")
+            String(localized: "queue.status.running", bundle: .app)
         case .awaitingAction:
-            String(localized: "queue.status.awaiting_action")
+            String(localized: "queue.status.awaiting_action", bundle: .app)
         case .succeeded:
-            String(localized: "queue.status.succeeded")
+            String(localized: "queue.status.succeeded", bundle: .app)
         case .partial:
-            String(localized: "queue.status.partial")
+            String(localized: "queue.status.partial", bundle: .app)
         case .failed:
-            String(localized: "queue.status.failed")
+            String(localized: "queue.status.failed", bundle: .app)
         case .cancelled:
-            String(localized: "queue.status.cancelled")
+            String(localized: "queue.status.cancelled", bundle: .app)
         }
     }
 

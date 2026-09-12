@@ -200,16 +200,16 @@ struct DownloadTabView: View {
                             VStack(spacing: 8) {
                                 if selectedPreset != .images {
                                     downloadOptionToggle(
-                                        title: String(localized: "download.options.playlist.title"),
-                                        subtitle: String(localized: "download.options.playlist.help"),
+                                        title: String(localized: "download.options.playlist.title", bundle: .app),
+                                        subtitle: String(localized: "download.options.playlist.help", bundle: .app),
                                         isOn: $downloadPlaylist
                                     )
 
                                     subtitleDownloadOptionRow
 
                                     downloadOptionToggle(
-                                        title: String(localized: "download.options.thumbnail.title"),
-                                        subtitle: String(localized: "download.options.thumbnail.help"),
+                                        title: String(localized: "download.options.thumbnail.title", bundle: .app),
+                                        subtitle: String(localized: "download.options.thumbnail.help", bundle: .app),
                                         isOn: $embedThumbnail
                                     )
                                 }
@@ -305,7 +305,7 @@ struct DownloadTabView: View {
         .sheet(isPresented: $showFormatPicker) {
             FormatPickerSheetView(
                 title: formatPickerTitle.isEmpty
-                    ? String(localized: "download.formats.title")
+                    ? String(localized: "download.formats.title", bundle: .app)
                     : formatPickerTitle,
                 formats: availableFormats,
                 embedThumbnail: formatPickerEmbedsThumbnail,
@@ -686,16 +686,16 @@ struct DownloadTabView: View {
         if subtitleLanguagePattern == SubtitleLanguageOption.custom.subtitlePattern {
             let trimmed = customSubtitleLanguagePattern.trimmingCharacters(in: .whitespacesAndNewlines)
             return trimmed.isEmpty
-                ? String(localized: "common.custom")
-                : String(format: String(localized: "download.custom.value"), trimmed)
+                ? String(localized: "common.custom", bundle: .app)
+                : String(format: String(localized: "download.custom.value", bundle: .app), trimmed)
         }
         if let option = selectedSubtitleOption {
             return option.title
         }
         let trimmed = subtitleLanguagePattern.trimmingCharacters(in: .whitespacesAndNewlines)
         return trimmed.isEmpty
-            ? String(localized: "common.custom")
-            : String(format: String(localized: "download.custom.value"), trimmed)
+            ? String(localized: "common.custom", bundle: .app)
+            : String(format: String(localized: "download.custom.value", bundle: .app), trimmed)
     }
 
     private var normalizedCustomSubtitlePattern: Binding<String> {
@@ -714,21 +714,21 @@ struct DownloadTabView: View {
     private var downloadOptionsSummary: String {
         var parts: [String] = []
         if downloadPlaylist {
-            parts.append(String(localized: "download.options.playlist.short"))
+            parts.append(String(localized: "download.options.playlist.short", bundle: .app))
         }
         if downloadSubtitles {
-            parts.append(String(format: String(localized: "download.options.subtitles.value"), subtitleSummaryText))
+            parts.append(String(format: String(localized: "download.options.subtitles.value", bundle: .app), subtitleSummaryText))
         }
         if embedThumbnail {
-            parts.append(String(localized: "download.options.thumbnail.title"))
+            parts.append(String(localized: "download.options.thumbnail.title", bundle: .app))
         }
         let selectedCookieName = selectedCookieFileName.trimmingCharacters(in: .whitespacesAndNewlines)
         if useCookies, !selectedCookieName.isEmpty {
-            parts.append(String(format: String(localized: "download.options.cookies.value"), selectedCookieName))
+            parts.append(String(format: String(localized: "download.options.cookies.value", bundle: .app), selectedCookieName))
         } else if useCookies {
-            parts.append(String(localized: "download.options.cookies.title"))
+            parts.append(String(localized: "download.options.cookies.title", bundle: .app))
         }
-        return parts.isEmpty ? String(localized: "download.options.summary.default") : parts.joined(separator: " • ")
+        return parts.isEmpty ? String(localized: "download.options.summary.default", bundle: .app) : parts.joined(separator: " • ")
     }
 
     private func queueProgressCard(_ item: DownloadQueueItem) -> some View {
@@ -779,7 +779,7 @@ struct DownloadTabView: View {
     private func queueProgressTitle(for item: DownloadQueueItem) -> String {
         let currentIndex = downloadQueue.items.firstIndex(where: { $0.id == item.id }) ?? 0
         return String(
-            format: String(localized: "queue.progress.value"),
+            format: String(localized: "queue.progress.value", bundle: .app),
             currentIndex + 1,
             downloadQueue.items.count
         )
@@ -812,15 +812,15 @@ struct DownloadTabView: View {
 
             HStack(spacing: 8) {
                 playlistMetric(
-                    label: String(localized: "download.playlist.total"),
+                    label: String(localized: "download.playlist.total", bundle: .app),
                     value: snapshot.expectedCount.map(String.init) ?? "?"
                 )
                 playlistMetric(
-                    label: String(localized: "download.playlist.completed"),
+                    label: String(localized: "download.playlist.completed", bundle: .app),
                     value: "\(snapshot.completedCount)"
                 )
                 playlistMetric(
-                    label: String(localized: "download.playlist.failed"),
+                    label: String(localized: "download.playlist.failed", bundle: .app),
                     value: "\(snapshot.failedCount)"
                 )
             }
@@ -868,15 +868,15 @@ struct DownloadTabView: View {
     private func playlistStatusText(for snapshot: PlaylistProgressSnapshot) -> String {
         switch snapshot.resultKind {
         case "partial":
-            return String(localized: "download.status.partial")
+            return String(localized: "download.status.partial", bundle: .app)
         case "success":
-            return String(localized: "download.status.complete")
+            return String(localized: "download.status.complete", bundle: .app)
         case "error":
-            return String(localized: "download.status.failed")
+            return String(localized: "download.status.failed", bundle: .app)
         case "cancelled":
-            return String(localized: "download.status.cancelled")
+            return String(localized: "download.status.cancelled", bundle: .app)
         default:
-            return String(localized: "download.status.running")
+            return String(localized: "download.status.running", bundle: .app)
         }
     }
 
@@ -915,32 +915,32 @@ struct DownloadTabView: View {
         switch snapshot.resultKind {
         case "partial":
             return String(
-                format: String(localized: "download.playlist.summary.partial"),
+                format: String(localized: "download.playlist.summary.partial", bundle: .app),
                 snapshot.completedCount,
                 expectedCount,
                 snapshot.failedCount
             )
         case "success":
             return String(
-                format: String(localized: "download.playlist.summary.success"),
+                format: String(localized: "download.playlist.summary.success", bundle: .app),
                 snapshot.completedCount,
                 expectedCount
             )
         case "error":
             return String(
-                format: String(localized: "download.playlist.summary.failed"),
+                format: String(localized: "download.playlist.summary.failed", bundle: .app),
                 snapshot.failedCount,
                 expectedCount
             )
         case "cancelled":
             return String(
-                format: String(localized: "download.playlist.summary.cancelled"),
+                format: String(localized: "download.playlist.summary.cancelled", bundle: .app),
                 snapshot.completedCount,
                 expectedCount
             )
         default:
             return String(
-                format: String(localized: "download.playlist.summary.running"),
+                format: String(localized: "download.playlist.summary.running", bundle: .app),
                 snapshot.completedCount,
                 expectedCount,
                 snapshot.failedCount
@@ -953,13 +953,13 @@ struct DownloadTabView: View {
         guard let currentItemIndex = snapshot.currentItemIndex else { return nil }
         if let currentItemTitle = snapshot.currentItemTitle, !currentItemTitle.isEmpty {
             return String(
-                format: String(localized: "download.playlist.current.value"),
+                format: String(localized: "download.playlist.current.value", bundle: .app),
                 currentItemIndex,
                 currentItemTitle
             )
         }
         return String(
-            format: String(localized: "download.playlist.current.index"),
+            format: String(localized: "download.playlist.current.index", bundle: .app),
             currentItemIndex
         )
     }

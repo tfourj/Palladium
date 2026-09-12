@@ -48,6 +48,7 @@ Palladium/
 | `Resources/ManagedPipPackages.txt` | Single manifest for managed pip packages and optional `[version]` locks. |
 | `AppIntents/ShortcutDownloadIntents.swift` | App Shortcuts intents for starting downloads. |
 | `Models/AppAppearanceMode.swift` | Appearance-mode setting model. |
+| `Models/AppLanguageSettings.swift` | Persisted app language, system-language resolution, and observable localization bundle. |
 | `Models/DownloadServiceDomain.swift` | Canonical source-service domain resolver for saved-download folders. |
 | `Models/DownloadOptions.swift` | Download option model and persisted settings. |
 | `Models/PostProcessingPreferences.swift` | Persisted video conversion settings and download configuration snapshots. |
