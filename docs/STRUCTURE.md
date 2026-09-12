@@ -126,6 +126,7 @@ Palladium/
 | `Services/Python/palladium_ytdlp/maintenance.py` | Python runtime package maintenance flow. |
 | `Services/Python/palladium_ytdlp/packages.py` | Python package installation and source helpers. |
 | `Services/Python/palladium_ytdlp/patching.py` | EJS solver script patcher and patch mode dispatcher. |
+| `Services/Python/palladium_ytdlp/quickjs_bridge.py` | Embedded QuickJS runtime detection, evaluation, and scoped yt-dlp provider hooks. |
 | `Services/Python/palladium_ytdlp/runtime.py` | Runtime reset, module invalidation, and cancellation helpers. |
 | `Services/Python/palladium_ytdlp/shared.py` | Shared Python helpers and constants. |
 | `Services/Python/palladium_ytdlp/webkit_jsi.py` | WebKit JavaScript integration used by yt-dlp. |
