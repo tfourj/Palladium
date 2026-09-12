@@ -13,6 +13,7 @@ struct LanguageSettingsView: View {
                     }
                 }
                 .pickerStyle(.inline)
+                .labelsHidden()
             } footer: {
                 Text("settings.language.help")
             }

@@ -170,7 +170,6 @@ struct SettingsTabView: View {
         List {
             Section(header: Text("settings.general.section")) {
                 settingsNavigationLink(for: .userInterface)
-                settingsNavigationLink(for: .language)
                 settingsNavigationLink(for: .downloadSettings)
                 settingsNavigationLink(for: .packages)
                 settingsNavigationLink(for: .advanced)
@@ -369,6 +368,7 @@ struct SettingsTabView: View {
     private func userInterfaceSettingsList() -> some View {
         List {
             settingsNavigationLink(for: .appearance)
+            settingsNavigationLink(for: .language)
             settingsNavigationLink(for: .downloadsTab)
             settingsNavigationLink(for: .history)
             settingsNavigationLink(for: .notifications)
