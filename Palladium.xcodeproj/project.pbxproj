@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D22000042F80000100D20001 /* QuickJS LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = D21000042F80000100D20001 /* QuickJS LICENSE */; };
+		D22000032F80000100D20001 /* libunicode.c in Sources */ = {isa = PBXBuildFile; fileRef = D21000032F80000100D20001 /* libunicode.c */; settings = {COMPILER_FLAGS = "-D_GNU_SOURCE -DQUICKJS_NG_BUILD"; }; };
+		D22000022F80000100D20001 /* libregexp.c in Sources */ = {isa = PBXBuildFile; fileRef = D21000022F80000100D20001 /* libregexp.c */; settings = {COMPILER_FLAGS = "-D_GNU_SOURCE -DQUICKJS_NG_BUILD"; }; };
+		D22000012F80000100D20001 /* dtoa.c in Sources */ = {isa = PBXBuildFile; fileRef = D21000012F80000100D20001 /* dtoa.c */; settings = {COMPILER_FLAGS = "-D_GNU_SOURCE -DQUICKJS_NG_BUILD"; }; };
+		D22000002F80000100D20001 /* quickjs.c in Sources */ = {isa = PBXBuildFile; fileRef = D21000002F80000100D20001 /* quickjs.c */; settings = {COMPILER_FLAGS = "-D_GNU_SOURCE -DQUICKJS_NG_BUILD"; }; };
 		8256E3B62F57A8970067DF6E /* ShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 8256E3AC2F57A8960067DF6E /* ShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		82BF06CE2F5762BC00133331 /* Frameworks/Python.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82BF06CD2F5762BC00133331 /* Frameworks/Python.xcframework */; };
 		82BF06CF2F5762BC00133331 /* Frameworks/Python.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 82BF06CD2F5762BC00133331 /* Frameworks/Python.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -58,6 +63,11 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		D21000042F80000100D20001 /* QuickJS LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; name = "QuickJS LICENSE"; path = Frameworks/QuickJS/LICENSE; sourceTree = SOURCE_ROOT; };
+		D21000032F80000100D20001 /* libunicode.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Frameworks/QuickJS/libunicode.c; sourceTree = SOURCE_ROOT; };
+		D21000022F80000100D20001 /* libregexp.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Frameworks/QuickJS/libregexp.c; sourceTree = SOURCE_ROOT; };
+		D21000012F80000100D20001 /* dtoa.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Frameworks/QuickJS/dtoa.c; sourceTree = SOURCE_ROOT; };
+		D21000002F80000100D20001 /* quickjs.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Frameworks/QuickJS/quickjs.c; sourceTree = SOURCE_ROOT; };
 		8256E3AC2F57A8960067DF6E /* ShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		82BF06BE2F5761E800133331 /* Palladium.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Palladium.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		82BF06CD2F5762BC00133331 /* Frameworks/Python.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = Frameworks/Python.xcframework; sourceTree = "<group>"; };
@@ -306,6 +316,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D22000042F80000100D20001 /* QuickJS LICENSE in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -374,6 +385,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D22000032F80000100D20001 /* libunicode.c in Sources */,
+				D22000022F80000100D20001 /* libregexp.c in Sources */,
+				D22000012F80000100D20001 /* dtoa.c in Sources */,
+				D22000002F80000100D20001 /* quickjs.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -630,10 +645,16 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = "$(APP_VERSION)";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Frameworks/QuickJS",
+				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-Wl,-u,_palladium_ffmpeg_bridge_run",
 					"-Wl,-u,_palladium_ffmpeg_bridge_free",
+					"-Wl,-u,_palladium_quickjs_bridge_run",
+					"-Wl,-u,_palladium_quickjs_bridge_free",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.tfourj.Palladium;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -681,10 +702,16 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = "$(APP_VERSION)";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Frameworks/QuickJS",
+				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-Wl,-u,_palladium_ffmpeg_bridge_run",
 					"-Wl,-u,_palladium_ffmpeg_bridge_free",
+					"-Wl,-u,_palladium_quickjs_bridge_run",
+					"-Wl,-u,_palladium_quickjs_bridge_free",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.tfourj.Palladium;
 				PRODUCT_NAME = "$(TARGET_NAME)";

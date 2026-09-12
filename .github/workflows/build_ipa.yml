@@ -43,6 +43,17 @@ jobs:
         "$python_test_env/bin/python" -m pip install yt-dlp==2026.8.19
         PYTHONDONTWRITEBYTECODE=1 "$python_test_env/bin/python" -m unittest scripts.test_format_resolution
 
+    - name: Install QuickJS-NG sources
+      run: |
+        set -euo pipefail
+        archive="$RUNNER_TEMP/quickjs-0.16.2.tar.gz"
+        curl -fL https://github.com/quickjs-ng/quickjs/archive/refs/tags/v0.16.2.tar.gz -o "$archive"
+        expected="97c80625b26775a4c7ca618c004d4ea24cf99cbf867e4eba78bd927a8b23d106"
+        actual=$(shasum -a 256 "$archive" | cut -d ' ' -f 1)
+        test "$actual" = "$expected"
+        mkdir -p Frameworks/QuickJS
+        tar -xzf "$archive" --strip-components=1 -C Frameworks/QuickJS
+
     - name: Download Python Apple Support
       uses: robinraju/release-downloader@v1
       with:

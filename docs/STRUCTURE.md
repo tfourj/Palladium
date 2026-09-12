@@ -110,6 +110,7 @@ Palladium/
 | --- | --- |
 | `Services/Cookies/NetscapeCookieExporter.swift` | Converts browser cookies into Netscape cookie-file records. |
 | `Services/FFmpeg/SwiftFFmpegBridge.swift` | Swift interface to bundled FFmpeg functionality. |
+| `Services/QuickJS/` | Bounded JavaScript evaluation and the Foundation JSON bridge callable from Python. |
 | `Services/Logging/ConsoleLogStore.swift` | Store backing the in-app console. |
 | `Services/Media/GalleryVideoThumbnailLoader.swift` | Cached remote video previews using metadata thumbnails or generated frames. |
 | `Services/Shortcuts/ShortcutDownloadRequestStore.swift` | Transfers download requests from App Shortcuts into the app. |
@@ -176,6 +177,7 @@ Palladium/
 | `privacy-manifests/python/_hashlib.xcprivacy` | Required-reason API declaration for Python's hashlib module. |
 | `privacy-manifests/python/_ssl.xcprivacy` | Required-reason API declaration for Python's SSL module. |
 | `LICENSE` | GPLv3 terms. |
+| `Frameworks/QuickJS/` | Manually downloaded QuickJS-NG engine sources; required to build and intentionally untracked. |
 | `Frameworks/Python.xcframework` | Locally installed Python runtime; required to build and intentionally untracked. |
 | `Frameworks/SwiftFFmpeg-iOS` | Locally installed SwiftFFmpeg package and FFmpeg framework; required to build and intentionally untracked. |
 | `Frameworks/SwiftCurlCffi-iOS` | Locally installed Swift package containing the iOS curl-cffi payload; required to build and intentionally untracked. |
