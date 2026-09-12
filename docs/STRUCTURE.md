@@ -95,6 +95,7 @@ Palladium/
 | `Views/Tabs/Settings/PostProcessingSettingsView.swift` | Optional final video re-encoding and remux settings. |
 | `Views/Tabs/Settings/DownloadsTabSettingsView.swift` | Downloads-tab settings screen. |
 | `Views/Tabs/Settings/HistorySettingsView.swift` | History settings screen. |
+| `Views/Tabs/Settings/LanguageSettingsView.swift` | In-app language picker with a system default and bundled language choices. |
 | `Views/Tabs/Settings/NotificationsSettingsView.swift` | Notification settings screen. |
 | `Views/Tabs/Settings/PackageManagerSettingsView.swift` | Package-manager settings screen. |
 | `Views/Tabs/Settings/PackagesSettingsView.swift` | Package source and package settings screen. |

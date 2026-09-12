@@ -14,6 +14,7 @@ struct SettingsTabView: View {
         case downloadArguments
         case cookies
         case appearance
+        case language
         case downloadsTab
         case history
         case notifications
@@ -148,6 +149,9 @@ struct SettingsTabView: View {
                 prompt: Text("settings.search.prompt")
             )
             .onAppear(perform: onRefreshStorage)
+            .onChange(of: AppLanguageSettings.shared.languageCode) { _, _ in
+                onRefreshStorage()
+            }
             .alert("settings.advanced.reinstall_prompt.title", isPresented: $showPatchReinstallPrompt) {
                 Button("common.cancel", role: .cancel) {}
                 Button("settings.advanced.reinstall") {
@@ -166,6 +170,7 @@ struct SettingsTabView: View {
         List {
             Section(header: Text("settings.general.section")) {
                 settingsNavigationLink(for: .userInterface)
+                settingsNavigationLink(for: .language)
                 settingsNavigationLink(for: .downloadSettings)
                 settingsNavigationLink(for: .packages)
                 settingsNavigationLink(for: .advanced)
@@ -264,6 +269,8 @@ struct SettingsTabView: View {
                 appAppearanceMode: $appAppearanceMode,
                 isRunning: isRunning
             )
+        case .language:
+            LanguageSettingsView()
         case .downloadsTab:
             DownloadsTabSettingsView(
                 showTemporaryDownloads: $showTemporaryDownloads,
@@ -882,6 +889,7 @@ struct SettingsTabView: View {
         let routes: [SettingsRoute] = [
             .userInterface,
             .appearance,
+            .language,
             .downloadsTab,
             .history,
             .notifications,
@@ -1008,6 +1016,14 @@ struct SettingsTabView: View {
                     ),
                 icon: "lock.doc.fill",
                 color: .brown
+            )
+        case .language:
+            return SearchableSetting(
+                route: route,
+                title: String(localized: "settings.language.title", bundle: .app),
+                subtitle: String(localized: "settings.language.subtitle", bundle: .app),
+                icon: "globe",
+                color: .blue
             )
         case .appearance:
             return SearchableSetting(
