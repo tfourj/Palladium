@@ -5416,6 +5416,46 @@
         }
       }
     },
+    "settings.advanced.javascript_runtime" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JavaScript runtime"
+          }
+        }
+      }
+    },
+    "settings.advanced.javascript_runtime.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose the JavaScript runtime for video downloads. Apple WebKit is the default."
+          }
+        }
+      }
+    },
+    "settings.advanced.javascript_runtime.quickjs" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QuickJS"
+          }
+        }
+      }
+    },
+    "settings.advanced.javascript_runtime.webkit" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple WebKit"
+          }
+        }
+      }
+    },
     "settings.advanced.youtube_patch_mode" : {
       "localizations" : {
         "en" : {
