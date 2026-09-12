@@ -1,5 +1,6 @@
 import Darwin
 import XCTest
+@testable import Palladium
 
 final class QuickJSBridgeTests: XCTestCase {
     private func invoke(_ request: [String: Any]) throws -> [String: Any] {
@@ -17,6 +18,14 @@ final class QuickJSBridgeTests: XCTestCase {
         defer { free(pointer) }
         let response = Data(bytes: pointer, count: strlen(pointer))
         return try XCTUnwrap(JSONSerialization.jsonObject(with: response) as? [String: Any])
+    }
+
+    @MainActor
+    func testPythonPackageStagesQuickJSAdapter() throws {
+        let scriptRoot = PythonScripts.ytDlpScriptURL.deletingLastPathComponent()
+        let adapter = scriptRoot.appendingPathComponent("palladium_ytdlp/quickjs_bridge.py")
+        let bundledAdapter = try XCTUnwrap(Bundle.main.url(forResource: "quickjs_bridge", withExtension: "py"))
+        XCTAssertEqual(try Data(contentsOf: adapter), try Data(contentsOf: bundledAdapter))
     }
 
     func testAppExportsEmbeddedEngine() throws {
