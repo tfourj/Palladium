@@ -159,6 +159,10 @@ Palladium/
 
 | Path | Purpose |
 | --- | --- |
+| `scripts/test_quickjs_runtime.py` | Offline native QuickJS and real yt-dlp/EJS integration tests on arm64 macOS. |
+| `scripts/fixtures/quickjs_player.js` | Synthetic player fixture for EJS preprocessing and signature/n challenge tests. |
+| `scripts/python_tests/test_quickjs_bridge.py` | Bridge error handling, response ownership, cancellation, and default option tests. |
+| `scripts/swift_tests/QuickJSBridgeTests.swift` | App-hosted bridge export, evaluation, and isolation tests. |
 | `scripts/test_format_resolution.py` | Offline yt-dlp integration tests for format resolution, conversion processors, and output paths. |
 | `scripts/python_tests/test_post_processing.py` | Conversion override, disabled-default, and audio extraction regression tests. |
 | `scripts/swift_tests/PostProcessingPreferencesTests.swift` | Video conversion preference defaults, persistence, and supported formats. |

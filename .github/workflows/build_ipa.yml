@@ -54,6 +54,11 @@ jobs:
         mkdir -p Frameworks/QuickJS
         tar -xzf "$archive" --strip-components=1 -C Frameworks/QuickJS
 
+    - name: Test embedded QuickJS and EJS
+      run: |
+        "$RUNNER_TEMP/palladium-python-tests/bin/python" -m pip install "yt-dlp[default]==2026.8.19" yt-dlp-apple-webkit-jsi==0.1.1
+        PYTHONDONTWRITEBYTECODE=1 "$RUNNER_TEMP/palladium-python-tests/bin/python" -m unittest scripts.test_quickjs_runtime
+
     - name: Download Python Apple Support
       uses: robinraju/release-downloader@v1
       with:
