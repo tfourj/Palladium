@@ -4256,7 +4256,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "App フォルダに保存"
+            "value" : "アプリフォルダへ保存"
           }
         }
       }
@@ -6547,7 +6547,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "yt-dlp Cache"
+            "value" : "yt-dlp キャッシュ"
           }
         }
       }
@@ -6611,7 +6611,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "「Temporary Downloads」には、実行中および最近完了したダウンロードのフォルダが保存されます。「Saved Files」には、「Save to App Folder」機能で保存したファイルのコピーが保存されます。"
+            "value" : "「一時ダウンロード」には、実行中および最近完了したダウンロードのフォルダが保存されます。「保存されたファイル」には、「アプリフォルダへ保存」機能で保存したファイルのコピーが保存されます。"
           }
         }
       }
