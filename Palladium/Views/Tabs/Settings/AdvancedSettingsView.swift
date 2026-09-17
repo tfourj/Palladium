@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct AdvancedSettingsView: View {
+    @AppStorage(JavaScriptRuntime.defaultsKey) private var javascriptRuntime = JavaScriptRuntime.defaultValue
     @Binding var youtubePatchMode: YouTubePatchMode
     let isRunning: Bool
     let onReinstallPackages: () -> Void
@@ -9,6 +10,17 @@ struct AdvancedSettingsView: View {
 
     var body: some View {
         Form {
+            Section {
+                Picker("settings.advanced.javascript_runtime", selection: $javascriptRuntime) {
+                    ForEach(JavaScriptRuntime.allCases) { runtime in
+                        Text(runtime.title).tag(runtime)
+                    }
+                }
+                .disabled(isRunning)
+            } footer: {
+                Text("settings.advanced.javascript_runtime.help")
+            }
+
             Section {
                 Picker("settings.advanced.youtube_patch_mode", selection: $youtubePatchMode) {
                     ForEach(YouTubePatchMode.allCases) { mode in

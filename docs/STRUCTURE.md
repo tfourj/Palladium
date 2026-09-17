@@ -57,6 +57,7 @@ Palladium/
 | `Models/LinkHistory.swift` | Previously used link model and history storage data. |
 | `Models/PackageSourceMode.swift` | Package-source selection model. |
 | `Models/TemporaryDownloadRetentionPolicy.swift` | Decides whether completed temporary downloads are removed after saving. |
+| `Models/JavaScriptRuntime.swift` | Persisted JavaScript runtime choice, defaulting to Apple WebKit. |
 | `Models/YouTubePatchMode.swift` | Patch target setting model. |
 
 ### Views
@@ -110,6 +111,7 @@ Palladium/
 | --- | --- |
 | `Services/Cookies/NetscapeCookieExporter.swift` | Converts browser cookies into Netscape cookie-file records. |
 | `Services/FFmpeg/SwiftFFmpegBridge.swift` | Swift interface to bundled FFmpeg functionality. |
+| `Services/QuickJS/` | Bounded JavaScript evaluation and the Foundation JSON bridge callable from Python. |
 | `Services/Logging/ConsoleLogStore.swift` | Store backing the in-app console. |
 | `Services/Media/GalleryVideoThumbnailLoader.swift` | Cached remote video previews using metadata thumbnails or generated frames. |
 | `Services/Shortcuts/ShortcutDownloadRequestStore.swift` | Transfers download requests from App Shortcuts into the app. |
@@ -125,6 +127,7 @@ Palladium/
 | `Services/Python/palladium_ytdlp/maintenance.py` | Python runtime package maintenance flow. |
 | `Services/Python/palladium_ytdlp/packages.py` | Python package installation and source helpers. |
 | `Services/Python/palladium_ytdlp/patching.py` | EJS solver script patcher and patch mode dispatcher. |
+| `Services/Python/palladium_ytdlp/quickjs_bridge.py` | Embedded QuickJS runtime detection, evaluation, and scoped yt-dlp provider hooks. |
 | `Services/Python/palladium_ytdlp/runtime.py` | Runtime reset, module invalidation, and cancellation helpers. |
 | `Services/Python/palladium_ytdlp/shared.py` | Shared Python helpers and constants. |
 | `Services/Python/palladium_ytdlp/webkit_jsi.py` | WebKit JavaScript integration used by yt-dlp. |
@@ -157,6 +160,10 @@ Palladium/
 
 | Path | Purpose |
 | --- | --- |
+| `scripts/test_quickjs_runtime.py` | Offline native QuickJS and real yt-dlp/EJS integration tests on arm64 macOS. |
+| `scripts/fixtures/quickjs_player.js` | Synthetic player fixture for EJS preprocessing and signature/n challenge tests. |
+| `scripts/python_tests/test_quickjs_bridge.py` | Bridge error handling, response ownership, cancellation, and default option tests. |
+| `scripts/swift_tests/QuickJSBridgeTests.swift` | App-hosted bridge export, evaluation, and isolation tests. |
 | `scripts/test_format_resolution.py` | Offline yt-dlp integration tests for format resolution, conversion processors, and output paths. |
 | `scripts/python_tests/test_post_processing.py` | Conversion override, disabled-default, and audio extraction regression tests. |
 | `scripts/swift_tests/PostProcessingPreferencesTests.swift` | Video conversion preference defaults, persistence, and supported formats. |
@@ -176,6 +183,7 @@ Palladium/
 | `privacy-manifests/python/_hashlib.xcprivacy` | Required-reason API declaration for Python's hashlib module. |
 | `privacy-manifests/python/_ssl.xcprivacy` | Required-reason API declaration for Python's SSL module. |
 | `LICENSE` | GPLv3 terms. |
+| `Frameworks/QuickJS/` | Manually downloaded QuickJS-NG engine sources; required to build and intentionally untracked. |
 | `Frameworks/Python.xcframework` | Locally installed Python runtime; required to build and intentionally untracked. |
 | `Frameworks/SwiftFFmpeg-iOS` | Locally installed SwiftFFmpeg package and FFmpeg framework; required to build and intentionally untracked. |
 | `Frameworks/SwiftCurlCffi-iOS` | Locally installed Swift package containing the iOS curl-cffi payload; required to build and intentionally untracked. |

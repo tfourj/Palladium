@@ -14,6 +14,7 @@ Palladium/
     Python.xcframework
     SwiftFFmpeg-iOS/
     SwiftCurlCffi-iOS/
+    QuickJS/
 ```
 
 ## Python
@@ -85,12 +86,23 @@ cd ../SwiftCurlCffi-iOS
 Frameworks/SwiftCurlCffi-iOS/Sources/SwiftCurlCffiIOS/Resources/curl_cffi_ios_payload.zip
 ```
 
+## QuickJS-NG
+
+- Download the [QuickJS-NG v0.16.2 source archive](https://github.com/quickjs-ng/quickjs/archive/refs/tags/v0.16.2.tar.gz)
+- Extract it and rename `quickjs-0.16.2` to `QuickJS`
+- Put the folder here:
+
+```text
+Frameworks/QuickJS
+```
+
 ## Build In Xcode
 
 - Open `Palladium.xcodeproj`
 - Check that `PythonKit` resolves
 - Check that local package `Frameworks/SwiftFFmpeg-iOS` resolves
 - Check that local package `Frameworks/SwiftCurlCffi-iOS` resolves
+- Check that `Frameworks/QuickJS/quickjs.c` exists
 - Select scheme `Palladium`
 - Set your signing team in Signing & Capabilities
 - Choose an iPhone or Generic iOS Device
@@ -114,6 +126,7 @@ Swift tests live in `scripts/swift_tests` and use the `PalladiumTests` XCTest
 target. After installing the local dependencies above:
 
 - Open `Palladium.xcodeproj`
+- Check that `Frameworks/QuickJS/quickjs.c` exists
 - Select scheme `Palladium`
 - Choose an iOS Simulator
 - Press `Product -> Test`
