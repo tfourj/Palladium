@@ -19,7 +19,7 @@ On-device iOS media downloader powered by `yt-dlp`, `gallery-dl`, `ffmpeg`, and 
   </a>
 </div>
 
-## App Screenshoots
+## App Screenshots
 
 <p align="center">
   <img src="https://getpalladium.app/assets/palladium_save_download-3klk9xNj.png" alt="Palladium save and download screen" width="30%">
@@ -73,6 +73,7 @@ Other documentation: [docs/ALLOWLISTS.md](docs/ALLOWLISTS.md) for custom URL all
 - [`LAME`](https://lame.sourceforge.io/)
 - [`SwiftFFmpeg-iOS`](https://github.com/tfourj/SwiftFFmpeg-iOS)
 - [`SwiftCurlCffi-iOS`](https://github.com/tfourj/SwiftCurlCffi-iOS)
+- [`QuickJS-NG`](https://github.com/quickjs-ng/quickjs)
 
 ## License
 
