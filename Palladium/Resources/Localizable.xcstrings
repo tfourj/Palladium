@@ -21,6 +21,36 @@
         }
       }
     },
+    "about.contributors.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contributors"
+          }
+        }
+      }
+    },
+    "about.translators.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Translators"
+          }
+        }
+      }
+    },
+    "about.translators.japanese" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Japanese"
+          }
+        }
+      }
+    },
     "about.developer.name" : {
       "localizations" : {
         "en" : {
