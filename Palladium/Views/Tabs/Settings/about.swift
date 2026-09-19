@@ -46,18 +46,43 @@ struct SettingsAboutView: View {
             }
 
             Section("about.developer.title") {
-                HStack {
-                    Text("about.developer.title")
-                    Spacer()
-                    Text("about.developer.name")
-                        .foregroundStyle(.secondary)
-                }
-                
                 if let githubURL {
                     Link(destination: githubURL) {
-                        linkRow("GitHub")
+                        HStack(spacing: 14) {
+                            AsyncImage(url: URL(string: "https://github.com/TfourJ.png?size=128")) { image in
+                                image.resizable().scaledToFill()
+                            } placeholder: {
+                                initialBadge("T", size: 52)
+                            }
+                            .frame(width: 52, height: 52)
+                            .clipShape(RoundedRectangle(cornerRadius: 14))
+                            .accessibilityHidden(true)
+
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("about.developer.name")
+                                    .font(.headline)
+                                    .foregroundStyle(.primary)
+                                Text("about.developer.title")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                            }
+                            Spacer(minLength: 8)
+                            Image(systemName: "chevron.right")
+                                .font(.footnote.weight(.semibold))
+                                .foregroundStyle(.secondary)
+                        }
+                        .padding(.vertical, 8)
                     }
+                    .buttonStyle(.plain)
                 }
+            }
+
+            Section("about.contributors.title") {
+                creditBadge(name: "francescofugazzi", initial: "F")
+            }
+
+            Section("about.translators.title") {
+                creditBadge(name: "so-5699", initial: "S", language: "about.translators.japanese")
             }
 
             Section("about.links.title") {
@@ -85,6 +110,42 @@ struct SettingsAboutView: View {
         }
         .navigationTitle("settings.about.title")
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private func initialBadge(_ initial: String, size: CGFloat) -> some View {
+        Text(verbatim: initial)
+            .font(.system(size: size * 0.45, weight: .semibold))
+            .foregroundStyle(Color.accentColor)
+            .frame(width: size, height: size)
+            .background(Color.accentColor.opacity(0.18), in: Circle())
+            .accessibilityHidden(true)
+    }
+
+    private func creditBadge(name: String, initial: String, language: LocalizedStringKey? = nil) -> some View {
+        HStack(spacing: 8) {
+            initialBadge(initial, size: 24)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(verbatim: name)
+                    .font(.footnote.weight(.medium))
+                    .foregroundStyle(.primary)
+                    .fixedSize(horizontal: false, vertical: true)
+                if let language {
+                    Text(language)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            if language != nil {
+                Text(verbatim: "🇯🇵")
+                    .font(.footnote)
+                    .accessibilityHidden(true)
+            }
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(Color.accentColor.opacity(0.12), in: Capsule())
+        .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+        .accessibilityElement(children: .combine)
     }
 
     private func linkRow(_ title: String) -> some View {
