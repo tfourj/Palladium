@@ -21,6 +21,54 @@
         }
       }
     },
+    "about.contributors.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contributors"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Contributors"
+          }
+        }
+      }
+    },
+    "about.translators.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Translators"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Translators"
+          }
+        }
+      }
+    },
+    "about.translators.japanese" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Japanese"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Japanese"
+          }
+        }
+      }
+    },
     "about.developer.name" : {
       "localizations" : {
         "en" : {
