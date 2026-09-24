@@ -31,8 +31,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Contributors"
+            "state" : "translated",
+            "value" : "貢献者"
           }
         }
       }
@@ -47,8 +47,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Translators"
+            "state" : "translated",
+            "value" : "翻訳者"
           }
         }
       }
@@ -63,8 +63,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Japanese"
+            "state" : "translated",
+            "value" : "日本語"
           }
         }
       }
@@ -5474,8 +5474,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "JavaScript runtime"
+            "state" : "translated",
+            "value" : "JavaScript ランタイム"
           }
         }
       }
@@ -5490,8 +5490,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Choose the JavaScript runtime for video downloads. Apple WebKit is the default."
+            "state" : "translated",
+            "value" : "ビデオダウンロードのJavaScriptランタイムを選択します。Apple WebKitがデフォルトです。"
           }
         }
       }
@@ -5506,7 +5506,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "QuickJS"
           }
         }
@@ -5522,7 +5522,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Apple WebKit"
           }
         }
