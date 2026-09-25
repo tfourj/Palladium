@@ -98,6 +98,7 @@ struct SettingsTabView: View {
     @Binding var customPackageSpecsText: String
     @Binding var additionalManagedPackageNames: [String]
     @Binding var lockedPackageVersions: [String: String]
+    @AppStorage(JavaScriptRuntime.defaultsKey) private var javascriptRuntime = JavaScriptRuntime.defaultValue
     @Binding var youtubePatchMode: YouTubePatchMode
     let packageStatusText: String
     let versionsText: String
@@ -772,6 +773,23 @@ struct SettingsTabView: View {
                         isOn: $autoUpdatePackagesOnLaunch,
                         disabled: isPackageRunning || !checkPackageUpdatesOnLaunch
                     )
+                )
+            },
+            controlSetting(
+                id: "javascriptRuntime",
+                menu: .advanced,
+                title: "settings.advanced.javascript_runtime",
+                subtitle: "settings.advanced.javascript_runtime.help",
+                keywords: JavaScriptRuntime.allCases.map(\.title)
+            ) { title in
+                AnyView(
+                    Picker(title, selection: $javascriptRuntime) {
+                        ForEach(JavaScriptRuntime.allCases) { runtime in
+                            Text(runtime.title).tag(runtime)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .disabled(isRunning || isPackageRunning)
                 )
             },
             controlSetting(
