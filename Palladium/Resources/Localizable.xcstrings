@@ -28,6 +28,12 @@
             "state" : "translated",
             "value" : "Contributors"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "貢献者"
+          }
         }
       }
     },
@@ -38,6 +44,12 @@
             "state" : "translated",
             "value" : "Translators"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "翻訳者"
+          }
         }
       }
     },
@@ -47,6 +59,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Japanese"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日本語"
           }
         }
       }
@@ -4286,7 +4304,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "App フォルダに保存"
+            "value" : "アプリフォルダへ保存"
           }
         }
       }
@@ -5453,6 +5471,12 @@
             "state" : "translated",
             "value" : "JavaScript runtime"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JavaScript ランタイム"
+          }
         }
       }
     },
@@ -5462,6 +5486,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Choose the JavaScript runtime for video downloads. Apple WebKit is the default."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ビデオダウンロードのJavaScriptランタイムを選択します。Apple WebKitがデフォルトです。"
           }
         }
       }
@@ -5473,12 +5503,24 @@
             "state" : "translated",
             "value" : "QuickJS"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QuickJS"
+          }
         }
       }
     },
     "settings.advanced.javascript_runtime.webkit" : {
       "localizations" : {
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple WebKit"
+          }
+        },
+        "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Apple WebKit"
@@ -6617,7 +6659,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "yt-dlp Cache"
+            "value" : "yt-dlp キャッシュ"
           }
         }
       }
@@ -6681,7 +6723,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "「Temporary Downloads」には、実行中および最近完了したダウンロードのフォルダが保存されます。「Saved Files」には、「Save to App Folder」機能で保存したファイルのコピーが保存されます。"
+            "value" : "「一時ダウンロード」には、実行中および最近完了したダウンロードのフォルダが保存されます。「保存されたファイル」には、「アプリフォルダへ保存」機能で保存したファイルのコピーが保存されます。"
           }
         }
       }
