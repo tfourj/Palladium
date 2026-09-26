@@ -42,6 +42,8 @@ extension ContentView {
             defaults.set(data, forKey: Self.downloadPresetSettingsDefaultsKey)
         }
         defaults.set(extraArgsText, forKey: Self.extraArgsDefaultsKey)
+        defaults.set(filenameExportPreset.rawValue, forKey: Self.filenameExportPresetDefaultsKey)
+        defaults.set(customFilenameTemplate, forKey: Self.customFilenameTemplateDefaultsKey)
         defaults.set(afterDownloadBehavior.rawValue, forKey: Self.afterDownloadBehaviorDefaultsKey)
         defaults.removeObject(forKey: Self.askUserAfterDownloadDefaultsKey)
         defaults.removeObject(forKey: Self.selectedPostDownloadActionDefaultsKey)
@@ -153,6 +155,15 @@ extension ContentView {
 
     static func loadExtraArgs() -> String {
         UserDefaults.standard.string(forKey: extraArgsDefaultsKey) ?? ""
+    }
+
+    static func loadFilenameExportPreset() -> FilenameExportPreset {
+        let rawValue = UserDefaults.standard.string(forKey: filenameExportPresetDefaultsKey) ?? ""
+        return FilenameExportPreset(rawValue: rawValue) ?? .default
+    }
+
+    static func loadCustomFilenameTemplate() -> String {
+        UserDefaults.standard.string(forKey: customFilenameTemplateDefaultsKey) ?? ""
     }
 
     static func loadAfterDownloadBehavior() -> AfterDownloadBehavior {
