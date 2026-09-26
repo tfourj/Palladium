@@ -45,6 +45,8 @@ struct ContentView: View {
     static let showCustomDownloadOptionDefaultsKey = "palladium.showCustomDownloadOption"
     static let downloadPresetSettingsDefaultsKey = "palladium.downloadPresetSettings"
     static let extraArgsDefaultsKey = "palladium.extraArgs"
+    static let filenameExportPresetDefaultsKey = "palladium.filenameExportPreset"
+    static let customFilenameTemplateDefaultsKey = "palladium.customFilenameTemplate"
     static let afterDownloadBehaviorDefaultsKey = "palladium.afterDownloadBehavior"
     static let askUserAfterDownloadDefaultsKey = "palladium.askUserAfterDownload"
     static let selectedPostDownloadActionDefaultsKey = "palladium.selectedPostDownloadAction"
@@ -99,6 +101,8 @@ struct ContentView: View {
     @State var customArgsText: String
     @State var downloadPresetSettings: [DownloadPresetSetting]
     @State var extraArgsText: String
+    @State var filenameExportPreset: FilenameExportPreset
+    @State var customFilenameTemplate: String
     @State var afterDownloadBehavior: AfterDownloadBehavior
     @State var notificationsEnabled: Bool
     @State var rememberSelectedPreset: Bool
@@ -218,6 +222,8 @@ struct ContentView: View {
         _customArgsText = State(initialValue: Self.loadCustomArgs())
         _downloadPresetSettings = State(initialValue: downloadPresetSettings)
         _extraArgsText = State(initialValue: Self.loadExtraArgs())
+        _filenameExportPreset = State(initialValue: Self.loadFilenameExportPreset())
+        _customFilenameTemplate = State(initialValue: Self.loadCustomFilenameTemplate())
         _afterDownloadBehavior = State(initialValue: Self.loadAfterDownloadBehavior())
         _notificationsEnabled = State(initialValue: Self.loadNotificationsEnabled())
         _rememberSelectedPreset = State(initialValue: rememberPreset)
@@ -344,6 +350,8 @@ struct ContentView: View {
                     autoUpdatePackagesOnLaunch: $autoUpdatePackagesOnLaunch,
                     customArgsText: $customArgsText,
                     extraArgsText: $extraArgsText,
+                    filenameExportPreset: $filenameExportPreset,
+                    customFilenameTemplate: $customFilenameTemplate,
                     selectedPreset: $selectedPreset,
                     afterDownloadBehavior: $afterDownloadBehavior,
                     notificationsEnabled: $notificationsEnabled,
@@ -450,6 +458,12 @@ struct ContentView: View {
             persistPreferences()
         }
         .onChange(of: extraArgsText, initial: false) {
+            persistPreferences()
+        }
+        .onChange(of: filenameExportPreset, initial: false) {
+            persistPreferences()
+        }
+        .onChange(of: customFilenameTemplate, initial: false) {
             persistPreferences()
         }
         .onChange(of: downloadPresetSettings, initial: false) {

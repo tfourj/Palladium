@@ -25,7 +25,9 @@ extension ContentView {
             useCookies: useCookies,
             cookieFileName: selectedCookieFileName,
             afterDownloadBehaviorRawValue: afterDownloadBehavior.rawValue,
-            postProcessing: PostProcessingPreferences.load()
+            postProcessing: PostProcessingPreferences.load(),
+            filenameExportPreset: filenameExportPreset,
+            customFilenameTemplate: customFilenameTemplate
         )
     }
 

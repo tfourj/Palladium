@@ -143,11 +143,28 @@ def has_custom_output_template(args):
     for index, arg in enumerate(normalized):
         if arg == "-o":
             return index + 1 < len(normalized)
+        if arg.startswith("-o") and not arg.startswith("--"):
+            return True
         if arg == "--output":
             return index + 1 < len(normalized)
         if arg.startswith("--output="):
             return True
     return False
+
+
+def build_output_args(filename_preset, custom_template, download_playlist, preset_args, extra_args):
+    if has_custom_output_template(preset_args) or has_custom_output_template(extra_args):
+        return []
+
+    if filename_preset == "video_id":
+        template = "%(id)s.%(ext)s"
+    elif filename_preset == "custom" and str(custom_template or "").strip():
+        template = str(custom_template)
+    elif download_playlist:
+        template = "%(playlist_index)03d - %(title).200B.%(ext)s"
+    else:
+        template = "%(title).200B.%(ext)s"
+    return ["-o", template]
 
 
 def apply_post_processing_args(preset_args, extra_args, configuration_json):

@@ -12,6 +12,7 @@ struct SettingsTabView: View {
         case afterDownload
         case downloadBehavior
         case downloadArguments
+        case filenameSettings
         case cookies
         case appearance
         case language
@@ -67,6 +68,8 @@ struct SettingsTabView: View {
     @Binding var autoUpdatePackagesOnLaunch: Bool
     @Binding var customArgsText: String
     @Binding var extraArgsText: String
+    @Binding var filenameExportPreset: FilenameExportPreset
+    @Binding var customFilenameTemplate: String
     @Binding var selectedPreset: DownloadPreset
     @Binding var afterDownloadBehavior: AfterDownloadBehavior
     @Binding var notificationsEnabled: Bool
@@ -264,6 +267,12 @@ struct SettingsTabView: View {
                 extraArgsText: $extraArgsText,
                 isRunning: isRunning
             )
+        case .filenameSettings:
+            FilenameSettingsView(
+                filenameExportPreset: $filenameExportPreset,
+                customFilenameTemplate: $customFilenameTemplate,
+                isRunning: isRunning
+            )
         case .appearance:
             AppearanceSettingsView(
                 appAppearanceMode: $appAppearanceMode,
@@ -386,6 +395,7 @@ struct SettingsTabView: View {
             settingsNavigationLink(for: .postProcessing)
             settingsNavigationLink(for: .afterDownload)
             settingsNavigationLink(for: .downloadBehavior)
+            settingsNavigationLink(for: .filenameSettings)
             settingsNavigationLink(for: .downloadArguments)
             settingsNavigationLink(for: .cookies)
         }
@@ -678,6 +688,22 @@ struct SettingsTabView: View {
                 AnyView(searchToggle(title, isOn: $detailedProgressEnabled, disabled: isRunning))
             },
             controlSetting(
+                id: "filenameExportPreset",
+                menu: .filenameSettings,
+                title: "download.filename.picker",
+                subtitle: "download.filename.help"
+            ) { title in
+                AnyView(
+                    Picker(title, selection: $filenameExportPreset) {
+                        Text("download.filename.default").tag(FilenameExportPreset.default)
+                        Text("download.filename.video_id").tag(FilenameExportPreset.videoID)
+                        Text("download.filename.custom").tag(FilenameExportPreset.custom)
+                    }
+                    .pickerStyle(.menu)
+                    .disabled(isRunning)
+                )
+            },
+            controlSetting(
                 id: "customArguments",
                 menu: .downloadArguments,
                 title: "download.args.custom.title",
@@ -920,6 +946,7 @@ struct SettingsTabView: View {
             .downloadOptions,
             .afterDownload,
             .downloadBehavior,
+            .filenameSettings,
             .downloadArguments,
             .cookies,
             .packages,
@@ -1021,6 +1048,14 @@ struct SettingsTabView: View {
                 subtitle: String(localized: "settings.download_args.subtitle", bundle: .app),
                 icon: "terminal",
                 color: .blue
+            )
+        case .filenameSettings:
+            return SearchableSetting(
+                route: route,
+                title: String(localized: "settings.filename.title", bundle: .app),
+                subtitle: String(localized: "settings.filename.subtitle", bundle: .app),
+                icon: "textformat",
+                color: .indigo
             )
         case .cookies:
             return SearchableSetting(

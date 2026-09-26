@@ -1,5 +1,13 @@
 import Foundation
 
+enum FilenameExportPreset: String, CaseIterable, Identifiable {
+    case `default`
+    case videoID = "video_id"
+    case custom
+
+    var id: String { rawValue }
+}
+
 enum VideoDownloadQuality: String, CaseIterable, Identifiable {
     case best
     case p2160

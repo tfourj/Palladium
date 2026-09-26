@@ -49,12 +49,29 @@ final class DownloadQueueTests: XCTestCase {
         let data = try JSONEncoder().encode(configuration)
         var json = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
         json.removeValue(forKey: "postProcessing")
+        json.removeValue(forKey: "filenameExportPresetRawValue")
+        json.removeValue(forKey: "customFilenameTemplate")
         let legacyData = try JSONSerialization.data(withJSONObject: json)
 
         let restored = try JSONDecoder().decode(QueuedDownloadConfiguration.self, from: legacyData)
 
         XCTAssertNil(restored.postProcessing)
         XCTAssertEqual(restored.presetRawValue, configuration.presetRawValue)
+        XCTAssertEqual(restored.filenameExportPreset, .default)
+        XCTAssertNil(restored.customFilenameTemplate)
+    }
+
+    func testFilenameSettingsSurviveQueuePersistence() throws {
+        var snapshot = configuration
+        snapshot.filenameExportPresetRawValue = FilenameExportPreset.custom.rawValue
+        snapshot.customFilenameTemplate = "%(uploader)s - %(title)s.%(ext)s"
+        var queue = DownloadQueue()
+        queue.append(linksText: "https://example.com/video", configuration: snapshot)
+
+        let restored = try JSONDecoder().decode(DownloadQueue.self, from: JSONEncoder().encode(queue))
+
+        XCTAssertEqual(restored.items.first?.configuration.filenameExportPreset, .custom)
+        XCTAssertEqual(restored.items.first?.configuration.customFilenameTemplate, snapshot.customFilenameTemplate)
     }
 
     func testBatchUsesConfigurationSnapshotForEveryItem() {
