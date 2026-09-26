@@ -413,6 +413,8 @@ extension ContentView {
             )
         }
         let downloadPlaylistAtStart = queuedConfiguration?.downloadPlaylist ?? downloadPlaylist
+        let filenameExportPresetAtStart = queuedConfiguration?.filenameExportPreset ?? filenameExportPreset
+        let customFilenameTemplateAtStart = queuedConfiguration?.customFilenameTemplate ?? customFilenameTemplate
         let downloadSubtitlesAtStart = queuedConfiguration?.downloadSubtitles ?? downloadSubtitles
         let embedThumbnailAtStart = queuedConfiguration?.embedThumbnail ?? embedThumbnail
         let autoRetryFailedDownloadsAtStart = queuedConfiguration?.autoRetryFailedDownloads
@@ -490,7 +492,9 @@ extension ContentView {
                     cookieFilePath: cookieFilePathAtStart,
                     runOutputDir: runOutputURL.path,
                     packageSourceJSON: buildPackageSourceJSON(),
-                    liveLogFD: liveLogFD
+                    liveLogFD: liveLogFD,
+                    filenameExportPreset: filenameExportPresetAtStart,
+                    customFilenameTemplate: customFilenameTemplateAtStart
                 )
             }
 

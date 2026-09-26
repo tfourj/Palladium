@@ -7,8 +7,22 @@ import yt_dlp
 from scripts.python_tests import helpers  # noqa: F401
 
 from palladium_ytdlp.ytdlp import list_yt_dlp_formats, resolve_picker_formats  # noqa: E402
-from palladium_ytdlp.args import apply_post_processing_args  # noqa: E402
+from palladium_ytdlp.args import apply_post_processing_args, build_output_args  # noqa: E402
 from yt_dlp.postprocessor.ffmpeg import FFmpegVideoConvertorPP, FFmpegVideoRemuxerPP
+
+
+class OutputTemplateIntegrationTests(unittest.TestCase):
+    def test_default_shortens_long_unicode_titles_and_keeps_extension(self):
+        output_args = build_output_args("default", "", False, [], [])
+        options = yt_dlp.parse_options(["--ignore-config", *output_args]).ydl_opts
+        downloader = yt_dlp.YoutubeDL(options)
+
+        short_name = downloader.prepare_filename({"id": "short", "title": "Short title", "ext": "mp4"})
+        long_name = downloader.prepare_filename({"id": "long", "title": "é" * 200, "ext": "mp4"})
+
+        self.assertEqual(short_name, "Short title.mp4")
+        self.assertTrue(long_name.endswith(".mp4"))
+        self.assertLessEqual(len(long_name.encode("utf-8")), 204)
 
 
 class PostProcessingIntegrationTests(unittest.TestCase):

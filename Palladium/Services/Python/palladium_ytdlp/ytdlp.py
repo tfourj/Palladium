@@ -9,8 +9,8 @@ import urllib.parse
 
 from .args import (
     apply_post_processing_args,
+    build_output_args,
     build_preset_args,
-    has_custom_output_template,
     parse_custom_args,
     parse_extra_args,
     parse_preset_args_map,
@@ -622,6 +622,8 @@ def run_yt_dlp_flow(
     live_log_fd_override=None,
     package_source_json_override=None,
     post_processing_json_override=None,
+    filename_export_preset_override=None,
+    custom_filename_template_override=None,
 ):
     output = TailBuffer()
     console_stdout = sys.__stdout__ if sys.__stdout__ is not None else None
@@ -650,6 +652,14 @@ def run_yt_dlp_flow(
         extra_args_text = os.environ.get("PALLADIUM_EXTRA_ARGS", "").strip()
     else:
         extra_args_text = str(extra_args_override).strip()
+    if filename_export_preset_override is None:
+        filename_export_preset = os.environ.get("PALLADIUM_FILENAME_EXPORT_PRESET", "default").strip()
+    else:
+        filename_export_preset = str(filename_export_preset_override).strip()
+    if custom_filename_template_override is None:
+        custom_filename_template = os.environ.get("PALLADIUM_CUSTOM_FILENAME_TEMPLATE", "")
+    else:
+        custom_filename_template = str(custom_filename_template_override)
     if download_playlist_override is None:
         download_playlist = os.environ.get("PALLADIUM_DOWNLOAD_PLAYLIST", "").strip().lower() in ("1", "true", "yes", "on")
     else:
@@ -819,16 +829,17 @@ def run_yt_dlp_flow(
                             preset_args, extra_args, post_processing_json_override
                         )
                         raise_if_cancel_requested(cancel_file_path, "[palladium] cancellation requested before yt-dlp invocation")
-                        output_args = []
+                        output_args = build_output_args(
+                            filename_export_preset,
+                            custom_filename_template,
+                            download_playlist,
+                            preset_args,
+                            extra_args,
+                        )
                         download_behavior_args = []
                         filter_embedded_entries = should_inspect_embedded_playlist(download_url, download_preset)
-                        if has_custom_output_template(preset_args) or has_custom_output_template(extra_args):
+                        if not output_args:
                             print("[palladium] custom output template detected")
-                        else:
-                            if download_playlist:
-                                output_args = ["-o", "%(playlist_index)03d - %(title)s.%(ext)s"]
-                            else:
-                                output_args = ["-o", "%(title)s.%(ext)s"]
 
                         if not download_playlist:
                             download_behavior_args.append("--no-playlist")

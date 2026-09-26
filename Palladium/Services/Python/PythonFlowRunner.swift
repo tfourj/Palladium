@@ -206,7 +206,9 @@ enum PythonFlowRunner {
         cookieFilePath: String?,
         runOutputDir: String,
         packageSourceJSON: String,
-        liveLogFD: Int32?
+        liveLogFD: Int32?,
+        filenameExportPreset: FilenameExportPreset,
+        customFilenameTemplate: String
     ) async -> PythonFlowOutcome {
         await runOnPythonThread {
             let payload: String
@@ -229,7 +231,9 @@ enum PythonFlowRunner {
                         runOutputDir,
                         liveLogArgument,
                         packageSourceJSON,
-                        postProcessingJSON
+                        postProcessingJSON,
+                        filenameExportPreset.rawValue,
+                        customFilenameTemplate
                     ]
                 )
                 payload = String(result) ?? ""
