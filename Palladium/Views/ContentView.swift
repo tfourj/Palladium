@@ -350,6 +350,8 @@ struct ContentView: View {
                     autoUpdatePackagesOnLaunch: $autoUpdatePackagesOnLaunch,
                     customArgsText: $customArgsText,
                     extraArgsText: $extraArgsText,
+                    filenameExportPreset: $filenameExportPreset,
+                    customFilenameTemplate: $customFilenameTemplate,
                     selectedPreset: $selectedPreset,
                     afterDownloadBehavior: $afterDownloadBehavior,
                     notificationsEnabled: $notificationsEnabled,

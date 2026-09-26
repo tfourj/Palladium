@@ -1196,6 +1196,83 @@
         }
       }
     },
+    "download.filename.picker" : {
+      "comment" : "Label for selecting a yt-dlp output filename preset.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filename"
+          }
+        }
+      }
+    },
+    "download.filename.default" : {
+      "comment" : "Filename preset that uses a shortened media title.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Default"
+          }
+        }
+      }
+    },
+    "download.filename.video_id" : {
+      "comment" : "Filename preset that uses the media site's stable yt-dlp ID.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video ID"
+          }
+        }
+      }
+    },
+    "download.filename.custom" : {
+      "comment" : "Filename preset for a user-supplied yt-dlp output template.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Custom"
+          }
+        }
+      }
+    },
+    "download.filename.custom.placeholder" : {
+      "comment" : "Example yt-dlp output filename template shown in the custom field.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%(title)s.%(ext)s"
+          }
+        }
+      }
+    },
+    "download.filename.custom.help" : {
+      "comment" : "Help text for a user-supplied yt-dlp output filename template.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter a yt-dlp output template. Include %(ext)s for the file extension. Leave blank to use Default."
+          }
+        }
+      }
+    },
+    "download.filename.help" : {
+      "comment" : "Help text explaining filename preset behavior and existing output argument priority.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Default shortens long titles to 200 bytes. Video ID uses the media site's stable ID. Existing -o or --output arguments take priority."
+          }
+        }
+      }
+    },
     "download.custom.value" : {
       "localizations" : {
         "en" : {
@@ -6212,6 +6289,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "全般"
+          }
+        }
+      }
+    },
+    "settings.filename.title" : {
+      "comment" : "Title of the yt-dlp output filename settings screen.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filename Settings"
+          }
+        }
+      }
+    },
+    "settings.filename.subtitle" : {
+      "comment" : "Subtitle for the yt-dlp output filename settings screen.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose how downloaded files are named"
           }
         }
       }
