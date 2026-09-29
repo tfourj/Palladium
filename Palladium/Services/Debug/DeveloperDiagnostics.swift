@@ -145,6 +145,7 @@ nonisolated enum DeveloperDiagnostics {
             DeveloperDiagnosticDetail(key: "Bundle ID", value: Bundle.main.bundleIdentifier ?? "unknown"),
             DeveloperDiagnosticDetail(key: "System", value: "\(device.systemName) \(device.systemVersion)"),
             DeveloperDiagnosticDetail(key: "Hardware", value: "\(machine) (\(destination))"),
+            DeveloperDiagnosticDetail(key: "SwiftFFmpeg build", value: SwiftFFmpeg.buildCommit),
             DeveloperDiagnosticDetail(key: "JavaScript runtime", value: JavaScriptRuntime.selected.rawValue),
             DeveloperDiagnosticDetail(key: "PYTHONHOME", value: environment["PYTHONHOME"] ?? "unset"),
             DeveloperDiagnosticDetail(key: "Downloads", value: environment["PALLADIUM_DOWNLOADS"] ?? "unset"),
@@ -205,7 +206,7 @@ nonisolated enum DeveloperDiagnostics {
     static func ffmpeg(tool: FFmpegTool, arguments: [String]) async -> DeveloperDiagnosticResult {
         await measured {
             let executed = executeFFmpeg(tool: tool, arguments: arguments)
-            var details: [DeveloperDiagnosticDetail] = []
+            var details = [DeveloperDiagnosticDetail(key: "swiftffmpeg build", value: SwiftFFmpeg.buildCommit)]
             if let version = ffmpegVersion(from: executed.output) {
                 details.append(DeveloperDiagnosticDetail(key: "version", value: version))
             }
