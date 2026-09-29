@@ -143,3 +143,10 @@ xcodebuild test \
   ARCHS=arm64 \
   ONLY_ACTIVE_ARCH=YES
 ```
+
+## Developer Menu
+
+- Available in Debug builds only
+- Shake the device, or use `Device -> Shake` in the Simulator
+- Shows version info and runs checks for Python, FFmpeg, curl-cffi, and QuickJS
+- Avoid running checks during a download
