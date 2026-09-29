@@ -76,6 +76,7 @@ Palladium/
 | `Views/ContentView+Preferences.swift` | Shared preference access and updates. |
 | `Views/ContentView+Storage.swift` | Download storage and file-management behavior. |
 | `Views/ContentView+Support.swift` | Support, diagnostics, and helper UI behavior. |
+| `Views/Debug/DeveloperDebugMenuPresenter.swift` | Opens the developer menu on device shake in debug builds. |
 | `Views/Debug/DeveloperDebugMenuView.swift` | Debug-only developer menu, check results, and shared diagnostic result views. |
 | `Views/Debug/DeveloperFrameworkDebugView.swift` | Per-framework version info, checks, and Python, FFmpeg, curl-cffi, and QuickJS playgrounds. |
 | `Views/Tabs/DownloadTabView.swift` | Main download screen. |
