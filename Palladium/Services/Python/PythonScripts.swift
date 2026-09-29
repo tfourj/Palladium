@@ -5,6 +5,7 @@ enum PythonScripts {
         "yt_dlp_flow.py",
         "palladium_ytdlp/__init__.py",
         "palladium_ytdlp/args.py",
+        "palladium_ytdlp/diagnostics.py",
         "palladium_ytdlp/entrypoints.py",
         "palladium_ytdlp/ffmpeg_bridge.py",
         "palladium_ytdlp/files.py",

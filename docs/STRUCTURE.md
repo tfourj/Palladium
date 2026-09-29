@@ -123,6 +123,7 @@ Palladium/
 | `Services/Python/yt_dlp_flow.py` | Python flow that invokes yt-dlp for downloads. |
 | `Services/Python/palladium_ytdlp/__init__.py` | Python package marker and exports. |
 | `Services/Python/palladium_ytdlp/args.py` | Builds yt-dlp command arguments, including final video conversion overrides. |
+| `Services/Python/palladium_ytdlp/diagnostics.py` | Debug menu probes for Python, curl-cffi, and the FFmpeg and QuickJS bridges. |
 | `Services/Python/palladium_ytdlp/entrypoints.py` | Stable public Python entry point facade used by Swift. |
 | `Services/Python/palladium_ytdlp/ffmpeg_bridge.py` | Connects Python download work to FFmpeg. |
 | `Services/Python/palladium_ytdlp/files.py` | Download file and path helpers. |
