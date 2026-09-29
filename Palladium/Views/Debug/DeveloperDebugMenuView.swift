@@ -139,6 +139,7 @@ struct DeveloperCheckLink: View {
             } label: {
                 row(result: nil)
             }
+            .tint(.primary)
             .disabled(store.isRunning(check))
         }
     }
