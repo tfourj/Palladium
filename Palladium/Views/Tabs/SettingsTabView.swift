@@ -12,6 +12,7 @@ struct SettingsTabView: View {
         case afterDownload
         case downloadBehavior
         case downloadArguments
+        case websiteArguments
         case filenameSettings
         case cookies
         case appearance
@@ -267,6 +268,8 @@ struct SettingsTabView: View {
                 extraArgsText: $extraArgsText,
                 isRunning: isRunning
             )
+        case .websiteArguments:
+            WebsiteArgumentsSettingsView(isRunning: isRunning)
         case .filenameSettings:
             FilenameSettingsView(
                 filenameExportPreset: $filenameExportPreset,
@@ -948,6 +951,7 @@ struct SettingsTabView: View {
             .downloadBehavior,
             .filenameSettings,
             .downloadArguments,
+            .websiteArguments,
             .cookies,
             .packages,
             .packageManager,
@@ -1048,6 +1052,14 @@ struct SettingsTabView: View {
                 subtitle: String(localized: "settings.download_args.subtitle", bundle: .app),
                 icon: "terminal",
                 color: .blue
+            )
+        case .websiteArguments:
+            return SearchableSetting(
+                route: route,
+                title: String(localized: "settings.website_args.title", bundle: .app),
+                subtitle: String(localized: "settings.website_args.subtitle", bundle: .app),
+                icon: "globe",
+                color: .teal
             )
         case .filenameSettings:
             return SearchableSetting(

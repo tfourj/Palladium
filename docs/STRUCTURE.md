@@ -90,6 +90,7 @@ Palladium/
 | `Views/Tabs/Settings/CookiesSettingsView.swift` | Cookie settings screen. |
 | `Views/Tabs/Settings/CookieWebsiteImportView.swift` | Private website login flow for importing browser cookies. |
 | `Views/Tabs/Settings/DownloadArgumentsSettingsView.swift` | Custom yt-dlp argument settings screen. |
+| `Views/Tabs/Settings/WebsiteArgumentsSettingsView.swift` | Per-website yt-dlp argument rule list, editor, and link tester. |
 | `Views/Tabs/Settings/DownloadBehaviorSettingsView.swift` | Download behavior settings screen. |
 | `Views/Tabs/Settings/DownloadModesSettingsView.swift` | Download-mode settings screen. |
 | `Views/Tabs/Settings/DownloadOptionsSettingsView.swift` | Download option settings screen. |
