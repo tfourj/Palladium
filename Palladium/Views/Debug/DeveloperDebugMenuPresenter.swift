@@ -26,6 +26,7 @@ enum DeveloperDebugMenuPresenter {
         let menu = DeveloperDebugMenuView(store: store) {
             presenter.dismiss(animated: true)
         }
+        UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
         presenter.present(DeveloperDebugMenuHostingController(rootView: menu), animated: true)
     }
 }
