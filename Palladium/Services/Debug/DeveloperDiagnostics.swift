@@ -205,9 +205,8 @@ nonisolated enum DeveloperDiagnostics {
     static func ffmpeg(tool: FFmpegTool, arguments: [String]) async -> DeveloperDiagnosticResult {
         await measured {
             let executed = executeFFmpeg(tool: tool, arguments: arguments)
-            let toolName = tool == .ffmpeg ? "ffmpeg" : "ffprobe"
             var details: [DeveloperDiagnosticDetail] = []
-            if let version = ffmpegVersion(from: executed.output, tool: toolName) {
+            if let version = ffmpegVersion(from: executed.output) {
                 details.append(DeveloperDiagnosticDetail(key: "version", value: version))
             }
             if let configuration = ffmpegConfiguration(from: executed.output) {
@@ -224,6 +223,7 @@ nonisolated enum DeveloperDiagnostics {
             try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
             defer { try? FileManager.default.removeItem(at: directory) }
             let outputPath = directory.appendingPathComponent("native-test.mp4").path
+            let probeURL = directory.appendingPathComponent("native-test.json")
 
             let encode = executeFFmpeg(tool: .ffmpeg, arguments: [
                 "-hide_banner", "-nostdin", "-y",
@@ -235,14 +235,15 @@ nonisolated enum DeveloperDiagnostics {
                 return (false, encode.output, [], encode.error ?? "ffmpeg exited with \(encode.exitCode)")
             }
 
+            // The native wrapper mixes FFmpeg's log into captured output, so ffprobe writes JSON to a file.
             let probe = executeFFmpeg(tool: .ffprobe, arguments: [
                 "-hide_banner", "-v", "error", "-show_entries", "stream=codec_name",
-                "-of", "csv=p=0", outputPath,
+                "-of", "json", "-o", probeURL.path, outputPath,
             ])
-            let codecs = probe.output
-                .split(whereSeparator: \.isNewline)
-                .map { $0.trimmingCharacters(in: .whitespaces) }
-                .filter { !$0.isEmpty }
+            let probeJSON = (try? Data(contentsOf: probeURL))
+                .flatMap { try? JSONSerialization.jsonObject(with: $0) as? [String: Any] }
+            let streams = probeJSON?["streams"] as? [[String: Any]] ?? []
+            let codecs = streams.compactMap { $0["codec_name"] as? String }
             let size = (try? FileManager.default.attributesOfItem(atPath: outputPath)[.size] as? Int) ?? 0
             let details = [
                 DeveloperDiagnosticDetail(key: "streams", value: codecs.joined(separator: ", ")),
@@ -252,12 +253,12 @@ nonisolated enum DeveloperDiagnostics {
         }
     }
 
-    static func ffmpegVersion(from output: String, tool: String) -> String? {
-        let prefix = "\(tool) version "
+    // Both tools share one program name in the linked wrapper, so ffprobe also prints "ffmpeg version".
+    static func ffmpegVersion(from output: String) -> String? {
         for line in output.split(whereSeparator: \.isNewline) {
-            let trimmed = line.trimmingCharacters(in: .whitespaces)
-            guard trimmed.lowercased().hasPrefix(prefix) else { continue }
-            return trimmed.dropFirst(prefix.count).split(separator: " ").first.map(String.init)
+            let words = line.split(separator: " ")
+            guard words.count > 2, ["ffmpeg", "ffprobe"].contains(words[0]), words[1] == "version" else { continue }
+            return String(words[2])
         }
         return nil
     }

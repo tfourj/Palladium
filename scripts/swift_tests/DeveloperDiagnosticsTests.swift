@@ -7,8 +7,9 @@ final class DeveloperDiagnosticsTests: XCTestCase {
         ffmpeg version n8.0.1 Copyright (c) 2000-2025 the FFmpeg developers
         configuration: --enable-gpl --enable-libopus
         """
-        XCTAssertEqual(DeveloperDiagnostics.ffmpegVersion(from: output, tool: "ffmpeg"), "n8.0.1")
-        XCTAssertNil(DeveloperDiagnostics.ffmpegVersion(from: output, tool: "ffprobe"))
+        XCTAssertEqual(DeveloperDiagnostics.ffmpegVersion(from: output), "n8.0.1")
+        XCTAssertEqual(DeveloperDiagnostics.ffmpegVersion(from: "ffprobe version 8.1 Copyright"), "8.1")
+        XCTAssertNil(DeveloperDiagnostics.ffmpegVersion(from: "configuration: --enable-gpl"))
         XCTAssertEqual(DeveloperDiagnostics.ffmpegConfiguration(from: output), "--enable-gpl --enable-libopus")
     }
 
@@ -45,6 +46,12 @@ final class DeveloperDiagnosticsTests: XCTestCase {
         let result = await DeveloperDiagnostics.ffmpeg(tool: .ffmpeg, arguments: ["-hide_banner", "-version"])
         XCTAssertTrue(result.ok, result.report)
         XCTAssertNotNil(result.details.first { $0.key == "version" })
+    }
+
+    func testNativeFFmpegEncodesAndProbesTestMedia() async {
+        let result = await DeveloperDiagnostics.ffmpegEncodeTest()
+        XCTAssertTrue(result.ok, result.report)
+        XCTAssertEqual(result.details.first { $0.key == "streams" }?.value, "mpeg4, aac")
     }
 
     func testStandardChecksCoverEveryFramework() {
