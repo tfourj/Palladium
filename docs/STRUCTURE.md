@@ -76,6 +76,8 @@ Palladium/
 | `Views/ContentView+Preferences.swift` | Shared preference access and updates. |
 | `Views/ContentView+Storage.swift` | Download storage and file-management behavior. |
 | `Views/ContentView+Support.swift` | Support, diagnostics, and helper UI behavior. |
+| `Views/Debug/DeveloperDebugMenuView.swift` | Debug-only developer menu, check results, and shared diagnostic result views. |
+| `Views/Debug/DeveloperFrameworkDebugView.swift` | Per-framework version info, checks, and Python, FFmpeg, curl-cffi, and QuickJS playgrounds. |
 | `Views/Tabs/DownloadTabView.swift` | Main download screen. |
 | `Views/Tabs/GalleryVideoPreview.swift` | Gallery picker video thumbnail, loading state, and fallback icon. |
 | `Views/Tabs/FormatPickerSheetView.swift` | Shared yt-dlp format and quality picker sheet. |
