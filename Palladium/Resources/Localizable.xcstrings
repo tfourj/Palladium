@@ -1204,6 +1204,12 @@
             "state" : "translated",
             "value" : "Filename"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファイル名"
+          }
         }
       }
     },
@@ -1214,6 +1220,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Default"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "デフォルト"
           }
         }
       }
@@ -1226,6 +1238,12 @@
             "state" : "translated",
             "value" : "Video ID"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ビデオID"
+          }
         }
       }
     },
@@ -1237,6 +1255,12 @@
             "state" : "translated",
             "value" : "Custom"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カスタム"
+          }
         }
       }
     },
@@ -1244,6 +1268,12 @@
       "comment" : "Example yt-dlp output filename template shown in the custom field.",
       "localizations" : {
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%(title)s.%(ext)s"
+          }
+        },
+        "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%(title)s.%(ext)s"
@@ -1259,6 +1289,12 @@
             "state" : "translated",
             "value" : "Enter a yt-dlp output template. Include %(ext)s for the file extension. Leave blank to use Default."
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "yt-dlp出力テンプレートを入力します。ファイル拡張子には %(ext)s を含めます。デフォルトを使用するには空白のままにしてください。"
+          }
         }
       }
     },
@@ -1269,6 +1305,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Default shortens long titles to 200 bytes. Video ID uses the media site's stable ID. Existing -o or --output arguments take priority."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "デフォルトでは、長いタイトルを 200 バイトに短縮します。ビデオ ID ではメディアサイトの安定した ID を使用します。既存の -o または --output 引数は優先されます。"
           }
         }
       }
@@ -6301,6 +6343,12 @@
             "state" : "translated",
             "value" : "Filename Settings"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファイル名の設定"
+          }
         }
       }
     },
@@ -6311,6 +6359,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Choose how downloaded files are named"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ダウンロードしたファイルの名前を選択"
           }
         }
       }
@@ -8430,6 +8484,12 @@
             "state" : "translated",
             "value" : "Website Arguments"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Website Arguments"
+          }
         }
       }
     },
@@ -8439,6 +8499,12 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
+            "value" : "yt-dlp args for specific websites"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "new",
             "value" : "yt-dlp args for specific websites"
           }
         }
@@ -8452,6 +8518,12 @@
             "state" : "translated",
             "value" : "Add yt-dlp args that only apply to links from specific websites."
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add yt-dlp args that only apply to links from specific websites."
+          }
         }
       }
     },
@@ -8461,6 +8533,12 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
+            "value" : "Rules"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "new",
             "value" : "Rules"
           }
         }
@@ -8474,6 +8552,12 @@
             "state" : "translated",
             "value" : "No website rules yet."
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "No website rules yet."
+          }
         }
       }
     },
@@ -8483,6 +8567,12 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
+            "value" : "Add Rule"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "new",
             "value" : "Add Rule"
           }
         }
@@ -8496,6 +8586,12 @@
             "state" : "translated",
             "value" : "Only one rule applies to each link. Regex rules are checked first, from top to bottom. Otherwise the most specific website wins, so test.example.com is used before example.com. Website args are added after global extra args."
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Only one rule applies to each link. Regex rules are checked first, from top to bottom. Otherwise the most specific website wins, so test.example.com is used before example.com. Website args are added after global extra args."
+          }
         }
       }
     },
@@ -8505,6 +8601,12 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
+            "value" : "Test a Link"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "new",
             "value" : "Test a Link"
           }
         }
@@ -8518,6 +8620,12 @@
             "state" : "translated",
             "value" : "https://example.com/video"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "https://example.com/video"
+          }
         }
       }
     },
@@ -8527,6 +8635,12 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
+            "value" : "Uses %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "new",
             "value" : "Uses %@"
           }
         }
@@ -8540,6 +8654,12 @@
             "state" : "translated",
             "value" : "No rule matches this link."
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "No rule matches this link."
+          }
         }
       }
     },
@@ -8549,6 +8669,12 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
+            "value" : "Match"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "new",
             "value" : "Match"
           }
         }
@@ -8562,6 +8688,12 @@
             "state" : "translated",
             "value" : "Website"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Website"
+          }
         }
       }
     },
@@ -8571,6 +8703,12 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
+            "value" : "Regex"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "new",
             "value" : "Regex"
           }
         }
@@ -8584,6 +8722,12 @@
             "state" : "translated",
             "value" : "example.com"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "example.com"
+          }
         }
       }
     },
@@ -8593,6 +8737,12 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
+            "value" : "https?://example.com/watch.*"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "new",
             "value" : "https?://example.com/watch.*"
           }
         }
@@ -8606,6 +8756,12 @@
             "state" : "translated",
             "value" : "Matches this website and all of its subdomains."
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Matches this website and all of its subdomains."
+          }
         }
       }
     },
@@ -8615,6 +8771,12 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
+            "value" : "Matched against the full link, ignoring case."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "new",
             "value" : "Matched against the full link, ignoring case."
           }
         }
@@ -8628,6 +8790,12 @@
             "state" : "translated",
             "value" : "Enter a website like example.com."
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Enter a website like example.com."
+          }
         }
       }
     },
@@ -8637,6 +8805,12 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
+            "value" : "This regular expression is not valid."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "new",
             "value" : "This regular expression is not valid."
           }
         }
@@ -8650,6 +8824,12 @@
             "state" : "translated",
             "value" : "Arguments"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Arguments"
+          }
         }
       }
     },
@@ -8659,6 +8839,12 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
+            "value" : "--no-mtime"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "new",
             "value" : "--no-mtime"
           }
         }
@@ -8672,6 +8858,12 @@
             "state" : "translated",
             "value" : "Added after global extra args for links that match this rule."
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Added after global extra args for links that match this rule."
+          }
         }
       }
     },
@@ -8681,6 +8873,12 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
+            "value" : "Enabled"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "new",
             "value" : "Enabled"
           }
         }
@@ -8694,6 +8892,12 @@
             "state" : "translated",
             "value" : "Off"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Off"
+          }
         }
       }
     },
@@ -8705,6 +8909,12 @@
             "state" : "translated",
             "value" : "New Rule"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "New Rule"
+          }
         }
       }
     },
@@ -8714,6 +8924,12 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
+            "value" : "Edit Rule"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "new",
             "value" : "Edit Rule"
           }
         }
