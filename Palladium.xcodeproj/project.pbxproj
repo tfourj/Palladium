@@ -7,17 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		D22000042F80000100D20001 /* QuickJS LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = D21000042F80000100D20001 /* QuickJS LICENSE */; };
-		D22000032F80000100D20001 /* libunicode.c in Sources */ = {isa = PBXBuildFile; fileRef = D21000032F80000100D20001 /* libunicode.c */; settings = {COMPILER_FLAGS = "-D_GNU_SOURCE -DQUICKJS_NG_BUILD"; }; };
-		D22000022F80000100D20001 /* libregexp.c in Sources */ = {isa = PBXBuildFile; fileRef = D21000022F80000100D20001 /* libregexp.c */; settings = {COMPILER_FLAGS = "-D_GNU_SOURCE -DQUICKJS_NG_BUILD"; }; };
-		D22000012F80000100D20001 /* dtoa.c in Sources */ = {isa = PBXBuildFile; fileRef = D21000012F80000100D20001 /* dtoa.c */; settings = {COMPILER_FLAGS = "-D_GNU_SOURCE -DQUICKJS_NG_BUILD"; }; };
-		D22000002F80000100D20001 /* quickjs.c in Sources */ = {isa = PBXBuildFile; fileRef = D21000002F80000100D20001 /* quickjs.c */; settings = {COMPILER_FLAGS = "-D_GNU_SOURCE -DQUICKJS_NG_BUILD"; }; };
 		8256E3B62F57A8970067DF6E /* ShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 8256E3AC2F57A8960067DF6E /* ShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		82BF06CE2F5762BC00133331 /* Frameworks/Python.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82BF06CD2F5762BC00133331 /* Frameworks/Python.xcframework */; };
 		82BF06CF2F5762BC00133331 /* Frameworks/Python.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 82BF06CD2F5762BC00133331 /* Frameworks/Python.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		82BF06D32F5762DD00133331 /* PythonKit in Frameworks */ = {isa = PBXBuildFile; productRef = 82BF06D22F5762DD00133331 /* PythonKit */; };
 		82CFC0012F70000100CFF001 /* SwiftCurlCffiIOS in Frameworks */ = {isa = PBXBuildFile; productRef = 82CFC0032F70000100CFF001 /* SwiftCurlCffiIOS */; };
 		82FD7E062F5B673000E69220 /* SwiftFFmpeg in Frameworks */ = {isa = PBXBuildFile; productRef = 82FD7E052F5B673000E69220 /* SwiftFFmpeg */; };
+		D22000002F80000100D20001 /* Frameworks/QuickJS/quickjs.c in Sources */ = {isa = PBXBuildFile; fileRef = D21000002F80000100D20001 /* Frameworks/QuickJS/quickjs.c */; settings = {COMPILER_FLAGS = "-D_GNU_SOURCE -DQUICKJS_NG_BUILD"; }; };
+		D22000012F80000100D20001 /* Frameworks/QuickJS/dtoa.c in Sources */ = {isa = PBXBuildFile; fileRef = D21000012F80000100D20001 /* Frameworks/QuickJS/dtoa.c */; settings = {COMPILER_FLAGS = "-D_GNU_SOURCE -DQUICKJS_NG_BUILD"; }; };
+		D22000022F80000100D20001 /* Frameworks/QuickJS/libregexp.c in Sources */ = {isa = PBXBuildFile; fileRef = D21000022F80000100D20001 /* Frameworks/QuickJS/libregexp.c */; settings = {COMPILER_FLAGS = "-D_GNU_SOURCE -DQUICKJS_NG_BUILD"; }; };
+		D22000032F80000100D20001 /* Frameworks/QuickJS/libunicode.c in Sources */ = {isa = PBXBuildFile; fileRef = D21000032F80000100D20001 /* Frameworks/QuickJS/libunicode.c */; settings = {COMPILER_FLAGS = "-D_GNU_SOURCE -DQUICKJS_NG_BUILD"; }; };
+		D22000042F80000100D20001 /* QuickJS LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = D21000042F80000100D20001 /* QuickJS LICENSE */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -63,17 +63,17 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		D21000042F80000100D20001 /* QuickJS LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; name = "QuickJS LICENSE"; path = Frameworks/QuickJS/LICENSE; sourceTree = SOURCE_ROOT; };
-		D21000032F80000100D20001 /* libunicode.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Frameworks/QuickJS/libunicode.c; sourceTree = SOURCE_ROOT; };
-		D21000022F80000100D20001 /* libregexp.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Frameworks/QuickJS/libregexp.c; sourceTree = SOURCE_ROOT; };
-		D21000012F80000100D20001 /* dtoa.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Frameworks/QuickJS/dtoa.c; sourceTree = SOURCE_ROOT; };
-		D21000002F80000100D20001 /* quickjs.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Frameworks/QuickJS/quickjs.c; sourceTree = SOURCE_ROOT; };
 		8256E3AC2F57A8960067DF6E /* ShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		82BF06BE2F5761E800133331 /* Palladium.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Palladium.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		82BF06CD2F5762BC00133331 /* Frameworks/Python.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = Frameworks/Python.xcframework; sourceTree = "<group>"; };
 		82BF06D42F5762DD00133331 /* Version.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Version.xcconfig; sourceTree = "<group>"; };
 		82FD7E012F5B666000E69220 /* FFmpeg.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = FFmpeg.xcframework; path = "Frameworks/SwiftFFmpeg-iOS/FFmpeg.xcframework"; sourceTree = "<group>"; };
 		D10000022F80000100D10001 /* PalladiumTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PalladiumTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D21000002F80000100D20001 /* Frameworks/QuickJS/quickjs.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Frameworks/QuickJS/quickjs.c; sourceTree = SOURCE_ROOT; };
+		D21000012F80000100D20001 /* Frameworks/QuickJS/dtoa.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Frameworks/QuickJS/dtoa.c; sourceTree = SOURCE_ROOT; };
+		D21000022F80000100D20001 /* Frameworks/QuickJS/libregexp.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Frameworks/QuickJS/libregexp.c; sourceTree = SOURCE_ROOT; };
+		D21000032F80000100D20001 /* Frameworks/QuickJS/libunicode.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Frameworks/QuickJS/libunicode.c; sourceTree = SOURCE_ROOT; };
+		D21000042F80000100D20001 /* QuickJS LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; name = "QuickJS LICENSE"; path = Frameworks/QuickJS/LICENSE; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -147,6 +147,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		82497AAA306C31B100548C17 /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				D21000032F80000100D20001 /* Frameworks/QuickJS/libunicode.c */,
+				D21000022F80000100D20001 /* Frameworks/QuickJS/libregexp.c */,
+				D21000012F80000100D20001 /* Frameworks/QuickJS/dtoa.c */,
+				D21000002F80000100D20001 /* Frameworks/QuickJS/quickjs.c */,
+				D21000042F80000100D20001 /* QuickJS LICENSE */,
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
 		82BF06B52F5761E800133331 = {
 			isa = PBXGroup;
 			children = (
@@ -156,6 +168,7 @@
 				8256E3AD2F57A8970067DF6E /* ShareExtension */,
 				82BF06CC2F5762BC00133331 /* Frameworks */,
 				82BF06BF2F5761E800133331 /* Products */,
+				82497AAA306C31B100548C17 /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -385,10 +398,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D22000032F80000100D20001 /* libunicode.c in Sources */,
-				D22000022F80000100D20001 /* libregexp.c in Sources */,
-				D22000012F80000100D20001 /* dtoa.c in Sources */,
-				D22000002F80000100D20001 /* quickjs.c in Sources */,
+				D22000032F80000100D20001 /* Frameworks/QuickJS/libunicode.c in Sources */,
+				D22000022F80000100D20001 /* Frameworks/QuickJS/libregexp.c in Sources */,
+				D22000012F80000100D20001 /* Frameworks/QuickJS/dtoa.c in Sources */,
+				D22000002F80000100D20001 /* Frameworks/QuickJS/quickjs.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -626,6 +639,10 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Frameworks/QuickJS",
+				);
 				INFOPLIST_FILE = Palladium/Info.plist;
 				INFOPLIST_KEY_APP_FINAL = "$(APP_FINAL)";
 				INFOPLIST_KEY_CFBundleDisplayName = Palladium;
@@ -645,10 +662,6 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = "$(APP_VERSION)";
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(SRCROOT)/Frameworks/QuickJS",
-				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-Wl,-u,_palladium_ffmpeg_bridge_run",
@@ -683,6 +696,10 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Frameworks/QuickJS",
+				);
 				INFOPLIST_FILE = Palladium/Info.plist;
 				INFOPLIST_KEY_APP_FINAL = "$(APP_FINAL)";
 				INFOPLIST_KEY_CFBundleDisplayName = Palladium;
@@ -702,10 +719,6 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = "$(APP_VERSION)";
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(SRCROOT)/Frameworks/QuickJS",
-				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-Wl,-u,_palladium_ffmpeg_bridge_run",

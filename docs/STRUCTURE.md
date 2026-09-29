@@ -76,6 +76,9 @@ Palladium/
 | `Views/ContentView+Preferences.swift` | Shared preference access and updates. |
 | `Views/ContentView+Storage.swift` | Download storage and file-management behavior. |
 | `Views/ContentView+Support.swift` | Support, diagnostics, and helper UI behavior. |
+| `Views/Debug/DeveloperDebugMenuPresenter.swift` | Opens the developer menu on device shake in debug builds. |
+| `Views/Debug/DeveloperDebugMenuView.swift` | Debug-only developer menu, check results, and shared diagnostic result views. |
+| `Views/Debug/DeveloperFrameworkDebugView.swift` | Per-framework version info, checks, and Python, FFmpeg, curl-cffi, and QuickJS playgrounds. |
 | `Views/Tabs/DownloadTabView.swift` | Main download screen. |
 | `Views/Tabs/GalleryVideoPreview.swift` | Gallery picker video thumbnail, loading state, and fallback icon. |
 | `Views/Tabs/FormatPickerSheetView.swift` | Shared yt-dlp format and quality picker sheet. |
@@ -113,6 +116,7 @@ Palladium/
 | Path | Purpose |
 | --- | --- |
 | `Services/Cookies/NetscapeCookieExporter.swift` | Converts browser cookies into Netscape cookie-file records. |
+| `Services/Debug/DeveloperDiagnostics.swift` | Debug-only version probes and framework checks for the developer menu. |
 | `Services/FFmpeg/SwiftFFmpegBridge.swift` | Swift interface to bundled FFmpeg functionality. |
 | `Services/QuickJS/` | Bounded JavaScript evaluation and the Foundation JSON bridge callable from Python. |
 | `Services/Logging/ConsoleLogStore.swift` | Store backing the in-app console. |
@@ -123,6 +127,7 @@ Palladium/
 | `Services/Python/yt_dlp_flow.py` | Python flow that invokes yt-dlp for downloads. |
 | `Services/Python/palladium_ytdlp/__init__.py` | Python package marker and exports. |
 | `Services/Python/palladium_ytdlp/args.py` | Builds yt-dlp command arguments, including final video conversion overrides. |
+| `Services/Python/palladium_ytdlp/diagnostics.py` | Debug menu probes for Python, curl-cffi, and the FFmpeg and QuickJS bridges. |
 | `Services/Python/palladium_ytdlp/entrypoints.py` | Stable public Python entry point facade used by Swift. |
 | `Services/Python/palladium_ytdlp/ffmpeg_bridge.py` | Connects Python download work to FFmpeg. |
 | `Services/Python/palladium_ytdlp/files.py` | Download file and path helpers. |
@@ -168,10 +173,12 @@ Palladium/
 | `scripts/python_tests/test_quickjs_bridge.py` | Bridge error handling, response ownership, cancellation, and default option tests. |
 | `scripts/swift_tests/QuickJSBridgeTests.swift` | App-hosted bridge export, evaluation, and isolation tests. |
 | `scripts/test_format_resolution.py` | Offline yt-dlp integration tests for format resolution, conversion processors, and output paths. |
+| `scripts/python_tests/test_debug_diagnostics.py` | Debug diagnostic dispatch, Python snippet evaluation, and bridge probe tests. |
 | `scripts/python_tests/test_output_templates.py` | Filename preset selection and output-argument priority tests. |
 | `scripts/python_tests/test_post_processing.py` | Conversion override, disabled-default, and audio extraction regression tests. |
 | `scripts/swift_tests/PostProcessingPreferencesTests.swift` | Video conversion preference defaults, persistence, and supported formats. |
 | `scripts/swift_tests/AppLanguageSettingsTests.swift` | Language persistence, regional matching, English fallback, and view invalidation. |
+| `scripts/swift_tests/DeveloperDiagnosticsTests.swift` | Developer diagnostic parsing plus native FFmpeg and QuickJS check tests. |
 | `scripts/swift_tests/DownloadServiceDomainTests.swift` | Saved-download service-domain canonicalization tests. |
 | `scripts/swift_tests/WebsiteArgumentRuleTests.swift` | Website argument rule matching priority, normalization, and persistence tests. |
 | `scripts/swift_tests/DownloadQueueTests.swift` | Download queue parsing, state transition, ordering, and persistence tests. |
