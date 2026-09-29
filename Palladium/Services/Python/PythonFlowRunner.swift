@@ -354,6 +354,23 @@ enum PythonFlowRunner {
         }
     }
 
+#if DEBUG
+    static func runDebugDiagnostic(name: String, argumentJSON: String) async -> String {
+        await runOnPythonThread {
+            do {
+                let module = try loadYtDlpModule()
+                let function = try pythonMember(module, named: "run_debug_diagnostic")
+                let result = try function.throwing.dynamicallyCall(withArguments: [name, argumentJSON])
+                return String(result) ?? ""
+            } catch {
+                let payload: [String: Any] = ["ok": false, "output": "", "error": String(describing: error)]
+                let data = (try? JSONSerialization.data(withJSONObject: payload)) ?? Data()
+                return String(data: data, encoding: .utf8) ?? ""
+            }
+        }
+    }
+#endif
+
     static func interruptActiveFlow() {
         PythonExecutor.shared.interruptActiveWork()
     }

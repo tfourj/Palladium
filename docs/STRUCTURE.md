@@ -113,6 +113,7 @@ Palladium/
 | Path | Purpose |
 | --- | --- |
 | `Services/Cookies/NetscapeCookieExporter.swift` | Converts browser cookies into Netscape cookie-file records. |
+| `Services/Debug/DeveloperDiagnostics.swift` | Debug-only version probes and framework checks for the developer menu. |
 | `Services/FFmpeg/SwiftFFmpegBridge.swift` | Swift interface to bundled FFmpeg functionality. |
 | `Services/QuickJS/` | Bounded JavaScript evaluation and the Foundation JSON bridge callable from Python. |
 | `Services/Logging/ConsoleLogStore.swift` | Store backing the in-app console. |
