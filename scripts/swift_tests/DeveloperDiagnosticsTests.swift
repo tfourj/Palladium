@@ -46,6 +46,7 @@ final class DeveloperDiagnosticsTests: XCTestCase {
         let result = await DeveloperDiagnostics.ffmpeg(tool: .ffmpeg, arguments: ["-hide_banner", "-version"])
         XCTAssertTrue(result.ok, result.report)
         XCTAssertNotNil(result.details.first { $0.key == "version" })
+        XCTAssertFalse(result.details.first { $0.key == "swiftffmpeg build" }?.value.isEmpty ?? true)
     }
 
     func testNativeFFmpegEncodesAndProbesTestMedia() async {
