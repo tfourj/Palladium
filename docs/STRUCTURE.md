@@ -50,6 +50,7 @@ Palladium/
 | `Models/AppAppearanceMode.swift` | Appearance-mode setting model. |
 | `Models/AppLanguageSettings.swift` | Persisted app language, system-language resolution, and observable localization bundle. |
 | `Models/DownloadServiceDomain.swift` | Canonical source-service domain resolver for saved-download folders. |
+| `Models/WebsiteArgumentRule.swift` | Persisted per-website yt-dlp argument rules and link matching priority. |
 | `Models/DownloadOptions.swift` | Download option model and persisted settings. |
 | `Models/PostProcessingPreferences.swift` | Persisted video conversion settings and download configuration snapshots. |
 | `Models/DownloadQueue.swift` | Sequential download queue models, batch quality selection, state transitions, and persistence. |
