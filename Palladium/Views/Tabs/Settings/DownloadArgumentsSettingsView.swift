@@ -31,6 +31,16 @@ struct DownloadArgumentsSettingsView: View {
                     .foregroundStyle(.secondary)
             }
 
+            Section {
+                NavigationLink {
+                    WebsiteArgumentsSettingsView(isRunning: isRunning)
+                } label: {
+                    Label("settings.website_args.title", systemImage: "globe")
+                }
+            } footer: {
+                Text("settings.website_args.footer")
+            }
+
             Section("download.args.examples") {
                 HStack {
                     exampleButton(String(localized: "download.args.example.mp4", bundle: .app), value: DownloadPreset.autoVideo.defaultArguments)

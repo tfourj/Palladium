@@ -8421,6 +8421,303 @@
           }
         }
       }
+    },
+    "settings.website_args.title" : {
+      "comment" : "Title of the per-website yt-dlp argument rules screen.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Website Arguments"
+          }
+        }
+      }
+    },
+    "settings.website_args.subtitle" : {
+      "comment" : "Settings search subtitle for per-website yt-dlp argument rules.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "yt-dlp args for specific websites"
+          }
+        }
+      }
+    },
+    "settings.website_args.footer" : {
+      "comment" : "Footer below the link to per-website yt-dlp argument rules.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add yt-dlp args that only apply to links from specific websites."
+          }
+        }
+      }
+    },
+    "settings.website_args.rules.section" : {
+      "comment" : "Section header for the list of per-website argument rules.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rules"
+          }
+        }
+      }
+    },
+    "settings.website_args.empty" : {
+      "comment" : "Shown when no per-website argument rules exist.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No website rules yet."
+          }
+        }
+      }
+    },
+    "settings.website_args.add" : {
+      "comment" : "Button that adds a per-website argument rule.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Rule"
+          }
+        }
+      }
+    },
+    "settings.website_args.priority.footer" : {
+      "comment" : "Explains how per-website argument rules are matched and prioritized.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only one rule applies to each link. Regex rules are checked first, from top to bottom. Otherwise the most specific website wins, so test.example.com is used before example.com. Website args are added after global extra args."
+          }
+        }
+      }
+    },
+    "settings.website_args.test.section" : {
+      "comment" : "Section header for checking which website rule applies to a link.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Test a Link"
+          }
+        }
+      }
+    },
+    "settings.website_args.test.placeholder" : {
+      "comment" : "Placeholder link for testing website argument rules.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://example.com/video"
+          }
+        }
+      }
+    },
+    "settings.website_args.test.match" : {
+      "comment" : "Shows the website or regex rule that matches the tested link.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uses %@"
+          }
+        }
+      }
+    },
+    "settings.website_args.test.no_match" : {
+      "comment" : "Shown when no website argument rule matches the tested link.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No rule matches this link."
+          }
+        }
+      }
+    },
+    "settings.website_args.match_type" : {
+      "comment" : "Label for choosing how a website argument rule matches links.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Match"
+          }
+        }
+      }
+    },
+    "settings.website_args.match_type.website" : {
+      "comment" : "Match type that compares the link's website and subdomains.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Website"
+          }
+        }
+      }
+    },
+    "settings.website_args.match_type.regex" : {
+      "comment" : "Match type that uses a regular expression against the full link.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Regex"
+          }
+        }
+      }
+    },
+    "settings.website_args.pattern.website.placeholder" : {
+      "comment" : "Placeholder website for a website argument rule.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "example.com"
+          }
+        }
+      }
+    },
+    "settings.website_args.pattern.regex.placeholder" : {
+      "comment" : "Placeholder regular expression for a website argument rule.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https?://example.com/watch.*"
+          }
+        }
+      }
+    },
+    "settings.website_args.pattern.website.help" : {
+      "comment" : "Help text for website match rules.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matches this website and all of its subdomains."
+          }
+        }
+      }
+    },
+    "settings.website_args.pattern.regex.help" : {
+      "comment" : "Help text for regular expression match rules.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matched against the full link, ignoring case."
+          }
+        }
+      }
+    },
+    "settings.website_args.pattern.website.invalid" : {
+      "comment" : "Validation message for an invalid website in a rule.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter a website like example.com."
+          }
+        }
+      }
+    },
+    "settings.website_args.pattern.regex.invalid" : {
+      "comment" : "Validation message for an invalid regular expression in a rule.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This regular expression is not valid."
+          }
+        }
+      }
+    },
+    "settings.website_args.arguments.title" : {
+      "comment" : "Section header for yt-dlp arguments in a website rule.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arguments"
+          }
+        }
+      }
+    },
+    "settings.website_args.arguments.placeholder" : {
+      "comment" : "Placeholder yt-dlp arguments for a website rule.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "--no-mtime"
+          }
+        }
+      }
+    },
+    "settings.website_args.arguments.help" : {
+      "comment" : "Help text for yt-dlp arguments in a website rule.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Added after global extra args for links that match this rule."
+          }
+        }
+      }
+    },
+    "settings.website_args.enabled" : {
+      "comment" : "Toggle that turns a website argument rule on or off.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enabled"
+          }
+        }
+      }
+    },
+    "settings.website_args.disabled_badge" : {
+      "comment" : "Badge shown next to a disabled website argument rule.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Off"
+          }
+        }
+      }
+    },
+    "settings.website_args.new.title" : {
+      "comment" : "Title of the sheet for adding a website argument rule.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New Rule"
+          }
+        }
+      }
+    },
+    "settings.website_args.edit.title" : {
+      "comment" : "Title of the sheet for editing a website argument rule.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Rule"
+          }
+        }
+      }
     }
   },
   "version" : "1.1"

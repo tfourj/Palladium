@@ -50,6 +50,7 @@ Palladium/
 | `Models/AppAppearanceMode.swift` | Appearance-mode setting model. |
 | `Models/AppLanguageSettings.swift` | Persisted app language, system-language resolution, and observable localization bundle. |
 | `Models/DownloadServiceDomain.swift` | Canonical source-service domain resolver for saved-download folders. |
+| `Models/WebsiteArgumentRule.swift` | Persisted per-website yt-dlp argument rules and link matching priority. |
 | `Models/DownloadOptions.swift` | Download option model and persisted settings. |
 | `Models/PostProcessingPreferences.swift` | Persisted video conversion settings and download configuration snapshots. |
 | `Models/DownloadQueue.swift` | Sequential download queue models, batch quality selection, state transitions, and persistence. |
@@ -89,6 +90,7 @@ Palladium/
 | `Views/Tabs/Settings/CookiesSettingsView.swift` | Cookie settings screen. |
 | `Views/Tabs/Settings/CookieWebsiteImportView.swift` | Private website login flow for importing browser cookies. |
 | `Views/Tabs/Settings/DownloadArgumentsSettingsView.swift` | Custom yt-dlp argument settings screen. |
+| `Views/Tabs/Settings/WebsiteArgumentsSettingsView.swift` | Per-website yt-dlp argument rule list, editor, and link tester. |
 | `Views/Tabs/Settings/DownloadBehaviorSettingsView.swift` | Download behavior settings screen. |
 | `Views/Tabs/Settings/DownloadModesSettingsView.swift` | Download-mode settings screen. |
 | `Views/Tabs/Settings/DownloadOptionsSettingsView.swift` | Download option settings screen. |
@@ -171,6 +173,7 @@ Palladium/
 | `scripts/swift_tests/PostProcessingPreferencesTests.swift` | Video conversion preference defaults, persistence, and supported formats. |
 | `scripts/swift_tests/AppLanguageSettingsTests.swift` | Language persistence, regional matching, English fallback, and view invalidation. |
 | `scripts/swift_tests/DownloadServiceDomainTests.swift` | Saved-download service-domain canonicalization tests. |
+| `scripts/swift_tests/WebsiteArgumentRuleTests.swift` | Website argument rule matching priority, normalization, and persistence tests. |
 | `scripts/swift_tests/DownloadQueueTests.swift` | Download queue parsing, state transition, ordering, and persistence tests. |
 | `scripts/swift_tests/YTDLPFormatTests.swift` | Resolved format selection, Photos compatibility, and exact download argument tests. |
 | `scripts/swift_tests/TemporaryDownloadRetentionPolicyTests.swift` | Temporary-download cleanup policy tests. |
