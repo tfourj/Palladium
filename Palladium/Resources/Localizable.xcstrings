@@ -5834,7 +5834,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "引数をダウンロード"
+            "value" : "引数付きダウンロード設定"
           }
         }
       }
@@ -8428,7 +8428,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ダウンロード"
+            "value" : "ダウンロードタブ"
           }
         }
       }
@@ -8487,8 +8487,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Website Arguments"
+            "state" : "translated",
+            "value" : "ウェブサイト引数"
           }
         }
       }
@@ -8504,8 +8504,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "yt-dlp args for specific websites"
+            "state" : "translated",
+            "value" : "特定のウェブサイト向けの yt-dlp 引数"
           }
         }
       }
@@ -8521,8 +8521,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Add yt-dlp args that only apply to links from specific websites."
+            "state" : "translated",
+            "value" : "特定のウェブサイトからのリンクにのみ適用される yt-dlp 引数を追加します。"
           }
         }
       }
@@ -8538,8 +8538,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Rules"
+            "state" : "translated",
+            "value" : "ルール"
           }
         }
       }
@@ -8555,8 +8555,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "No website rules yet."
+            "state" : "translated",
+            "value" : "まだウェブサイトのルールはありません。"
           }
         }
       }
@@ -8572,8 +8572,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Add Rule"
+            "state" : "translated",
+            "value" : "ルールを追加"
           }
         }
       }
@@ -8589,8 +8589,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Only one rule applies to each link. Regex rules are checked first, from top to bottom. Otherwise the most specific website wins, so test.example.com is used before example.com. Website args are added after global extra args."
+            "state" : "translated",
+            "value" : "各リンクに適用されるルールは1つのみです。正規表現ルールが上から順に優先してチェックされます。それ以外の場合は、より具体的なウェブサイトが優先されるため、example.com よりも test.example.com が先に適用されます。ウェブサイト固有の引数は、グローバルな追加引数の後ろに追加されます。"
           }
         }
       }
@@ -8606,8 +8606,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Test a Link"
+            "state" : "translated",
+            "value" : "リンクをテスト"
           }
         }
       }
@@ -8623,7 +8623,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "https://example.com/video"
           }
         }
@@ -8640,8 +8640,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Uses %@"
+            "state" : "translated",
+            "value" : "%@ を使用"
           }
         }
       }
@@ -8657,8 +8657,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "No rule matches this link."
+            "state" : "translated",
+            "value" : "このリンクに一致するルールはありません。"
           }
         }
       }
@@ -8674,8 +8674,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Match"
+            "state" : "translated",
+            "value" : "一致"
           }
         }
       }
@@ -8691,8 +8691,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Website"
+            "state" : "translated",
+            "value" : "ウェブサイト"
           }
         }
       }
@@ -8708,8 +8708,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Regex"
+            "state" : "translated",
+            "value" : "正規表現"
           }
         }
       }
@@ -8725,7 +8725,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "example.com"
           }
         }
@@ -8742,7 +8742,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "https?://example.com/watch.*"
           }
         }
@@ -8759,8 +8759,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Matches this website and all of its subdomains."
+            "state" : "translated",
+            "value" : "このウェブサイトとそのすべてのサブドメインが一致します。"
           }
         }
       }
@@ -8776,8 +8776,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Matched against the full link, ignoring case."
+            "state" : "translated",
+            "value" : "大文字と小文字を無視して、完全なリンクと一致しました。"
           }
         }
       }
@@ -8793,8 +8793,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Enter a website like example.com."
+            "state" : "translated",
+            "value" : "example.com のようなウェブサイトを入力します。"
           }
         }
       }
@@ -8810,8 +8810,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "This regular expression is not valid."
+            "state" : "translated",
+            "value" : "この正規表現は無効です。"
           }
         }
       }
@@ -8827,8 +8827,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Arguments"
+            "state" : "translated",
+            "value" : "引数"
           }
         }
       }
@@ -8844,7 +8844,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "--no-mtime"
           }
         }
@@ -8861,8 +8861,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Added after global extra args for links that match this rule."
+            "state" : "translated",
+            "value" : "このルールに一致するリンクに対するグローバル追加引数の後に追加されました。"
           }
         }
       }
@@ -8878,8 +8878,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Enabled"
+            "state" : "translated",
+            "value" : "有効"
           }
         }
       }
@@ -8895,8 +8895,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Off"
+            "state" : "translated",
+            "value" : "オフ"
           }
         }
       }
@@ -8912,8 +8912,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "New Rule"
+            "state" : "translated",
+            "value" : "新しいルール"
           }
         }
       }
@@ -8929,8 +8929,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Edit Rule"
+            "state" : "translated",
+            "value" : "ルール編集"
           }
         }
       }
