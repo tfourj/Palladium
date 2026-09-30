@@ -17,6 +17,8 @@ On-device iOS media downloader powered by `yt-dlp`, `gallery-dl`, `ffmpeg`, and 
   <a href="https://apps.apple.com/us/app/palladium-media-manager/id6760206193">
     <img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83" alt="Download on the App Store" height="48">
   </a>
+  <br>
+  <sub>(AppStore is limited to v1.3.0, to get latest version download from <a href="https://getpalladium.app/downloads">getpalladium.app</a>)</sub>
 </div>
 
 ## App Screenshots
@@ -48,7 +50,7 @@ On-device iOS media downloader powered by `yt-dlp`, `gallery-dl`, `ffmpeg`, and 
 
 ## Download
 
-- [Palladium Downloads](https://getpalladium.app/downloads) (AppStore, TestFlight, AltStore PAL, .ipa, ~~AltStore Classic~~)
+- [Palladium Downloads](https://getpalladium.app/downloads) (AppStore, AltStore PAL, .ipa, AltStore Classic)
 - .ipa from GitHub
   - Stable: [GitHub Releases](https://github.com/tfourj/Palladium/releases)
   - Nightly: [GitHub Actions](https://github.com/tfourj/Palladium/actions)
@@ -60,6 +62,10 @@ Pull requests are welcome! For major changes, please open an issue first to disc
 Build instructions: [docs/BUILD.md](docs/BUILD.md).
 
 Other documentation: [docs/ALLOWLISTS.md](docs/ALLOWLISTS.md) for custom URL allowlists and [docs/STRUCTURE.md](docs/STRUCTURE.md) for a project map.
+
+## Translations
+
+Help translate Palladium on [Crowdin](https://crowdin.com/project/palladium).
 
 ## Credits & Acknowledgments
 
