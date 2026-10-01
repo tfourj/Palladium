@@ -1315,6 +1315,16 @@
         }
       }
     },
+    "download.button" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download"
+          }
+        }
+      }
+    },
     "download.custom.value" : {
       "localizations" : {
         "en" : {

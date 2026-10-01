@@ -256,7 +256,7 @@ struct DownloadTabView: View {
                         Button(action: primaryDownloadAction) {
                             HStack(spacing: 8) {
                                 Image(systemName: isRunning ? "stop.circle.fill" : "arrow.down.circle.fill")
-                                Text(isRunning ? "common.cancel" : "tab.download")
+                                Text(isRunning ? "common.cancel" : "download.button")
                             }
                             .font(.headline)
                             .frame(maxWidth: .infinity, minHeight: 50, maxHeight: 50)
