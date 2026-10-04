@@ -105,6 +105,10 @@ final class ConsoleLogStore: ObservableObject {
         }
     }
 
+    func exportLogArchive() async throws -> URL {
+        try await writer.exportZippedLog()
+    }
+
     private func appendInMemory(_ chunk: String, sourceHint: ConsoleLogSource?) {
         let normalized = chunk
             .replacingOccurrences(of: "\r\n", with: "\n")
@@ -240,6 +244,55 @@ actor ConsoleLogFileWriter {
         }
 
         ensureActiveFileExists()
+    }
+
+    func exportZippedLog() throws -> URL {
+        var data = Data()
+        for logURL in archiveFileURLs.reversed() + [activeLogFileURL] {
+            guard let fileData = try? Data(contentsOf: logURL), !fileData.isEmpty else { continue }
+            data.append(fileData)
+            if data.last != UInt8(ascii: "\n") {
+                data.append(UInt8(ascii: "\n"))
+            }
+        }
+
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyyMMdd-HHmmss"
+
+        let exportName = "Palladium-Logs-\(formatter.string(from: Date()))"
+        let exportDirectoryURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("LogExport", isDirectory: true)
+        let contentsDirectoryURL = exportDirectoryURL.appendingPathComponent(exportName, isDirectory: true)
+        try? FileManager.default.removeItem(at: exportDirectoryURL)
+        try FileManager.default.createDirectory(at: contentsDirectoryURL, withIntermediateDirectories: true)
+        try data.write(to: contentsDirectoryURL.appendingPathComponent("\(exportName).txt"), options: .atomic)
+
+        let zipURL = exportDirectoryURL.appendingPathComponent("\(exportName).zip")
+        try zipDirectory(at: contentsDirectoryURL, to: zipURL)
+        return zipURL
+    }
+
+    private func zipDirectory(at directoryURL: URL, to zipURL: URL) throws {
+        var coordinatorError: NSError?
+        var copyError: Error?
+
+        // Coordinated reads of a directory with .forUploading hand back a zip archive of it.
+        NSFileCoordinator().coordinate(
+            readingItemAt: directoryURL,
+            options: .forUploading,
+            error: &coordinatorError
+        ) { archiveURL in
+            do {
+                try FileManager.default.copyItem(at: archiveURL, to: zipURL)
+            } catch {
+                copyError = error
+            }
+        }
+
+        if let error = coordinatorError ?? copyError {
+            throw error
+        }
     }
 
     private func rotateIfNeeded(forAdditionalBytes additionalBytes: Int) {
