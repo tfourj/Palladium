@@ -19,7 +19,7 @@ enum VideoDownloadQuality: String, CaseIterable, Identifiable {
     var id: String { rawValue }
     var title: String {
         switch self {
-        case .best: return "Best"
+        case .best: return String(localized: "download.quality.best", bundle: .app)
         case .p2160: return "4K"
         case .p1440: return "1440p"
         case .p1080: return "1080p"
@@ -59,12 +59,13 @@ enum VideoDownloadCodec: String, CaseIterable, Identifiable {
     var id: String { rawValue }
     var title: String {
         switch self {
-        case .photosCompatible: return "H.264 / H.265 (Photos)"
+        case .photosCompatible:
+            return String(localized: "download.quality.video.codec.photos_compatible", bundle: .app)
         case .h264: return "H.264"
         case .h265: return "H.265 / HEVC"
         case .av1: return "AV1"
         case .vp9: return "VP9"
-        case .best: return "Best available"
+        case .best: return String(localized: "download.quality.video.codec.best_available", bundle: .app)
         }
     }
     var formatFilter: String? {
@@ -110,7 +111,7 @@ enum AudioDownloadFormat: String, CaseIterable, Identifiable {
     var id: String { rawValue }
     var title: String {
         switch self {
-        case .best: return "Best"
+        case .best: return String(localized: "download.quality.best", bundle: .app)
         default: return rawValue.uppercased()
         }
     }
@@ -126,7 +127,7 @@ enum AudioDownloadQuality: String, CaseIterable, Identifiable {
     var id: String { rawValue }
     var title: String {
         switch self {
-        case .best: return "Best"
+        case .best: return String(localized: "download.quality.best", bundle: .app)
         case .kbps320: return "320 kbps"
         case .kbps256: return "256 kbps"
         case .kbps192: return "192 kbps"
