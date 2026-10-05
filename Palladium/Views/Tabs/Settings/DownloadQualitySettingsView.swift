@@ -33,19 +33,19 @@ struct DownloadQualitySettingsView: View {
     var body: some View {
         Form {
             Section {
-                Picker("Quality", selection: $videoQuality) {
+                Picker("download.quality.quality", selection: $videoQuality) {
                     ForEach(VideoDownloadQuality.allCases) { quality in
                         Text(quality.title).tag(quality.rawValue)
                     }
                 }
 
-                Picker("Format", selection: $videoContainer) {
+                Picker("download.quality.format", selection: $videoContainer) {
                     ForEach(VideoDownloadContainer.allCases) { container in
                         Text(container.title).tag(container.rawValue)
                     }
                 }
 
-                Picker("Codec", selection: $videoCodec) {
+                Picker("download.quality.codec", selection: $videoCodec) {
                     ForEach(VideoDownloadCodec.allCases) { codec in
                         Text(codec.title).tag(codec.rawValue)
                     }
@@ -57,7 +57,7 @@ struct DownloadQualitySettingsView: View {
                     }
                 }
             } header: {
-                Text("Video")
+                Text("download.quality.video.section")
             } footer: {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("download.quality.video.codec_help")
@@ -66,19 +66,19 @@ struct DownloadQualitySettingsView: View {
             }
 
             Section {
-                Picker("Quality", selection: $audioQuality) {
+                Picker("download.quality.quality", selection: $audioQuality) {
                     ForEach(AudioDownloadQuality.allCases) { quality in
                         Text(quality.title).tag(quality.rawValue)
                     }
                 }
 
-                Picker("Format", selection: $audioFormat) {
+                Picker("download.quality.format", selection: $audioFormat) {
                     ForEach(AudioDownloadFormat.allCases) { format in
                         Text(format.title).tag(format.rawValue)
                     }
                 }
             } header: {
-                Text("Audio")
+                Text("download.quality.audio.section")
             } footer: {
                 Text("download.quality.audio.best_help")
             }
@@ -115,7 +115,7 @@ struct DownloadQualitySettingsView: View {
             }
         }
         .disabled(isRunning)
-        .navigationTitle("Download Quality")
+        .navigationTitle("settings.download_quality.title")
         .navigationBarTitleDisplayMode(.inline)
     }
 }

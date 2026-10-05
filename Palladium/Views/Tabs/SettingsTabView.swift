@@ -1000,8 +1000,8 @@ struct SettingsTabView: View {
         case .downloadQuality:
             return SearchableSetting(
                 route: route,
-                title: "Download Quality",
-                subtitle: "Default video and audio formats, codecs, and quality",
+                title: String(localized: "settings.download_quality.title", bundle: .app),
+                subtitle: String(localized: "settings.download_quality.subtitle", bundle: .app),
                 icon: "4k.tv.fill",
                 color: .purple
             )
