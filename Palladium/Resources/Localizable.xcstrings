@@ -2386,6 +2386,39 @@
         }
       }
     },
+    "download.quality.best" : {
+      "comment" : "Option that selects the best available quality or format.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Best"
+          }
+        }
+      }
+    },
+    "download.quality.codec" : {
+      "comment" : "Label for the video codec picker.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Codec"
+          }
+        }
+      }
+    },
+    "download.quality.format" : {
+      "comment" : "Label for the download format picker.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Format"
+          }
+        }
+      }
+    },
     "download.quality.override_format_list_export.help" : {
       "comment" : "Help text explaining the format-list export override setting.",
       "localizations" : {
@@ -2416,6 +2449,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "フォーマットリストのエクスポートを上書きする"
+          }
+        }
+      }
+    },
+    "download.quality.quality" : {
+      "comment" : "Label for the download quality picker.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quality"
           }
         }
       }
@@ -2586,6 +2630,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "音声プリセット"
+          }
+        }
+      }
+    },
+    "download.quality.video.codec.best_available" : {
+      "comment" : "Video codec option that allows any available codec.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Best available"
+          }
+        }
+      }
+    },
+    "download.quality.video.codec.photos_compatible" : {
+      "comment" : "Video codec option limited to codecs compatible with the Photos app.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "H.264 / H.265 (Photos)"
           }
         }
       }
@@ -8502,6 +8568,50 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "動画"
+          }
+        }
+      }
+    },
+    "download.quality.audio.section" : {
+      "comment" : "Header for the audio download quality settings section.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio"
+          }
+        }
+      }
+    },
+    "download.quality.video.section" : {
+      "comment" : "Header for the video download quality settings section.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video"
+          }
+        }
+      }
+    },
+    "settings.download_quality.subtitle" : {
+      "comment" : "Subtitle of the Download Quality settings row.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Default video and audio formats, codecs, and quality"
+          }
+        }
+      }
+    },
+    "settings.download_quality.title" : {
+      "comment" : "Title of the Download Quality settings row and screen.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download Quality"
           }
         }
       }
