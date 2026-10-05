@@ -454,6 +454,26 @@
         }
       }
     },
+    "console.export" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export"
+          }
+        }
+      }
+    },
+    "console.export.failed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't prepare logs for export."
+          }
+        }
+      }
+    },
     "console.lines.visible" : {
       "localizations" : {
         "en" : {

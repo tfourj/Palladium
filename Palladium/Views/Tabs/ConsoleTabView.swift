@@ -4,6 +4,8 @@ import UIKit
 struct ConsoleTabView: View {
     @ObservedObject var logStore: ConsoleLogStore
     @State private var searchText = ""
+    @State private var sharePayload: SharePayload?
+    @State private var showExportFailed = false
 
     var body: some View {
         let visibleEntries = logStore.filteredEntries
@@ -15,6 +17,10 @@ struct ConsoleTabView: View {
                 Text("console.title")
                     .font(.title2.bold())
                 Spacer()
+                Button("console.export") {
+                    exportLogs()
+                }
+                .buttonStyle(.bordered)
                 Button("common.clear") {
                     logStore.clearAll()
                 }
@@ -55,6 +61,23 @@ struct ConsoleTabView: View {
             .clipShape(RoundedRectangle(cornerRadius: 12))
         }
         .padding()
+        .alert("console.export.failed", isPresented: $showExportFailed) {
+            Button("common.ok", role: .cancel) {}
+        }
+        .sheet(item: $sharePayload) { payload in
+            ShareSheet(activityItems: payload.activityItems)
+        }
+    }
+
+    private func exportLogs() {
+        Task {
+            do {
+                let archiveURL = try await logStore.exportLogArchive()
+                sharePayload = SharePayload(activityItems: [archiveURL])
+            } catch {
+                showExportFailed = true
+            }
+        }
     }
 
     private func filteredEntries(from entries: [ConsoleLogEntry], matching query: String) -> [ConsoleLogEntry] {
