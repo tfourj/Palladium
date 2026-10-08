@@ -43,7 +43,14 @@ final class BackgroundDownloadTask {
     }
 
     /// Starts background execution for a download, or reuses the task that is still active from a previous one.
-    func begin(subtitle: String, log: @escaping (String) -> Void, onExpiration: @escaping () -> Void) {
+    ///
+    /// When `allowsContinuedProcessing` is false, only the short UIKit background time window is requested.
+    func begin(
+        subtitle: String,
+        allowsContinuedProcessing: Bool,
+        log: @escaping (String) -> Void,
+        onExpiration: @escaping () -> Void
+    ) {
         pendingEnd?.cancel()
         pendingEnd = nil
         self.log = log
@@ -58,7 +65,7 @@ final class BackgroundDownloadTask {
 
         currentFraction = 0
         wantedSubtitle = subtitle
-        if #available(iOS 26.0, *), submitContinuedProcessingTask(subtitle: subtitle) {
+        if allowsContinuedProcessing, #available(iOS 26.0, *), submitContinuedProcessingTask(subtitle: subtitle) {
             endLegacyTask()
         } else if legacyTaskID == .invalid {
             beginLegacyTask()

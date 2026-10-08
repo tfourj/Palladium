@@ -461,6 +461,7 @@ extension ContentView {
 
         BackgroundDownloadTask.shared.begin(
             subtitle: backgroundDownloadDefaultSubtitle(for: targetURL),
+            allowsContinuedProcessing: backgroundDownloadsEnabled,
             log: { appendConsoleText($0) },
             onExpiration: { cancelDownloadFlow() }
         )
