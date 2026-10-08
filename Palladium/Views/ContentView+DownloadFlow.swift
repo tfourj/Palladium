@@ -1022,6 +1022,10 @@ extension ContentView {
                     progressText = String(localized: "download.status.processing", bundle: .app)
                 }
             }
+        } else if trimmed.hasPrefix("[download] Destination:") {
+            // A new stream or side file starts at 0%, so the previous stream's percent no longer applies.
+            lastDownloadProgressPercent = nil
+            progressText = trimmed
         } else if detailedProgressEnabled, shouldShowDetailedProgressLine(trimmed) {
             progressText = trimmed
         } else if trimmed.contains("[download]") {
