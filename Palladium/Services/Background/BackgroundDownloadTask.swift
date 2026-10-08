@@ -31,6 +31,7 @@ final class BackgroundDownloadTask {
     private var displayedSubtitle = ""
     private var currentFraction: Double = 0
     private var log: (String) -> Void = { _ in }
+    private var onStop: () -> Void = {}
 
     private init() {}
 
@@ -50,10 +51,18 @@ final class BackgroundDownloadTask {
     /// Starts background execution for a download, or reuses the task that is still active from a previous one.
     ///
     /// When `allowsContinuedProcessing` is false, only the short UIKit background time window is requested.
-    func begin(subtitle: String, allowsContinuedProcessing: Bool, log: @escaping (String) -> Void) {
+    ///
+    /// `onStop` runs when the system progress UI's stop button ends the task while the app is in the background.
+    func begin(
+        subtitle: String,
+        allowsContinuedProcessing: Bool,
+        log: @escaping (String) -> Void,
+        onStop: @escaping () -> Void
+    ) {
         pendingEnd?.cancel()
         pendingEnd = nil
         self.log = log
+        self.onStop = onStop
         defaultSubtitle = subtitle
 
         if continuedTask != nil || submittedIdentifier != nil {
@@ -187,9 +196,15 @@ final class BackgroundDownloadTask {
         pendingEnd = nil
         stopHeartbeat()
         continuedTask = nil
-        // Cancelling here would discard work that may already be finished, such as a download that is only
-        // embedding its thumbnail. Let the current step use the short UIKit window instead; if that runs out
-        // too, the app is suspended and the download continues when the user returns.
+
+        // The stop button and system conditions both expire the task, and iOS does not say which one it was.
+        // In the background treat it as the user's stop; otherwise keep going with the short UIKit window.
+        if UIApplication.shared.applicationState == .background {
+            task.setTaskCompleted(success: false)
+            log("[palladium] background download task stopped; cancelling download\n")
+            onStop()
+            return
+        }
         if legacyTaskID == .invalid {
             beginLegacyTask()
         }
