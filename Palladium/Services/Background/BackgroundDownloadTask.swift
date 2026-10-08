@@ -11,8 +11,8 @@ final class BackgroundDownloadTask {
     static let shared = BackgroundDownloadTask()
 
     private static let identifierPrefix = "\(Bundle.main.bundleIdentifier ?? "com.tfourj.Palladium").download."
-    /// Time to wait before ending the task so a queued download or post-download action can reuse it.
-    private static let endGracePeriod: Duration = .seconds(10)
+    /// Time to wait before ending the task so the next queued download can reuse it.
+    private static let queueGracePeriod: Duration = .seconds(10)
     /// yt-dlp reports 100% for each stream and side file, and the system shows a full bar as finished.
     private static let maximumRunningFraction = 0.99
 
@@ -28,6 +28,11 @@ final class BackgroundDownloadTask {
     private var onExpiration: () -> Void = {}
 
     private init() {}
+
+    /// Whether the system is showing progress UI, which also tells the user when the download finishes.
+    var isShowingSystemProgress: Bool {
+        continuedTask != nil
+    }
 
     /// Starts background execution for a download, or reuses the task that is still active from a previous one.
     func begin(subtitle: String, log: @escaping (String) -> Void, onExpiration: @escaping () -> Void) {
@@ -67,11 +72,16 @@ final class BackgroundDownloadTask {
         }
     }
 
-    /// Ends background execution after a short grace period unless another download begins first.
-    func end(success: Bool) {
+    /// Ends background execution. When another queued download follows, the task is kept briefly so it can be reused.
+    func end(success: Bool, nextDownloadExpected: Bool) {
         pendingEnd?.cancel()
+        pendingEnd = nil
+        guard nextDownloadExpected else {
+            finish(success: success)
+            return
+        }
         pendingEnd = Task { [weak self] in
-            try? await Task.sleep(for: Self.endGracePeriod)
+            try? await Task.sleep(for: Self.queueGracePeriod)
             guard !Task.isCancelled else { return }
             self?.finish(success: success)
         }
@@ -149,7 +159,7 @@ final class BackgroundDownloadTask {
         legacyTaskID = UIApplication.shared.beginBackgroundTask(withName: "Palladium download") { [weak self] in
             DispatchQueue.main.async {
                 guard let self, self.legacyTaskID != .invalid else { return }
-                self.log("[palladium] background time expired; pausing download until the app returns\n")
+                self.log("[palladium] background time expired; pausing until the app returns\n")
                 self.endLegacyTask()
             }
         }
@@ -166,18 +176,23 @@ final class BackgroundDownloadTask {
 
     private func finish(success: Bool) {
         pendingEnd = nil
-        if let task = continuedTask {
-            continuedTask = nil
-            if #available(iOS 26.0, *), let task = task as? BGContinuedProcessingTask, success {
-                task.progress.completedUnitCount = task.progress.totalUnitCount
-            }
-            task.setTaskCompleted(success: success)
-        }
         if let submittedIdentifier {
             self.submittedIdentifier = nil
             BGTaskScheduler.shared.cancel(taskRequestWithIdentifier: submittedIdentifier)
         }
-        endLegacyTask()
+        if let task = continuedTask {
+            continuedTask = nil
+            // Post-download actions such as saving to Photos still need a moment after the task ends.
+            if UIApplication.shared.applicationState != .active, legacyTaskID == .invalid {
+                beginLegacyTask()
+            }
+            if #available(iOS 26.0, *), let task = task as? BGContinuedProcessingTask, success {
+                task.progress.completedUnitCount = task.progress.totalUnitCount
+            }
+            task.setTaskCompleted(success: success)
+        } else {
+            endLegacyTask()
+        }
         displayedSubtitle = ""
         currentFraction = 0
     }

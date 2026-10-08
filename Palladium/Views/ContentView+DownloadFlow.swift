@@ -553,7 +553,13 @@ extension ContentView {
 
             let finalResultKind = cancelWasRequested ? "cancelled" : (outcome.resultKind ?? outcome.statusText)
             statusText = finalResultKind
-            BackgroundDownloadTask.shared.end(success: finalResultKind == "success" || finalResultKind == "partial")
+            BackgroundDownloadTask.shared.end(
+                success: finalResultKind == "success" || finalResultKind == "partial",
+                nextDownloadExpected: queuedItemID != nil
+                    && finalResultKind != "cancelled"
+                    && downloadQueue.isActive
+                    && downloadQueue.hasPendingItems
+            )
             if effectiveDownloadPreset == .images {
                 playlistProgress = PlaylistProgressSnapshot(
                     title: effectiveDownloadPreset.title,
