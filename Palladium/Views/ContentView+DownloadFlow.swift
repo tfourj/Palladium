@@ -462,8 +462,7 @@ extension ContentView {
         BackgroundDownloadTask.shared.begin(
             subtitle: backgroundDownloadDefaultSubtitle(for: targetURL),
             allowsContinuedProcessing: backgroundDownloadsEnabled,
-            log: { appendConsoleText($0) },
-            onExpiration: { cancelDownloadFlow() }
+            log: { appendConsoleText($0) }
         )
         if effectiveDownloadPreset == .images {
             appendConsoleText("[palladium] gallery-dl download started for \(gallerySelectionCountAtStart) image(s)\n")

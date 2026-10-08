@@ -25,7 +25,6 @@ final class BackgroundDownloadTask {
     private var displayedSubtitle = ""
     private var currentFraction: Double = 0
     private var log: (String) -> Void = { _ in }
-    private var onExpiration: () -> Void = {}
 
     private init() {}
 
@@ -45,16 +44,10 @@ final class BackgroundDownloadTask {
     /// Starts background execution for a download, or reuses the task that is still active from a previous one.
     ///
     /// When `allowsContinuedProcessing` is false, only the short UIKit background time window is requested.
-    func begin(
-        subtitle: String,
-        allowsContinuedProcessing: Bool,
-        log: @escaping (String) -> Void,
-        onExpiration: @escaping () -> Void
-    ) {
+    func begin(subtitle: String, allowsContinuedProcessing: Bool, log: @escaping (String) -> Void) {
         pendingEnd?.cancel()
         pendingEnd = nil
         self.log = log
-        self.onExpiration = onExpiration
         defaultSubtitle = subtitle
 
         if continuedTask != nil || submittedIdentifier != nil {
@@ -159,15 +152,14 @@ final class BackgroundDownloadTask {
         pendingEnd?.cancel()
         pendingEnd = nil
         continuedTask = nil
-        task.setTaskCompleted(success: false)
-
-        // The system UI's stop button also expires the task. Keep going when the user is in the app.
-        if UIApplication.shared.applicationState == .active {
-            log("[palladium] background download task ended by the system\n")
-        } else {
-            log("[palladium] background download task stopped; cancelling download\n")
-            onExpiration()
+        // Cancelling here would discard work that may already be finished, such as a download that is only
+        // embedding its thumbnail. Let the current step use the short UIKit window instead; if that runs out
+        // too, the app is suspended and the download continues when the user returns.
+        if legacyTaskID == .invalid {
+            beginLegacyTask()
         }
+        task.setTaskCompleted(success: false)
+        log("[palladium] background download task ended by the system; continuing with limited background time\n")
     }
 
     private func beginLegacyTask() {
