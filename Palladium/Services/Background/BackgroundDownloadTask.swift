@@ -15,11 +15,17 @@ final class BackgroundDownloadTask {
     private static let queueGracePeriod: Duration = .seconds(10)
     /// yt-dlp reports 100% for each stream and side file, and the system shows a full bar as finished.
     private static let maximumRunningFraction = 0.99
+    /// Fine-grained so heartbeat steps stay invisible in the progress bar.
+    private static let progressUnitCount: Int64 = 1_000_000
+    /// Steps such as embedding a thumbnail report no progress, and the system expires tasks that look stalled.
+    private static let heartbeatInterval: Duration = .seconds(3)
 
     private var continuedTask: BGTask?
     private var submittedIdentifier: String?
     private var legacyTaskID: UIBackgroundTaskIdentifier = .invalid
     private var pendingEnd: Task<Void, Never>?
+    private var heartbeat: Task<Void, Never>?
+    private var lastHeartbeatUnits: Int64 = -1
     private var defaultSubtitle = ""
     private var wantedSubtitle = ""
     private var displayedSubtitle = ""
@@ -137,20 +143,49 @@ final class BackgroundDownloadTask {
 
         submittedIdentifier = nil
         continuedTask = task
-        task.progress.totalUnitCount = 1000
+        task.progress.totalUnitCount = Self.progressUnitCount
         task.expirationHandler = { [weak self] in
             DispatchQueue.main.async {
                 self?.handleContinuedTaskExpiration()
             }
         }
         update(fraction: currentFraction, subtitle: wantedSubtitle)
+        startHeartbeat()
         log("[palladium] background download task started\n")
+    }
+
+    private func startHeartbeat() {
+        heartbeat?.cancel()
+        lastHeartbeatUnits = -1
+        heartbeat = Task { [weak self] in
+            while !Task.isCancelled {
+                try? await Task.sleep(for: Self.heartbeatInterval)
+                guard !Task.isCancelled else { return }
+                self?.advanceStalledProgress()
+            }
+        }
+    }
+
+    /// Nudges progress by one unit when nothing changed since the last heartbeat, while staying below complete.
+    private func advanceStalledProgress() {
+        guard let progress = (continuedTask as? ProgressReporting)?.progress else { return }
+        let isStalled = progress.completedUnitCount == lastHeartbeatUnits
+        if isStalled, progress.completedUnitCount < progress.totalUnitCount - 1 {
+            progress.completedUnitCount += 1
+        }
+        lastHeartbeatUnits = progress.completedUnitCount
+    }
+
+    private func stopHeartbeat() {
+        heartbeat?.cancel()
+        heartbeat = nil
     }
 
     private func handleContinuedTaskExpiration() {
         guard let task = continuedTask else { return }
         pendingEnd?.cancel()
         pendingEnd = nil
+        stopHeartbeat()
         continuedTask = nil
         // Cancelling here would discard work that may already be finished, such as a download that is only
         // embedding its thumbnail. Let the current step use the short UIKit window instead; if that runs out
@@ -183,6 +218,7 @@ final class BackgroundDownloadTask {
 
     private func finish(success: Bool) {
         pendingEnd = nil
+        stopHeartbeat()
         if let submittedIdentifier {
             self.submittedIdentifier = nil
             BGTaskScheduler.shared.cancel(taskRequestWithIdentifier: submittedIdentifier)
