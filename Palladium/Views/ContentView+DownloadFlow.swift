@@ -999,6 +999,8 @@ extension ContentView {
         for line in lines {
             updateProgressLine(line)
         }
+        // SwiftUI skips view updates in the background, so progress is reported here instead of from onChange.
+        syncBackgroundDownloadProgress()
     }
 
     func updateProgressLine(_ line: String) {
