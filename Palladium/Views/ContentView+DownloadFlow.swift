@@ -553,12 +553,16 @@ extension ContentView {
 
             let finalResultKind = cancelWasRequested ? "cancelled" : (outcome.resultKind ?? outcome.statusText)
             statusText = finalResultKind
+            let nextDownloadExpected = queuedItemID != nil
+                && finalResultKind != "cancelled"
+                && downloadQueue.isActive
+                && downloadQueue.hasPendingItems
+            // The system progress UI announces completion itself when its task ends.
+            let systemAnnouncesCompletion = BackgroundDownloadTask.shared.isShowingSystemProgress
+                && !nextDownloadExpected
             BackgroundDownloadTask.shared.end(
                 success: finalResultKind == "success" || finalResultKind == "partial",
-                nextDownloadExpected: queuedItemID != nil
-                    && finalResultKind != "cancelled"
-                    && downloadQueue.isActive
-                    && downloadQueue.hasPendingItems
+                nextDownloadExpected: nextDownloadExpected
             )
             if effectiveDownloadPreset == .images {
                 playlistProgress = PlaylistProgressSnapshot(
@@ -637,7 +641,7 @@ extension ContentView {
                         partial: finalResultKind == "partial"
                     )
                 }
-                if let notificationTarget = result.notificationTargetURL {
+                if let notificationTarget = result.notificationTargetURL, !systemAnnouncesCompletion {
                     notifyDownloadCompletionIfNeeded(fileURL: notificationTarget)
                 }
 
