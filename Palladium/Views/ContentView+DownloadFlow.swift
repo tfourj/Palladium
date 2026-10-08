@@ -6,7 +6,6 @@
 import SwiftUI
 import Foundation
 import OSLog
-import UIKit
 
 extension ContentView {
     var shareSheetDefaultPreset: DownloadPreset {
@@ -459,19 +458,11 @@ extension ContentView {
             processLiveLogData(data, decoder: liveLogDecoder, didReceiveLiveOutput: &receivedPythonLiveOutput)
         }
 
-        var backgroundTaskID = UIBackgroundTaskIdentifier.invalid
-        backgroundTaskID = UIApplication.shared.beginBackgroundTask(withName: "Palladium download") {
-            Task { @MainActor in
-                appendConsoleText("[palladium] background time expired; pausing download until the app returns\n")
-                if backgroundTaskID != .invalid {
-                    UIApplication.shared.endBackgroundTask(backgroundTaskID)
-                    backgroundTaskID = .invalid
-                }
-            }
-        }
-        if backgroundTaskID != .invalid {
-            appendConsoleText("[palladium] background download time requested\n")
-        }
+        BackgroundDownloadTask.shared.begin(
+            subtitle: backgroundDownloadDefaultSubtitle(for: targetURL),
+            log: { appendConsoleText($0) },
+            onExpiration: { cancelDownloadFlow() }
+        )
         if effectiveDownloadPreset == .images {
             appendConsoleText("[palladium] gallery-dl download started for \(gallerySelectionCountAtStart) image(s)\n")
         }
@@ -528,11 +519,6 @@ extension ContentView {
             self.cancelMarkerURL = nil
             self.currentDownloadTask = nil
 
-            if backgroundTaskID != .invalid {
-                UIApplication.shared.endBackgroundTask(backgroundTaskID)
-                backgroundTaskID = .invalid
-            }
-
             let cancelWasRequested = downloadCancelRequested
             let galleryExpectedCountAtFinish = galleryDownloadExpectedCount
             let galleryCompletedCountAtFinish = max(
@@ -566,6 +552,7 @@ extension ContentView {
 
             let finalResultKind = cancelWasRequested ? "cancelled" : (outcome.resultKind ?? outcome.statusText)
             statusText = finalResultKind
+            BackgroundDownloadTask.shared.end(success: finalResultKind == "success" || finalResultKind == "partial")
             if effectiveDownloadPreset == .images {
                 playlistProgress = PlaylistProgressSnapshot(
                     title: effectiveDownloadPreset.title,
@@ -941,6 +928,44 @@ extension ContentView {
         ffmpegProgressDurationSeconds = nil
         isInstallingPackagesDuringDownload = false
         progressText = String(localized: "download.status.cancelling", bundle: .app)
+    }
+
+    var backgroundDownloadFraction: Double? {
+        let itemFraction = lastDownloadProgressPercent.map { min(max($0, 0), 100) / 100 }
+        guard let playlistProgress,
+              let expectedCount = playlistProgress.expectedCount,
+              expectedCount > 1 else {
+            return itemFraction
+        }
+        let finishedCount = playlistProgress.completedCount + playlistProgress.failedCount
+        return min((Double(finishedCount) + (itemFraction ?? 0)) / Double(expectedCount), 1)
+    }
+
+    var backgroundDownloadSubtitle: String? {
+        guard let playlistProgress,
+              let expectedCount = playlistProgress.expectedCount,
+              expectedCount > 1,
+              let currentItemIndex = playlistProgress.currentItemIndex else {
+            return nil
+        }
+        return String(
+            format: String(localized: "download.background.playlist_item", bundle: .app),
+            currentItemIndex,
+            expectedCount
+        )
+    }
+
+    func syncBackgroundDownloadProgress() {
+        guard isRunning else { return }
+        BackgroundDownloadTask.shared.update(
+            fraction: backgroundDownloadFraction,
+            subtitle: backgroundDownloadSubtitle
+        )
+    }
+
+    private func backgroundDownloadDefaultSubtitle(for url: String) -> String {
+        guard let host = URL(string: url)?.host() else { return url }
+        return host.hasPrefix("www.") ? String(host.dropFirst(4)) : host
     }
 
     func updateProgress(from chunk: String) {

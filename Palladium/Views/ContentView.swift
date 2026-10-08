@@ -656,6 +656,12 @@ struct ContentView: View {
         .onChange(of: isRunning, initial: true) { _, _ in
             syncIdleTimerDisabled()
         }
+        .onChange(of: backgroundDownloadFraction) { _, _ in
+            syncBackgroundDownloadProgress()
+        }
+        .onChange(of: backgroundDownloadSubtitle) { _, _ in
+            syncBackgroundDownloadProgress()
+        }
         .onChange(of: isPackageRunning, initial: true) { _, _ in
             syncIdleTimerDisabled()
             consumePendingSharedDownloadIfNeeded()
