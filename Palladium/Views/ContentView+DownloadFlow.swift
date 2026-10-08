@@ -321,6 +321,7 @@ extension ContentView {
         progressText = String(localized: "download.status.running", bundle: .app)
         downloadCancelRequested = false
         lastDownloadProgressPercent = nil
+        backgroundDownloadProgress = BackgroundDownloadProgress()
         ffmpegProgressDurationSeconds = nil
         pendingDownloadProgressLine = ""
         isInstallingPackagesDuringDownload = false
@@ -930,15 +931,15 @@ extension ContentView {
         progressText = String(localized: "download.status.cancelling", bundle: .app)
     }
 
-    var backgroundDownloadFraction: Double? {
-        let itemFraction = lastDownloadProgressPercent.map { min(max($0, 0), 100) / 100 }
+    var backgroundDownloadFraction: Double {
+        let itemFraction = backgroundDownloadProgress.fraction
         guard let playlistProgress,
               let expectedCount = playlistProgress.expectedCount,
               expectedCount > 1 else {
             return itemFraction
         }
         let finishedCount = playlistProgress.completedCount + playlistProgress.failedCount
-        return min((Double(finishedCount) + (itemFraction ?? 0)) / Double(expectedCount), 1)
+        return min((Double(finishedCount) + itemFraction) / Double(expectedCount), 1)
     }
 
     var backgroundDownloadSubtitle: String? {
@@ -946,7 +947,9 @@ extension ContentView {
               let expectedCount = playlistProgress.expectedCount,
               expectedCount > 1,
               let currentItemIndex = playlistProgress.currentItemIndex else {
-            return nil
+            return backgroundDownloadProgress.isProcessing
+                ? String(localized: "download.status.processing", bundle: .app)
+                : nil
         }
         return String(
             format: String(localized: "download.background.playlist_item", bundle: .app),
@@ -991,6 +994,7 @@ extension ContentView {
         let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
         guard !downloadCancelRequested else { return }
+        backgroundDownloadProgress.handleLine(trimmed)
 
         if handlePlaylistProgressMarkerLine(trimmed) {
             return
@@ -1010,6 +1014,7 @@ extension ContentView {
             if let update = parseFFmpegProgressUpdate(from: trimmed) {
                 if let progressPercent = update.percent {
                     lastDownloadProgressPercent = progressPercent
+                    backgroundDownloadProgress.updateProcessing(percent: progressPercent)
                     let clampedPercent = min(max(progressPercent, 0), 100)
                     let baseProcessingText = String(localized: "download.status.processing", bundle: .app)
                     let percentText = String(format: "%.1f%%", locale: .current, clampedPercent)
