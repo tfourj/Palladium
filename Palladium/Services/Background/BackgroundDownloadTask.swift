@@ -13,6 +13,8 @@ final class BackgroundDownloadTask {
     private static let identifierPrefix = "\(Bundle.main.bundleIdentifier ?? "com.tfourj.Palladium").download."
     /// Time to wait before ending the task so a queued download or post-download action can reuse it.
     private static let endGracePeriod: Duration = .seconds(10)
+    /// yt-dlp reports 100% for each stream and side file, and the system shows a full bar as finished.
+    private static let maximumRunningFraction = 0.99
 
     private var continuedTask: BGTask?
     private var submittedIdentifier: String?
@@ -53,7 +55,7 @@ final class BackgroundDownloadTask {
     /// Reports download progress to the system UI. A nil subtitle restores the subtitle passed to `begin`.
     func update(fraction: Double?, subtitle: String?) {
         if let fraction {
-            currentFraction = min(max(fraction, 0), 1)
+            currentFraction = min(max(fraction, 0), Self.maximumRunningFraction)
         }
         wantedSubtitle = subtitle ?? defaultSubtitle
         guard #available(iOS 26.0, *), let task = continuedTask as? BGContinuedProcessingTask else { return }
