@@ -1335,6 +1335,26 @@
         }
       }
     },
+    "download.background.playlist_item" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Item %1$lld of %2$lld"
+          }
+        }
+      }
+    },
+    "download.background.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloading with Palladium"
+          }
+        }
+      }
+    },
     "download.button" : {
       "localizations" : {
         "en" : {
