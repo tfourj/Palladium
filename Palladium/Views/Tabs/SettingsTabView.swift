@@ -79,6 +79,7 @@ struct SettingsTabView: View {
     @Binding var autoRetryFailedDownloads: Bool
     @Binding var saveIncompleteDownloadsToHistory: Bool
     @Binding var detailedProgressEnabled: Bool
+    @Binding var backgroundDownloadsEnabled: Bool
     @Binding var downloadPresetSettings: [DownloadPresetSetting]
     @Binding var shareSheetDownloadMode: ShareSheetDownloadMode
     @Binding var showShareSheetFormatButton: Bool
@@ -260,6 +261,7 @@ struct SettingsTabView: View {
                 autoRetryFailedDownloads: $autoRetryFailedDownloads,
                 saveIncompleteDownloadsToHistory: $saveIncompleteDownloadsToHistory,
                 detailedProgressEnabled: $detailedProgressEnabled,
+                backgroundDownloadsEnabled: $backgroundDownloadsEnabled,
                 isRunning: isRunning
             )
         case .downloadArguments:
@@ -689,6 +691,20 @@ struct SettingsTabView: View {
                 subtitle: "settings.ui.progress.help"
             ) { title in
                 AnyView(searchToggle(title, isOn: $detailedProgressEnabled, disabled: isRunning))
+            },
+            controlSetting(
+                id: "backgroundDownloads",
+                menu: .downloadBehavior,
+                title: "settings.download_behavior.background.toggle",
+                subtitle: "settings.download_behavior.background.help"
+            ) { title in
+                AnyView(
+                    searchToggle(
+                        title,
+                        isOn: $backgroundDownloadsEnabled,
+                        disabled: isRunning || !BackgroundDownloadTask.isSupported
+                    )
+                )
             },
             controlSetting(
                 id: "filenameExportPreset",

@@ -5955,6 +5955,36 @@
         }
       }
     },
+    "settings.download_behavior.background.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keeps downloads running after you leave Palladium and shows their progress in system UI. Requires iOS 26 or later."
+          }
+        }
+      }
+    },
+    "settings.download_behavior.background.toggle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Background Downloads"
+          }
+        }
+      }
+    },
+    "settings.download_behavior.background_section" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Background"
+          }
+        }
+      }
+    },
     "settings.download_behavior.incomplete_history.help" : {
       "localizations" : {
         "en" : {

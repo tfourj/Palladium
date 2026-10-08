@@ -29,6 +29,14 @@ final class BackgroundDownloadTask {
 
     private init() {}
 
+    /// Whether this system supports continued processing tasks for downloads.
+    static var isSupported: Bool {
+        if #available(iOS 26.0, *) {
+            return true
+        }
+        return false
+    }
+
     /// Whether the system is showing progress UI, which also tells the user when the download finishes.
     var isShowingSystemProgress: Bool {
         continuedTask != nil
