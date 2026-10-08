@@ -115,6 +115,7 @@ Palladium/
 
 | Path | Purpose |
 | --- | --- |
+| `Services/Background/BackgroundDownloadTask.swift` | Keeps downloads running in the background with iOS 26 continued processing tasks or UIKit background time. |
 | `Services/Cookies/NetscapeCookieExporter.swift` | Converts browser cookies into Netscape cookie-file records. |
 | `Services/Debug/DeveloperDiagnostics.swift` | Debug-only version probes and framework checks for the developer menu. |
 | `Services/FFmpeg/SwiftFFmpegBridge.swift` | Swift interface to bundled FFmpeg functionality. |
