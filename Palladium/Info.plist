@@ -8,6 +8,14 @@
 	<string>$(APP_FINAL)</string>
 	<key>GIT_COMMIT_ID</key>
 	<string></string>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>$(PRODUCT_BUNDLE_IDENTIFIER).download.*</string>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>processing</string>
+	</array>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

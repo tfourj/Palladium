@@ -6,7 +6,6 @@
 import SwiftUI
 import Foundation
 import OSLog
-import UIKit
 
 extension ContentView {
     var shareSheetDefaultPreset: DownloadPreset {
@@ -322,6 +321,7 @@ extension ContentView {
         progressText = String(localized: "download.status.running", bundle: .app)
         downloadCancelRequested = false
         lastDownloadProgressPercent = nil
+        backgroundDownloadProgress = BackgroundDownloadProgress()
         ffmpegProgressDurationSeconds = nil
         pendingDownloadProgressLine = ""
         isInstallingPackagesDuringDownload = false
@@ -459,19 +459,12 @@ extension ContentView {
             processLiveLogData(data, decoder: liveLogDecoder, didReceiveLiveOutput: &receivedPythonLiveOutput)
         }
 
-        var backgroundTaskID = UIBackgroundTaskIdentifier.invalid
-        backgroundTaskID = UIApplication.shared.beginBackgroundTask(withName: "Palladium download") {
-            Task { @MainActor in
-                appendConsoleText("[palladium] background time expired; pausing download until the app returns\n")
-                if backgroundTaskID != .invalid {
-                    UIApplication.shared.endBackgroundTask(backgroundTaskID)
-                    backgroundTaskID = .invalid
-                }
-            }
-        }
-        if backgroundTaskID != .invalid {
-            appendConsoleText("[palladium] background download time requested\n")
-        }
+        BackgroundDownloadTask.shared.begin(
+            subtitle: backgroundDownloadDefaultSubtitle(for: targetURL),
+            allowsContinuedProcessing: backgroundDownloadsEnabled,
+            log: { appendConsoleText($0) },
+            onStop: { cancelDownloadFlow() }
+        )
         if effectiveDownloadPreset == .images {
             appendConsoleText("[palladium] gallery-dl download started for \(gallerySelectionCountAtStart) image(s)\n")
         }
@@ -528,11 +521,6 @@ extension ContentView {
             self.cancelMarkerURL = nil
             self.currentDownloadTask = nil
 
-            if backgroundTaskID != .invalid {
-                UIApplication.shared.endBackgroundTask(backgroundTaskID)
-                backgroundTaskID = .invalid
-            }
-
             let cancelWasRequested = downloadCancelRequested
             let galleryExpectedCountAtFinish = galleryDownloadExpectedCount
             let galleryCompletedCountAtFinish = max(
@@ -566,6 +554,17 @@ extension ContentView {
 
             let finalResultKind = cancelWasRequested ? "cancelled" : (outcome.resultKind ?? outcome.statusText)
             statusText = finalResultKind
+            let nextDownloadExpected = queuedItemID != nil
+                && finalResultKind != "cancelled"
+                && downloadQueue.isActive
+                && downloadQueue.hasPendingItems
+            // The system progress UI announces completion itself when its task ends.
+            let systemAnnouncesCompletion = BackgroundDownloadTask.shared.isShowingSystemProgress
+                && !nextDownloadExpected
+            BackgroundDownloadTask.shared.end(
+                success: finalResultKind == "success" || finalResultKind == "partial",
+                nextDownloadExpected: nextDownloadExpected
+            )
             if effectiveDownloadPreset == .images {
                 playlistProgress = PlaylistProgressSnapshot(
                     title: effectiveDownloadPreset.title,
@@ -643,7 +642,7 @@ extension ContentView {
                         partial: finalResultKind == "partial"
                     )
                 }
-                if let notificationTarget = result.notificationTargetURL {
+                if let notificationTarget = result.notificationTargetURL, !systemAnnouncesCompletion {
                     notifyDownloadCompletionIfNeeded(fileURL: notificationTarget)
                 }
 
@@ -943,6 +942,46 @@ extension ContentView {
         progressText = String(localized: "download.status.cancelling", bundle: .app)
     }
 
+    var backgroundDownloadFraction: Double {
+        let itemFraction = backgroundDownloadProgress.fraction
+        guard let playlistProgress,
+              let expectedCount = playlistProgress.expectedCount,
+              expectedCount > 1 else {
+            return itemFraction
+        }
+        let finishedCount = playlistProgress.completedCount + playlistProgress.failedCount
+        return min((Double(finishedCount) + itemFraction) / Double(expectedCount), 1)
+    }
+
+    var backgroundDownloadSubtitle: String? {
+        guard let playlistProgress,
+              let expectedCount = playlistProgress.expectedCount,
+              expectedCount > 1,
+              let currentItemIndex = playlistProgress.currentItemIndex else {
+            return backgroundDownloadProgress.isProcessing
+                ? String(localized: "download.status.processing", bundle: .app)
+                : nil
+        }
+        return String(
+            format: String(localized: "download.background.playlist_item", bundle: .app),
+            currentItemIndex,
+            expectedCount
+        )
+    }
+
+    func syncBackgroundDownloadProgress() {
+        guard isRunning else { return }
+        BackgroundDownloadTask.shared.update(
+            fraction: backgroundDownloadFraction,
+            subtitle: backgroundDownloadSubtitle
+        )
+    }
+
+    private func backgroundDownloadDefaultSubtitle(for url: String) -> String {
+        guard let host = URL(string: url)?.host() else { return url }
+        return host.hasPrefix("www.") ? String(host.dropFirst(4)) : host
+    }
+
     func updateProgress(from chunk: String) {
         let normalized = chunk
             .replacingOccurrences(of: "\r\n", with: "\n")
@@ -960,12 +999,15 @@ extension ContentView {
         for line in lines {
             updateProgressLine(line)
         }
+        // SwiftUI skips view updates in the background, so progress is reported here instead of from onChange.
+        syncBackgroundDownloadProgress()
     }
 
     func updateProgressLine(_ line: String) {
         let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
         guard !downloadCancelRequested else { return }
+        backgroundDownloadProgress.handleLine(trimmed)
 
         if handlePlaylistProgressMarkerLine(trimmed) {
             return
@@ -985,6 +1027,7 @@ extension ContentView {
             if let update = parseFFmpegProgressUpdate(from: trimmed) {
                 if let progressPercent = update.percent {
                     lastDownloadProgressPercent = progressPercent
+                    backgroundDownloadProgress.updateProcessing(percent: progressPercent)
                     let clampedPercent = min(max(progressPercent, 0), 100)
                     let baseProcessingText = String(localized: "download.status.processing", bundle: .app)
                     let percentText = String(format: "%.1f%%", locale: .current, clampedPercent)
@@ -997,6 +1040,10 @@ extension ContentView {
                     progressText = String(localized: "download.status.processing", bundle: .app)
                 }
             }
+        } else if trimmed.hasPrefix("[download] Destination:") {
+            // A new stream or side file starts at 0%, so the previous stream's percent no longer applies.
+            lastDownloadProgressPercent = nil
+            progressText = trimmed
         } else if detailedProgressEnabled, shouldShowDetailedProgressLine(trimmed) {
             progressText = trimmed
         } else if trimmed.contains("[download]") {

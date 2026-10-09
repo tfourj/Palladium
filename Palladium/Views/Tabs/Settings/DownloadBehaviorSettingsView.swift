@@ -5,6 +5,7 @@ struct DownloadBehaviorSettingsView: View {
     @Binding var autoRetryFailedDownloads: Bool
     @Binding var saveIncompleteDownloadsToHistory: Bool
     @Binding var detailedProgressEnabled: Bool
+    @Binding var backgroundDownloadsEnabled: Bool
 
     let isRunning: Bool
 
@@ -47,6 +48,15 @@ struct DownloadBehaviorSettingsView: View {
                 Text("settings.ui.progress.section")
             } footer: {
                 Text("settings.ui.progress.help")
+            }
+
+            Section {
+                Toggle("settings.download_behavior.background.toggle", isOn: $backgroundDownloadsEnabled)
+                    .disabled(isRunning || !BackgroundDownloadTask.isSupported)
+            } header: {
+                Text("settings.download_behavior.background_section")
+            } footer: {
+                Text("settings.download_behavior.background.help")
             }
         }
         .navigationTitle("settings.download_behavior.title")

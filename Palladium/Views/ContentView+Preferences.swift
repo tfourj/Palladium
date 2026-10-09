@@ -50,6 +50,7 @@ extension ContentView {
         defaults.set(notificationsEnabled, forKey: Self.notificationsEnabledDefaultsKey)
         defaults.set(autoDownloadOnPaste, forKey: Self.autoDownloadOnPasteDefaultsKey)
         defaults.set(detailedProgressEnabled, forKey: Self.detailedProgressEnabledDefaultsKey)
+        defaults.set(backgroundDownloadsEnabled, forKey: Self.backgroundDownloadsEnabledDefaultsKey)
         defaults.set(shareSheetDownloadMode.rawValue, forKey: Self.shareSheetDownloadModeDefaultsKey)
         defaults.set(showShareSheetFormatButton, forKey: Self.showShareSheetFormatButtonDefaultsKey)
         defaults.set(showShareSheetFillURLButton, forKey: Self.showShareSheetFillURLButtonDefaultsKey)
@@ -247,6 +248,13 @@ extension ContentView {
             return true
         }
         return UserDefaults.standard.bool(forKey: detailedProgressEnabledDefaultsKey)
+    }
+
+    static func loadBackgroundDownloadsEnabled() -> Bool {
+        if UserDefaults.standard.object(forKey: backgroundDownloadsEnabledDefaultsKey) == nil {
+            return true
+        }
+        return UserDefaults.standard.bool(forKey: backgroundDownloadsEnabledDefaultsKey)
     }
 
     static func loadDownloadPlaylist() -> Bool {

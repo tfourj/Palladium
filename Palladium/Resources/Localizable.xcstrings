@@ -1335,6 +1335,26 @@
         }
       }
     },
+    "download.background.playlist_item" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Item %1$lld of %2$lld"
+          }
+        }
+      }
+    },
+    "download.background.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloading with Palladium"
+          }
+        }
+      }
+    },
     "download.button" : {
       "localizations" : {
         "en" : {
@@ -5931,6 +5951,36 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "引数付きダウンロード設定"
+          }
+        }
+      }
+    },
+    "settings.download_behavior.background.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keeps downloads running after you leave Palladium and shows their progress in system UI. Requires iOS 26 or later."
+          }
+        }
+      }
+    },
+    "settings.download_behavior.background.toggle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Background Downloads"
+          }
+        }
+      }
+    },
+    "settings.download_behavior.background_section" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Background"
           }
         }
       }
