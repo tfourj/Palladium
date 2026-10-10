@@ -5555,6 +5555,26 @@
         }
       }
     },
+    "settings.post_processing.always_reencode" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Always re-encode"
+          }
+        }
+      }
+    },
+    "settings.post_processing.always_reencode_help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When off, videos that already use the chosen codec are copied without quality loss, and the quality setting only applies to videos that need re-encoding."
+          }
+        }
+      }
+    },
     "settings.post_processing.auto" : {
       "localizations" : {
         "en" : {
