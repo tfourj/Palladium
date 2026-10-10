@@ -132,6 +132,7 @@ struct PostProcessingPreferences: Codable, Equatable {
     static let encoderKey = "palladium.postProcessingEncoder"
     static let qualityKey = "palladium.postProcessingQuality"
     static let hardwareDecodingKey = "palladium.postProcessingHardwareDecoding"
+    static let alwaysReencodeKey = "palladium.postProcessingAlwaysReencode"
 
     var enabled = false
     var method: VideoPostProcessingMethod = .recode
@@ -140,6 +141,7 @@ struct PostProcessingPreferences: Codable, Equatable {
     var encoder: VideoPostProcessingEncoder = .auto
     var quality: VideoPostProcessingQuality = .high
     var hardwareDecoding = true
+    var alwaysReencode = false
 
     init(
         enabled: Bool = false,
@@ -148,7 +150,8 @@ struct PostProcessingPreferences: Codable, Equatable {
         codec: VideoPostProcessingCodec = .auto,
         encoder: VideoPostProcessingEncoder = .auto,
         quality: VideoPostProcessingQuality = .high,
-        hardwareDecoding: Bool = true
+        hardwareDecoding: Bool = true,
+        alwaysReencode: Bool = false
     ) {
         self.enabled = enabled
         self.method = method
@@ -157,6 +160,7 @@ struct PostProcessingPreferences: Codable, Equatable {
         self.encoder = encoder
         self.quality = quality
         self.hardwareDecoding = hardwareDecoding
+        self.alwaysReencode = alwaysReencode
     }
 
     // Queued downloads persist this snapshot, so fields added later must decode as defaults.
@@ -169,6 +173,7 @@ struct PostProcessingPreferences: Codable, Equatable {
         encoder = try container.decodeIfPresent(VideoPostProcessingEncoder.self, forKey: .encoder) ?? .auto
         quality = try container.decodeIfPresent(VideoPostProcessingQuality.self, forKey: .quality) ?? .high
         hardwareDecoding = try container.decodeIfPresent(Bool.self, forKey: .hardwareDecoding) ?? true
+        alwaysReencode = try container.decodeIfPresent(Bool.self, forKey: .alwaysReencode) ?? false
     }
 
     static func load(from defaults: UserDefaults = .standard) -> Self {
@@ -179,7 +184,8 @@ struct PostProcessingPreferences: Codable, Equatable {
             codec: VideoPostProcessingCodec(rawValue: defaults.string(forKey: codecKey) ?? "") ?? .auto,
             encoder: VideoPostProcessingEncoder(rawValue: defaults.string(forKey: encoderKey) ?? "") ?? .auto,
             quality: VideoPostProcessingQuality(rawValue: defaults.string(forKey: qualityKey) ?? "") ?? .high,
-            hardwareDecoding: defaults.object(forKey: hardwareDecodingKey) as? Bool ?? true
+            hardwareDecoding: defaults.object(forKey: hardwareDecodingKey) as? Bool ?? true,
+            alwaysReencode: defaults.bool(forKey: alwaysReencodeKey)
         )
     }
 
