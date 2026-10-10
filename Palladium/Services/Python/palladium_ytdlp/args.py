@@ -3,6 +3,8 @@ import re
 import shlex
 import traceback
 
+from .video_conversion import parse_video_conversion_settings, recode_output_args, video_decoder_args
+
 CLI_DASHLIKE_PREFIX = "?\u2010\u2011\u2012\u2013\u2014\u2015\u2212\uFE58\uFE63\uFF0D"
 FLAGS_WITH_VALUES = {
     "-o",
@@ -168,20 +170,13 @@ def build_output_args(filename_preset, custom_template, download_playlist, prese
 
 
 def apply_post_processing_args(preset_args, extra_args, configuration_json):
-    if not configuration_json:
-        return preset_args, extra_args
-    configuration = json.loads(str(configuration_json))
-    if not isinstance(configuration, dict) or configuration.get("enabled") is not True:
+    settings = parse_video_conversion_settings(configuration_json)
+    if settings is None:
         return preset_args, extra_args
 
     # Custom audio extraction must also remain an audio-only operation.
     if any(arg in ("-x", "--extract-audio") for arg in [*preset_args, *extra_args]):
         return preset_args, extra_args
-
-    method = configuration.get("method")
-    target = configuration.get("format")
-    if method not in ("recode", "remux") or target not in ("mp4", "webm", "avi", "mkv", "mov"):
-        raise ValueError("Unsupported video post-processing settings")
 
     def strip_conversion_options(args):
         output = []
@@ -199,17 +194,15 @@ def apply_post_processing_args(preset_args, extra_args, configuration_json):
     extra_args = strip_conversion_options(extra_args)
     # Merge into a broad container before converting; AVI is not a merge format,
     # and forcing WebM before conversion would reject H.264/AAC source streams.
-    extra_args.extend(["--merge-output-format", "mkv", f"--{method}-video", target])
-    if method == "recode":
-        # yt-dlp defaults to libxvid for AVI and desktop encoders for other formats.
-        # Use encoders included in the iOS FFmpeg framework instead.
-        if target == "webm":
-            codecs = "-c:v libvpx-vp9 -crf 32 -b:v 0 -pix_fmt yuv420p -c:a libopus -b:a 128k"
-        elif target == "avi":
-            codecs = "-c:v mpeg4 -q:v 3 -c:a pcm_s16le"
-        else:
-            codecs = "-c:v h264_videotoolbox -b:v 8M -pix_fmt yuv420p -c:a aac -b:a 192k"
-        extra_args.extend(["--postprocessor-args", f"VideoConvertor+ffmpeg_o:{codecs}"])
+    extra_args.extend(["--merge-output-format", "mkv", f"--{settings.method}-video", settings.format])
+    if settings.method == "recode":
+        # yt-dlp defaults to desktop encoders, so pass encoders included in the iOS FFmpeg framework.
+        extra_args.extend([
+            "--postprocessor-args", f"VideoConvertor+ffmpeg_o:{shlex.join(recode_output_args(settings))}",
+        ])
+        decoder_args = video_decoder_args(settings)
+        if decoder_args:
+            extra_args.extend(["--postprocessor-args", f"VideoConvertor+ffmpeg_i:{shlex.join(decoder_args)}"])
     return preset_args, extra_args
 
 

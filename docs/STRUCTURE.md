@@ -140,6 +140,7 @@ Palladium/
 | `Services/Python/palladium_ytdlp/quickjs_bridge.py` | Embedded QuickJS runtime detection, evaluation, and scoped yt-dlp provider hooks. |
 | `Services/Python/palladium_ytdlp/runtime.py` | Runtime reset, module invalidation, and cancellation helpers. |
 | `Services/Python/palladium_ytdlp/shared.py` | Shared Python helpers and constants. |
+| `Services/Python/palladium_ytdlp/video_conversion.py` | Final video codec, encoder, and quality settings mapped to FFmpeg arguments. |
 | `Services/Python/palladium_ytdlp/webkit_jsi.py` | WebKit JavaScript integration used by yt-dlp. |
 | `Services/Python/palladium_ytdlp/ytdlp.py` | yt-dlp download flow and playlist progress tracking. |
 
