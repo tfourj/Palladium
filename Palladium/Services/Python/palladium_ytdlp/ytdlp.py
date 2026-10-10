@@ -36,6 +36,7 @@ from .patching import apply_youtube_patches
 from .quickjs_bridge import embedded_quickjs, runtime_default_args, runtime_default_options
 from .runtime import raise_if_cancel_requested
 from .shared import TailBuffer, Tee, open_live_log_stream
+from .video_conversion import codec_aware_video_conversion, parse_video_conversion_settings
 
 
 PLAYLIST_PROGRESS_PREFIX = "[palladium][playlist-progress] "
@@ -564,6 +565,7 @@ def run_retry_without_thumbnails(
     preset_args,
     extra_args,
     bridge_adapter,
+    conversion_settings=None,
 ):
     item_index = retry_candidate.get("index")
     if item_index is None:
@@ -596,7 +598,11 @@ def run_retry_without_thumbnails(
 
     sys.argv = retry_args
     try:
-        with embedded_quickjs(), patch_ytdlp_for_swiftffmpeg(bridge_adapter):
+        with (
+            embedded_quickjs(),
+            patch_ytdlp_for_swiftffmpeg(bridge_adapter),
+            codec_aware_video_conversion(conversion_settings),
+        ):
             runpy.run_module("yt_dlp", run_name="__main__", alter_sys=True)
         return True, None
     except SystemExit as exc:
@@ -828,6 +834,7 @@ def run_yt_dlp_flow(
                         preset_args, extra_args = apply_post_processing_args(
                             preset_args, extra_args, post_processing_json_override
                         )
+                        conversion_settings = parse_video_conversion_settings(post_processing_json_override)
                         raise_if_cancel_requested(cancel_file_path, "[palladium] cancellation requested before yt-dlp invocation")
                         output_args = build_output_args(
                             filename_export_preset,
@@ -885,6 +892,7 @@ def run_yt_dlp_flow(
                             with (
                                 embedded_quickjs(cancel_file_path),
                                 patch_ytdlp_for_swiftffmpeg(bridge_adapter),
+                                codec_aware_video_conversion(conversion_settings),
                                 filter_embedded_playlist_entries(filter_embedded_entries),
                             ):
                                 runpy.run_module("yt_dlp", run_name="__main__", alter_sys=True)
@@ -930,6 +938,7 @@ def run_yt_dlp_flow(
                                     preset_args=preset_args,
                                     extra_args=extra_args,
                                     bridge_adapter=bridge_adapter,
+                                    conversion_settings=conversion_settings,
                                 )
                                 playlist_progress.set_tracking_suspended(False)
                                 if retry_success:
