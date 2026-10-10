@@ -351,6 +351,10 @@ private struct SavedAVPlayerView: UIViewControllerRepresentable {
     let url: URL
 
     func makeUIViewController(context: Context) -> AVPlayerViewController {
+        // Use the playback category so video audio is not muted by the silent switch.
+        try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback)
+        try? AVAudioSession.sharedInstance().setActive(true)
+
         let controller = AVPlayerViewController()
         controller.player = AVPlayer(url: url)
         controller.allowsPictureInPicturePlayback = true
@@ -367,6 +371,7 @@ private struct SavedAVPlayerView: UIViewControllerRepresentable {
     static func dismantleUIViewController(_ controller: AVPlayerViewController, coordinator: ()) {
         controller.player?.pause()
         controller.player = nil
+        try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
     }
 }
 
