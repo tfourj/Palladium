@@ -5544,13 +5544,143 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Off by default. Re-encoding increases CPU usage, battery use, and processing time, and may reduce quality. Videos already in the chosen format are not re-encoded."
+            "value" : "Off by default. Re-encoding increases battery use and processing time, and may reduce quality. Videos already in the chosen format and codec are not re-encoded."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "デフォルトではオフです。再エンコードするとCPUの使用率、バッテリー使用率、処理時間が増加し、品質が低下する可能性があります。選択したフォーマットの動画は再エンコードされません。"
+          }
+        }
+      }
+    },
+    "settings.post_processing.auto" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auto"
+          }
+        }
+      }
+    },
+    "settings.post_processing.codec" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video codec"
+          }
+        }
+      }
+    },
+    "settings.post_processing.encoder" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encoder"
+          }
+        }
+      }
+    },
+    "settings.post_processing.encoder.hardware" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hardware"
+          }
+        }
+      }
+    },
+    "settings.post_processing.encoder.software" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Software"
+          }
+        }
+      }
+    },
+    "settings.post_processing.encoding" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encoding"
+          }
+        }
+      }
+    },
+    "settings.post_processing.encoding_help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auto uses Apple's hardware encoder when the codec supports it and software otherwise. Hardware decoding falls back to software for sources the device cannot decode. Current encoder: %@"
+          }
+        }
+      }
+    },
+    "settings.post_processing.hardware_decoding" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hardware decoding"
+          }
+        }
+      }
+    },
+    "settings.post_processing.quality" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quality"
+          }
+        }
+      }
+    },
+    "settings.post_processing.quality.high" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "High"
+          }
+        }
+      }
+    },
+    "settings.post_processing.quality.low" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Low"
+          }
+        }
+      }
+    },
+    "settings.post_processing.quality.maximum" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maximum"
+          }
+        }
+      }
+    },
+    "settings.post_processing.quality.medium" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Medium"
           }
         }
       }
