@@ -37,38 +37,6 @@
         }
       }
     },
-    "about.translators.title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Translators"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "翻訳者"
-          }
-        }
-      }
-    },
-    "about.translators.japanese" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Japanese"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "日本語"
-          }
-        }
-      }
-    },
     "about.developer.name" : {
       "localizations" : {
         "en" : {
@@ -129,6 +97,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Powered by yt-dlp and ffmpeg"
+          }
+        }
+      }
+    },
+    "about.translators.japanese" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Japanese"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日本語"
+          }
+        }
+      }
+    },
+    "about.translators.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Translators"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "翻訳者"
           }
         }
       }
@@ -199,6 +199,7 @@
     },
     "Audio" : {
       "comment" : "A label displayed above the audio quality and format settings.",
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -221,6 +222,7 @@
     },
     "Codec" : {
       "comment" : "A label for the video codec picker.",
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -1079,6 +1081,7 @@
     },
     "Download Quality" : {
       "comment" : "A title for a screen that lets the user configure the quality of video and audio downloads.",
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -1216,125 +1219,6 @@
         }
       }
     },
-    "download.filename.picker" : {
-      "comment" : "Label for selecting a yt-dlp output filename preset.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Filename"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ファイル名"
-          }
-        }
-      }
-    },
-    "download.filename.default" : {
-      "comment" : "Filename preset that uses a shortened media title.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Default"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "デフォルト"
-          }
-        }
-      }
-    },
-    "download.filename.video_id" : {
-      "comment" : "Filename preset that uses the media site's stable yt-dlp ID.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Video ID"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ビデオID"
-          }
-        }
-      }
-    },
-    "download.filename.custom" : {
-      "comment" : "Filename preset for a user-supplied yt-dlp output template.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Custom"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "カスタム"
-          }
-        }
-      }
-    },
-    "download.filename.custom.placeholder" : {
-      "comment" : "Example yt-dlp output filename template shown in the custom field.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%(title)s.%(ext)s"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%(title)s.%(ext)s"
-          }
-        }
-      }
-    },
-    "download.filename.custom.help" : {
-      "comment" : "Help text for a user-supplied yt-dlp output filename template.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enter a yt-dlp output template. Include %(ext)s for the file extension. Leave blank to use Default."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "yt-dlp出力テンプレートを入力します。ファイル拡張子には %(ext)s を含めます。デフォルトを使用するには空白のままにしてください。"
-          }
-        }
-      }
-    },
-    "download.filename.help" : {
-      "comment" : "Help text explaining filename preset behavior and existing output argument priority.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Default shortens long titles to 200 bytes. Video ID uses the media site's stable ID. Existing -o or --output arguments take priority."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "デフォルトでは、長いタイトルを 200 バイトに短縮します。ビデオ ID ではメディアサイトの安定した ID を使用します。既存の -o または --output 引数は優先されます。"
-          }
-        }
-      }
-    },
     "download.background.playlist_item" : {
       "localizations" : {
         "en" : {
@@ -1445,34 +1329,121 @@
         }
       }
     },
-    "download.formats.audio_section" : {
+    "download.filename.custom" : {
+      "comment" : "Filename preset for a user-supplied yt-dlp output template.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Audio"
+            "value" : "Custom"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "音声"
+            "value" : "カスタム"
           }
         }
       }
     },
-    "download.formats.no_audio" : {
+    "download.filename.custom.help" : {
+      "comment" : "Help text for a user-supplied yt-dlp output filename template.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "None available"
+            "value" : "Enter a yt-dlp output template. Include %(ext)s for the file extension. Leave blank to use Default."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "利用可能なものはありません"
+            "value" : "yt-dlp出力テンプレートを入力します。ファイル拡張子には %(ext)s を含めます。デフォルトを使用するには空白のままにしてください。"
+          }
+        }
+      }
+    },
+    "download.filename.custom.placeholder" : {
+      "comment" : "Example yt-dlp output filename template shown in the custom field.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%(title)s.%(ext)s"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%(title)s.%(ext)s"
+          }
+        }
+      }
+    },
+    "download.filename.default" : {
+      "comment" : "Filename preset that uses a shortened media title.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Default"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "デフォルト"
+          }
+        }
+      }
+    },
+    "download.filename.help" : {
+      "comment" : "Help text explaining filename preset behavior and existing output argument priority.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Default shortens long titles to 200 bytes. Video ID uses the media site's stable ID. Existing -o or --output arguments take priority."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "デフォルトでは、長いタイトルを 200 バイトに短縮します。ビデオ ID ではメディアサイトの安定した ID を使用します。既存の -o または --output 引数は優先されます。"
+          }
+        }
+      }
+    },
+    "download.filename.picker" : {
+      "comment" : "Label for selecting a yt-dlp output filename preset.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filename"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファイル名"
+          }
+        }
+      }
+    },
+    "download.filename.video_id" : {
+      "comment" : "Filename preset that uses the media site's stable yt-dlp ID.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video ID"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ビデオID"
           }
         }
       }
@@ -1493,22 +1464,6 @@
         }
       }
     },
-    "download.formats.video_label" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Video:"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "動画:"
-          }
-        }
-      }
-    },
     "download.formats.audio_label" : {
       "localizations" : {
         "en" : {
@@ -1525,82 +1480,18 @@
         }
       }
     },
-    "download.formats.final_label" : {
+    "download.formats.audio_section" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Final:"
+            "value" : "Audio"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "完了："
-          }
-        }
-      }
-    },
-    "download.formats.thumbnail_mkv_help" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MKV is used to embed the thumbnail."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "サムネイルの埋め込みに MKV を使用します。"
-          }
-        }
-      }
-    },
-    "download.formats.export_override_help" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Export settings are enabled and may change the final container."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "エクスポート設定は有効になっており、最終コンテナを変更することができます。"
-          }
-        }
-      }
-    },
-    "download.formats.source_help" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Video and audio show the source streams and their sizes. Final shows the merged container, including thumbnail handling."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "動画と音質には、ソースストリームとそのサイズが表示されます。最後に、サムネイルの処理を含むマージされたコンテナが表示されます。"
-          }
-        }
-      }
-    },
-    "download.formats.size_unknown" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Size unknown"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "サイズが不明です"
+            "value" : "音声"
           }
         }
       }
@@ -1637,6 +1528,38 @@
         }
       }
     },
+    "download.formats.export_override_help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export settings are enabled and may change the final container."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "エクスポート設定は有効になっており、最終コンテナを変更することができます。"
+          }
+        }
+      }
+    },
+    "download.formats.final_label" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Final:"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完了："
+          }
+        }
+      }
+    },
     "download.formats.loading" : {
       "localizations" : {
         "en" : {
@@ -1653,18 +1576,18 @@
         }
       }
     },
-    "download.formats.webm_thumbnail_warning" : {
+    "download.formats.no_audio" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "WEBM does not support embedded thumbnails."
+            "value" : "None available"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "WEBMは埋め込みサムネイルをサポートしていません。"
+            "value" : "利用可能なものはありません"
           }
         }
       }
@@ -1701,6 +1624,54 @@
         }
       }
     },
+    "download.formats.size_unknown" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Size unknown"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サイズが不明です"
+          }
+        }
+      }
+    },
+    "download.formats.source_help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video and audio show the source streams and their sizes. Final shows the merged container, including thumbnail handling."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "動画と音質には、ソースストリームとそのサイズが表示されます。最後に、サムネイルの処理を含むマージされたコンテナが表示されます。"
+          }
+        }
+      }
+    },
+    "download.formats.thumbnail_mkv_help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MKV is used to embed the thumbnail."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サムネイルの埋め込みに MKV を使用します。"
+          }
+        }
+      }
+    },
     "download.formats.title" : {
       "localizations" : {
         "en" : {
@@ -1717,6 +1688,22 @@
         }
       }
     },
+    "download.formats.video_label" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video:"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "動画:"
+          }
+        }
+      }
+    },
     "download.formats.video_section" : {
       "localizations" : {
         "en" : {
@@ -1729,6 +1716,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "音声付きの動画"
+          }
+        }
+      }
+    },
+    "download.formats.webm_thumbnail_warning" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WEBM does not support embedded thumbnails."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WEBMは埋め込みサムネイルをサポートしていません。"
           }
         }
       }
@@ -2406,6 +2409,17 @@
         }
       }
     },
+    "download.quality.audio.section" : {
+      "comment" : "Header for the audio download quality settings section.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio"
+          }
+        }
+      }
+    },
     "download.quality.best" : {
       "comment" : "Option that selects the best available quality or format.",
       "localizations" : {
@@ -2654,6 +2668,23 @@
         }
       }
     },
+    "download.quality.video.codec_help" : {
+      "comment" : "A description of the video codec compatibility options.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "H.264 and H.265/HEVC in MP4 are compatible with the Photos app. H.264 is preferred when both are available."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MP4形式のH.264およびH.265/HEVCは、「写真」アプリに対応しています。両方を利用可能な場合は、H.264が優先されます。"
+          }
+        }
+      }
+    },
     "download.quality.video.codec.best_available" : {
       "comment" : "Video codec option that allows any available codec.",
       "localizations" : {
@@ -2676,19 +2707,13 @@
         }
       }
     },
-    "download.quality.video.codec_help" : {
-      "comment" : "A description of the video codec compatibility options.",
+    "download.quality.video.section" : {
+      "comment" : "Header for the video download quality settings section.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "H.264 and H.265/HEVC in MP4 are compatible with the Photos app. H.264 is preferred when both are available."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MP4形式のH.264およびH.265/HEVCは、「写真」アプリに対応しています。両方を利用可能な場合は、H.264が優先されます。"
+            "value" : "Video"
           }
         }
       }
@@ -3127,6 +3152,7 @@
     },
     "Format" : {
       "comment" : "A warning that appears when the user selects a video codec that is incompatible with the Photos app.",
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -4844,6 +4870,7 @@
       }
     },
     "Quality" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -5395,316 +5422,6 @@
         }
       }
     },
-    "settings.post_processing.enabled" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Convert final video"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "最終動画を変換する"
-          }
-        }
-      }
-    },
-    "settings.post_processing.format" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Output format"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "出力フォーマット"
-          }
-        }
-      }
-    },
-    "settings.post_processing.mode" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Conversion method"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "変換方法"
-          }
-        }
-      }
-    },
-    "settings.post_processing.recode" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Re-encode"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "再エンコード"
-          }
-        }
-      }
-    },
-    "settings.post_processing.remux" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Remux"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "リマックス（再多重化）"
-          }
-        }
-      }
-    },
-    "settings.post_processing.remux_help" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Remuxing changes the container without re-encoding, so it is faster and preserves quality. It can fail if the selected container does not support the original codecs."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "再多重化は、再エンコードせずに容器を変更するので、より速く、品質を維持します。 選択したコンテナが元のコーデックをサポートしていない場合、失敗する可能性があります。"
-          }
-        }
-      }
-    },
-    "settings.post_processing.scope" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Applies to video downloads, including format selections. Audio-only and image downloads are unchanged. Enabled conversion overrides video container and conversion arguments. Queued downloads keep the settings chosen when added."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "フォーマット選択を含む動画ダウンロードに適用されます。音声のみと画像のダウンロードは変更されません。 変換を有効にすると、動画コンテナと変換引数が上書きされます。キューに追加されたダウンロードは、追加時に選択された設定を維持します。"
-          }
-        }
-      }
-    },
-    "settings.post_processing.subtitle" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Re-encode or remux downloaded videos into another format"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "動画を別のフォーマットにエンコードまたは再多重化する"
-          }
-        }
-      }
-    },
-    "settings.post_processing.title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Post Processing"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ポスト処理中"
-          }
-        }
-      }
-    },
-    "settings.post_processing.warning" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Off by default. Re-encoding increases battery use and processing time, and may reduce quality. Videos already in the chosen format and codec are not re-encoded."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "デフォルトではオフです。再エンコードするとCPUの使用率、バッテリー使用率、処理時間が増加し、品質が低下する可能性があります。選択したフォーマットの動画は再エンコードされません。"
-          }
-        }
-      }
-    },
-    "settings.post_processing.always_reencode" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Always re-encode"
-          }
-        }
-      }
-    },
-    "settings.post_processing.always_reencode_help" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "When off, videos that already use the chosen codec are copied without quality loss, and the quality setting only applies to videos that need re-encoding."
-          }
-        }
-      }
-    },
-    "settings.post_processing.auto" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Auto"
-          }
-        }
-      }
-    },
-    "settings.post_processing.codec" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Video codec"
-          }
-        }
-      }
-    },
-    "settings.post_processing.encoder" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Encoder"
-          }
-        }
-      }
-    },
-    "settings.post_processing.encoder.hardware" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hardware"
-          }
-        }
-      }
-    },
-    "settings.post_processing.encoder.software" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Software"
-          }
-        }
-      }
-    },
-    "settings.post_processing.encoding" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Encoding"
-          }
-        }
-      }
-    },
-    "settings.post_processing.encoding_help" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Auto uses Apple's hardware encoder when the codec supports it and software otherwise. Hardware decoding falls back to software for sources the device cannot decode. Current encoder: %@"
-          }
-        }
-      }
-    },
-    "settings.post_processing.hardware_decoding" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hardware decoding"
-          }
-        }
-      }
-    },
-    "settings.post_processing.quality" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Quality"
-          }
-        }
-      }
-    },
-    "settings.post_processing.quality.high" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "High"
-          }
-        }
-      }
-    },
-    "settings.post_processing.quality.low" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Low"
-          }
-        }
-      }
-    },
-    "settings.post_processing.quality.maximum" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Maximum"
-          }
-        }
-      }
-    },
-    "settings.post_processing.quality.medium" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Medium"
-          }
-        }
-      }
-    },
     "settings.about.subtitle" : {
       "localizations" : {
         "en" : {
@@ -5733,6 +5450,70 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "情報"
+          }
+        }
+      }
+    },
+    "settings.advanced.javascript_runtime" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JavaScript runtime"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JavaScript ランタイム"
+          }
+        }
+      }
+    },
+    "settings.advanced.javascript_runtime.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose the JavaScript runtime for video downloads. Apple WebKit is the default."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ビデオダウンロードのJavaScriptランタイムを選択します。Apple WebKitがデフォルトです。"
+          }
+        }
+      }
+    },
+    "settings.advanced.javascript_runtime.quickjs" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QuickJS"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QuickJS"
+          }
+        }
+      }
+    },
+    "settings.advanced.javascript_runtime.webkit" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple WebKit"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple WebKit"
           }
         }
       }
@@ -5845,70 +5626,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "高度な設定"
-          }
-        }
-      }
-    },
-    "settings.advanced.javascript_runtime" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "JavaScript runtime"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "JavaScript ランタイム"
-          }
-        }
-      }
-    },
-    "settings.advanced.javascript_runtime.help" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choose the JavaScript runtime for video downloads. Apple WebKit is the default."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ビデオダウンロードのJavaScriptランタイムを選択します。Apple WebKitがデフォルトです。"
-          }
-        }
-      }
-    },
-    "settings.advanced.javascript_runtime.quickjs" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "QuickJS"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "QuickJS"
-          }
-        }
-      }
-    },
-    "settings.advanced.javascript_runtime.webkit" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple WebKit"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple WebKit"
           }
         }
       }
@@ -6105,6 +5822,16 @@
         }
       }
     },
+    "settings.download_behavior.background_section" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Background"
+          }
+        }
+      }
+    },
     "settings.download_behavior.background.help" : {
       "localizations" : {
         "en" : {
@@ -6121,16 +5848,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Background Downloads"
-          }
-        }
-      }
-    },
-    "settings.download_behavior.background_section" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Background"
           }
         }
       }
@@ -6487,6 +6204,28 @@
         }
       }
     },
+    "settings.download_quality.subtitle" : {
+      "comment" : "Subtitle of the Download Quality settings row.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Default video and audio formats, codecs, and quality"
+          }
+        }
+      }
+    },
+    "settings.download_quality.title" : {
+      "comment" : "Title of the Download Quality settings row and screen.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download Quality"
+          }
+        }
+      }
+    },
     "settings.download_settings.subtitle" : {
       "localizations" : {
         "en" : {
@@ -6551,18 +6290,84 @@
         }
       }
     },
-    "settings.language.title" : {
+    "settings.filename.subtitle" : {
+      "comment" : "Subtitle for the yt-dlp output filename settings screen.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Language"
+            "value" : "Choose how downloaded files are named"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "言語"
+            "value" : "ダウンロードしたファイルの名前を選択"
+          }
+        }
+      }
+    },
+    "settings.filename.title" : {
+      "comment" : "Title of the yt-dlp output filename settings screen.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filename Settings"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファイル名の設定"
+          }
+        }
+      }
+    },
+    "settings.general.section" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "General"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "全般"
+          }
+        }
+      }
+    },
+    "settings.history.subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recent links and history limit"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最近のリンクと履歴の上限"
+          }
+        }
+      }
+    },
+    "settings.language.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "System uses your preferred supported language, or English when no translation is available."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「システム」は対応する優先言語を使用します。対応する翻訳がない場合は英語を使用します。"
           }
         }
       }
@@ -6599,84 +6404,18 @@
         }
       }
     },
-    "settings.language.help" : {
+    "settings.language.title" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "System uses your preferred supported language, or English when no translation is available."
+            "value" : "Language"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "「システム」は対応する優先言語を使用します。対応する翻訳がない場合は英語を使用します。"
-          }
-        }
-      }
-    },
-    "settings.general.section" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "General"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "全般"
-          }
-        }
-      }
-    },
-    "settings.filename.title" : {
-      "comment" : "Title of the yt-dlp output filename settings screen.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Filename Settings"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ファイル名の設定"
-          }
-        }
-      }
-    },
-    "settings.filename.subtitle" : {
-      "comment" : "Subtitle for the yt-dlp output filename settings screen.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choose how downloaded files are named"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ダウンロードしたファイルの名前を選択"
-          }
-        }
-      }
-    },
-    "settings.history.subtitle" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Recent links and history limit"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "最近のリンクと履歴の上限"
+            "value" : "言語"
           }
         }
       }
@@ -6869,6 +6608,316 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "アップデートの確認"
+          }
+        }
+      }
+    },
+    "settings.post_processing.always_reencode" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Always re-encode"
+          }
+        }
+      }
+    },
+    "settings.post_processing.always_reencode_help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When off, videos that already use the chosen codec are copied without quality loss, and the quality setting only applies to videos that need re-encoding."
+          }
+        }
+      }
+    },
+    "settings.post_processing.auto" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auto"
+          }
+        }
+      }
+    },
+    "settings.post_processing.codec" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video codec"
+          }
+        }
+      }
+    },
+    "settings.post_processing.enabled" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Convert final video"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最終動画を変換する"
+          }
+        }
+      }
+    },
+    "settings.post_processing.encoder" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encoder"
+          }
+        }
+      }
+    },
+    "settings.post_processing.encoder.hardware" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hardware"
+          }
+        }
+      }
+    },
+    "settings.post_processing.encoder.software" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Software"
+          }
+        }
+      }
+    },
+    "settings.post_processing.encoding" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encoding"
+          }
+        }
+      }
+    },
+    "settings.post_processing.encoding_help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auto uses Apple's hardware encoder when the codec supports it and software otherwise. Hardware decoding falls back to software for sources the device cannot decode. Current encoder: %@"
+          }
+        }
+      }
+    },
+    "settings.post_processing.format" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Output format"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "出力フォーマット"
+          }
+        }
+      }
+    },
+    "settings.post_processing.hardware_decoding" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hardware decoding"
+          }
+        }
+      }
+    },
+    "settings.post_processing.mode" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conversion method"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "変換方法"
+          }
+        }
+      }
+    },
+    "settings.post_processing.quality" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quality"
+          }
+        }
+      }
+    },
+    "settings.post_processing.quality.high" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "High"
+          }
+        }
+      }
+    },
+    "settings.post_processing.quality.low" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Low"
+          }
+        }
+      }
+    },
+    "settings.post_processing.quality.maximum" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maximum"
+          }
+        }
+      }
+    },
+    "settings.post_processing.quality.medium" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Medium"
+          }
+        }
+      }
+    },
+    "settings.post_processing.recode" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Re-encode"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "再エンコード"
+          }
+        }
+      }
+    },
+    "settings.post_processing.remux" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remux"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リマックス（再多重化）"
+          }
+        }
+      }
+    },
+    "settings.post_processing.remux_help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remuxing changes the container without re-encoding, so it is faster and preserves quality. It can fail if the selected container does not support the original codecs."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "再多重化は、再エンコードせずに容器を変更するので、より速く、品質を維持します。 選択したコンテナが元のコーデックをサポートしていない場合、失敗する可能性があります。"
+          }
+        }
+      }
+    },
+    "settings.post_processing.scope" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applies to video downloads, including format selections. Audio-only and image downloads are unchanged. Enabled conversion overrides video container and conversion arguments. Queued downloads keep the settings chosen when added."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フォーマット選択を含む動画ダウンロードに適用されます。音声のみと画像のダウンロードは変更されません。 変換を有効にすると、動画コンテナと変換引数が上書きされます。キューに追加されたダウンロードは、追加時に選択された設定を維持します。"
+          }
+        }
+      }
+    },
+    "settings.post_processing.subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Re-encode or remux downloaded videos into another format"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "動画を別のフォーマットにエンコードまたは再多重化する"
+          }
+        }
+      }
+    },
+    "settings.post_processing.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Post Processing"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ポスト処理中"
+          }
+        }
+      }
+    },
+    "settings.post_processing.warning" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Off by default. Re-encoding increases battery use and processing time, and may reduce quality. Videos already in the chosen format and codec are not re-encoded."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "デフォルトではオフです。再エンコードするとCPUの使用率、バッテリー使用率、処理時間が増加し、品質が低下する可能性があります。選択したフォーマットの動画は再エンコードされません。"
           }
         }
       }
@@ -7833,6 +7882,465 @@
         }
       }
     },
+    "settings.website_args.add" : {
+      "comment" : "Button that adds a per-website argument rule.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Rule"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ルールを追加"
+          }
+        }
+      }
+    },
+    "settings.website_args.arguments.help" : {
+      "comment" : "Help text for yt-dlp arguments in a website rule.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Added after global extra args for links that match this rule."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このルールに一致するリンクに対するグローバル追加引数の後に追加されました。"
+          }
+        }
+      }
+    },
+    "settings.website_args.arguments.placeholder" : {
+      "comment" : "Placeholder yt-dlp arguments for a website rule.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "--no-mtime"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "--no-mtime"
+          }
+        }
+      }
+    },
+    "settings.website_args.arguments.title" : {
+      "comment" : "Section header for yt-dlp arguments in a website rule.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arguments"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "引数"
+          }
+        }
+      }
+    },
+    "settings.website_args.disabled_badge" : {
+      "comment" : "Badge shown next to a disabled website argument rule.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Off"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オフ"
+          }
+        }
+      }
+    },
+    "settings.website_args.edit.title" : {
+      "comment" : "Title of the sheet for editing a website argument rule.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Rule"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ルール編集"
+          }
+        }
+      }
+    },
+    "settings.website_args.empty" : {
+      "comment" : "Shown when no per-website argument rules exist.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No website rules yet."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "まだウェブサイトのルールはありません。"
+          }
+        }
+      }
+    },
+    "settings.website_args.enabled" : {
+      "comment" : "Toggle that turns a website argument rule on or off.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enabled"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "有効"
+          }
+        }
+      }
+    },
+    "settings.website_args.footer" : {
+      "comment" : "Footer below the link to per-website yt-dlp argument rules.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add yt-dlp args that only apply to links from specific websites."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "特定のウェブサイトからのリンクにのみ適用される yt-dlp 引数を追加します。"
+          }
+        }
+      }
+    },
+    "settings.website_args.match_type" : {
+      "comment" : "Label for choosing how a website argument rule matches links.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Match"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一致"
+          }
+        }
+      }
+    },
+    "settings.website_args.match_type.regex" : {
+      "comment" : "Match type that uses a regular expression against the full link.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Regex"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正規表現"
+          }
+        }
+      }
+    },
+    "settings.website_args.match_type.website" : {
+      "comment" : "Match type that compares the link's website and subdomains.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Website"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ウェブサイト"
+          }
+        }
+      }
+    },
+    "settings.website_args.new.title" : {
+      "comment" : "Title of the sheet for adding a website argument rule.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New Rule"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新しいルール"
+          }
+        }
+      }
+    },
+    "settings.website_args.pattern.regex.help" : {
+      "comment" : "Help text for regular expression match rules.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matched against the full link, ignoring case."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "大文字と小文字を無視して、完全なリンクと一致しました。"
+          }
+        }
+      }
+    },
+    "settings.website_args.pattern.regex.invalid" : {
+      "comment" : "Validation message for an invalid regular expression in a rule.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This regular expression is not valid."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この正規表現は無効です。"
+          }
+        }
+      }
+    },
+    "settings.website_args.pattern.regex.placeholder" : {
+      "comment" : "Placeholder regular expression for a website argument rule.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https?://example.com/watch.*"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https?://example.com/watch.*"
+          }
+        }
+      }
+    },
+    "settings.website_args.pattern.website.help" : {
+      "comment" : "Help text for website match rules.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matches this website and all of its subdomains."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このウェブサイトとそのすべてのサブドメインが一致します。"
+          }
+        }
+      }
+    },
+    "settings.website_args.pattern.website.invalid" : {
+      "comment" : "Validation message for an invalid website in a rule.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter a website like example.com."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "example.com のようなウェブサイトを入力します。"
+          }
+        }
+      }
+    },
+    "settings.website_args.pattern.website.placeholder" : {
+      "comment" : "Placeholder website for a website argument rule.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "example.com"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "example.com"
+          }
+        }
+      }
+    },
+    "settings.website_args.priority.footer" : {
+      "comment" : "Explains how per-website argument rules are matched and prioritized.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only one rule applies to each link. Regex rules are checked first, from top to bottom. Otherwise the most specific website wins, so test.example.com is used before example.com. Website args are added after global extra args."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "各リンクに適用されるルールは1つのみです。正規表現ルールが上から順に優先してチェックされます。それ以外の場合は、より具体的なウェブサイトが優先されるため、example.com よりも test.example.com が先に適用されます。ウェブサイト固有の引数は、グローバルな追加引数の後ろに追加されます。"
+          }
+        }
+      }
+    },
+    "settings.website_args.rules.section" : {
+      "comment" : "Section header for the list of per-website argument rules.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rules"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ルール"
+          }
+        }
+      }
+    },
+    "settings.website_args.subtitle" : {
+      "comment" : "Settings search subtitle for per-website yt-dlp argument rules.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "yt-dlp args for specific websites"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "特定のウェブサイト向けの yt-dlp 引数"
+          }
+        }
+      }
+    },
+    "settings.website_args.test.match" : {
+      "comment" : "Shows the website or regex rule that matches the tested link.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uses %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ を使用"
+          }
+        }
+      }
+    },
+    "settings.website_args.test.no_match" : {
+      "comment" : "Shown when no website argument rule matches the tested link.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No rule matches this link."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このリンクに一致するルールはありません。"
+          }
+        }
+      }
+    },
+    "settings.website_args.test.placeholder" : {
+      "comment" : "Placeholder link for testing website argument rules.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://example.com/video"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://example.com/video"
+          }
+        }
+      }
+    },
+    "settings.website_args.test.section" : {
+      "comment" : "Section header for checking which website rule applies to a link.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Test a Link"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リンクをテスト"
+          }
+        }
+      }
+    },
+    "settings.website_args.title" : {
+      "comment" : "Title of the per-website yt-dlp argument rules screen.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Website Arguments"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ウェブサイト引数"
+          }
+        }
+      }
+    },
     "shortcuts.download_type.title" : {
       "localizations" : {
         "en" : {
@@ -8763,514 +9271,12 @@
     },
     "Video" : {
       "comment" : "A heading for the video settings in the download quality settings.",
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "動画"
-          }
-        }
-      }
-    },
-    "download.quality.audio.section" : {
-      "comment" : "Header for the audio download quality settings section.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Audio"
-          }
-        }
-      }
-    },
-    "download.quality.video.section" : {
-      "comment" : "Header for the video download quality settings section.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Video"
-          }
-        }
-      }
-    },
-    "settings.download_quality.subtitle" : {
-      "comment" : "Subtitle of the Download Quality settings row.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Default video and audio formats, codecs, and quality"
-          }
-        }
-      }
-    },
-    "settings.download_quality.title" : {
-      "comment" : "Title of the Download Quality settings row and screen.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Download Quality"
-          }
-        }
-      }
-    },
-    "settings.website_args.title" : {
-      "comment" : "Title of the per-website yt-dlp argument rules screen.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Website Arguments"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ウェブサイト引数"
-          }
-        }
-      }
-    },
-    "settings.website_args.subtitle" : {
-      "comment" : "Settings search subtitle for per-website yt-dlp argument rules.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "yt-dlp args for specific websites"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "特定のウェブサイト向けの yt-dlp 引数"
-          }
-        }
-      }
-    },
-    "settings.website_args.footer" : {
-      "comment" : "Footer below the link to per-website yt-dlp argument rules.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Add yt-dlp args that only apply to links from specific websites."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "特定のウェブサイトからのリンクにのみ適用される yt-dlp 引数を追加します。"
-          }
-        }
-      }
-    },
-    "settings.website_args.rules.section" : {
-      "comment" : "Section header for the list of per-website argument rules.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rules"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ルール"
-          }
-        }
-      }
-    },
-    "settings.website_args.empty" : {
-      "comment" : "Shown when no per-website argument rules exist.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No website rules yet."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "まだウェブサイトのルールはありません。"
-          }
-        }
-      }
-    },
-    "settings.website_args.add" : {
-      "comment" : "Button that adds a per-website argument rule.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Add Rule"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ルールを追加"
-          }
-        }
-      }
-    },
-    "settings.website_args.priority.footer" : {
-      "comment" : "Explains how per-website argument rules are matched and prioritized.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Only one rule applies to each link. Regex rules are checked first, from top to bottom. Otherwise the most specific website wins, so test.example.com is used before example.com. Website args are added after global extra args."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "各リンクに適用されるルールは1つのみです。正規表現ルールが上から順に優先してチェックされます。それ以外の場合は、より具体的なウェブサイトが優先されるため、example.com よりも test.example.com が先に適用されます。ウェブサイト固有の引数は、グローバルな追加引数の後ろに追加されます。"
-          }
-        }
-      }
-    },
-    "settings.website_args.test.section" : {
-      "comment" : "Section header for checking which website rule applies to a link.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Test a Link"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "リンクをテスト"
-          }
-        }
-      }
-    },
-    "settings.website_args.test.placeholder" : {
-      "comment" : "Placeholder link for testing website argument rules.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "https://example.com/video"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "https://example.com/video"
-          }
-        }
-      }
-    },
-    "settings.website_args.test.match" : {
-      "comment" : "Shows the website or regex rule that matches the tested link.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Uses %@"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ を使用"
-          }
-        }
-      }
-    },
-    "settings.website_args.test.no_match" : {
-      "comment" : "Shown when no website argument rule matches the tested link.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No rule matches this link."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "このリンクに一致するルールはありません。"
-          }
-        }
-      }
-    },
-    "settings.website_args.match_type" : {
-      "comment" : "Label for choosing how a website argument rule matches links.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Match"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "一致"
-          }
-        }
-      }
-    },
-    "settings.website_args.match_type.website" : {
-      "comment" : "Match type that compares the link's website and subdomains.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Website"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ウェブサイト"
-          }
-        }
-      }
-    },
-    "settings.website_args.match_type.regex" : {
-      "comment" : "Match type that uses a regular expression against the full link.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Regex"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "正規表現"
-          }
-        }
-      }
-    },
-    "settings.website_args.pattern.website.placeholder" : {
-      "comment" : "Placeholder website for a website argument rule.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "example.com"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "example.com"
-          }
-        }
-      }
-    },
-    "settings.website_args.pattern.regex.placeholder" : {
-      "comment" : "Placeholder regular expression for a website argument rule.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "https?://example.com/watch.*"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "https?://example.com/watch.*"
-          }
-        }
-      }
-    },
-    "settings.website_args.pattern.website.help" : {
-      "comment" : "Help text for website match rules.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Matches this website and all of its subdomains."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "このウェブサイトとそのすべてのサブドメインが一致します。"
-          }
-        }
-      }
-    },
-    "settings.website_args.pattern.regex.help" : {
-      "comment" : "Help text for regular expression match rules.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Matched against the full link, ignoring case."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "大文字と小文字を無視して、完全なリンクと一致しました。"
-          }
-        }
-      }
-    },
-    "settings.website_args.pattern.website.invalid" : {
-      "comment" : "Validation message for an invalid website in a rule.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enter a website like example.com."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "example.com のようなウェブサイトを入力します。"
-          }
-        }
-      }
-    },
-    "settings.website_args.pattern.regex.invalid" : {
-      "comment" : "Validation message for an invalid regular expression in a rule.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This regular expression is not valid."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "この正規表現は無効です。"
-          }
-        }
-      }
-    },
-    "settings.website_args.arguments.title" : {
-      "comment" : "Section header for yt-dlp arguments in a website rule.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Arguments"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "引数"
-          }
-        }
-      }
-    },
-    "settings.website_args.arguments.placeholder" : {
-      "comment" : "Placeholder yt-dlp arguments for a website rule.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "--no-mtime"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "--no-mtime"
-          }
-        }
-      }
-    },
-    "settings.website_args.arguments.help" : {
-      "comment" : "Help text for yt-dlp arguments in a website rule.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Added after global extra args for links that match this rule."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "このルールに一致するリンクに対するグローバル追加引数の後に追加されました。"
-          }
-        }
-      }
-    },
-    "settings.website_args.enabled" : {
-      "comment" : "Toggle that turns a website argument rule on or off.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enabled"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "有効"
-          }
-        }
-      }
-    },
-    "settings.website_args.disabled_badge" : {
-      "comment" : "Badge shown next to a disabled website argument rule.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Off"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "オフ"
-          }
-        }
-      }
-    },
-    "settings.website_args.new.title" : {
-      "comment" : "Title of the sheet for adding a website argument rule.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "New Rule"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "新しいルール"
-          }
-        }
-      }
-    },
-    "settings.website_args.edit.title" : {
-      "comment" : "Title of the sheet for editing a website argument rule.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Edit Rule"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ルール編集"
           }
         }
       }
