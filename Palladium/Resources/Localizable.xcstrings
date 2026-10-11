@@ -227,6 +227,16 @@
         }
       }
     },
+    "about.translators.chinese" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chinese"
+          }
+        }
+      }
+    },
     "about.translators.japanese" : {
       "localizations" : {
         "en" : {
@@ -257,6 +267,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "日语"
+          }
+        }
+      }
+    },
+    "about.translators.korean" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Korean"
           }
         }
       }
