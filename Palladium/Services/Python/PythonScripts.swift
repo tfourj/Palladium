@@ -16,6 +16,7 @@ enum PythonScripts {
         "palladium_ytdlp/quickjs_bridge.py",
         "palladium_ytdlp/runtime.py",
         "palladium_ytdlp/shared.py",
+        "palladium_ytdlp/video_conversion.py",
         "palladium_ytdlp/webkit_jsi.py",
         "palladium_ytdlp/ytdlp.py",
     ]

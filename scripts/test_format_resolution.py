@@ -1,4 +1,6 @@
 import json
+import os
+import tempfile
 import unittest
 from unittest import mock
 
@@ -8,7 +10,11 @@ from scripts.python_tests import helpers  # noqa: F401
 
 from palladium_ytdlp.ytdlp import list_yt_dlp_formats, resolve_picker_formats  # noqa: E402
 from palladium_ytdlp.args import apply_post_processing_args, build_output_args  # noqa: E402
-from yt_dlp.postprocessor.ffmpeg import FFmpegVideoConvertorPP, FFmpegVideoRemuxerPP
+from palladium_ytdlp.video_conversion import (  # noqa: E402
+    codec_aware_video_conversion,
+    parse_video_conversion_settings,
+)
+from yt_dlp.postprocessor.ffmpeg import FFmpegPostProcessorError, FFmpegVideoConvertorPP, FFmpegVideoRemuxerPP
 
 
 class OutputTemplateIntegrationTests(unittest.TestCase):
@@ -76,6 +82,79 @@ class PostProcessingIntegrationTests(unittest.TestCase):
         run.assert_not_called()
         self.assertEqual(deleted, [])
         self.assertEqual(result["filepath"], "/tmp/video.mp4")
+
+
+class CodecAwareConversionTests(unittest.TestCase):
+    def convert(self, source_ext, video_codec, audio_codec="aac", fail_first=False, **encoding):
+        settings = parse_video_conversion_settings(json.dumps({"enabled": True, "method": "recode", **encoding}))
+        directory = self.enterContext(tempfile.TemporaryDirectory())
+        source = os.path.join(directory, f"video.{source_ext}")
+        with open(source, "w") as file:
+            file.write("source")
+        metadata = {"streams": [
+            {"codec_type": "video", "codec_name": video_codec},
+            {"codec_type": "audio", "codec_name": audio_codec},
+        ]}
+        calls = []
+
+        with codec_aware_video_conversion(settings):
+            processor = FFmpegVideoConvertorPP(yt_dlp.YoutubeDL({"quiet": True}), preferedformat=settings.format)
+
+            def run_ffmpeg(path, out_path, options):
+                calls.append((
+                    processor._configuration_args("ffmpeg", ["_i1", "_i"]),
+                    processor._configuration_args("ffmpeg", ["_o1", "_o", ""]),
+                ))
+                if fail_first and len(calls) == 1:
+                    raise FFmpegPostProcessorError("hardware failed")
+                with open(out_path, "w") as file:
+                    file.write("converted")
+
+            with (
+                mock.patch.object(processor, "get_metadata_object", return_value=metadata),
+                mock.patch.object(processor, "run_ffmpeg", side_effect=run_ffmpeg),
+                mock.patch.object(processor, "report_warning"),
+            ):
+                deleted, info = processor.run({
+                    "filepath": source, "ext": source_ext, "vcodec": video_codec, "acodec": audio_codec,
+                })
+        return source, deleted, info, calls, sorted(os.listdir(directory))
+
+    def test_matching_container_with_other_codec_is_reencoded_in_place(self):
+        source, deleted, info, calls, files = self.convert("mp4", "h264", format="mp4", codec="hevc")
+        self.assertEqual(deleted, [])
+        self.assertEqual(info["filepath"], source)
+        self.assertEqual(files, ["video.mp4"])
+        self.assertEqual(calls[0][0], ["-hwaccel", "videotoolbox"])
+        self.assertIn("hevc_videotoolbox", calls[0][1])
+
+    def test_matching_container_and_codec_is_skipped(self):
+        _, deleted, _, calls, _ = self.convert("mp4", "h264", format="mp4")
+        self.assertEqual((deleted, calls), ([], []))
+
+    def test_matching_codec_is_copied_into_new_container(self):
+        source, deleted, info, calls, _ = self.convert("mkv", "h264", "opus", format="mp4")
+        self.assertEqual(deleted, [source])
+        self.assertEqual(info["ext"], "mp4")
+        self.assertEqual(calls, [([], ["-c:v", "copy", "-c:a", "aac", "-b:a", "192k"])])
+
+    def test_always_reencode_encodes_matching_codec(self):
+        _, _, _, calls, _ = self.convert("mkv", "h264", format="mp4", alwaysReencode=True)
+        self.assertIn("h264_videotoolbox", calls[0][1])
+
+    def test_auto_retries_hardware_failure_with_software(self):
+        _, _, info, calls, _ = self.convert("mkv", "h264", fail_first=True, format="mov", codec="prores")
+        self.assertEqual(info["ext"], "mov")
+        self.assertIn("prores_videotoolbox", calls[0][1])
+        self.assertEqual(calls[1][0], [])
+        self.assertIn("prores_ks", calls[1][1])
+
+    def test_explicit_hardware_failure_is_not_hidden(self):
+        with self.assertRaises(FFmpegPostProcessorError):
+            self.convert(
+                "mkv", "h264", fail_first=True,
+                format="mov", codec="prores", encoder="hardware", hardwareDecoding=False,
+            )
 
 
 class FormatResolutionTests(unittest.TestCase):
