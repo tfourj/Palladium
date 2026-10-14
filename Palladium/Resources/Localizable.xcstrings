@@ -243,8 +243,8 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Chinese"
+            "state" : "translated",
+            "value" : "중국어"
           }
         },
         "lt" : {
@@ -255,8 +255,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Chinese"
+            "state" : "translated",
+            "value" : "中文"
           }
         }
       }
@@ -311,8 +311,8 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Korean"
+            "state" : "translated",
+            "value" : "한국어"
           }
         },
         "lt" : {
@@ -323,8 +323,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Korean"
+            "state" : "translated",
+            "value" : "韩语"
           }
         }
       }
@@ -2589,8 +2589,8 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Item %1$lld of %2$lld"
+            "state" : "translated",
+            "value" : "항목 %1$lld / %2$lld"
           }
         },
         "lt" : {
@@ -2601,8 +2601,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Item %1$lld of %2$lld"
+            "state" : "translated",
+            "value" : "第 %1$lld 项，共 %2$lld 项"
           }
         }
       }
@@ -2623,8 +2623,8 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Downloading with Palladium"
+            "state" : "translated",
+            "value" : "Palladium으로 다운로드 중"
           }
         },
         "lt" : {
@@ -2635,8 +2635,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Downloading with Palladium"
+            "state" : "translated",
+            "value" : "正在使用 Palladium 下载"
           }
         }
       }
@@ -3437,6 +3437,24 @@
             "state" : "translated",
             "value" : "Failed to read the yt-dlp format list."
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "yt-dlpのフォーマット一覧を読み込めませんでした。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "yt-dlp 형식 목록을 읽지 못했습니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法读取 yt-dlp 格式列表。"
+          }
         }
       }
     },
@@ -3820,6 +3838,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Download pictures with gallery-dl"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "gallery-dlで画像をダウンロード"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "gallery-dl로 사진 다운로드"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使用 gallery-dl 下载图片"
           }
         }
       }
@@ -6811,6 +6847,24 @@
             "state" : "translated",
             "value" : "Download %lld Audio"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "音声を%lld件ダウンロード"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "오디오 %lld개 다운로드"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下载 %lld 个音频"
+          }
         }
       }
     },
@@ -6820,6 +6874,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Download %lld Files"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld個のファイルをダウンロード"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "파일 %lld개 다운로드"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下载 %lld 个文件"
           }
         }
       }
@@ -6831,6 +6903,24 @@
             "state" : "translated",
             "value" : "Download 1 File"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1個のファイルをダウンロード"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "파일 1개 다운로드"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下载 1 个文件"
+          }
         }
       }
     },
@@ -6840,6 +6930,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Download %lld Images"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld枚の画像をダウンロード"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이미지 %lld개 다운로드"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下载 %lld 张图片"
           }
         }
       }
@@ -6851,6 +6959,24 @@
             "state" : "translated",
             "value" : "Download 1 Image"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1枚の画像をダウンロード"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이미지 1개 다운로드"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下载 1 张图片"
+          }
         }
       }
     },
@@ -6860,6 +6986,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Download %lld Items"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld件のアイテムをダウンロード"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "항목 %lld개 다운로드"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下载 %lld 个项目"
           }
         }
       }
@@ -6871,6 +7015,24 @@
             "state" : "translated",
             "value" : "Download 1 Item"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1件のアイテムをダウンロード"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "항목 1개 다운로드"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下载 1 个项目"
+          }
         }
       }
     },
@@ -6881,6 +7043,24 @@
             "state" : "translated",
             "value" : "Download %lld Videos"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld本の動画をダウンロード"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "비디오 %lld개 다운로드"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下载 %lld 个视频"
+          }
         }
       }
     },
@@ -6890,6 +7070,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Download 1 Video"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1本の動画をダウンロード"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "비디오 1개 다운로드"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下载 1 个视频"
           }
         }
       }
@@ -6935,6 +7133,24 @@
             "state" : "translated",
             "value" : "Audio"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "音声"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "오디오"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "音频"
+          }
         }
       }
     },
@@ -6944,6 +7160,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "File"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファイル"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "파일"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "文件"
           }
         }
       }
@@ -6955,6 +7189,24 @@
             "state" : "translated",
             "value" : "Image"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画像"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이미지"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "图片"
+          }
         }
       }
     },
@@ -6964,6 +7216,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Video"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "動画"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "비디오"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "视频"
           }
         }
       }
@@ -6975,6 +7245,24 @@
             "state" : "translated",
             "value" : "Deselect All"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべて選択解除"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "모두 선택 해제"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "取消全选"
+          }
         }
       }
     },
@@ -6984,6 +7272,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Select All"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべて選択"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "모두 선택"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "全选"
           }
         }
       }
@@ -6995,6 +7301,24 @@
             "state" : "translated",
             "value" : "Select Audio"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "音声を選択"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "오디오 선택"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择音频"
+          }
         }
       }
     },
@@ -7004,6 +7328,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Select Files"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファイルを選択"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "파일 선택"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择文件"
           }
         }
       }
@@ -7015,6 +7357,24 @@
             "state" : "translated",
             "value" : "Select Images"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画像を選択"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이미지 선택"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择图片"
+          }
         }
       }
     },
@@ -7024,6 +7384,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Select Items"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アイテムを選択"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "항목 선택"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择项目"
           }
         }
       }
@@ -7035,6 +7413,24 @@
             "state" : "translated",
             "value" : "Select Videos"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "動画を選択"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "비디오 선택"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择视频"
+          }
         }
       }
     },
@@ -7044,6 +7440,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Preview unavailable"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プレビューを利用できません"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "미리보기를 사용할 수 없음"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法预览"
           }
         }
       }
@@ -7055,6 +7469,24 @@
             "state" : "translated",
             "value" : "Downloading Gallery"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ギャラリーをダウンロード中"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "갤러리 다운로드 중"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在下载图片"
+          }
         }
       }
     },
@@ -7065,6 +7497,24 @@
             "state" : "translated",
             "value" : "Downloading Gallery %1$lld of %2$lld"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ギャラリーをダウンロード中 %1$lld / %2$lld"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "갤러리 다운로드 중 %1$lld / %2$lld"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在下载图片 %1$lld / %2$lld"
+          }
         }
       }
     },
@@ -7074,6 +7524,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Resolving items..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アイテムを解析中..."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "항목 확인 중..."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在解析项目……"
           }
         }
       }
@@ -12639,8 +13107,8 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Background"
+            "state" : "translated",
+            "value" : "백그라운드"
           }
         },
         "lt" : {
@@ -12651,8 +13119,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Background"
+            "state" : "translated",
+            "value" : "后台"
           }
         }
       }
@@ -12673,8 +13141,8 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Keeps downloads running after you leave Palladium and shows their progress in system UI. Requires iOS 26 or later."
+            "state" : "translated",
+            "value" : "Palladium을 떠난 후에도 다운로드를 계속하고 시스템 UI에 진행 상황을 표시합니다. iOS 26 이상이 필요합니다."
           }
         },
         "lt" : {
@@ -12685,8 +13153,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Keeps downloads running after you leave Palladium and shows their progress in system UI. Requires iOS 26 or later."
+            "state" : "translated",
+            "value" : "离开 Palladium 后继续下载，并在系统界面中显示进度。需要 iOS 26 或更高版本。"
           }
         }
       }
@@ -12707,8 +13175,8 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Background Downloads"
+            "state" : "translated",
+            "value" : "백그라운드 다운로드"
           }
         },
         "lt" : {
@@ -12719,8 +13187,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Background Downloads"
+            "state" : "translated",
+            "value" : "后台下载"
           }
         }
       }
@@ -14377,8 +14845,8 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Always re-encode"
+            "state" : "translated",
+            "value" : "항상 재인코딩"
           }
         },
         "lt" : {
@@ -14389,8 +14857,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Always re-encode"
+            "state" : "translated",
+            "value" : "始终重新编码"
           }
         }
       }
@@ -14411,8 +14879,8 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "When off, videos that already use the chosen codec are copied without quality loss, and the quality setting only applies to videos that need re-encoding."
+            "state" : "translated",
+            "value" : "끄면 이미 선택한 코덱을 사용하는 비디오는 품질 손실 없이 복사되며, 품질 설정은 재인코딩이 필요한 비디오에만 적용됩니다."
           }
         },
         "lt" : {
@@ -14423,8 +14891,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "When off, videos that already use the chosen codec are copied without quality loss, and the quality setting only applies to videos that need re-encoding."
+            "state" : "translated",
+            "value" : "关闭时，已使用所选编解码器的视频将无损复制，质量设置仅适用于需要重新编码的视频。"
           }
         }
       }
@@ -14445,8 +14913,8 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Auto"
+            "state" : "translated",
+            "value" : "자동"
           }
         },
         "lt" : {
@@ -14457,8 +14925,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Auto"
+            "state" : "translated",
+            "value" : "自动"
           }
         }
       }
@@ -14479,8 +14947,8 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Video codec"
+            "state" : "translated",
+            "value" : "비디오 코덱"
           }
         },
         "lt" : {
@@ -14491,8 +14959,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Video codec"
+            "state" : "translated",
+            "value" : "视频编解码器"
           }
         }
       }
@@ -14547,8 +15015,8 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Encoder"
+            "state" : "translated",
+            "value" : "인코더"
           }
         },
         "lt" : {
@@ -14559,8 +15027,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Encoder"
+            "state" : "translated",
+            "value" : "编码器"
           }
         }
       }
@@ -14581,8 +15049,8 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Hardware"
+            "state" : "translated",
+            "value" : "하드웨어"
           }
         },
         "lt" : {
@@ -14593,8 +15061,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Hardware"
+            "state" : "translated",
+            "value" : "硬件"
           }
         }
       }
@@ -14615,8 +15083,8 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Software"
+            "state" : "translated",
+            "value" : "소프트웨어"
           }
         },
         "lt" : {
@@ -14627,8 +15095,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Software"
+            "state" : "translated",
+            "value" : "软件"
           }
         }
       }
@@ -14649,8 +15117,8 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Encoding"
+            "state" : "translated",
+            "value" : "인코딩"
           }
         },
         "lt" : {
@@ -14661,8 +15129,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Encoding"
+            "state" : "translated",
+            "value" : "编码"
           }
         }
       }
@@ -14683,8 +15151,8 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Auto uses Apple's hardware encoder when the codec supports it and software otherwise. Hardware decoding falls back to software for sources the device cannot decode. Current encoder: %@"
+            "state" : "translated",
+            "value" : "자동은 코덱이 지원하는 경우 Apple의 하드웨어 인코더를 사용하고, 그렇지 않으면 소프트웨어를 사용합니다. 기기가 디코딩할 수 없는 소스의 경우 하드웨어 디코딩은 소프트웨어로 대체됩니다. 현재 인코더: %@"
           }
         },
         "lt" : {
@@ -14695,8 +15163,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Auto uses Apple's hardware encoder when the codec supports it and software otherwise. Hardware decoding falls back to software for sources the device cannot decode. Current encoder: %@"
+            "state" : "translated",
+            "value" : "“自动”会在编解码器支持时使用 Apple 硬件编码器，否则使用软件编码。对于设备无法解码的来源，硬件解码会回退到软件解码。当前编码器：%@"
           }
         }
       }
@@ -14751,8 +15219,8 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Hardware decoding"
+            "state" : "translated",
+            "value" : "하드웨어 디코딩"
           }
         },
         "lt" : {
@@ -14763,8 +15231,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Hardware decoding"
+            "state" : "translated",
+            "value" : "硬件解码"
           }
         }
       }
@@ -14819,8 +15287,8 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Quality"
+            "state" : "translated",
+            "value" : "품질"
           }
         },
         "lt" : {
@@ -14831,8 +15299,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Quality"
+            "state" : "translated",
+            "value" : "质量"
           }
         }
       }
@@ -14853,8 +15321,8 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "High"
+            "state" : "translated",
+            "value" : "높음"
           }
         },
         "lt" : {
@@ -14865,8 +15333,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "High"
+            "state" : "translated",
+            "value" : "高"
           }
         }
       }
@@ -14887,8 +15355,8 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Low"
+            "state" : "translated",
+            "value" : "낮음"
           }
         },
         "lt" : {
@@ -14899,8 +15367,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Low"
+            "state" : "translated",
+            "value" : "低"
           }
         }
       }
@@ -14921,8 +15389,8 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Maximum"
+            "state" : "translated",
+            "value" : "최대"
           }
         },
         "lt" : {
@@ -14933,8 +15401,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Maximum"
+            "state" : "translated",
+            "value" : "最高"
           }
         }
       }
@@ -14955,8 +15423,8 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Medium"
+            "state" : "translated",
+            "value" : "중간"
           }
         },
         "lt" : {
@@ -14967,8 +15435,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Medium"
+            "state" : "translated",
+            "value" : "中"
           }
         }
       }
@@ -15193,8 +15661,8 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Off by default. Re-encoding increases battery use and processing time, and may reduce quality. Videos already in the chosen format and codec are not re-encoded."
+            "state" : "translated",
+            "value" : "기본적으로 꺼져 있습니다. 재인코딩은 배터리 사용량과 처리 시간을 늘리고 품질을 떨어뜨릴 수 있습니다. 이미 선택한 형식과 코덱을 사용하는 비디오는 재인코딩되지 않습니다."
           }
         },
         "lt" : {
@@ -15205,8 +15673,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Off by default. Re-encoding increases battery use and processing time, and may reduce quality. Videos already in the chosen format and codec are not re-encoded."
+            "state" : "translated",
+            "value" : "默认关闭。重新编码会增加电池消耗和处理时间，并可能降低质量。已采用所选格式和编解码器的视频不会被重新编码。"
           }
         }
       }
