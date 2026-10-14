@@ -234,6 +234,30 @@
             "state" : "translated",
             "value" : "Chinese"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "中国語"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Chinese"
+          }
+        },
+        "lt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Chinese"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Chinese"
+          }
         }
       }
     },
@@ -276,6 +300,30 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
+            "value" : "Korean"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "韓国語"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Korean"
+          }
+        },
+        "lt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Korean"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "new",
             "value" : "Korean"
           }
         }
@@ -2683,8 +2731,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Item %1$lld of %2$lld"
+            "state" : "translated",
+            "value" : "%2$lld 個中 %1$lld 番目の項目"
           }
         },
         "ko" : {
@@ -2717,8 +2765,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Downloading with Palladium"
+            "state" : "translated",
+            "value" : "Palladiumでダウンロード中"
           }
         },
         "ko" : {
@@ -12590,8 +12638,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Background"
+            "state" : "translated",
+            "value" : "バックグラウンド"
           }
         },
         "ko" : {
@@ -12624,8 +12672,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Keeps downloads running after you leave Palladium and shows their progress in system UI. Requires iOS 26 or later."
+            "state" : "translated",
+            "value" : "パラジウムを離れた後もダウンロードを続け、システムUIに進行状況を表示します。iOS 26以降が必要です。"
           }
         },
         "ko" : {
@@ -12658,8 +12706,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Background Downloads"
+            "state" : "translated",
+            "value" : "バックグラウンドでダウンロード"
           }
         },
         "ko" : {
@@ -14328,8 +14376,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Always re-encode"
+            "state" : "translated",
+            "value" : "常に再エンコードする"
           }
         },
         "ko" : {
@@ -14362,8 +14410,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "When off, videos that already use the chosen codec are copied without quality loss, and the quality setting only applies to videos that need re-encoding."
+            "state" : "translated",
+            "value" : "オフの場合、選択したコーデックを使用している動画は品質を損なうことなくコピーされ、品質設定は再エンコードが必要な動画にのみ適用されます。"
           }
         },
         "ko" : {
@@ -14396,8 +14444,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Auto"
+            "state" : "translated",
+            "value" : "自動"
           }
         },
         "ko" : {
@@ -14430,8 +14478,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Video codec"
+            "state" : "translated",
+            "value" : "ビデオコーデック"
           }
         },
         "ko" : {
@@ -14498,8 +14546,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Encoder"
+            "state" : "translated",
+            "value" : "エンコーダー"
           }
         },
         "ko" : {
@@ -14532,8 +14580,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Hardware"
+            "state" : "translated",
+            "value" : "ハードウェア"
           }
         },
         "ko" : {
@@ -14566,8 +14614,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Software"
+            "state" : "translated",
+            "value" : "ソフトウェア"
           }
         },
         "ko" : {
@@ -14600,8 +14648,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Encoding"
+            "state" : "translated",
+            "value" : "エンコード中"
           }
         },
         "ko" : {
@@ -14634,8 +14682,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Auto uses Apple's hardware encoder when the codec supports it and software otherwise. Hardware decoding falls back to software for sources the device cannot decode. Current encoder: %@"
+            "state" : "translated",
+            "value" : "自動では、コーデックがそれをサポートしていない場合は、Appleのハードウェアエンコーダーを使用します。 ハードウェアデコードは、デバイスがデコードできないソースのソフトウェアに戻ります。現在のエンコーダー: %@"
           }
         },
         "ko" : {
@@ -14702,8 +14750,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Hardware decoding"
+            "state" : "translated",
+            "value" : "ハードウェアデコード中"
           }
         },
         "ko" : {
@@ -14770,8 +14818,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Quality"
+            "state" : "translated",
+            "value" : "品質"
           }
         },
         "ko" : {
@@ -14804,8 +14852,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "High"
+            "state" : "translated",
+            "value" : "高"
           }
         },
         "ko" : {
@@ -14838,8 +14886,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Low"
+            "state" : "translated",
+            "value" : "低"
           }
         },
         "ko" : {
@@ -14872,8 +14920,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Maximum"
+            "state" : "translated",
+            "value" : "最高"
           }
         },
         "ko" : {
@@ -14906,8 +14954,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Medium"
+            "state" : "translated",
+            "value" : "平均的"
           }
         },
         "ko" : {
@@ -15144,8 +15192,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Off by default. Re-encoding increases battery use and processing time, and may reduce quality. Videos already in the chosen format and codec are not re-encoded."
+            "state" : "translated",
+            "value" : "デフォルトではオフです。再エンコードするとCPUの使用率、バッテリー使用率、処理時間が増加し、品質が低下する可能性があります。選択したフォーマットの動画は再エンコードされません。"
           }
         },
         "ko" : {
