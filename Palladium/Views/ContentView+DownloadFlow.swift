@@ -122,7 +122,7 @@ extension ContentView {
                     "music.note", .green)
         case .images:
             return (String(localized: "download.preset.images", bundle: .app),
-                    "Download pictures with gallery-dl",
+                    String(localized: "download.mode.images.help", bundle: .app),
                     "photo.on.rectangle", .purple)
         case .custom:
             return (String(localized: "common.custom", bundle: .app),
@@ -763,7 +763,7 @@ extension ContentView {
         isRunning = true
         syncIdleTimerDisabled()
         statusText = "running"
-        progressText = "Resolving items..."
+        progressText = String(localized: "gallery.status.resolving", bundle: .app)
         downloadCancelRequested = false
         appendConsoleText("[palladium] resolving items with gallery-dl\n")
         let cookieFilePath = useCookies ? resolvedSelectedCookieFilePath() : nil
@@ -1128,9 +1128,13 @@ extension ContentView {
             resultKind: "running"
         )
         if galleryDownloadExpectedCount > 0 {
-            progressText = "Downloading Gallery \(completed) of \(galleryDownloadExpectedCount)"
+            progressText = String(
+                format: String(localized: "gallery.status.downloading_progress", bundle: .app),
+                completed,
+                galleryDownloadExpectedCount
+            )
         } else {
-            progressText = "Downloading Gallery"
+            progressText = String(localized: "gallery.status.downloading", bundle: .app)
         }
     }
 

@@ -443,10 +443,10 @@ struct DownloadTabView: View {
             .navigationTitle(galleryPickerTitle)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("Cancel") { showGalleryPicker = false }
+                    Button("common.cancel") { showGalleryPicker = false }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button(selectedGalleryItemIndices.count == galleryItems.count ? "Deselect All" : "Select All") {
+                    Button(selectedGalleryItemIndices.count == galleryItems.count ? "gallery.picker.deselect_all" : "gallery.picker.select_all") {
                         selectedGalleryItemIndices = selectedGalleryItemIndices.count == galleryItems.count
                             ? [] : Set(galleryItems.map(\.index))
                     }
@@ -474,7 +474,7 @@ struct DownloadTabView: View {
         VStack(spacing: 8) {
             Image(systemName: "exclamationmark.triangle")
                 .font(.system(size: 34, weight: .semibold))
-            Text("Preview unavailable")
+            Text("gallery.preview.unavailable")
                 .font(.caption)
                 .fontWeight(.semibold)
         }
@@ -488,15 +488,15 @@ struct DownloadTabView: View {
     private var galleryPickerTitle: String {
         switch galleryVisibleMediaType {
         case .some(.image):
-            return "Select Images"
+            return String(localized: "gallery.picker.title.images", bundle: .app)
         case .some(.audio):
-            return "Select Audio"
+            return String(localized: "gallery.picker.title.audio", bundle: .app)
         case .some(.video):
-            return "Select Videos"
+            return String(localized: "gallery.picker.title.videos", bundle: .app)
         case .some(.file):
-            return "Select Files"
+            return String(localized: "gallery.picker.title.files", bundle: .app)
         case nil:
-            return "Select Items"
+            return String(localized: "gallery.picker.title.items", bundle: .app)
         }
     }
 
@@ -504,15 +504,19 @@ struct DownloadTabView: View {
         let count = selectedGalleryItemIndices.count
         switch gallerySelectedMediaType {
         case .some(.image):
-            return "Download \(count) Image\(count == 1 ? "" : "s")"
+            if count == 1 { return String(localized: "gallery.download.images.one", bundle: .app) }
+            return String(format: String(localized: "gallery.download.images.many", bundle: .app), count)
         case .some(.audio):
-            return "Download \(count) Audio"
+            return String(format: String(localized: "gallery.download.audio", bundle: .app), count)
         case .some(.video):
-            return "Download \(count) Video\(count == 1 ? "" : "s")"
+            if count == 1 { return String(localized: "gallery.download.videos.one", bundle: .app) }
+            return String(format: String(localized: "gallery.download.videos.many", bundle: .app), count)
         case .some(.file):
-            return "Download \(count) File\(count == 1 ? "" : "s")"
+            if count == 1 { return String(localized: "gallery.download.files.one", bundle: .app) }
+            return String(format: String(localized: "gallery.download.files.many", bundle: .app), count)
         case nil:
-            return "Download \(count) Item\(count == 1 ? "" : "s")"
+            if count == 1 { return String(localized: "gallery.download.items.one", bundle: .app) }
+            return String(format: String(localized: "gallery.download.items.many", bundle: .app), count)
         }
     }
 

@@ -499,95 +499,6 @@
         }
       }
     },
-    "Audio" : {
-      "comment" : "A label displayed above the audio quality and format settings.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "音声"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "오디오"
-          }
-        },
-        "lt" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Audio"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "音频"
-          }
-        }
-      }
-    },
-    "Cancel" : {
-      "comment" : "A button that cancels a task.",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "キャンセル"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "취소"
-          }
-        },
-        "lt" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Cancel"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "取消"
-          }
-        }
-      }
-    },
-    "Codec" : {
-      "comment" : "A label for the video codec picker.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "コーデック"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "코덱"
-          }
-        },
-        "lt" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Codec"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "编码器"
-          }
-        }
-      }
-    },
     "common.all" : {
       "localizations" : {
         "en" : {
@@ -2390,65 +2301,6 @@
         }
       }
     },
-    "Deselect All" : {
-      "comment" : "A button that deselects all selected items.",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "全て選択解除"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "모두 선택 해제"
-          }
-        },
-        "lt" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Deselect All"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "取消全选"
-          }
-        }
-      }
-    },
-    "Download Quality" : {
-      "comment" : "A title for a screen that lets the user configure the quality of video and audio downloads.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ダウンロード品質"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "다운로드 품질"
-          }
-        },
-        "lt" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Download Quality"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "下载质量"
-          }
-        }
-      }
-    },
     "download.args.custom.help" : {
       "localizations" : {
         "en" : {
@@ -3578,6 +3430,16 @@
         }
       }
     },
+    "download.formats.read_failed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to read the yt-dlp format list."
+          }
+        }
+      }
+    },
     "download.formats.share_sheet_help" : {
       "localizations" : {
         "en" : {
@@ -3948,6 +3810,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "使用自定义预设参数"
+          }
+        }
+      }
+    },
+    "download.mode.images.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download pictures with gallery-dl"
           }
         }
       }
@@ -6932,32 +6804,92 @@
         }
       }
     },
-    "Format" : {
-      "comment" : "A warning that appears when the user selects a video codec that is incompatible with the Photos app.",
-      "extractionState" : "stale",
+    "gallery.download.audio" : {
       "localizations" : {
-        "ja" : {
+        "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "フォーマット"
+            "value" : "Download %lld Audio"
           }
-        },
-        "ko" : {
+        }
+      }
+    },
+    "gallery.download.files.many" : {
+      "localizations" : {
+        "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "형식"
+            "value" : "Download %lld Files"
           }
-        },
-        "lt" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Format"
-          }
-        },
-        "zh-Hans" : {
+        }
+      }
+    },
+    "gallery.download.files.one" : {
+      "localizations" : {
+        "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "格式"
+            "value" : "Download 1 File"
+          }
+        }
+      }
+    },
+    "gallery.download.images.many" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download %lld Images"
+          }
+        }
+      }
+    },
+    "gallery.download.images.one" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download 1 Image"
+          }
+        }
+      }
+    },
+    "gallery.download.items.many" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download %lld Items"
+          }
+        }
+      }
+    },
+    "gallery.download.items.one" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download 1 Item"
+          }
+        }
+      }
+    },
+    "gallery.download.videos.many" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download %lld Videos"
+          }
+        }
+      }
+    },
+    "gallery.download.videos.one" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download 1 Video"
           }
         }
       }
@@ -6992,6 +6924,156 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "未找到该 URL 对应的受支持项目。"
+          }
+        }
+      }
+    },
+    "gallery.media.audio" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio"
+          }
+        }
+      }
+    },
+    "gallery.media.file" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File"
+          }
+        }
+      }
+    },
+    "gallery.media.image" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Image"
+          }
+        }
+      }
+    },
+    "gallery.media.video" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video"
+          }
+        }
+      }
+    },
+    "gallery.picker.deselect_all" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deselect All"
+          }
+        }
+      }
+    },
+    "gallery.picker.select_all" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select All"
+          }
+        }
+      }
+    },
+    "gallery.picker.title.audio" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select Audio"
+          }
+        }
+      }
+    },
+    "gallery.picker.title.files" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select Files"
+          }
+        }
+      }
+    },
+    "gallery.picker.title.images" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select Images"
+          }
+        }
+      }
+    },
+    "gallery.picker.title.items" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select Items"
+          }
+        }
+      }
+    },
+    "gallery.picker.title.videos" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select Videos"
+          }
+        }
+      }
+    },
+    "gallery.preview.unavailable" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preview unavailable"
+          }
+        }
+      }
+    },
+    "gallery.status.downloading" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloading Gallery"
+          }
+        }
+      }
+    },
+    "gallery.status.downloading_progress" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloading Gallery %1$lld of %2$lld"
+          }
+        }
+      }
+    },
+    "gallery.status.resolving" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resolving items..."
           }
         }
       }
@@ -10566,64 +10648,6 @@
         }
       }
     },
-    "Preview unavailable" : {
-      "comment" : "A label displayed when a gallery item's preview cannot be loaded.",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "プレビューが利用できません"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "미리보기를 사용할 수 없음"
-          }
-        },
-        "lt" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Preview unavailable"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "无法预览"
-          }
-        }
-      }
-    },
-    "Quality" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "品質"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "품질"
-          }
-        },
-        "lt" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Quality"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "质量"
-          }
-        }
-      }
-    },
     "queue.add" : {
       "localizations" : {
         "en" : {
@@ -11745,35 +11769,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "下载队列"
-          }
-        }
-      }
-    },
-    "Select All" : {
-      "comment" : "A button that selects all items when pressed.",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "全てを選択"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "모두 선택"
-          }
-        },
-        "lt" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Select All"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "全选"
           }
         }
       }
@@ -20169,36 +20164,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "设置"
-          }
-        }
-      }
-    },
-    "Video" : {
-      "comment" : "A heading for the video settings in the download quality settings.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "動画"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "비디오"
-          }
-        },
-        "lt" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Video"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "视频"
           }
         }
       }

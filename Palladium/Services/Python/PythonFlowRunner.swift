@@ -21,13 +21,13 @@ struct GalleryItem: Identifiable, Hashable, Sendable {
     var mediaLabel: String {
         switch mediaType {
         case .image:
-            return "Image"
+            return String(localized: "gallery.media.image", bundle: .app)
         case .audio:
-            return "Audio"
+            return String(localized: "gallery.media.audio", bundle: .app)
         case .video:
-            return "Video"
+            return String(localized: "gallery.media.video", bundle: .app)
         case .file:
-            return "File"
+            return String(localized: "gallery.media.file", bundle: .app)
         }
     }
 
@@ -561,7 +561,7 @@ enum PythonFlowRunner {
                 formats: [],
                 outputText: payload,
                 success: false,
-                errorMessage: "Failed to read the yt-dlp format list."
+                errorMessage: String(localized: "download.formats.read_failed", bundle: .app)
             )
         }
         let formats = ((result["formats"] as? [[String: Any]]) ?? []).compactMap { item -> YTDLPFormat? in
