@@ -10,7 +10,15 @@ import UIKit
 final class BackgroundDownloadTask {
     static let shared = BackgroundDownloadTask()
 
-    private static let identifierPrefix = "\(Bundle.main.bundleIdentifier ?? "com.tfourj.Palladium").download."
+    /// Read from Info.plist rather than built from the bundle identifier, because re-signing tools can change the
+    /// bundle identifier without updating the permitted identifiers the scheduler checks against.
+    private static let identifierPrefix: String = {
+        let permitted = Bundle.main.object(forInfoDictionaryKey: "BGTaskSchedulerPermittedIdentifiers") as? [String]
+        if let pattern = permitted?.first(where: { $0.hasSuffix(".download.*") }) {
+            return String(pattern.dropLast())
+        }
+        return "\(Bundle.main.bundleIdentifier ?? "com.tfourj.Palladium").download."
+    }()
     /// Time to wait before ending the task so the next queued download can reuse it.
     private static let queueGracePeriod: Duration = .seconds(10)
     /// yt-dlp reports 100% for each stream and side file, and the system shows a full bar as finished.
