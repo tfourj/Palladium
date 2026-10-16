@@ -55,7 +55,12 @@ final class BackgroundDownloadTask {
     /// Sideloading tools can change the bundle identifier without updating the permitted identifiers, and the
     /// scheduler then rejects every download task.
     static var isPermittedOnThisInstall: Bool {
-        permittedIdentifiers.contains(identifierPrefix + "*")
+        permittedIdentifiers.contains(permittedIdentifierPattern)
+    }
+
+    /// The Info.plist entry that permits download task identifiers under the running bundle identifier.
+    static var permittedIdentifierPattern: String {
+        identifierPrefix + "*"
     }
 
     private static var permittedIdentifiers: [String] {
