@@ -118,6 +118,7 @@ Palladium/
 | --- | --- |
 | `Services/Background/BackgroundDownloadTask.swift` | Keeps downloads running in the background with iOS 26 continued processing tasks or UIKit background time. |
 | `Services/Background/IPABackgroundPatcher.swift` | Adds a background task identifier to an .ipa's Info.plist without touching other archive entries. |
+| `Services/Background/InstalledAppExporter.swift` | Packages the installed app bundle into a patched .ipa with Palladium's original bundle IDs. |
 | `Services/Background/PatchedIPABuilder.swift` | Downloads the latest stable release and patches it for the bundle ID this install runs with. |
 | `Services/Cookies/NetscapeCookieExporter.swift` | Converts browser cookies into Netscape cookie-file records. |
 | `Services/Debug/DeveloperDiagnostics.swift` | Debug-only version probes and framework checks for the developer menu. |
