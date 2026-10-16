@@ -13184,7 +13184,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open IPA Patcher"
+            "value" : "Open Web IPA Patcher"
           }
         }
       }
@@ -13194,7 +13194,67 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your sideloading tool changed the bundle ID, so iOS blocks background downloads. Copy the bundle ID, patch the Palladium IPA with the IPA Patcher, then install the patched IPA with the same tool."
+            "value" : "Your sideloading tool changed the bundle ID, so iOS blocks background downloads. Tap Patch IPA Automatically to patch the latest stable release, then install it with the same tool. To patch a different build, use the web IPA patcher with this bundle ID."
+          }
+        }
+      }
+    },
+    "settings.download_behavior.background.patch.create" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Patch IPA Automatically"
+          }
+        }
+      }
+    },
+    "settings.download_behavior.background.patch.downloading" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloading %@..."
+          }
+        }
+      }
+    },
+    "settings.download_behavior.background.patch.failed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't create the patched IPA: %@"
+          }
+        }
+      }
+    },
+    "settings.download_behavior.background.patch.invalid_ipa" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The downloaded file isn't a Palladium IPA that can be patched."
+          }
+        }
+      }
+    },
+    "settings.download_behavior.background.patch.no_release_ipa" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The latest Palladium release has no .ipa file."
+          }
+        }
+      }
+    },
+    "settings.download_behavior.background.patch.patching" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Patching IPA..."
           }
         }
       }
