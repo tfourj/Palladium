@@ -51,15 +51,57 @@ struct DownloadBehaviorSettingsView: View {
             }
 
             Section {
-                Toggle("settings.download_behavior.background.toggle", isOn: $backgroundDownloadsEnabled)
-                    .disabled(isRunning || !BackgroundDownloadTask.isSupported)
+                Toggle(isOn: $backgroundDownloadsEnabled) {
+                    HStack(spacing: 6) {
+                        Text("settings.download_behavior.background.toggle")
+                        backgroundStatusIcon
+                    }
+                }
+                .disabled(isRunning || !BackgroundDownloadTask.isSupported)
+
+                if showsPatchInstructions {
+                    LabeledContent("settings.download_behavior.background.bundle_id") {
+                        Text(BackgroundDownloadTask.bundleIdentifier)
+                            .textSelection(.enabled)
+                    }
+                    Button("settings.download_behavior.background.copy_bundle_id") {
+                        UIPasteboard.general.string = BackgroundDownloadTask.bundleIdentifier
+                    }
+                    Link("settings.download_behavior.background.open_patcher", destination: Self.patcherURL)
+                }
             } header: {
                 Text("settings.download_behavior.background_section")
             } footer: {
-                Text("settings.download_behavior.background.help")
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("settings.download_behavior.background.help")
+                    if showsPatchInstructions {
+                        Text("settings.download_behavior.background.patch_help")
+                    }
+                }
             }
         }
         .navigationTitle("settings.download_behavior.title")
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private static let patcherURL = URL(string: "https://getpalladium.app/patcher")!
+
+    private var backgroundDownloadsWork: Bool {
+        BackgroundDownloadTask.isSupported && BackgroundDownloadTask.isPermittedOnThisInstall
+    }
+
+    /// Only installs whose bundle identifier was changed can be fixed by patching the IPA.
+    private var showsPatchInstructions: Bool {
+        BackgroundDownloadTask.isSupported && !BackgroundDownloadTask.isPermittedOnThisInstall
+    }
+
+    private var backgroundStatusIcon: some View {
+        Image(systemName: backgroundDownloadsWork ? "checkmark.circle.fill" : "xmark.circle.fill")
+            .foregroundStyle(backgroundDownloadsWork ? .green : .red)
+            .accessibilityLabel(
+                backgroundDownloadsWork
+                    ? Text("settings.download_behavior.background.status.available")
+                    : Text("settings.download_behavior.background.status.unavailable")
+            )
     }
 }
