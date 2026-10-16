@@ -96,6 +96,7 @@ Palladium/
 | `Views/Tabs/Settings/DownloadArgumentsSettingsView.swift` | Custom yt-dlp argument settings screen. |
 | `Views/Tabs/Settings/WebsiteArgumentsSettingsView.swift` | Per-website yt-dlp argument rule list, editor, and link tester. |
 | `Views/Tabs/Settings/DownloadBehaviorSettingsView.swift` | Download behavior settings screen. |
+| `Views/Tabs/Settings/BackgroundDownloadSettingsView.swift` | Background download toggle, install status, and patched IPA tools for sideloaded installs. |
 | `Views/Tabs/Settings/DownloadModesSettingsView.swift` | Download-mode settings screen. |
 | `Views/Tabs/Settings/DownloadOptionsSettingsView.swift` | Download option settings screen. |
 | `Views/Tabs/Settings/DownloadQualitySettingsView.swift` | Default video and audio quality settings screen. |
@@ -117,6 +118,9 @@ Palladium/
 | Path | Purpose |
 | --- | --- |
 | `Services/Background/BackgroundDownloadTask.swift` | Keeps downloads running in the background with iOS 26 continued processing tasks or UIKit background time. |
+| `Services/Background/IPABackgroundPatcher.swift` | Adds a background task identifier to an .ipa's Info.plist without touching other archive entries. |
+| `Services/Background/InstalledAppExporter.swift` | Packages the installed app bundle into a patched .ipa with Palladium's original bundle IDs. |
+| `Services/Background/PatchedIPABuilder.swift` | Downloads the latest stable release and patches it for the bundle ID this install runs with. |
 | `Services/Cookies/NetscapeCookieExporter.swift` | Converts browser cookies into Netscape cookie-file records. |
 | `Services/Debug/DeveloperDiagnostics.swift` | Debug-only version probes and framework checks for the developer menu. |
 | `Services/FFmpeg/SwiftFFmpegBridge.swift` | Swift interface to bundled FFmpeg functionality. |
@@ -188,6 +192,8 @@ Palladium/
 | `scripts/swift_tests/WebsiteArgumentRuleTests.swift` | Website argument rule matching priority, normalization, and persistence tests. |
 | `scripts/swift_tests/DownloadQueueTests.swift` | Download queue parsing, state transition, ordering, and persistence tests. |
 | `scripts/swift_tests/YTDLPFormatTests.swift` | Resolved format selection, Photos compatibility, and exact download argument tests. |
+| `scripts/swift_tests/IPABackgroundPatcherTests.swift` | .ipa Info.plist patching, already-patched detection, and archive preservation tests. |
+| `scripts/swift_tests/InstalledAppExporterTests.swift` | Installed-bundle .ipa layout, permissions, plist patching, and original bundle ID tests. |
 | `scripts/swift_tests/TemporaryDownloadRetentionPolicyTests.swift` | Temporary-download cleanup policy tests. |
 
 ## Other Files and Directories

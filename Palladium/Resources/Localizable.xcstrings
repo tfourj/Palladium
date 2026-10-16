@@ -12921,6 +12921,16 @@
         }
       }
     },
+    "settings.background_downloads.subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep downloads running after you leave Palladium"
+          }
+        }
+      }
+    },
     "settings.cookies.subtitle_count" : {
       "localizations" : {
         "en" : {
@@ -13125,6 +13135,26 @@
         }
       }
     },
+    "settings.download_behavior.background.bundle_id" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bundle ID"
+          }
+        }
+      }
+    },
+    "settings.download_behavior.background.copy_bundle_id" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy Bundle ID"
+          }
+        }
+      }
+    },
     "settings.download_behavior.background.help" : {
       "localizations" : {
         "en" : {
@@ -13155,6 +13185,106 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "离开 Palladium 后继续下载，并在系统界面中显示进度。需要 iOS 26 或更高版本。"
+          }
+        }
+      }
+    },
+    "settings.download_behavior.background.open_patcher" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Web IPA Patcher"
+          }
+        }
+      }
+    },
+    "settings.download_behavior.background.patch_help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your sideloading tool changed the bundle ID, so iOS blocks background downloads. Tap Patch IPA Automatically to create a patched copy of this version, then install it with the same tool. To patch a different build, use the web IPA patcher with this bundle ID."
+          }
+        }
+      }
+    },
+    "settings.download_behavior.background.patch.create" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Patch IPA Automatically"
+          }
+        }
+      }
+    },
+    "settings.download_behavior.background.patch.downloading" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloading %@..."
+          }
+        }
+      }
+    },
+    "settings.download_behavior.background.patch.failed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't create the patched IPA: %@"
+          }
+        }
+      }
+    },
+    "settings.download_behavior.background.patch.invalid_ipa" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The downloaded file isn't a Palladium IPA that can be patched."
+          }
+        }
+      }
+    },
+    "settings.download_behavior.background.patch.no_release_ipa" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The latest Palladium release has no .ipa file."
+          }
+        }
+      }
+    },
+    "settings.download_behavior.background.patch.patching" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Patching IPA..."
+          }
+        }
+      }
+    },
+    "settings.download_behavior.background.status.available" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Background downloads work on this install."
+          }
+        }
+      }
+    },
+    "settings.download_behavior.background.status.unavailable" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Background downloads don't work on this install."
           }
         }
       }

@@ -10,15 +10,9 @@ import UIKit
 final class BackgroundDownloadTask {
     static let shared = BackgroundDownloadTask()
 
-    /// Read from Info.plist rather than built from the bundle identifier, because re-signing tools can change the
-    /// bundle identifier without updating the permitted identifiers the scheduler checks against.
-    private static let identifierPrefix: String = {
-        let permitted = Bundle.main.object(forInfoDictionaryKey: "BGTaskSchedulerPermittedIdentifiers") as? [String]
-        if let pattern = permitted?.first(where: { $0.hasSuffix(".download.*") }) {
-            return String(pattern.dropLast())
-        }
-        return "\(Bundle.main.bundleIdentifier ?? "com.tfourj.Palladium").download."
-    }()
+    /// Built from the running bundle identifier, which the scheduler requires as a prefix. Sideloading tools that
+    /// append a suffix to it need a matching entry in Info.plist's permitted identifiers.
+    private static let identifierPrefix = "\(Bundle.main.bundleIdentifier ?? "com.tfourj.Palladium").download."
     /// Time to wait before ending the task so the next queued download can reuse it.
     private static let queueGracePeriod: Duration = .seconds(10)
     /// yt-dlp reports 100% for each stream and side file, and the system shows a full bar as finished.
@@ -49,6 +43,28 @@ final class BackgroundDownloadTask {
             return true
         }
         return false
+    }
+
+    /// The bundle identifier this install runs under, which sideloading tools may have changed.
+    static var bundleIdentifier: String {
+        Bundle.main.bundleIdentifier ?? "unknown"
+    }
+
+    /// Whether Info.plist permits the identifiers downloads register under the running bundle identifier.
+    ///
+    /// Sideloading tools can change the bundle identifier without updating the permitted identifiers, and the
+    /// scheduler then rejects every download task.
+    static var isPermittedOnThisInstall: Bool {
+        permittedIdentifiers.contains(permittedIdentifierPattern)
+    }
+
+    /// The Info.plist entry that permits download task identifiers under the running bundle identifier.
+    static var permittedIdentifierPattern: String {
+        identifierPrefix + "*"
+    }
+
+    private static var permittedIdentifiers: [String] {
+        Bundle.main.object(forInfoDictionaryKey: "BGTaskSchedulerPermittedIdentifiers") as? [String] ?? []
     }
 
     /// Whether the system is showing progress UI, which also tells the user when the download finishes.
@@ -132,7 +148,10 @@ final class BackgroundDownloadTask {
             }
         }
         guard registered else {
-            log("[palladium] background download task identifier is not permitted\n")
+            let bundleID = Self.bundleIdentifier
+            log("[palladium] background download task identifier is not permitted: \(identifier) (bundle \(bundleID))\n")
+            let permitted = Self.permittedIdentifiers.joined(separator: ", ")
+            log("[palladium] permitted background task identifiers: \(permitted)\n")
             return false
         }
 
@@ -147,7 +166,8 @@ final class BackgroundDownloadTask {
 
         submittedIdentifier = identifier
         displayedSubtitle = subtitle
-        log("[palladium] background download task requested\n")
+        let bundleID = Self.bundleIdentifier
+        log("[palladium] background download task requested: \(identifier) (bundle \(bundleID))\n")
         return true
     }
 
