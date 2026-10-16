@@ -13194,7 +13194,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your sideloading tool changed the bundle ID, so iOS blocks background downloads. Tap Patch IPA Automatically to patch the latest stable release, then install it with the same tool. To patch a different build, use the web IPA patcher with this bundle ID."
+            "value" : "Your sideloading tool changed the bundle ID, so iOS blocks background downloads. Tap Patch IPA Automatically to create a patched copy of this version, then install it with the same tool. To patch a different build, use the web IPA patcher with this bundle ID."
           }
         }
       }
