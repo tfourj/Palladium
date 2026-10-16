@@ -190,6 +190,7 @@ Palladium/
 | `scripts/swift_tests/WebsiteArgumentRuleTests.swift` | Website argument rule matching priority, normalization, and persistence tests. |
 | `scripts/swift_tests/DownloadQueueTests.swift` | Download queue parsing, state transition, ordering, and persistence tests. |
 | `scripts/swift_tests/YTDLPFormatTests.swift` | Resolved format selection, Photos compatibility, and exact download argument tests. |
+| `scripts/swift_tests/IPABackgroundPatcherTests.swift` | .ipa Info.plist patching, already-patched detection, and archive preservation tests. |
 | `scripts/swift_tests/TemporaryDownloadRetentionPolicyTests.swift` | Temporary-download cleanup policy tests. |
 
 ## Other Files and Directories
