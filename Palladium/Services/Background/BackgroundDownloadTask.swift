@@ -132,7 +132,8 @@ final class BackgroundDownloadTask {
             }
         }
         guard registered else {
-            log("[palladium] background download task identifier is not permitted\n")
+            let bundleID = Bundle.main.bundleIdentifier ?? "unknown"
+            log("[palladium] background download task identifier is not permitted: \(identifier) (bundle \(bundleID))\n")
             return false
         }
 
