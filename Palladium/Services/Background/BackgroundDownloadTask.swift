@@ -45,6 +45,23 @@ final class BackgroundDownloadTask {
         return false
     }
 
+    /// The bundle identifier this install runs under, which sideloading tools may have changed.
+    static var bundleIdentifier: String {
+        Bundle.main.bundleIdentifier ?? "unknown"
+    }
+
+    /// Whether Info.plist permits the identifiers downloads register under the running bundle identifier.
+    ///
+    /// Sideloading tools can change the bundle identifier without updating the permitted identifiers, and the
+    /// scheduler then rejects every download task.
+    static var isPermittedOnThisInstall: Bool {
+        permittedIdentifiers.contains(identifierPrefix + "*")
+    }
+
+    private static var permittedIdentifiers: [String] {
+        Bundle.main.object(forInfoDictionaryKey: "BGTaskSchedulerPermittedIdentifiers") as? [String] ?? []
+    }
+
     /// Whether the system is showing progress UI, which also tells the user when the download finishes.
     var isShowingSystemProgress: Bool {
         continuedTask != nil
@@ -126,11 +143,10 @@ final class BackgroundDownloadTask {
             }
         }
         guard registered else {
-            let bundleID = Bundle.main.bundleIdentifier ?? "unknown"
+            let bundleID = Self.bundleIdentifier
             log("[palladium] background download task identifier is not permitted: \(identifier) (bundle \(bundleID))\n")
-            let permittedKey = "BGTaskSchedulerPermittedIdentifiers"
-            let permitted = Bundle.main.object(forInfoDictionaryKey: permittedKey) as? [String] ?? []
-            log("[palladium] permitted background task identifiers: \(permitted.joined(separator: ", "))\n")
+            let permitted = Self.permittedIdentifiers.joined(separator: ", ")
+            log("[palladium] permitted background task identifiers: \(permitted)\n")
             return false
         }
 
@@ -145,7 +161,7 @@ final class BackgroundDownloadTask {
 
         submittedIdentifier = identifier
         displayedSubtitle = subtitle
-        let bundleID = Bundle.main.bundleIdentifier ?? "unknown"
+        let bundleID = Self.bundleIdentifier
         log("[palladium] background download task requested: \(identifier) (bundle \(bundleID))\n")
         return true
     }
