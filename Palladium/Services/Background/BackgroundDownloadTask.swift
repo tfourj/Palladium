@@ -145,7 +145,8 @@ final class BackgroundDownloadTask {
 
         submittedIdentifier = identifier
         displayedSubtitle = subtitle
-        log("[palladium] background download task requested\n")
+        let bundleID = Bundle.main.bundleIdentifier ?? "unknown"
+        log("[palladium] background download task requested: \(identifier) (bundle \(bundleID))\n")
         return true
     }
 
