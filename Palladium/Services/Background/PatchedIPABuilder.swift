@@ -1,8 +1,10 @@
 import Combine
 import Foundation
 
-/// Downloads the latest stable Palladium release and patches it so background downloads work under the bundle
-/// identifier this install runs with.
+/// Builds a patched .ipa so background downloads work under the bundle identifier this install runs with.
+///
+/// The installed app is packaged first, so the patched copy matches the running version. When that fails, the latest
+/// stable release is downloaded and patched instead.
 final class PatchedIPABuilder: ObservableObject {
     enum State: Equatable {
         case idle
@@ -28,28 +30,49 @@ final class PatchedIPABuilder: ObservableObject {
     /// Builds the patched .ipa in the temporary directory and returns its location, or nil when building failed.
     func build() async -> URL? {
         guard !isBusy else { return nil }
-        state = .fetchingRelease
+        let identifier = BackgroundDownloadTask.permittedIdentifierPattern
+
+        state = .patching
+        if let outputURL = try? await Self.exportInstalledApp(permitting: identifier) {
+            state = .idle
+            return outputURL
+        }
+
         do {
-            let release = try await fetchLatestRelease()
-            guard let asset = release.assets.first(where: { $0.name.lowercased().hasSuffix(".ipa") }) else {
-                throw ReleaseError()
-            }
-
-            state = .downloading(version: release.tagName, fraction: 0)
-            let downloadedURL = try await download(asset.browserDownloadUrl, version: release.tagName)
-
-            state = .patching
-            let outputURL = FileManager.default.temporaryDirectory
-                .appendingPathComponent(asset.name.replacingOccurrences(of: ".ipa", with: "-patched.ipa"))
-            let identifier = BackgroundDownloadTask.permittedIdentifierPattern
-            try await Self.patch(downloadedURL, to: outputURL, permitting: identifier)
-
+            let outputURL = try await buildFromLatestRelease(permitting: identifier)
             state = .idle
             return outputURL
         } catch {
             state = .failed(error.localizedDescription)
             return nil
         }
+    }
+
+    private nonisolated static func exportInstalledApp(permitting identifier: String) async throws -> URL {
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "installed"
+        let outputURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("Palladium-v\(version)-patched.ipa")
+        try await Task.detached(priority: .userInitiated) {
+            try InstalledAppExporter.exportPatchedIPA(permitting: identifier, to: outputURL)
+        }.value
+        return outputURL
+    }
+
+    private func buildFromLatestRelease(permitting identifier: String) async throws -> URL {
+        state = .fetchingRelease
+        let release = try await fetchLatestRelease()
+        guard let asset = release.assets.first(where: { $0.name.lowercased().hasSuffix(".ipa") }) else {
+            throw ReleaseError()
+        }
+
+        state = .downloading(version: release.tagName, fraction: 0)
+        let downloadedURL = try await download(asset.browserDownloadUrl, version: release.tagName)
+
+        state = .patching
+        let outputURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent(asset.name.replacingOccurrences(of: ".ipa", with: "-patched.ipa"))
+        try await Self.patch(downloadedURL, to: outputURL, permitting: identifier)
+        return outputURL
     }
 
     private func fetchLatestRelease() async throws -> Release {
