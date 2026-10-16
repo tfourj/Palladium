@@ -12921,6 +12921,16 @@
         }
       }
     },
+    "settings.background_downloads.subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep downloads running after you leave Palladium"
+          }
+        }
+      }
+    },
     "settings.cookies.subtitle_count" : {
       "localizations" : {
         "en" : {
