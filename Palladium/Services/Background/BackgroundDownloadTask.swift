@@ -128,6 +128,9 @@ final class BackgroundDownloadTask {
         guard registered else {
             let bundleID = Bundle.main.bundleIdentifier ?? "unknown"
             log("[palladium] background download task identifier is not permitted: \(identifier) (bundle \(bundleID))\n")
+            let permittedKey = "BGTaskSchedulerPermittedIdentifiers"
+            let permitted = Bundle.main.object(forInfoDictionaryKey: permittedKey) as? [String] ?? []
+            log("[palladium] permitted background task identifiers: \(permitted.joined(separator: ", "))\n")
             return false
         }
 
