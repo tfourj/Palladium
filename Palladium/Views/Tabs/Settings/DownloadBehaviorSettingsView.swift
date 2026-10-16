@@ -9,6 +9,9 @@ struct DownloadBehaviorSettingsView: View {
 
     let isRunning: Bool
 
+    @StateObject private var patchedIPABuilder = PatchedIPABuilder()
+    @State private var sharePayload: SharePayload?
+
     var body: some View {
         Form {
             Section {
@@ -64,6 +67,10 @@ struct DownloadBehaviorSettingsView: View {
                         Text(BackgroundDownloadTask.bundleIdentifier)
                             .textSelection(.enabled)
                     }
+                    Button(action: createPatchedIPA) {
+                        createPatchedIPALabel
+                    }
+                    .disabled(patchedIPABuilder.isBusy)
                     Button("settings.download_behavior.background.copy_bundle_id") {
                         UIPasteboard.general.string = BackgroundDownloadTask.bundleIdentifier
                     }
@@ -77,11 +84,18 @@ struct DownloadBehaviorSettingsView: View {
                     if showsPatchInstructions {
                         Text("settings.download_behavior.background.patch_help")
                     }
+                    if case let .failed(message) = patchedIPABuilder.state {
+                        Text(patchFailedText(message))
+                            .foregroundStyle(.red)
+                    }
                 }
             }
         }
         .navigationTitle("settings.download_behavior.title")
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(item: $sharePayload) { payload in
+            ShareSheet(activityItems: payload.activityItems)
+        }
     }
 
     private static let patcherURL = URL(string: "https://getpalladium.app/patcher")!
@@ -93,6 +107,49 @@ struct DownloadBehaviorSettingsView: View {
     /// Only installs whose bundle identifier was changed can be fixed by patching the IPA.
     private var showsPatchInstructions: Bool {
         BackgroundDownloadTask.isSupported && !BackgroundDownloadTask.isPermittedOnThisInstall
+    }
+
+    @ViewBuilder
+    private var createPatchedIPALabel: some View {
+        switch patchedIPABuilder.state {
+        case let .downloading(version, fraction):
+            VStack(alignment: .leading, spacing: 6) {
+                Text(patchDownloadingText(version))
+                ProgressView(value: fraction)
+            }
+        case .fetchingRelease:
+            HStack {
+                Text("settings.download_behavior.background.patch.create")
+                Spacer()
+                ProgressView()
+            }
+        case .patching:
+            HStack {
+                Text("settings.download_behavior.background.patch.patching")
+                Spacer()
+                ProgressView()
+            }
+        case .idle, .failed:
+            Text("settings.download_behavior.background.patch.create")
+        }
+    }
+
+    private func patchDownloadingText(_ version: String) -> String {
+        let format = String(localized: "settings.download_behavior.background.patch.downloading", bundle: .app)
+        return String(format: format, version)
+    }
+
+    private func patchFailedText(_ message: String) -> String {
+        let format = String(localized: "settings.download_behavior.background.patch.failed", bundle: .app)
+        return String(format: format, message)
+    }
+
+    private func createPatchedIPA() {
+        Task {
+            if let url = await patchedIPABuilder.build() {
+                sharePayload = SharePayload(activityItems: [url])
+            }
+        }
     }
 
     private var backgroundStatusIcon: some View {
