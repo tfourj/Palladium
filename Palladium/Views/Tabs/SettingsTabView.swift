@@ -11,6 +11,7 @@ struct SettingsTabView: View {
         case downloadOptions
         case afterDownload
         case downloadBehavior
+        case backgroundDownloads
         case downloadArguments
         case websiteArguments
         case filenameSettings
@@ -261,6 +262,10 @@ struct SettingsTabView: View {
                 autoRetryFailedDownloads: $autoRetryFailedDownloads,
                 saveIncompleteDownloadsToHistory: $saveIncompleteDownloadsToHistory,
                 detailedProgressEnabled: $detailedProgressEnabled,
+                isRunning: isRunning
+            )
+        case .backgroundDownloads:
+            BackgroundDownloadSettingsView(
                 backgroundDownloadsEnabled: $backgroundDownloadsEnabled,
                 isRunning: isRunning
             )
@@ -400,6 +405,7 @@ struct SettingsTabView: View {
             settingsNavigationLink(for: .postProcessing)
             settingsNavigationLink(for: .afterDownload)
             settingsNavigationLink(for: .downloadBehavior)
+            settingsNavigationLink(for: .backgroundDownloads)
             settingsNavigationLink(for: .filenameSettings)
             settingsNavigationLink(for: .downloadArguments)
             settingsNavigationLink(for: .cookies)
@@ -694,7 +700,7 @@ struct SettingsTabView: View {
             },
             controlSetting(
                 id: "backgroundDownloads",
-                menu: .downloadBehavior,
+                menu: .backgroundDownloads,
                 title: "settings.download_behavior.background.toggle",
                 subtitle: "settings.download_behavior.background.help"
             ) { title in
@@ -965,6 +971,7 @@ struct SettingsTabView: View {
             .downloadOptions,
             .afterDownload,
             .downloadBehavior,
+            .backgroundDownloads,
             .filenameSettings,
             .downloadArguments,
             .websiteArguments,
@@ -1060,6 +1067,14 @@ struct SettingsTabView: View {
                 subtitle: String(localized: "settings.download_behavior.subtitle", bundle: .app),
                 icon: "bolt.fill",
                 color: .yellow
+            )
+        case .backgroundDownloads:
+            return SearchableSetting(
+                route: route,
+                title: String(localized: "settings.download_behavior.background.toggle", bundle: .app),
+                subtitle: String(localized: "settings.background_downloads.subtitle", bundle: .app),
+                icon: "arrow.down.circle.dotted",
+                color: .mint
             )
         case .downloadArguments:
             return SearchableSetting(
