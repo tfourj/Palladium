@@ -389,7 +389,7 @@ class PackagePlanningTests(unittest.TestCase):
         ])
         self.assertEqual(
             cleanup,
-            ["yt-dlp", "yt-dlp-apple-webkit-jsi", "curl-cffi", "gallery-dl", "mutagen"],
+            ["yt-dlp", "yt-dlp-apple-webkit-jsi", "yt-dlp-ejs", "curl-cffi", "gallery-dl", "mutagen"],
         )
 
     def test_custom_source_disables_patches(self):

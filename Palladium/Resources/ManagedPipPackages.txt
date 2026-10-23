@@ -2,6 +2,7 @@
 # Append [version] to lock a package, for example: pip[26.1]
 yt-dlp
 yt-dlp-apple-webkit-jsi
+yt-dlp-ejs
 curl-cffi
 gallery-dl
 mutagen

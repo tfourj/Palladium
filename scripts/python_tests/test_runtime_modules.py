@@ -1,3 +1,4 @@
+import re
 import sys
 import types
 import unittest
@@ -26,6 +27,27 @@ class RuntimeModuleTests(unittest.TestCase):
                     sys.modules.pop(name, None)
                 else:
                     sys.modules[name] = module
+
+    def test_urllib3_percent_re_override_is_unwrapped_before_reload(self):
+        class Urllib3PercentREOverride:
+            def __init__(self, r):
+                self.re = r
+
+        pattern = re.compile("%[a-fA-F0-9]{2}")
+        url_module = types.ModuleType("urllib3.util.url")
+        url_module._PERCENT_RE = Urllib3PercentREOverride(Urllib3PercentREOverride(pattern))
+        original = sys.modules.get("urllib3.util.url")
+        try:
+            sys.modules["urllib3.util.url"] = url_module
+
+            invalidate_runtime_package_modules()
+
+            self.assertIs(url_module._PERCENT_RE, pattern)
+        finally:
+            if original is None:
+                sys.modules.pop("urllib3.util.url", None)
+            else:
+                sys.modules["urllib3.util.url"] = original
 
     def test_loaded_webkit_jsi_runtime_is_invalidated_without_restart(self):
         module_names = (
