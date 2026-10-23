@@ -68,6 +68,7 @@ Palladium/
 | Path | Purpose |
 | --- | --- |
 | `Views/ContentView.swift` | Root UI, tab layout, and shared view state. |
+| `Views/ContentView+AutoPaste.swift` | Clipboard link checks that start downloads when the app opens. |
 | `Views/ContentView+Cookies.swift` | Cookie import and management UI logic. |
 | `Views/ContentView+DownloadFlow.swift` | Download initiation and progress flow. |
 | `Views/ContentView+DownloadQueue.swift` | Persistent sequential queue coordination and queue state actions. |

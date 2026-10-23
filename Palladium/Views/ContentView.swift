@@ -692,9 +692,13 @@ struct ContentView: View {
             }
         }
         .onChange(of: scenePhase, initial: true) { _, newPhase in
+            if newPhase == .background {
+                rememberClipboardChangeCount()
+            }
             guard newPhase == .active else { return }
             syncIdleTimerDisabled()
             consumePendingShortcutDownloadRequestIfNeeded()
+            checkClipboardForAutoPasteLink()
         }
         .onOpenURL { incomingURL in
             handleIncomingURL(incomingURL)
