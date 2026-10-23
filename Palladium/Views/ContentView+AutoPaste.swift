@@ -52,10 +52,14 @@ extension ContentView {
 
     func handleAutoPasteLink(_ link: String) {
         guard autoPasteLinkEnabled else { return }
+        // Clipboard syncing can rewrite the same link and bump the change count, so skip repeats.
+        let defaults = UserDefaults.standard
+        guard defaults.string(forKey: Self.autoPasteLastLinkDefaultsKey) != link else { return }
         guard canStartAutoPasteDownload else {
             appendConsoleText("[palladium] auto paste link skipped while another task is active\n")
             return
         }
+        defaults.set(link, forKey: Self.autoPasteLastLinkDefaultsKey)
         appendConsoleText("[palladium] auto paste link detected: \(link)\n")
         routeExternalLink(link, mode: autoPasteDownloadMode)
     }

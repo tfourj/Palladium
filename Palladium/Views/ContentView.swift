@@ -59,6 +59,7 @@ struct ContentView: View {
     static let autoPasteLinkEnabledDefaultsKey = "palladium.autoPasteLinkEnabled"
     static let autoPasteDownloadModeDefaultsKey = "palladium.autoPasteDownloadMode"
     static let autoPasteLastChangeCountDefaultsKey = "palladium.autoPasteLastChangeCount"
+    static let autoPasteLastLinkDefaultsKey = "palladium.autoPasteLastLink"
     static let downloadPlaylistDefaultsKey = "palladium.downloadPlaylist"
     static let downloadSubtitlesDefaultsKey = "palladium.downloadSubtitles"
     static let embedThumbnailDefaultsKey = "palladium.embedThumbnail"
