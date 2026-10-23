@@ -50,6 +50,7 @@ Palladium/
 | `Models/AppAppearanceMode.swift` | Appearance-mode setting model. |
 | `Models/AppLanguageSettings.swift` | Persisted app language, system-language resolution, and observable localization bundle. |
 | `Models/BackgroundDownloadProgress.swift` | Combines yt-dlp stream and ffmpeg progress into one fraction for the system background task UI. |
+| `Models/ClipboardLinkDetector.swift` | Finds the first web link in clipboard text for auto paste downloads. |
 | `Models/DownloadServiceDomain.swift` | Canonical source-service domain resolver for saved-download folders. |
 | `Models/WebsiteArgumentRule.swift` | Persisted per-website yt-dlp argument rules and link matching priority. |
 | `Models/DownloadOptions.swift` | Download option model and persisted settings. |
