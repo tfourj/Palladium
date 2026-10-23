@@ -370,6 +370,8 @@ struct ContentView: View {
                     notificationsEnabled: $notificationsEnabled,
                     rememberSelectedPreset: $rememberSelectedPreset,
                     autoDownloadOnPaste: $autoDownloadOnPaste,
+                    autoPasteLinkEnabled: $autoPasteLinkEnabled,
+                    autoPasteDownloadMode: $autoPasteDownloadMode,
                     autoRetryFailedDownloads: $autoRetryFailedDownloads,
                     saveIncompleteDownloadsToHistory: $saveIncompleteDownloadsToHistory,
                     detailedProgressEnabled: $detailedProgressEnabled,
