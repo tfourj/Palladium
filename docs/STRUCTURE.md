@@ -190,6 +190,7 @@ Palladium/
 | `scripts/swift_tests/DeveloperDiagnosticsTests.swift` | Developer diagnostic parsing plus native FFmpeg and QuickJS check tests. |
 | `scripts/swift_tests/BackgroundDownloadProgressTests.swift` | Background download stream ordering, side-file, processing, and playlist progress tests. |
 | `scripts/swift_tests/DownloadServiceDomainTests.swift` | Saved-download service-domain canonicalization tests. |
+| `scripts/swift_tests/ClipboardLinkDetectorTests.swift` | Clipboard text link detection tests for auto paste downloads. |
 | `scripts/swift_tests/WebsiteArgumentRuleTests.swift` | Website argument rule matching priority, normalization, and persistence tests. |
 | `scripts/swift_tests/DownloadQueueTests.swift` | Download queue parsing, state transition, ordering, and persistence tests. |
 | `scripts/swift_tests/YTDLPFormatTests.swift` | Resolved format selection, Photos compatibility, and exact download argument tests. |
