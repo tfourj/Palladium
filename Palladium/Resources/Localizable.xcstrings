@@ -5,7 +5,7 @@
       "localizations" : {
         "es" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "%lld"
           }
         },
@@ -39,7 +39,7 @@
       "localizations" : {
         "es" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "0"
           }
         },
@@ -79,8 +79,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Contributors"
+            "state" : "translated",
+            "value" : "Contribuidores"
           }
         },
         "ja" : {
@@ -119,7 +119,7 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "TfourJ"
           }
         },
@@ -159,8 +159,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Developer"
+            "state" : "translated",
+            "value" : "Desarrollador"
           }
         },
         "ja" : {
@@ -199,8 +199,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Links"
+            "state" : "translated",
+            "value" : "Enlaces"
           }
         },
         "ja" : {
@@ -239,8 +239,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Powered by yt-dlp and ffmpeg"
+            "state" : "translated",
+            "value" : "Con tecnología de yt-dlp y ffmpeg"
           }
         },
         "ja" : {
@@ -279,8 +279,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Chinese"
+            "state" : "translated",
+            "value" : "Chino"
           }
         },
         "ja" : {
@@ -319,8 +319,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Japanese"
+            "state" : "translated",
+            "value" : "Japonés"
           }
         },
         "ja" : {
@@ -359,8 +359,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Korean"
+            "state" : "translated",
+            "value" : "Coreano"
           }
         },
         "ja" : {
@@ -399,8 +399,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Translators"
+            "state" : "translated",
+            "value" : "Traductores"
           }
         },
         "ja" : {
@@ -439,7 +439,7 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Palladium"
           }
         },
@@ -479,8 +479,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Dark Mode"
+            "state" : "translated",
+            "value" : "Modo oscuro"
           }
         },
         "ja" : {
@@ -519,8 +519,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Light Mode"
+            "state" : "translated",
+            "value" : "Modo claro"
           }
         },
         "ja" : {
@@ -559,8 +559,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "System"
+            "state" : "translated",
+            "value" : "Sistema"
           }
         },
         "ja" : {
@@ -599,8 +599,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "All"
+            "state" : "translated",
+            "value" : "Todos"
           }
         },
         "ja" : {
@@ -639,8 +639,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Apply"
+            "state" : "translated",
+            "value" : "Aplicar"
           }
         },
         "ja" : {
@@ -679,8 +679,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Ask"
+            "state" : "translated",
+            "value" : "Preguntar"
           }
         },
         "ja" : {
@@ -719,8 +719,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Cancel"
+            "state" : "translated",
+            "value" : "Cancelar"
           }
         },
         "ja" : {
@@ -759,8 +759,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Clear"
+            "state" : "translated",
+            "value" : "Restablecer"
           }
         },
         "ja" : {
@@ -799,8 +799,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Copy"
+            "state" : "translated",
+            "value" : "Copiar"
           }
         },
         "ja" : {
@@ -839,8 +839,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Custom"
+            "state" : "translated",
+            "value" : "Personalizado"
           }
         },
         "ja" : {
@@ -879,8 +879,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Delete"
+            "state" : "translated",
+            "value" : "Eliminar"
           }
         },
         "ja" : {
@@ -919,8 +919,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Done"
+            "state" : "translated",
+            "value" : "Hecho"
           }
         },
         "ja" : {
@@ -959,8 +959,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "None"
+            "state" : "translated",
+            "value" : "Ninguno"
           }
         },
         "ja" : {
@@ -999,8 +999,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "OK"
+            "state" : "translated",
+            "value" : "Vale"
           }
         },
         "ja" : {
@@ -1039,8 +1039,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Rename"
+            "state" : "translated",
+            "value" : "Renombrar"
           }
         },
         "ja" : {
@@ -1079,8 +1079,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Result"
+            "state" : "translated",
+            "value" : "Resultado"
           }
         },
         "ja" : {
@@ -1119,8 +1119,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "No logs yet."
+            "state" : "translated",
+            "value" : "Aún no hay registros."
           }
         },
         "ja" : {
@@ -1159,8 +1159,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Export"
+            "state" : "translated",
+            "value" : "Exportar"
           }
         },
         "ja" : {
@@ -1199,8 +1199,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Couldn't prepare logs for export."
+            "state" : "translated",
+            "value" : "No se puedo preparar los registros para exportar."
           }
         },
         "ja" : {
@@ -1239,8 +1239,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Showing %lld of %lld lines"
+            "state" : "translated",
+            "value" : "Mostrando %lld de %lld líneas"
           }
         },
         "ja" : {
@@ -1279,8 +1279,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "No matching log lines."
+            "state" : "translated",
+            "value" : "No se han encontrado registros que coincidan."
           }
         },
         "ja" : {
@@ -1319,8 +1319,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Search console"
+            "state" : "translated",
+            "value" : "Buscar en la consola"
           }
         },
         "ja" : {
@@ -1359,8 +1359,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "App"
+            "state" : "translated",
+            "value" : "Aplicación"
           }
         },
         "ja" : {
@@ -1399,7 +1399,7 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "FFmpeg"
           }
         },
@@ -1439,8 +1439,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Source"
+            "state" : "translated",
+            "value" : "Origen"
           }
         },
         "ja" : {
@@ -1479,8 +1479,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "console"
+            "state" : "translated",
+            "value" : "consola"
           }
         },
         "ja" : {
@@ -1519,8 +1519,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Import or paste Netscape cookies to make them available in downloads."
+            "state" : "translated",
+            "value" : "Importa o pega cookies de Netscape para que estén disponibles en las descargas."
           }
         },
         "ja" : {
@@ -1559,8 +1559,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "No cookie files"
+            "state" : "translated",
+            "value" : "No hay archivos de cookies"
           }
         },
         "ja" : {
@@ -1599,8 +1599,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "The selected cookie content does not look like Netscape cookies format."
+            "state" : "translated",
+            "value" : "El contenido de la cookie seleccionada no parece tener el formato de Netscape."
           }
         },
         "ja" : {
@@ -1639,8 +1639,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Enter a valid HTTP or HTTPS website URL."
+            "state" : "translated",
+            "value" : "Inserta una URL de HTTP o HTTPS válida."
           }
         },
         "ja" : {
@@ -1679,8 +1679,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Could not create a unique filename for the imported cookie file."
+            "state" : "translated",
+            "value" : "No se puedo crear un nombre único para el archivo de la cookie."
           }
         },
         "ja" : {
@@ -1719,8 +1719,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "The selected file could not be read as text."
+            "state" : "translated",
+            "value" : "El archivo seleccionado no se puedo leer como texto."
           }
         },
         "ja" : {
@@ -1759,8 +1759,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "No cookies were found. Sign in or continue browsing before importing."
+            "state" : "translated",
+            "value" : "No se han encontrado cookies. Inicia sesión o continua navegando antes de importarlas."
           }
         },
         "ja" : {
@@ -1799,7 +1799,7 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "%@ • %@"
           }
         },
@@ -1839,8 +1839,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Import Cookie File"
+            "state" : "translated",
+            "value" : "Importar archivo de cookie"
           }
         },
         "ja" : {
@@ -1879,8 +1879,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Cookie name"
+            "state" : "translated",
+            "value" : "Nombre de la cookie"
           }
         },
         "ja" : {
@@ -1919,8 +1919,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Add Cookies"
+            "state" : "translated",
+            "value" : "Añadir cookies"
           }
         },
         "ja" : {
@@ -1959,8 +1959,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Paste Cookie Text"
+            "state" : "translated",
+            "value" : "Pegar texto de la cookie"
           }
         },
         "ja" : {
@@ -1999,8 +1999,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Paste Netscape cookie text below. Palladium will normalize it before saving."
+            "state" : "translated",
+            "value" : "Pega el texto de una cookie de Netscape debajo. Palladium lo normalizará antes de guardarlo."
           }
         },
         "ja" : {
@@ -2039,8 +2039,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Paste Cookies"
+            "state" : "translated",
+            "value" : "Pegar cookies"
           }
         },
         "ja" : {
@@ -2079,8 +2079,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Documents/Cookies"
+            "state" : "translated",
+            "value" : "Documentos/Cookies"
           }
         },
         "ja" : {
@@ -2119,8 +2119,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "App folder"
+            "state" : "translated",
+            "value" : "Carpeta de la aplicación"
           }
         },
         "ja" : {
@@ -2159,8 +2159,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Rename Cookie File"
+            "state" : "translated",
+            "value" : "Renombrar archivo de cookie"
           }
         },
         "ja" : {
@@ -2199,8 +2199,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Cookie files are copied into Palladium storage so yt-dlp can reuse them later."
+            "state" : "translated",
+            "value" : "Los archivos de cookies se copian en el almacenamiento de Palladium para que yt-dlp las pueda reusarlas después."
           }
         },
         "ja" : {
@@ -2239,8 +2239,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Cookies can also be switched on the main page using “More options”."
+            "state" : "translated",
+            "value" : "Las cookies pueden cambiarse en la página principal usando “Más opciones”."
           }
         },
         "ja" : {
@@ -2279,8 +2279,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Imported cookie file: %@"
+            "state" : "translated",
+            "value" : "Archivo de cookie importada: %@"
           }
         },
         "ja" : {
@@ -2319,8 +2319,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Renamed cookie file: %@"
+            "state" : "translated",
+            "value" : "Archivo de cookie renombrado: %@"
           }
         },
         "ja" : {
@@ -2359,8 +2359,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Sign in, then tap Import to save this private browser session as a Netscape cookie file."
+            "state" : "translated",
+            "value" : "Inicia sesión, después toca Importar para guardar esta sesión de navegador privado como una cookie de Netscape."
           }
         },
         "ja" : {
@@ -2399,8 +2399,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Website Login"
+            "state" : "translated",
+            "value" : "Iniciar sesión desde el sitio web"
           }
         },
         "ja" : {
@@ -2439,8 +2439,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Import from Website"
+            "state" : "translated",
+            "value" : "Importar de un sitio web"
           }
         },
         "ja" : {
@@ -2479,8 +2479,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Import"
+            "state" : "translated",
+            "value" : "Importar"
           }
         },
         "ja" : {
@@ -2519,8 +2519,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Open Login Page"
+            "state" : "translated",
+            "value" : "Abrir página de inicio de sesión"
           }
         },
         "ja" : {
@@ -2559,8 +2559,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "The login opens in a private browser session. Palladium saves its cookies only when you tap Import."
+            "state" : "translated",
+            "value" : "El inicio de sesión se abre en una sesión del navegador privado. Palladium guarda sus cookies solo cuando tocas Importar."
           }
         },
         "ja" : {
@@ -2599,8 +2599,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Enter the website where you want to sign in."
+            "state" : "translated",
+            "value" : "Introduce el sitio web en donde quieres iniciar sesión."
           }
         },
         "ja" : {
@@ -2639,8 +2639,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "example.com"
+            "state" : "translated",
+            "value" : "ejemplo.es"
           }
         },
         "ja" : {
@@ -2679,8 +2679,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Import Website Cookies"
+            "state" : "translated",
+            "value" : "Importar cookies del sitio web"
           }
         },
         "ja" : {
@@ -2719,8 +2719,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Used only when Preset is Custom."
+            "state" : "translated",
+            "value" : "Solo se usa cuando la configuración está personalizada."
           }
         },
         "ja" : {
@@ -2759,8 +2759,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Custom Preset Args"
+            "state" : "translated",
+            "value" : "Argumentos de la configuración personalizada"
           }
         },
         "ja" : {
@@ -2799,7 +2799,7 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "mp3"
           }
         },
@@ -2839,7 +2839,7 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "mp4"
           }
         },
@@ -2879,8 +2879,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "mute"
+            "state" : "translated",
+            "value" : "silenciado"
           }
         },
         "ja" : {
@@ -2919,8 +2919,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Examples"
+            "state" : "translated",
+            "value" : "Ejemplos"
           }
         },
         "ja" : {
@@ -2959,8 +2959,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Appended for every run."
+            "state" : "translated",
+            "value" : "Añadido para cada ejecución."
           }
         },
         "ja" : {
@@ -2999,8 +2999,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Global Extra Args"
+            "state" : "translated",
+            "value" : "Argumentos extra globales"
           }
         },
         "ja" : {
@@ -3039,8 +3039,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Item %1$lld of %2$lld"
+            "state" : "translated",
+            "value" : "Elemento %1$lld de %2$lld"
           }
         },
         "ja" : {
@@ -3079,8 +3079,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Downloading with Palladium"
+            "state" : "translated",
+            "value" : "Descargando con Palladium"
           }
         },
         "ja" : {
@@ -3119,8 +3119,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download"
+            "state" : "translated",
+            "value" : "Descargar"
           }
         },
         "ja" : {
@@ -3159,8 +3159,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Custom: %@"
+            "state" : "translated",
+            "value" : "Personalizado: %@"
           }
         },
         "ja" : {
@@ -3199,8 +3199,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Last Error"
+            "state" : "translated",
+            "value" : "Último error"
           }
         },
         "ja" : {
@@ -3239,8 +3239,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download finished but no files were found."
+            "state" : "translated",
+            "value" : "La descarga terminó pero no se encontraron archivos."
           }
         },
         "ja" : {
@@ -3279,8 +3279,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Failed to prepare download folder."
+            "state" : "translated",
+            "value" : "Error al preparar la carpeta de descarga."
           }
         },
         "ja" : {
@@ -3319,8 +3319,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "download"
+            "state" : "translated",
+            "value" : "descarga"
           }
         },
         "ja" : {
@@ -3360,8 +3360,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Custom"
+            "state" : "translated",
+            "value" : "Personalizado"
           }
         },
         "ja" : {
@@ -3401,8 +3401,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Enter a yt-dlp output template. Include %(ext)s for the file extension. Leave blank to use Default."
+            "state" : "translated",
+            "value" : "Introduce una plantilla de salida de yt-dlp. Incluye %(ext)s para la extensión del archivo. Déjalo en blanco para usar el por defecto."
           }
         },
         "ja" : {
@@ -3442,7 +3442,7 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "%(title)s.%(ext)s"
           }
         },
@@ -3483,8 +3483,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Default"
+            "state" : "translated",
+            "value" : "Por defecto"
           }
         },
         "ja" : {
@@ -3524,8 +3524,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Default shortens long titles to 200 bytes. Video ID uses the media site's stable ID. Existing -o or --output arguments take priority."
+            "state" : "translated",
+            "value" : "Por defecto acorta títulos largos a 200 bytes. El ID del vídeo usa el ID estable del sitio. Los argumentos “-o” o “--output” tienen prioridad."
           }
         },
         "ja" : {
@@ -3565,8 +3565,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Filename"
+            "state" : "translated",
+            "value" : "Nombre del archivo"
           }
         },
         "ja" : {
@@ -3606,8 +3606,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Video ID"
+            "state" : "translated",
+            "value" : "ID del vídeo"
           }
         },
         "ja" : {
@@ -3646,8 +3646,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Included in video"
+            "state" : "translated",
+            "value" : "Incluido en el vídeo"
           }
         },
         "ja" : {
@@ -3686,7 +3686,7 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Audio:"
           }
         },
@@ -3726,7 +3726,7 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Audio"
           }
         },
@@ -3766,8 +3766,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Choose download format"
+            "state" : "translated",
+            "value" : "Escoge el formato de descarga"
           }
         },
         "ja" : {
@@ -3806,8 +3806,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "No downloadable formats were found."
+            "state" : "translated",
+            "value" : "No se encontraron formatos descargables."
           }
         },
         "ja" : {
@@ -3846,8 +3846,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Export settings are enabled and may change the final container."
+            "state" : "translated",
+            "value" : "Los ajustes de exportación están activados y pueden cambiar en el contenedor final."
           }
         },
         "ja" : {
@@ -3886,7 +3886,7 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Final:"
           }
         },
@@ -3926,8 +3926,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Loading formats..."
+            "state" : "translated",
+            "value" : "Cargando formatos..."
           }
         },
         "ja" : {
@@ -3966,8 +3966,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "None available"
+            "state" : "translated",
+            "value" : "No hay ninguno disponible"
           }
         },
         "ja" : {
@@ -4006,8 +4006,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Compatible with Save to Photos"
+            "state" : "translated",
+            "value" : "Compatible con Guardar en Fotos"
           }
         },
         "ja" : {
@@ -4046,8 +4046,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Failed to read the yt-dlp format list."
+            "state" : "translated",
+            "value" : "Error al leer el formato de lista de yt-dlp."
           }
         },
         "ja" : {
@@ -4086,8 +4086,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Pick a specific format"
+            "state" : "translated",
+            "value" : "Escoge un formato específico"
           }
         },
         "ja" : {
@@ -4126,8 +4126,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Size unknown"
+            "state" : "translated",
+            "value" : "Tamaño desconocido"
           }
         },
         "ja" : {
@@ -4166,8 +4166,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Video and audio show the source streams and their sizes. Final shows the merged container, including thumbnail handling."
+            "state" : "translated",
+            "value" : "Vídeo y audio muestran los orígenes y sus tamaños. Final muestra los contenedores juntos, incluyendo el manejo de miniaturas."
           }
         },
         "ja" : {
@@ -4206,8 +4206,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "MKV is used to embed the thumbnail."
+            "state" : "translated",
+            "value" : "MKV se usa para incrustar la miniatura."
           }
         },
         "ja" : {
@@ -4246,8 +4246,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Choose Format"
+            "state" : "translated",
+            "value" : "Escoge formato"
           }
         },
         "ja" : {
@@ -4286,8 +4286,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Video:"
+            "state" : "translated",
+            "value" : "Vídeo:"
           }
         },
         "ja" : {
@@ -4326,8 +4326,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Video with Audio"
+            "state" : "translated",
+            "value" : "Vídeo con audio"
           }
         },
         "ja" : {
@@ -4366,8 +4366,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "WEBM does not support embedded thumbnails."
+            "state" : "translated",
+            "value" : "WEBM no soporta la incrustación de miniaturas."
           }
         },
         "ja" : {
@@ -4406,8 +4406,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Extract audio track"
+            "state" : "translated",
+            "value" : "Extraer pista de audio"
           }
         },
         "ja" : {
@@ -4446,8 +4446,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Audio Only"
+            "state" : "translated",
+            "value" : "Solo audio"
           }
         },
         "ja" : {
@@ -4486,8 +4486,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Use custom preset arguments"
+            "state" : "translated",
+            "value" : "Usar argumentos preestablecidos personalizados"
           }
         },
         "ja" : {
@@ -4526,8 +4526,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download pictures with gallery-dl"
+            "state" : "translated",
+            "value" : "Descargar imágenes con gallery-dl"
           }
         },
         "ja" : {
@@ -4566,8 +4566,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Video without audio"
+            "state" : "translated",
+            "value" : "Vídeo sin audio"
           }
         },
         "ja" : {
@@ -4606,8 +4606,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Video (Muted)"
+            "state" : "translated",
+            "value" : "Vídeo (silenciado)"
           }
         },
         "ja" : {
@@ -4646,8 +4646,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "How would you like to download this content?"
+            "state" : "translated",
+            "value" : "¿Cómo te gustaría descargar este contenido?"
           }
         },
         "ja" : {
@@ -4686,8 +4686,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Choose Download Mode"
+            "state" : "translated",
+            "value" : "Escoger modo de descarga"
           }
         },
         "ja" : {
@@ -4726,8 +4726,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Best quality available"
+            "state" : "translated",
+            "value" : "La mejor calidad disponible"
           }
         },
         "ja" : {
@@ -4766,8 +4766,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Import a cookie file in Settings before enabling this option."
+            "state" : "translated",
+            "value" : "Importa un archivo de cookie en los Ajustes antes de activar esta opción."
           }
         },
         "ja" : {
@@ -4806,8 +4806,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Use one imported Netscape cookie file for this download"
+            "state" : "translated",
+            "value" : "Usar un archivo de cookie de Netscape para esta descarga"
           }
         },
         "ja" : {
@@ -4846,8 +4846,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Cookie file"
+            "state" : "translated",
+            "value" : "Archivo de cookie"
           }
         },
         "ja" : {
@@ -4886,7 +4886,7 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Cookies"
           }
         },
@@ -4926,7 +4926,7 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Cookies: %@"
           }
         },
@@ -4966,8 +4966,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Allow yt-dlp to fetch multiple items"
+            "state" : "translated",
+            "value" : "Permitir que yt-dlp busque varios elementos"
           }
         },
         "ja" : {
@@ -5006,8 +5006,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Playlist"
+            "state" : "translated",
+            "value" : "Lista de reproducción"
           }
         },
         "ja" : {
@@ -5046,8 +5046,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download playlist"
+            "state" : "translated",
+            "value" : "Descargar lista de reproducción"
           }
         },
         "ja" : {
@@ -5086,8 +5086,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Save subtitle sidecars with the media"
+            "state" : "translated",
+            "value" : "Guardar los sidecars de los subtítulos con el\nmedio"
           }
         },
         "ja" : {
@@ -5126,8 +5126,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Subtitle language"
+            "state" : "translated",
+            "value" : "Idioma de los subtítulos"
           }
         },
         "ja" : {
@@ -5166,8 +5166,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Subtitle pattern, e.g. en.*, es.*, zh-Hans"
+            "state" : "translated",
+            "value" : "Patrón de los subtítulos, ejemplo: en*, es.*, zh-Hans"
           }
         },
         "ja" : {
@@ -5206,8 +5206,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download subtitles"
+            "state" : "translated",
+            "value" : "Descargar subtítulos"
           }
         },
         "ja" : {
@@ -5246,8 +5246,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Subtitles: %@"
+            "state" : "translated",
+            "value" : "Subtítulos: %@"
           }
         },
         "ja" : {
@@ -5286,8 +5286,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Playlist, subtitles, and thumbnail settings"
+            "state" : "translated",
+            "value" : "Lista de reproducción, subtítulos y ajustes de miniatura"
           }
         },
         "ja" : {
@@ -5326,8 +5326,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Attach artwork to supported media files"
+            "state" : "translated",
+            "value" : "Adjuntar imágenes a archivos de media soportados"
           }
         },
         "ja" : {
@@ -5366,8 +5366,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Embed thumbnail"
+            "state" : "translated",
+            "value" : "Incrustar miniatura"
           }
         },
         "ja" : {
@@ -5406,8 +5406,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "More options"
+            "state" : "translated",
+            "value" : "Más opciones"
           }
         },
         "ja" : {
@@ -5446,8 +5446,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Completed"
+            "state" : "translated",
+            "value" : "Completado"
           }
         },
         "ja" : {
@@ -5486,8 +5486,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Current item: %d"
+            "state" : "translated",
+            "value" : "Elemento actual: %d"
           }
         },
         "ja" : {
@@ -5526,8 +5526,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Current item %d: %@"
+            "state" : "translated",
+            "value" : "Elemento actual %d: %@"
           }
         },
         "ja" : {
@@ -5566,8 +5566,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Failed"
+            "state" : "translated",
+            "value" : "Error"
           }
         },
         "ja" : {
@@ -5606,8 +5606,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "%d of %d downloaded before cancellation"
+            "state" : "translated",
+            "value" : "%d de %d descargado antes de la cancelación"
           }
         },
         "ja" : {
@@ -5646,8 +5646,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "%d of %d items failed"
+            "state" : "translated",
+            "value" : "%d de %d elementos erróneos"
           }
         },
         "ja" : {
@@ -5686,8 +5686,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "%d of %d downloaded, %d failed"
+            "state" : "translated",
+            "value" : "%d de %d descargados, %d erróneos"
           }
         },
         "ja" : {
@@ -5726,8 +5726,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "%d completed of %d, %d failed so far"
+            "state" : "translated",
+            "value" : "%d completados de %d, %d fallados hasta ahora"
           }
         },
         "ja" : {
@@ -5766,8 +5766,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "%d of %d downloaded"
+            "state" : "translated",
+            "value" : "%d de %d descargados"
           }
         },
         "ja" : {
@@ -5806,7 +5806,7 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Total"
           }
         },
@@ -5846,7 +5846,7 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Audio"
           }
         },
@@ -5886,8 +5886,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Gallery"
+            "state" : "translated",
+            "value" : "Galería"
           }
         },
         "ja" : {
@@ -5926,8 +5926,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Mute"
+            "state" : "translated",
+            "value" : "Silenciar"
           }
         },
         "ja" : {
@@ -5966,8 +5966,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Preset"
+            "state" : "translated",
+            "value" : "Preajuste"
           }
         },
         "ja" : {
@@ -6006,8 +6006,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Video"
+            "state" : "translated",
+            "value" : "Vídeo"
           }
         },
         "ja" : {
@@ -6046,8 +6046,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Enter a URL and tap Download."
+            "state" : "translated",
+            "value" : "Introduce una URL y toca Descargar."
           }
         },
         "ja" : {
@@ -6087,8 +6087,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Format and bitrate choices apply when using the Audio preset."
+            "state" : "translated",
+            "value" : "Las opciones de formato y bitrate se aplican cuando se usa la opción predefinida de audio."
           }
         },
         "ja" : {
@@ -6128,7 +6128,7 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Audio"
           }
         },
@@ -6169,8 +6169,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Best"
+            "state" : "translated",
+            "value" : "La mejor"
           }
         },
         "ja" : {
@@ -6210,8 +6210,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Codec"
+            "state" : "translated",
+            "value" : "Códec"
           }
         },
         "ja" : {
@@ -6251,8 +6251,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Format"
+            "state" : "translated",
+            "value" : "Formato"
           }
         },
         "ja" : {
@@ -6292,8 +6292,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Apply the video and audio Quality Settings when exporting a format selected from the format list."
+            "state" : "translated",
+            "value" : "Aplica la calidad del vídeo y audio cuando se exporta un formato seleccionado de la lista de formatos."
           }
         },
         "ja" : {
@@ -6333,8 +6333,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Override format-list export"
+            "state" : "translated",
+            "value" : "Reemplazar exportación de la lista de formatos"
           }
         },
         "ja" : {
@@ -6374,8 +6374,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Quality"
+            "state" : "translated",
+            "value" : "Calidad"
           }
         },
         "ja" : {
@@ -6456,8 +6456,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Choose for every link"
+            "state" : "translated",
+            "value" : "Escoger para cada enlace"
           }
         },
         "ja" : {
@@ -6497,8 +6497,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Pick max quality"
+            "state" : "translated",
+            "value" : "Escoger máxima calidad"
           }
         },
         "ja" : {
@@ -6538,8 +6538,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Selection"
+            "state" : "translated",
+            "value" : "Selección"
           }
         },
         "ja" : {
@@ -6579,8 +6579,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Queued Downloads"
+            "state" : "translated",
+            "value" : "Descargas en cola"
           }
         },
         "ja" : {
@@ -6620,8 +6620,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Select quality for queued downloads"
+            "state" : "translated",
+            "value" : "Selecciona la calidad para las descargas en cola"
           }
         },
         "ja" : {
@@ -6661,8 +6661,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Best Compatible"
+            "state" : "translated",
+            "value" : "Más compatible"
           }
         },
         "ja" : {
@@ -6702,8 +6702,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Best Quality"
+            "state" : "translated",
+            "value" : "Mejor calidad"
           }
         },
         "ja" : {
@@ -6784,8 +6784,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Audio Preset"
+            "state" : "translated",
+            "value" : "Preconfiguración de audio"
           }
         },
         "ja" : {
@@ -6866,8 +6866,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Best available"
+            "state" : "translated",
+            "value" : "La mejor disponible"
           }
         },
         "ja" : {
@@ -6907,8 +6907,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "H.264 / H.265 (Photos)"
+            "state" : "translated",
+            "value" : "H.264 / H.265 (Fotos)"
           }
         },
         "ja" : {
@@ -6948,8 +6948,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Video"
+            "state" : "translated",
+            "value" : "Vídeo"
           }
         },
         "ja" : {
@@ -6988,8 +6988,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Fill URL"
+            "state" : "translated",
+            "value" : "Rellenar URL"
           }
         },
         "ja" : {
@@ -7028,8 +7028,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Open without downloading"
+            "state" : "translated",
+            "value" : "Abrir sin descargar"
           }
         },
         "ja" : {
@@ -7068,8 +7068,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "download cancelled"
+            "state" : "translated",
+            "value" : "descarga cancelada"
           }
         },
         "ja" : {
@@ -7108,8 +7108,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Cancelling..."
+            "state" : "translated",
+            "value" : "Cancelando..."
           }
         },
         "ja" : {
@@ -7148,8 +7148,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "download complete"
+            "state" : "translated",
+            "value" : "descarga completada"
           }
         },
         "ja" : {
@@ -7188,8 +7188,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "download failed"
+            "state" : "translated",
+            "value" : "descarga fallida"
           }
         },
         "ja" : {
@@ -7228,8 +7228,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Merge finished"
+            "state" : "translated",
+            "value" : "Fusión terminada"
           }
         },
         "ja" : {
@@ -7268,8 +7268,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "completed with issues"
+            "state" : "translated",
+            "value" : "completado con problemas"
           }
         },
         "ja" : {
@@ -7308,8 +7308,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Processing with ffmpeg..."
+            "state" : "translated",
+            "value" : "Procesando con ffmpeg..."
           }
         },
         "ja" : {
@@ -7348,8 +7348,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Downloading..."
+            "state" : "translated",
+            "value" : "Descargando..."
           }
         },
         "ja" : {
@@ -7388,8 +7388,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Enter video URL"
+            "state" : "translated",
+            "value" : "Introduce la URL del vídeo"
           }
         },
         "ja" : {
@@ -7428,7 +7428,7 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "—format best —no-playlist"
           }
         },
@@ -7468,7 +7468,7 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "--embed-subs --write-subs"
           }
         },
@@ -7508,8 +7508,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Media saved to Palladium/Saved will appear here."
+            "state" : "translated",
+            "value" : "Los medios guardados en Palladium/Saved aparecerán aquí."
           }
         },
         "ja" : {
@@ -7548,8 +7548,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "No saved downloads"
+            "state" : "translated",
+            "value" : "No hay descargas guardadas"
           }
         },
         "ja" : {
@@ -7588,8 +7588,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Could not load downloads"
+            "state" : "translated",
+            "value" : "No se pudo cargar las descargas"
           }
         },
         "ja" : {
@@ -7828,8 +7828,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Options"
+            "state" : "translated",
+            "value" : "Opciones"
           }
         },
         "ja" : {
@@ -7868,8 +7868,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Refresh Downloads"
+            "state" : "translated",
+            "value" : "Actualizar descargas"
           }
         },
         "ja" : {
@@ -7908,7 +7908,7 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Audio"
           }
         },
@@ -7948,8 +7948,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Folder"
+            "state" : "translated",
+            "value" : "Carpeta"
           }
         },
         "ja" : {
@@ -7988,8 +7988,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Image"
+            "state" : "translated",
+            "value" : "Imagen"
           }
         },
         "ja" : {
@@ -8028,8 +8028,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Video"
+            "state" : "translated",
+            "value" : "Vídeo"
           }
         },
         "ja" : {
@@ -8068,8 +8068,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download %lld Audio"
+            "state" : "translated",
+            "value" : "Descargar audio de %lld"
           }
         },
         "ja" : {
@@ -8108,8 +8108,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download %lld Files"
+            "state" : "translated",
+            "value" : "Descargar %lld archivos"
           }
         },
         "ja" : {
@@ -8148,8 +8148,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download 1 File"
+            "state" : "translated",
+            "value" : "Descargar 1 archivo"
           }
         },
         "ja" : {
@@ -8188,8 +8188,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download %lld Images"
+            "state" : "translated",
+            "value" : "Descargar %lld imágenes"
           }
         },
         "ja" : {
@@ -8228,8 +8228,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download 1 Image"
+            "state" : "translated",
+            "value" : "Descargar 1 imagen"
           }
         },
         "ja" : {
@@ -8268,8 +8268,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download %lld Items"
+            "state" : "translated",
+            "value" : "Descargar %lld elementos"
           }
         },
         "ja" : {
@@ -8308,8 +8308,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download 1 Item"
+            "state" : "translated",
+            "value" : "Descargar 1 elemento"
           }
         },
         "ja" : {
@@ -8348,8 +8348,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download %lld Videos"
+            "state" : "translated",
+            "value" : "Descargar %lld vídeos"
           }
         },
         "ja" : {
@@ -8388,8 +8388,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download 1 Video"
+            "state" : "translated",
+            "value" : "Descargar 1 vídeo"
           }
         },
         "ja" : {
@@ -8428,8 +8428,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "No supported items were found for this URL."
+            "state" : "translated",
+            "value" : "No se han encontrado elementos compatibles en esta URL."
           }
         },
         "ja" : {
@@ -8468,7 +8468,7 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Audio"
           }
         },
@@ -8508,8 +8508,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "File"
+            "state" : "translated",
+            "value" : "Archivo"
           }
         },
         "ja" : {
@@ -8548,8 +8548,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Image"
+            "state" : "translated",
+            "value" : "Imagen"
           }
         },
         "ja" : {
@@ -8588,8 +8588,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Video"
+            "state" : "translated",
+            "value" : "Vídeo"
           }
         },
         "ja" : {
@@ -8628,8 +8628,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Deselect All"
+            "state" : "translated",
+            "value" : "Deseleccionar todo"
           }
         },
         "ja" : {
@@ -8668,8 +8668,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Select All"
+            "state" : "translated",
+            "value" : "Seleccionar todo"
           }
         },
         "ja" : {
@@ -8708,8 +8708,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Select Audio"
+            "state" : "translated",
+            "value" : "Seleccionar audio"
           }
         },
         "ja" : {
@@ -8748,8 +8748,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Select Files"
+            "state" : "translated",
+            "value" : "Seleccionar archivos"
           }
         },
         "ja" : {
@@ -8788,8 +8788,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Select Images"
+            "state" : "translated",
+            "value" : "Seleccionar imágenes"
           }
         },
         "ja" : {
@@ -8828,8 +8828,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Select Items"
+            "state" : "translated",
+            "value" : "Seleccionar elementos"
           }
         },
         "ja" : {
@@ -8868,8 +8868,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Select Videos"
+            "state" : "translated",
+            "value" : "Seleccionar vídeos"
           }
         },
         "ja" : {
@@ -8908,8 +8908,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Preview unavailable"
+            "state" : "translated",
+            "value" : "Vista previa no disponible"
           }
         },
         "ja" : {
@@ -8948,8 +8948,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Downloading Gallery"
+            "state" : "translated",
+            "value" : "Descargando galería"
           }
         },
         "ja" : {
@@ -8988,8 +8988,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Downloading Gallery %1$lld of %2$lld"
+            "state" : "translated",
+            "value" : "Descargando galería %1$lld de %2$lld"
           }
         },
         "ja" : {
@@ -9028,8 +9028,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Resolving items..."
+            "state" : "translated",
+            "value" : "Resolviendo elementos..."
           }
         },
         "ja" : {
@@ -9068,8 +9068,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Downloaded links will appear here."
+            "state" : "translated",
+            "value" : "Los enlaces descargados aparecerán aquí."
           }
         },
         "ja" : {
@@ -9108,8 +9108,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "No history yet"
+            "state" : "translated",
+            "value" : "Aún no hay historial"
           }
         },
         "ja" : {
@@ -9148,8 +9148,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Open link history"
+            "state" : "translated",
+            "value" : "Abrir historial de enlaces"
           }
         },
         "ja" : {
@@ -9188,8 +9188,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Link History"
+            "state" : "translated",
+            "value" : "Historial de enlaces"
           }
         },
         "ja" : {
@@ -9228,8 +9228,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Actions"
+            "state" : "translated",
+            "value" : "Acciones"
           }
         },
         "ja" : {
@@ -9268,8 +9268,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Please wait while package updates are installed."
+            "state" : "translated",
+            "value" : "Por favor espera hasta que las actualizaciones de los paquetes se instalen."
           }
         },
         "ja" : {
@@ -9308,8 +9308,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Updating: %@"
+            "state" : "translated",
+            "value" : "Actualizando: %@"
           }
         },
         "ja" : {
@@ -9348,8 +9348,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Updating packages"
+            "state" : "translated",
+            "value" : "Actualizando paquetes"
           }
         },
         "ja" : {
@@ -9388,8 +9388,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Check for Updates"
+            "state" : "translated",
+            "value" : "Buscar actualizaciones"
           }
         },
         "ja" : {
@@ -9428,8 +9428,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Add Custom Package"
+            "state" : "translated",
+            "value" : "Añadir paquete personalizado"
           }
         },
         "ja" : {
@@ -9468,8 +9468,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Add and Install"
+            "state" : "translated",
+            "value" : "Añadir e instalar"
           }
         },
         "ja" : {
@@ -9508,8 +9508,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Enter a pip package name. The package will be installed now and managed during future updates."
+            "state" : "translated",
+            "value" : "Inserta un nombre de paquete pip. El paquete se instalará ahora y se gestionará durante futuras actualizaciones."
           }
         },
         "ja" : {
@@ -9548,8 +9548,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Package name"
+            "state" : "translated",
+            "value" : "Nombre del paquete"
           }
         },
         "ja" : {
@@ -9588,8 +9588,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Add Custom Package"
+            "state" : "translated",
+            "value" : "Añadir paquete personalizado"
           }
         },
         "ja" : {
@@ -9628,8 +9628,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Select a version to update or downgrade. Use the lock button to keep a package on that version during future updates."
+            "state" : "translated",
+            "value" : "Selecciona una versión para actualizar o degradar. Usa el botón de bloqueo para mantener el paquete en una versión durante futuras actualizaciones."
           }
         },
         "ja" : {
@@ -9668,8 +9668,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Lock %@ to selected version"
+            "state" : "translated",
+            "value" : "Bloquear %@ a la versión seleccionada"
           }
         },
         "ja" : {
@@ -9708,8 +9708,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Stop managing %@"
+            "state" : "translated",
+            "value" : "Parar de gestionar %@"
           }
         },
         "ja" : {
@@ -9748,8 +9748,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Version Source"
+            "state" : "translated",
+            "value" : "Origen de versión"
           }
         },
         "ja" : {
@@ -9788,8 +9788,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Uses pip index versions for each package."
+            "state" : "translated",
+            "value" : "Usa versiones índice de pip para cada paquete."
           }
         },
         "ja" : {
@@ -9828,8 +9828,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Target Versions"
+            "state" : "translated",
+            "value" : "Versión objetiva"
           }
         },
         "ja" : {
@@ -9868,8 +9868,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Custom Update"
+            "state" : "translated",
+            "value" : "Actualización personalizada"
           }
         },
         "ja" : {
@@ -9908,8 +9908,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Unlock %@"
+            "state" : "translated",
+            "value" : "Desbloquear %@"
           }
         },
         "ja" : {
@@ -9948,8 +9948,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Installed Versions"
+            "state" : "translated",
+            "value" : "Versiones instaladas"
           }
         },
         "ja" : {
@@ -9988,8 +9988,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Latest"
+            "state" : "translated",
+            "value" : "Última"
           }
         },
         "ja" : {
@@ -10028,8 +10028,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Loading versions..."
+            "state" : "translated",
+            "value" : "Cargando versiones..."
           }
         },
         "ja" : {
@@ -10068,8 +10068,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Locked Versions"
+            "state" : "translated",
+            "value" : "Bloquear versiones"
           }
         },
         "ja" : {
@@ -10428,8 +10428,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Restore Pip Packages?"
+            "state" : "translated",
+            "value" : "¿Restaurar paquetes pip?"
           }
         },
         "ja" : {
@@ -10508,8 +10508,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Active source: %@"
+            "state" : "translated",
+            "value" : "Fuente activa: %@"
           }
         },
         "ja" : {
@@ -10548,8 +10548,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Custom"
+            "state" : "translated",
+            "value" : "Personalizado"
           }
         },
         "ja" : {
@@ -10588,8 +10588,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Add at least one custom package requirement before updating."
+            "state" : "translated",
+            "value" : "Añade al menos un requisito de paquete personalizado antes de actualizar."
           }
         },
         "ja" : {
@@ -10628,8 +10628,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Enter one pip requirement per line. Requirement pins, package names, and package @ URL specs are supported."
+            "state" : "translated",
+            "value" : "Introduzca un requisito de pip por línea. Se admiten los requerimientos de pins, nombres de paquetes y especificaciones de paquete @ URL."
           }
         },
         "ja" : {
@@ -10668,8 +10668,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Reset to Palladium Default"
+            "state" : "translated",
+            "value" : "Restablecer Palladium a por defecto"
           }
         },
         "ja" : {
@@ -10708,8 +10708,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Custom Requirements"
+            "state" : "translated",
+            "value" : "Requisitos personalizados"
           }
         },
         "ja" : {
@@ -10748,8 +10748,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Installs the package requirements listed below and skips the built-in webkit-js patch."
+            "state" : "translated",
+            "value" : "Instalar los requisitos del paquete listados debajo y saltar los parches webkit-js incorporados."
           }
         },
         "ja" : {
@@ -10788,7 +10788,7 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Nightly"
           }
         },
@@ -10828,8 +10828,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Enable Nightly"
+            "state" : "translated",
+            "value" : "Activar Nightly"
           }
         },
         "ja" : {
@@ -10868,8 +10868,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Uses prerelease package versions when pip offers them."
+            "state" : "translated",
+            "value" : "Usar versiones prelanzamiento de paquetes cuando pip los ofrece."
           }
         },
         "ja" : {
@@ -10908,8 +10908,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Nightly packages may be unstable or break downloads. You can switch back to stable packages at any time."
+            "state" : "translated",
+            "value" : "Los paquetes Nightly pueden ser inestables o romper las descargas. Puedes cambiar de vuelta a paquetes estables en cualquier momento."
           }
         },
         "ja" : {
@@ -10948,8 +10948,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Use Nightly Packages?"
+            "state" : "translated",
+            "value" : "¿Usar paquetes Nightly?"
           }
         },
         "ja" : {
@@ -10988,8 +10988,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Package Source"
+            "state" : "translated",
+            "value" : "Origen del paquete"
           }
         },
         "ja" : {
@@ -11028,8 +11028,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Stable"
+            "state" : "translated",
+            "value" : "Estable"
           }
         },
         "ja" : {
@@ -11068,8 +11068,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Uses the default stable package releases from pip."
+            "state" : "translated",
+            "value" : "Usa el los lanzamientos de paquete estable por defecto de pip."
           }
         },
         "ja" : {
@@ -11108,8 +11108,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Package Source"
+            "state" : "translated",
+            "value" : "Origen del paquete"
           }
         },
         "ja" : {
@@ -11148,8 +11148,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Checking versions..."
+            "state" : "translated",
+            "value" : "Comprobando versiones..."
           }
         },
         "ja" : {
@@ -11188,8 +11188,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Installing payload bundle..."
+            "state" : "translated",
+            "value" : "Instalando paquete de payload..."
           }
         },
         "ja" : {
@@ -11228,8 +11228,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Loading package versions..."
+            "state" : "translated",
+            "value" : "Cargando versiones de los paquetes..."
           }
         },
         "ja" : {
@@ -11268,8 +11268,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Removing package..."
+            "state" : "translated",
+            "value" : "Quitando paquete..."
           }
         },
         "ja" : {
@@ -11308,8 +11308,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Restoring pip packages..."
+            "state" : "translated",
+            "value" : "Restableciendo paquetes de pip..."
           }
         },
         "ja" : {
@@ -11348,8 +11348,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Running..."
+            "state" : "translated",
+            "value" : "Ejecutandose..."
           }
         },
         "ja" : {
@@ -11388,8 +11388,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Status"
+            "state" : "translated",
+            "value" : "Estado"
           }
         },
         "ja" : {
@@ -11428,8 +11428,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Updating packages..."
+            "state" : "translated",
+            "value" : "Actualizando paquetes..."
           }
         },
         "ja" : {
@@ -11468,8 +11468,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "status: %@"
+            "state" : "translated",
+            "value" : "estado: %@"
           }
         },
         "ja" : {
@@ -11508,8 +11508,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Updates not checked yet."
+            "state" : "translated",
+            "value" : "No se han buscado actualizaciones todavía."
           }
         },
         "ja" : {
@@ -11548,8 +11548,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Update Summary"
+            "state" : "translated",
+            "value" : "Actualizar resumen"
           }
         },
         "ja" : {
@@ -11588,8 +11588,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "package manager"
+            "state" : "translated",
+            "value" : "gestor de paquetes"
           }
         },
         "ja" : {
@@ -11628,8 +11628,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Update Packages"
+            "state" : "translated",
+            "value" : "Actualizar paquetes"
           }
         },
         "ja" : {
@@ -11668,8 +11668,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Long press Update Packages to set custom package versions."
+            "state" : "translated",
+            "value" : "Mantén presionado Actualizar Paquetes para establecer una versión de paquete personalizado."
           }
         },
         "ja" : {
@@ -11708,8 +11708,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Import image into Photos library"
+            "state" : "translated",
+            "value" : "Importar imágenes en la galería de Fotos"
           }
         },
         "ja" : {
@@ -11748,8 +11748,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Import video into Photos library"
+            "state" : "translated",
+            "value" : "Importar vídeo a la galería de Fotos"
           }
         },
         "ja" : {
@@ -11788,8 +11788,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Save to Photos"
+            "state" : "translated",
+            "value" : "Guardar en Fotos"
           }
         },
         "ja" : {
@@ -11828,8 +11828,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Checking compatibility..."
+            "state" : "translated",
+            "value" : "Comprobando compatibilidad..."
           }
         },
         "ja" : {
@@ -11868,8 +11868,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Could not verify media compatibility."
+            "state" : "translated",
+            "value" : "No se puedo verificar la compatibilidad con el\nmedio."
           }
         },
         "ja" : {
@@ -11908,8 +11908,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Video codec must be H.264 or H.265."
+            "state" : "translated",
+            "value" : "El códec del vídeo debe ser H.264 o H.265."
           }
         },
         "ja" : {
@@ -11948,8 +11948,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "iOS Photos cannot import this file: %@"
+            "state" : "translated",
+            "value" : "Fotos no puede importar este archivo: %@"
           }
         },
         "ja" : {
@@ -11988,8 +11988,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Failed to inspect media codec."
+            "state" : "translated",
+            "value" : "Error al inspeccionar el códec del medio."
           }
         },
         "ja" : {
@@ -12028,8 +12028,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Every file in this group must be compatible with Photos."
+            "state" : "translated",
+            "value" : "Cada archivo de este grupo debe ser compatible con Fotos."
           }
         },
         "ja" : {
@@ -12068,8 +12068,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "No video track found."
+            "state" : "translated",
+            "value" : "No se encontró una pista de vídeo."
           }
         },
         "ja" : {
@@ -12108,8 +12108,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Photo library permission was denied."
+            "state" : "translated",
+            "value" : "El permiso de fotos ha sido denegado."
           }
         },
         "ja" : {
@@ -12148,8 +12148,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Failed to save to Photos: %@"
+            "state" : "translated",
+            "value" : "Error al guardar en Fotos. %@"
           }
         },
         "ja" : {
@@ -12188,8 +12188,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Photos is only available for a single media file."
+            "state" : "translated",
+            "value" : "Fotos solo tiene disponible un archivo de medio."
           }
         },
         "ja" : {
@@ -12228,8 +12228,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Unsupported format (%@)."
+            "state" : "translated",
+            "value" : "Formato no soportado (%@)."
           }
         },
         "ja" : {
@@ -12268,8 +12268,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Unsupported image format (%@)."
+            "state" : "translated",
+            "value" : "Formato de imagen no soportado (%@)."
           }
         },
         "ja" : {
@@ -12308,8 +12308,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Audio and other files cannot be saved to Photos."
+            "state" : "translated",
+            "value" : "Audio y otros archivos no puede guardarse en Fotos."
           }
         },
         "ja" : {
@@ -12348,8 +12348,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Only MP4, MOV, or M4V can be saved."
+            "state" : "translated",
+            "value" : "Solo MP4, MOV o M4V puede guardarse."
           }
         },
         "ja" : {
@@ -12388,8 +12388,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Saved to Photos"
+            "state" : "translated",
+            "value" : "Guardado en Fotos"
           }
         },
         "ja" : {
@@ -12428,8 +12428,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Keep the whole download folder in Palladium/Saved"
+            "state" : "translated",
+            "value" : "Mantener toda la carpeta de descarga en Palladium/Saved"
           }
         },
         "ja" : {
@@ -12468,8 +12468,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Keep a copy in Palladium/Saved"
+            "state" : "translated",
+            "value" : "Mantener una copia en Palladium/Saved"
           }
         },
         "ja" : {
@@ -12508,8 +12508,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Save to App Folder"
+            "state" : "translated",
+            "value" : "Guardar a la carpeta de la app"
           }
         },
         "ja" : {
@@ -12548,8 +12548,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Share every downloaded file"
+            "state" : "translated",
+            "value" : "Compartir cada archivo descargado"
           }
         },
         "ja" : {
@@ -12588,8 +12588,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Share All"
+            "state" : "translated",
+            "value" : "Compartir todo"
           }
         },
         "ja" : {
@@ -12628,8 +12628,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Share or save with other apps"
+            "state" : "translated",
+            "value" : "Compartir o guardar con otras apps"
           }
         },
         "ja" : {
@@ -12668,8 +12668,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Open Share Sheet"
+            "state" : "translated",
+            "value" : "Abrir hoja de compartir"
           }
         },
         "ja" : {
@@ -12708,8 +12708,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Skip"
+            "state" : "translated",
+            "value" : "Saltar"
           }
         },
         "ja" : {
@@ -12748,8 +12748,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "The source service could not be determined from the download address."
+            "state" : "translated",
+            "value" : "No se ha podido determinar el servicio del origen a partir de la dirección de descarga."
           }
         },
         "ja" : {
@@ -12788,8 +12788,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "No downloaded files were available."
+            "state" : "translated",
+            "value" : "No había archivos para descargar."
           }
         },
         "ja" : {
@@ -12828,8 +12828,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Failed to save to app folder: %@"
+            "state" : "translated",
+            "value" : "Error al guardar en la carpeta de la app: %@"
           }
         },
         "ja" : {
@@ -12868,8 +12868,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Choose what to do with the downloaded files."
+            "state" : "translated",
+            "value" : "Escoge que hacer con los archivos descargados."
           }
         },
         "ja" : {
@@ -12908,8 +12908,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Choose what to do with these %lld downloaded files."
+            "state" : "translated",
+            "value" : "Escoge que hacer con estos %lld archivos descargados."
           }
         },
         "ja" : {
@@ -12948,8 +12948,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Choose what to do with the downloaded file."
+            "state" : "translated",
+            "value" : "Escoge que hacer con este archivo descargado."
           }
         },
         "ja" : {
@@ -12988,8 +12988,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download Complete"
+            "state" : "translated",
+            "value" : "Descarga completada"
           }
         },
         "ja" : {
@@ -13028,8 +13028,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Audio Downloaded"
+            "state" : "translated",
+            "value" : "Audio descargado"
           }
         },
         "ja" : {
@@ -13068,8 +13068,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Files Downloaded"
+            "state" : "translated",
+            "value" : "Archivos descargados"
           }
         },
         "ja" : {
@@ -13108,8 +13108,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Images Downloaded"
+            "state" : "translated",
+            "value" : "Imágenes descargadas"
           }
         },
         "ja" : {
@@ -13148,8 +13148,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Videos Downloaded"
+            "state" : "translated",
+            "value" : "Vídeos descargados"
           }
         },
         "ja" : {
@@ -13188,8 +13188,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Saved to app folder: %@"
+            "state" : "translated",
+            "value" : "Guardado a la carpeta de la app: %@"
           }
         },
         "ja" : {
@@ -13228,8 +13228,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Saved folder: %@"
+            "state" : "translated",
+            "value" : "Carpeta guardada: %@"
           }
         },
         "ja" : {
@@ -13268,8 +13268,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Add Links"
+            "state" : "translated",
+            "value" : "Añadir enlaces"
           }
         },
         "ja" : {
@@ -13308,8 +13308,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Finish the current operation before starting the queue."
+            "state" : "translated",
+            "value" : "Termina la operación actual antes de empezar la cola."
           }
         },
         "ja" : {
@@ -13348,8 +13348,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Clear Finished"
+            "state" : "translated",
+            "value" : "Cola vaciada correctamente"
           }
         },
         "ja" : {
@@ -13388,8 +13388,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Current"
+            "state" : "translated",
+            "value" : "Actual"
           }
         },
         "ja" : {
@@ -13428,8 +13428,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Add one link per line to create a download queue."
+            "state" : "translated",
+            "value" : "Añade un link por línea para crear una cola de descarga."
           }
         },
         "ja" : {
@@ -13468,8 +13468,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "No queued links"
+            "state" : "translated",
+            "value" : "No hay enlaces en la cola"
           }
         },
         "ja" : {
@@ -13508,8 +13508,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Finished"
+            "state" : "translated",
+            "value" : "Terminado"
           }
         },
         "ja" : {
@@ -13548,8 +13548,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Images uses an item picker and cannot be queued yet. Choose another download mode."
+            "state" : "translated",
+            "value" : "Las imágenes usan un selector de elementos y no pueden estar en cola todavía. Escoge otro modo de descarga."
           }
         },
         "ja" : {
@@ -13588,8 +13588,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Blank lines are ignored. Links are kept in the order entered."
+            "state" : "translated",
+            "value" : "Los enlaces en blanco se ignoran. Se mantienen en orden con los que se han insertado."
           }
         },
         "ja" : {
@@ -13628,8 +13628,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "https://example.com/video-one\nhttps://example.com/video-two"
+            "state" : "translated",
+            "value" : "https://ejemplo.es/video-uno\nhttps://ejemplo.es/video-dos"
           }
         },
         "ja" : {
@@ -13668,8 +13668,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Links"
+            "state" : "translated",
+            "value" : "Enlaces"
           }
         },
         "ja" : {
@@ -13708,8 +13708,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Open download queue"
+            "state" : "translated",
+            "value" : "Abrir cola de descarga"
           }
         },
         "ja" : {
@@ -13748,8 +13748,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Pause After Current"
+            "state" : "translated",
+            "value" : "Pausar después del actual"
           }
         },
         "ja" : {
@@ -13788,8 +13788,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Pausing lets the current item finish and prevents the next one from starting."
+            "state" : "translated",
+            "value" : "La pausa deja que el elemento termine y previene que el siguiente empiece."
           }
         },
         "ja" : {
@@ -13828,8 +13828,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Pending"
+            "state" : "translated",
+            "value" : "Pendiente"
           }
         },
         "ja" : {
@@ -13869,8 +13869,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Pick Quality and Start Download"
+            "state" : "translated",
+            "value" : "Escoger calidad y empezar descarga"
           }
         },
         "ja" : {
@@ -13909,8 +13909,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Queue %lld of %lld"
+            "state" : "translated",
+            "value" : "Cola %lld de %lld"
           }
         },
         "ja" : {
@@ -14150,8 +14150,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Retry"
+            "state" : "translated",
+            "value" : "Reintentar"
           }
         },
         "ja" : {
@@ -14190,8 +14190,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "New links will use the current %@ options."
+            "state" : "translated",
+            "value" : "Los enlaces nuevos usarán las %@ opciones actuales."
           }
         },
         "ja" : {
@@ -14231,8 +14231,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Start Download"
+            "state" : "translated",
+            "value" : "Iniciar descarga"
           }
         },
         "ja" : {
@@ -14271,8 +14271,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Waiting for action"
+            "state" : "translated",
+            "value" : "Esperando acción"
           }
         },
         "ja" : {
@@ -14311,8 +14311,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Cancelled"
+            "state" : "translated",
+            "value" : "Cancelado"
           }
         },
         "ja" : {
@@ -14351,8 +14351,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Failed"
+            "state" : "translated",
+            "value" : "Error"
           }
         },
         "ja" : {
@@ -14391,8 +14391,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Partially completed"
+            "state" : "translated",
+            "value" : "Parcialmente completado"
           }
         },
         "ja" : {
@@ -14431,8 +14431,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Pending"
+            "state" : "translated",
+            "value" : "Pendiente"
           }
         },
         "ja" : {
@@ -14471,8 +14471,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Downloading"
+            "state" : "translated",
+            "value" : "Descargando"
           }
         },
         "ja" : {
@@ -14511,8 +14511,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Completed"
+            "state" : "translated",
+            "value" : "Completado"
           }
         },
         "ja" : {
@@ -14551,8 +14551,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download Queue"
+            "state" : "translated",
+            "value" : "Descargar cola"
           }
         },
         "ja" : {
@@ -14577,26 +14577,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "下载队列"
-          }
-        }
-      }
-    },
-    "settings.about.coffee.subtitle" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Support Palladium on Ko-fi"
-          }
-        }
-      }
-    },
-    "settings.about.coffee.title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Buy Me a Coffee"
           }
         }
       }
@@ -15641,46 +15621,6 @@
         }
       }
     },
-    "settings.download_behavior.auto_paste.help" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Checks the clipboard for a link when you open Palladium and starts a download with the selected mode. Ask shows the download mode picker. iOS may ask for permission to paste."
-          }
-        }
-      }
-    },
-    "settings.download_behavior.auto_paste.mode" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Download mode"
-          }
-        }
-      }
-    },
-    "settings.download_behavior.auto_paste.section" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Auto Paste Link"
-          }
-        }
-      }
-    },
-    "settings.download_behavior.auto_paste.toggle" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Auto paste link"
-          }
-        }
-      }
-    },
     "settings.download_behavior.background.bundle_id" : {
       "localizations" : {
         "en" : {
@@ -15931,8 +15871,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Downloading %@..."
+            "state" : "translated",
+            "value" : "Descargando %@..."
           }
         },
         "ja" : {
@@ -15971,8 +15911,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Couldn't create the patched IPA: %@"
+            "state" : "translated",
+            "value" : "No se pudo crear el IPA parcheado: %@"
           }
         },
         "ja" : {
@@ -16011,8 +15951,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "The downloaded file isn't a Palladium IPA that can be patched."
+            "state" : "translated",
+            "value" : "El archivo descargado no es un IPA de Palladium que puede ser parcheado."
           }
         },
         "ja" : {
@@ -16051,8 +15991,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "The latest Palladium release has no .ipa file."
+            "state" : "translated",
+            "value" : "La última versión de Palladium no tiene un archivo .ipa."
           }
         },
         "ja" : {
@@ -16091,8 +16031,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Patching IPA..."
+            "state" : "translated",
+            "value" : "Parcheando IPA..."
           }
         },
         "ja" : {
@@ -16131,8 +16071,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Background downloads work on this install."
+            "state" : "translated",
+            "value" : "Las descargas de fondo funcionan en esta instalación."
           }
         },
         "ja" : {
@@ -16171,8 +16111,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Background downloads don't work on this install."
+            "state" : "translated",
+            "value" : "Las descargas de fondo no funcionan en esta instalación."
           }
         },
         "ja" : {
@@ -16211,8 +16151,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Background Downloads"
+            "state" : "translated",
+            "value" : "Descargas de fondo"
           }
         },
         "ja" : {
@@ -16251,8 +16191,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Adds a link to history when a download starts, so failed, cancelled, or interrupted downloads remain available. Link history must be enabled."
+            "state" : "translated",
+            "value" : "Añade un enlace al historial cuando se inicia una descarga, por lo que las descargas fallidas, canceladas o interrumpidas permanecen disponibles. El historial de enlaces debe estar habilitado."
           }
         },
         "ja" : {
@@ -16291,8 +16231,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Save unfinished downloads to history"
+            "state" : "translated",
+            "value" : "Guardar descargas sin acabar al historial"
           }
         },
         "ja" : {
@@ -16331,8 +16271,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Retry Failed Downloads"
+            "state" : "translated",
+            "value" : "Reintentar descargas fallidas"
           }
         },
         "ja" : {
@@ -16371,8 +16311,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Paste, history, retry, and progress behavior"
+            "state" : "translated",
+            "value" : "Pegar, historial, reintento, y comportamiento del progreso"
           }
         },
         "ja" : {
@@ -16411,8 +16351,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download Behavior"
+            "state" : "translated",
+            "value" : "Comportamimeto de descarga"
           }
         },
         "ja" : {
@@ -16451,8 +16391,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Use Cookies"
+            "state" : "translated",
+            "value" : "Usar cookies"
           }
         },
         "ja" : {
@@ -16491,8 +16431,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Default Values"
+            "state" : "translated",
+            "value" : "Valores por defecto"
           }
         },
         "ja" : {
@@ -16531,8 +16471,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download Playlist"
+            "state" : "translated",
+            "value" : "Descargar lista de reproducción"
           }
         },
         "ja" : {
