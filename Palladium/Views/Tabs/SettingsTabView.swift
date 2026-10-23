@@ -187,8 +187,29 @@ struct SettingsTabView: View {
             }
 
             Section(header: Text("settings.about.title")) {
+                buyMeACoffeeLink
                 settingsNavigationLink(for: .about)
             }
+        }
+    }
+
+    @ViewBuilder
+    private var buyMeACoffeeLink: some View {
+        if let kofiURL = URL(string: "https://ko-fi.com/tfourj") {
+            Link(destination: kofiURL) {
+                HStack {
+                    settingsRow(
+                        title: String(localized: "settings.about.coffee.title", bundle: .app),
+                        subtitle: String(localized: "settings.about.coffee.subtitle", bundle: .app),
+                        icon: "cup.and.saucer.fill",
+                        color: .brown
+                    )
+                    Spacer()
+                    Image(systemName: "arrow.up.right.square")
+                        .foregroundStyle(.blue)
+                }
+            }
+            .buttonStyle(.plain)
         }
     }
 
