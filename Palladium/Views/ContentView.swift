@@ -56,6 +56,10 @@ struct ContentView: View {
     static let shareSheetDownloadModeDefaultsKey = "palladium.shareSheetDownloadMode"
     static let showShareSheetFormatButtonDefaultsKey = "palladium.showShareSheetFormatButton"
     static let showShareSheetFillURLButtonDefaultsKey = "palladium.showShareSheetFillURLButton"
+    static let autoPasteLinkEnabledDefaultsKey = "palladium.autoPasteLinkEnabled"
+    static let autoPasteDownloadModeDefaultsKey = "palladium.autoPasteDownloadMode"
+    static let autoPasteLastChangeCountDefaultsKey = "palladium.autoPasteLastChangeCount"
+    static let autoPasteLastLinkDefaultsKey = "palladium.autoPasteLastLink"
     static let downloadPlaylistDefaultsKey = "palladium.downloadPlaylist"
     static let downloadSubtitlesDefaultsKey = "palladium.downloadSubtitles"
     static let embedThumbnailDefaultsKey = "palladium.embedThumbnail"
@@ -111,6 +115,8 @@ struct ContentView: View {
     @State var shareSheetDownloadMode: ShareSheetDownloadMode
     @State var showShareSheetFormatButton: Bool
     @State var showShareSheetFillURLButton: Bool
+    @State var autoPasteLinkEnabled: Bool
+    @State var autoPasteDownloadMode: ShareSheetDownloadMode
     @State var downloadPlaylist: Bool
     @State var downloadSubtitles: Bool
     @State var embedThumbnail: Bool
@@ -234,6 +240,10 @@ struct ContentView: View {
         _shareSheetDownloadMode = State(initialValue: Self.clampShareSheetMode(shareSheetDownloadMode, visiblePresets: visiblePresets))
         _showShareSheetFormatButton = State(initialValue: Self.loadShowShareSheetFormatButton())
         _showShareSheetFillURLButton = State(initialValue: Self.loadShowShareSheetFillURLButton())
+        _autoPasteLinkEnabled = State(initialValue: Self.loadAutoPasteLinkEnabled())
+        _autoPasteDownloadMode = State(
+            initialValue: Self.clampShareSheetMode(Self.loadAutoPasteDownloadMode(), visiblePresets: visiblePresets)
+        )
         let restoreDefaults = Self.loadRestoreDownloadDefaults()
         let defPlaylist = Self.loadDefaultDownloadPlaylist()
         let defSubtitles = Self.loadDefaultDownloadSubtitles()
@@ -361,6 +371,8 @@ struct ContentView: View {
                     notificationsEnabled: $notificationsEnabled,
                     rememberSelectedPreset: $rememberSelectedPreset,
                     autoDownloadOnPaste: $autoDownloadOnPaste,
+                    autoPasteLinkEnabled: $autoPasteLinkEnabled,
+                    autoPasteDownloadMode: $autoPasteDownloadMode,
                     autoRetryFailedDownloads: $autoRetryFailedDownloads,
                     saveIncompleteDownloadsToHistory: $saveIncompleteDownloadsToHistory,
                     detailedProgressEnabled: $detailedProgressEnabled,
@@ -479,6 +491,9 @@ struct ContentView: View {
             if let mode = shareSheetDownloadMode.preset, !visiblePresets.contains(mode) {
                 shareSheetDownloadMode = .ask
             }
+            if let mode = autoPasteDownloadMode.preset, !visiblePresets.contains(mode) {
+                autoPasteDownloadMode = .ask
+            }
             persistPreferences()
         }
         .onChange(of: afterDownloadBehavior, initial: false) {
@@ -507,6 +522,12 @@ struct ContentView: View {
             persistPreferences()
         }
         .onChange(of: showShareSheetFillURLButton, initial: false) {
+            persistPreferences()
+        }
+        .onChange(of: autoPasteLinkEnabled, initial: false) {
+            persistPreferences()
+        }
+        .onChange(of: autoPasteDownloadMode, initial: false) {
             persistPreferences()
         }
         .onChange(of: downloadPlaylist, initial: false) {
@@ -674,9 +695,13 @@ struct ContentView: View {
             }
         }
         .onChange(of: scenePhase, initial: true) { _, newPhase in
+            if newPhase == .background {
+                rememberClipboardChangeCount()
+            }
             guard newPhase == .active else { return }
             syncIdleTimerDisabled()
             consumePendingShortcutDownloadRequestIfNeeded()
+            checkClipboardForAutoPasteLink()
         }
         .onOpenURL { incomingURL in
             handleIncomingURL(incomingURL)

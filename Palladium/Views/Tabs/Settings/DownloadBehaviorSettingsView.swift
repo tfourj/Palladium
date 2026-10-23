@@ -2,10 +2,13 @@ import SwiftUI
 
 struct DownloadBehaviorSettingsView: View {
     @Binding var autoDownloadOnPaste: Bool
+    @Binding var autoPasteLinkEnabled: Bool
+    @Binding var autoPasteDownloadMode: ShareSheetDownloadMode
     @Binding var autoRetryFailedDownloads: Bool
     @Binding var saveIncompleteDownloadsToHistory: Bool
     @Binding var detailedProgressEnabled: Bool
 
+    let downloadPresetSettings: [DownloadPresetSetting]
     let isRunning: Bool
 
     var body: some View {
@@ -17,6 +20,25 @@ struct DownloadBehaviorSettingsView: View {
                 Text("settings.ui.paste.section")
             } footer: {
                 Text("settings.ui.paste.help")
+            }
+
+            Section {
+                Toggle("settings.download_behavior.auto_paste.toggle", isOn: $autoPasteLinkEnabled)
+                    .disabled(isRunning)
+
+                if autoPasteLinkEnabled {
+                    Picker("settings.download_behavior.auto_paste.mode", selection: $autoPasteDownloadMode) {
+                        ForEach(DownloadOptions.visibleShareSheetModes(from: downloadPresetSettings)) { mode in
+                            Text(mode.title).tag(mode)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .disabled(isRunning)
+                }
+            } header: {
+                Text("settings.download_behavior.auto_paste.section")
+            } footer: {
+                Text("settings.download_behavior.auto_paste.help")
             }
 
             Section {

@@ -15641,6 +15641,46 @@
         }
       }
     },
+    "settings.download_behavior.auto_paste.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Checks the clipboard for a link when you open Palladium and starts a download with the selected mode. Ask shows the download mode picker. iOS may ask for permission to paste."
+          }
+        }
+      }
+    },
+    "settings.download_behavior.auto_paste.mode" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download mode"
+          }
+        }
+      }
+    },
+    "settings.download_behavior.auto_paste.section" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auto Paste Link"
+          }
+        }
+      }
+    },
+    "settings.download_behavior.auto_paste.toggle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auto paste link"
+          }
+        }
+      }
+    },
     "settings.download_behavior.background.bundle_id" : {
       "localizations" : {
         "en" : {

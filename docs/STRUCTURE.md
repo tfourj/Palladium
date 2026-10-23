@@ -50,6 +50,7 @@ Palladium/
 | `Models/AppAppearanceMode.swift` | Appearance-mode setting model. |
 | `Models/AppLanguageSettings.swift` | Persisted app language, system-language resolution, and observable localization bundle. |
 | `Models/BackgroundDownloadProgress.swift` | Combines yt-dlp stream and ffmpeg progress into one fraction for the system background task UI. |
+| `Models/ClipboardLinkDetector.swift` | Finds the first web link in clipboard text for auto paste downloads. |
 | `Models/DownloadServiceDomain.swift` | Canonical source-service domain resolver for saved-download folders. |
 | `Models/WebsiteArgumentRule.swift` | Persisted per-website yt-dlp argument rules and link matching priority. |
 | `Models/DownloadOptions.swift` | Download option model and persisted settings. |
@@ -67,6 +68,7 @@ Palladium/
 | Path | Purpose |
 | --- | --- |
 | `Views/ContentView.swift` | Root UI, tab layout, and shared view state. |
+| `Views/ContentView+AutoPaste.swift` | Clipboard link checks that start downloads when the app opens. |
 | `Views/ContentView+Cookies.swift` | Cookie import and management UI logic. |
 | `Views/ContentView+DownloadFlow.swift` | Download initiation and progress flow. |
 | `Views/ContentView+DownloadQueue.swift` | Persistent sequential queue coordination and queue state actions. |
@@ -189,6 +191,7 @@ Palladium/
 | `scripts/swift_tests/DeveloperDiagnosticsTests.swift` | Developer diagnostic parsing plus native FFmpeg and QuickJS check tests. |
 | `scripts/swift_tests/BackgroundDownloadProgressTests.swift` | Background download stream ordering, side-file, processing, and playlist progress tests. |
 | `scripts/swift_tests/DownloadServiceDomainTests.swift` | Saved-download service-domain canonicalization tests. |
+| `scripts/swift_tests/ClipboardLinkDetectorTests.swift` | Clipboard text link detection tests for auto paste downloads. |
 | `scripts/swift_tests/WebsiteArgumentRuleTests.swift` | Website argument rule matching priority, normalization, and persistence tests. |
 | `scripts/swift_tests/DownloadQueueTests.swift` | Download queue parsing, state transition, ordering, and persistence tests. |
 | `scripts/swift_tests/YTDLPFormatTests.swift` | Resolved format selection, Photos compatibility, and exact download argument tests. |

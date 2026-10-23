@@ -77,6 +77,8 @@ struct SettingsTabView: View {
     @Binding var notificationsEnabled: Bool
     @Binding var rememberSelectedPreset: Bool
     @Binding var autoDownloadOnPaste: Bool
+    @Binding var autoPasteLinkEnabled: Bool
+    @Binding var autoPasteDownloadMode: ShareSheetDownloadMode
     @Binding var autoRetryFailedDownloads: Bool
     @Binding var saveIncompleteDownloadsToHistory: Bool
     @Binding var detailedProgressEnabled: Bool
@@ -280,9 +282,12 @@ struct SettingsTabView: View {
         case .downloadBehavior:
             DownloadBehaviorSettingsView(
                 autoDownloadOnPaste: $autoDownloadOnPaste,
+                autoPasteLinkEnabled: $autoPasteLinkEnabled,
+                autoPasteDownloadMode: $autoPasteDownloadMode,
                 autoRetryFailedDownloads: $autoRetryFailedDownloads,
                 saveIncompleteDownloadsToHistory: $saveIncompleteDownloadsToHistory,
                 detailedProgressEnabled: $detailedProgressEnabled,
+                downloadPresetSettings: downloadPresetSettings,
                 isRunning: isRunning
             )
         case .backgroundDownloads:
@@ -693,6 +698,32 @@ struct SettingsTabView: View {
                 subtitle: "settings.ui.paste.help"
             ) { title in
                 AnyView(searchToggle(title, isOn: $autoDownloadOnPaste, disabled: isRunning))
+            },
+            controlSetting(
+                id: "autoPasteLink",
+                menu: .downloadBehavior,
+                title: "settings.download_behavior.auto_paste.toggle",
+                subtitle: "settings.download_behavior.auto_paste.help"
+            ) { title in
+                AnyView(searchToggle(title, isOn: $autoPasteLinkEnabled, disabled: isRunning))
+            },
+            controlSetting(
+                id: "autoPasteDownloadMode",
+                menu: .downloadBehavior,
+                title: "settings.download_behavior.auto_paste.mode",
+                subtitle: "settings.download_behavior.auto_paste.help",
+                keywords: [String(localized: "settings.download_behavior.auto_paste.section", bundle: .app)]
+                    + ShareSheetDownloadMode.allCases.map(\.title)
+            ) { title in
+                AnyView(
+                    Picker(title, selection: $autoPasteDownloadMode) {
+                        ForEach(DownloadOptions.visibleShareSheetModes(from: downloadPresetSettings)) { mode in
+                            Text(mode.title).tag(mode)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .disabled(isRunning || !autoPasteLinkEnabled)
+                )
             },
             controlSetting(
                 id: "retryFailedDownloads",

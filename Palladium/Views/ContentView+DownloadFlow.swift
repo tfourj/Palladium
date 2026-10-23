@@ -898,9 +898,13 @@ extension ContentView {
             return
         }
 
+        appendConsoleText("[palladium] app opened via url scheme. link: \(sharedLink)\n")
+        routeExternalLink(sharedLink, mode: shareSheetDownloadMode)
+    }
+
+    func routeExternalLink(_ sharedLink: String, mode: ShareSheetDownloadMode) {
         selectedTab = .download
         urlText = sharedLink
-        appendConsoleText("[palladium] app opened via url scheme. link: \(sharedLink)\n")
 
         if isRunning {
             appendConsoleText("[palladium] download already running, queued link in input field only\n")
@@ -908,22 +912,22 @@ extension ContentView {
         }
 
         if isPackageRunning {
-            let presetToUse = shareSheetDownloadMode == .ask ? nil : shareSheetDownloadMode.preset ?? .autoVideo
+            let presetToUse = mode == .ask ? nil : mode.preset ?? .autoVideo
             queuePendingSharedDownload(sharedLink, preset: presetToUse)
-            if shareSheetDownloadMode == .ask {
+            if mode == .ask {
                 shareSheetURL = sharedLink
                 showShareSheetDownloadPicker = true
             }
             return
         }
 
-        if shareSheetDownloadMode == .ask {
+        if mode == .ask {
             shareSheetURL = sharedLink
             showShareSheetDownloadPicker = true
             return
         }
 
-        let presetToUse = shareSheetDownloadMode.preset ?? .autoVideo
+        let presetToUse = mode.preset ?? .autoVideo
         startDownloadFromSharedURL(sharedLink, preset: presetToUse)
     }
 
