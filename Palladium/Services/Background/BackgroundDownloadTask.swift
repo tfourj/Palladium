@@ -21,6 +21,8 @@ final class BackgroundDownloadTask {
     private static let progressUnitCount: Int64 = 1_000_000
     /// Steps such as embedding a thumbnail report no progress, and the system expires tasks that look stalled.
     private static let heartbeatInterval: Duration = .seconds(3)
+    /// Verbose progress lines can arrive many times a second, faster than the system UI needs to redraw.
+    private static let subtitleUpdateInterval: Duration = .seconds(1)
 
     private var continuedTask: BGTask?
     private var submittedIdentifier: String?
@@ -31,6 +33,7 @@ final class BackgroundDownloadTask {
     private var defaultSubtitle = ""
     private var wantedSubtitle = ""
     private var displayedSubtitle = ""
+    private var lastSubtitleUpdate: ContinuousClock.Instant?
     private var currentFraction: Double = 0
     private var log: (String) -> Void = { _ in }
     private var onStop: () -> Void = {}
@@ -113,10 +116,20 @@ final class BackgroundDownloadTask {
         guard #available(iOS 26.0, *), let task = continuedTask as? BGContinuedProcessingTask else { return }
 
         task.progress.completedUnitCount = Int64(currentFraction * Double(task.progress.totalUnitCount))
-        if wantedSubtitle != displayedSubtitle {
-            displayedSubtitle = wantedSubtitle
-            task.updateTitle(Self.title, subtitle: wantedSubtitle)
+        showWantedSubtitle(on: task, force: false)
+    }
+
+    /// Shows the latest subtitle, at most once per update interval unless `force` is set.
+    @available(iOS 26.0, *)
+    private func showWantedSubtitle(on task: BGContinuedProcessingTask, force: Bool) {
+        guard wantedSubtitle != displayedSubtitle else { return }
+        let now = ContinuousClock.now
+        if !force, let lastSubtitleUpdate, now - lastSubtitleUpdate < Self.subtitleUpdateInterval {
+            return
         }
+        lastSubtitleUpdate = now
+        displayedSubtitle = wantedSubtitle
+        task.updateTitle(Self.title, subtitle: wantedSubtitle)
     }
 
     /// Ends background execution. When another queued download follows, the task is kept briefly so it can be reused.
@@ -187,6 +200,7 @@ final class BackgroundDownloadTask {
             }
         }
         update(fraction: currentFraction, subtitle: wantedSubtitle)
+        showWantedSubtitle(on: task, force: true)
         startHeartbeat()
         log("[palladium] background download task started\n")
     }
@@ -199,6 +213,7 @@ final class BackgroundDownloadTask {
                 try? await Task.sleep(for: Self.heartbeatInterval)
                 guard !Task.isCancelled else { return }
                 self?.advanceStalledProgress()
+                self?.showThrottledSubtitle()
             }
         }
     }
@@ -211,6 +226,12 @@ final class BackgroundDownloadTask {
             progress.completedUnitCount += 1
         }
         lastHeartbeatUnits = progress.completedUnitCount
+    }
+
+    /// Shows a subtitle that arrived during the throttle window and was not followed by another update.
+    private func showThrottledSubtitle() {
+        guard #available(iOS 26.0, *), let task = continuedTask as? BGContinuedProcessingTask else { return }
+        showWantedSubtitle(on: task, force: false)
     }
 
     private func stopHeartbeat() {
@@ -280,6 +301,7 @@ final class BackgroundDownloadTask {
             endLegacyTask()
         }
         displayedSubtitle = ""
+        lastSubtitleUpdate = nil
         currentFraction = 0
     }
 }
