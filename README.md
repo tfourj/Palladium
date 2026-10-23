@@ -74,6 +74,7 @@ Help translate Palladium on [Crowdin](https://crowdin.com/project/palladium).
 - [`yt-dlp`](https://github.com/yt-dlp/yt-dlp)
 - [`gallery-dl`](https://github.com/mikf/gallery-dl)
 - [`yt-dlp-apple-webkit-jsi`](https://github.com/grqz/yt-dlp-apple-webkit-jsi)
+- [`yt-dlp-ejs`](https://github.com/yt-dlp/ejs)
 - [`ffmpeg`](https://ffmpeg.org/)
 - [`PythonKit`](https://github.com/pvieito/PythonKit)
 - [`python-apple-support`](https://github.com/beeware/Python-Apple-support)
