@@ -163,6 +163,7 @@ Palladium/
 | `Resources/Assets.xcassets/palladium_light.imageset/Contents.json` | Light logo metadata. |
 | `Resources/Assets.xcassets/palladium_light.imageset/palladium_light.png` | Light logo image. |
 | `Resources/Localizable.xcstrings` | Localized app strings. |
+| `Resources/Palladium.icon` | Icon Composer app icon. |
 
 ## Share Extension: `ShareExtension/`
 
