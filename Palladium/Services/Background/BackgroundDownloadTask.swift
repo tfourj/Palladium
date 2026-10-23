@@ -34,6 +34,9 @@ final class BackgroundDownloadTask {
     private var heartbeat: Task<Void, Never>?
     private var lastHeartbeatUnits: Int64 = -1
     private var reportedUnits: Int64 = -1
+    private var taskStartedAt: ContinuousClock.Instant?
+    private var lastProgressAt: ContinuousClock.Instant?
+    private var enteredBackgroundAt: ContinuousClock.Instant?
     private var defaultSubtitle = ""
     private var wantedSubtitle = ""
     private var displayedSubtitle = ""
@@ -42,7 +45,15 @@ final class BackgroundDownloadTask {
     private var log: (String) -> Void = { _ in }
     private var onStop: () -> Void = {}
 
-    private init() {}
+    private init() {
+        NotificationCenter.default.addObserver(
+            forName: UIApplication.didEnterBackgroundNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.enteredBackgroundAt = .now
+        }
+    }
 
     /// Whether this system supports continued processing tasks for downloads.
     static var isSupported: Bool {
@@ -126,6 +137,7 @@ final class BackgroundDownloadTask {
         let units = Int64(currentFraction * Double(task.progress.totalUnitCount))
         if units != reportedUnits {
             reportedUnits = units
+            lastProgressAt = .now
             task.progress.completedUnitCount = max(task.progress.completedUnitCount, units)
         }
         showWantedSubtitle(on: task, force: false)
@@ -227,6 +239,8 @@ final class BackgroundDownloadTask {
                 self?.handleContinuedTaskExpiration()
             }
         }
+        taskStartedAt = .now
+        lastProgressAt = .now
         update(fraction: currentFraction, subtitle: wantedSubtitle)
         showWantedSubtitle(on: task, force: true)
         startHeartbeat()
@@ -288,6 +302,7 @@ final class BackgroundDownloadTask {
         pendingEnd = nil
         stopHeartbeat()
         continuedTask = nil
+        log("[palladium] background download task expired: \(expirationDetails(for: task))\n")
 
         // The stop button and system conditions both expire the task, and iOS does not say which one it was.
         // In the background treat it as the user's stop; otherwise keep going with the short UIKit window.
@@ -302,6 +317,47 @@ final class BackgroundDownloadTask {
         }
         task.setTaskCompleted(success: false)
         log("[palladium] background download task ended by the system; continuing with limited background time\n")
+    }
+
+    /// Conditions iOS may weigh when it expires a task, since the expiration itself gives no reason.
+    private func expirationDetails(for task: BGTask) -> String {
+        var details: [String] = []
+        if let taskStartedAt {
+            details.append("ran \(Self.secondsText(since: taskStartedAt))")
+        }
+        if let progress = (task as? ProgressReporting)?.progress {
+            details.append("bar \(String(format: "%.2f%%", progress.fractionCompleted * 100))")
+        }
+        if let enteredBackgroundAt, UIApplication.shared.applicationState == .background {
+            details.append("in background \(Self.secondsText(since: enteredBackgroundAt))")
+        }
+        if let lastProgressAt {
+            details.append("last download progress \(Self.secondsText(since: lastProgressAt)) ago")
+        }
+        details.append("thermal \(Self.thermalStateText(ProcessInfo.processInfo.thermalState))")
+        details.append("low power \(ProcessInfo.processInfo.isLowPowerModeEnabled ? "on" : "off")")
+        return details.joined(separator: ", ")
+    }
+
+    private static func secondsText(since instant: ContinuousClock.Instant) -> String {
+        let elapsed = (ContinuousClock.now - instant).components
+        let seconds = Double(elapsed.seconds) + Double(elapsed.attoseconds) / 1e18
+        return String(format: "%.1fs", seconds)
+    }
+
+    private static func thermalStateText(_ state: ProcessInfo.ThermalState) -> String {
+        switch state {
+        case .nominal:
+            return "nominal"
+        case .fair:
+            return "fair"
+        case .serious:
+            return "serious"
+        case .critical:
+            return "critical"
+        @unknown default:
+            return "unknown"
+        }
     }
 
     private func beginLegacyTask() {
@@ -346,6 +402,8 @@ final class BackgroundDownloadTask {
         displayedSubtitle = ""
         lastSubtitleUpdate = nil
         reportedUnits = -1
+        taskStartedAt = nil
+        lastProgressAt = nil
         currentFraction = 0
     }
 }
