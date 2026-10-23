@@ -105,7 +105,30 @@ def run_gallery_dl_module(progress_callback=None, url_records=None):
         reset_gallery_dl_runtime()
 
 
+def unwrap_urllib3_percent_re():
+    """Undo yt-dlp's urllib3 percent regex override so a reimport wraps it only once."""
+    url_module = sys.modules.get("urllib3.util.url")
+    if url_module is None:
+        return False
+
+    # yt-dlp wraps this regex at import time. A wrapper around a wrapper loses
+    # methods the inner override does not define, such as `sub` in urllib3 2.8.
+    unwrapped = False
+    for name in ("PERCENT_RE", "_PERCENT_RE"):
+        pattern = getattr(url_module, name, None)
+        original = pattern
+        while type(pattern).__name__ == "Urllib3PercentREOverride":
+            pattern = pattern.re
+        if pattern is not original:
+            setattr(url_module, name, pattern)
+            unwrapped = True
+    return unwrapped
+
+
 def invalidate_runtime_package_modules():
+    if unwrap_urllib3_percent_re():
+        print("[palladium] restored urllib3 percent regex before yt-dlp reload")
+
     prefixes = ("yt_dlp", "yt_dlp_plugins")
     stale_modules = [
         name
