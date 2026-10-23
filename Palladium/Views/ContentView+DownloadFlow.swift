@@ -460,7 +460,7 @@ extension ContentView {
         }
 
         BackgroundDownloadTask.shared.begin(
-            subtitle: backgroundDownloadDefaultSubtitle(for: targetURL),
+            subtitle: backgroundDownloadSubtitle,
             allowsContinuedProcessing: backgroundDownloadsEnabled,
             log: { appendConsoleText($0) },
             onStop: { cancelDownloadFlow() }
@@ -957,20 +957,27 @@ extension ContentView {
         return min((Double(finishedCount) + itemFraction) / Double(expectedCount), 1)
     }
 
-    var backgroundDownloadSubtitle: String? {
+    /// Shows the live progress line when verbose progress is on, otherwise the completion percentage.
+    var backgroundDownloadSubtitle: String {
+        if detailedProgressEnabled {
+            return progressText
+        }
+        let percentText = backgroundDownloadFraction.formatted(.percent.precision(.fractionLength(0)))
+        let itemText = backgroundDownloadProgress.isProcessing
+            ? "\(String(localized: "download.status.processing", bundle: .app)) \(percentText)"
+            : percentText
         guard let playlistProgress,
               let expectedCount = playlistProgress.expectedCount,
               expectedCount > 1,
               let currentItemIndex = playlistProgress.currentItemIndex else {
-            return backgroundDownloadProgress.isProcessing
-                ? String(localized: "download.status.processing", bundle: .app)
-                : nil
+            return itemText
         }
-        return String(
+        let playlistItemText = String(
             format: String(localized: "download.background.playlist_item", bundle: .app),
             currentItemIndex,
             expectedCount
         )
+        return "\(playlistItemText) · \(itemText)"
     }
 
     func syncBackgroundDownloadProgress() {
@@ -979,11 +986,6 @@ extension ContentView {
             fraction: backgroundDownloadFraction,
             subtitle: backgroundDownloadSubtitle
         )
-    }
-
-    private func backgroundDownloadDefaultSubtitle(for url: String) -> String {
-        guard let host = URL(string: url)?.host() else { return url }
-        return host.hasPrefix("www.") ? String(host.dropFirst(4)) : host
     }
 
     func updateProgress(from chunk: String) {
