@@ -156,8 +156,6 @@ Palladium/
 | --- | --- |
 | `Resources/Assets.xcassets/Contents.json` | Asset catalog metadata. |
 | `Resources/Assets.xcassets/AccentColor.colorset/Contents.json` | Accent color definition. |
-| `Resources/Assets.xcassets/AppIcon.appiconset/Contents.json` | App icon metadata. |
-| `Resources/Assets.xcassets/AppIcon.appiconset/*.png` | App icon variants. |
 | `Resources/Assets.xcassets/palladium_dark.imageset/Contents.json` | Dark logo metadata. |
 | `Resources/Assets.xcassets/palladium_dark.imageset/palladium_dark.png` | Dark logo image. |
 | `Resources/Assets.xcassets/palladium_light.imageset/Contents.json` | Light logo metadata. |
