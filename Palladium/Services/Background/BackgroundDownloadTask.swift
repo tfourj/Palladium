@@ -97,6 +97,7 @@ final class BackgroundDownloadTask {
         defaultSubtitle = subtitle
 
         if continuedTask != nil || submittedIdentifier != nil {
+            resetProgress()
             update(fraction: 0, subtitle: nil)
             log("[palladium] reusing background download task\n")
             return
@@ -120,10 +121,12 @@ final class BackgroundDownloadTask {
         guard #available(iOS 26.0, *), let task = continuedTask as? BGContinuedProcessingTask else { return }
 
         // Repeated lines report the same fraction, and only a change replaces the heartbeat steps since then.
+        // Each ffmpeg step restarts at 0%, but the system bar only moves forward during one download, since a
+        // drop can look like a stalled task.
         let units = Int64(currentFraction * Double(task.progress.totalUnitCount))
         if units != reportedUnits {
             reportedUnits = units
-            task.progress.completedUnitCount = units
+            task.progress.completedUnitCount = max(task.progress.completedUnitCount, units)
         }
         showWantedSubtitle(on: task, force: false)
     }
@@ -147,6 +150,13 @@ final class BackgroundDownloadTask {
     /// interrupt it sends is then ignored. Files from a finished run are kept instead of being discarded.
     static func keepsResult(afterStopWithResultKind resultKind: String, downloadedPathCount: Int) -> Bool {
         (resultKind == "success" || resultKind == "partial") && downloadedPathCount > 0
+    }
+
+    /// Starts the system bar over for the next queued download that reuses the task.
+    private func resetProgress() {
+        currentFraction = 0
+        reportedUnits = -1
+        (continuedTask as? ProgressReporting)?.progress.completedUnitCount = 0
     }
 
     /// Ends background execution. When another queued download follows, the task is kept briefly so it can be reused.
