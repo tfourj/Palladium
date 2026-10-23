@@ -12,6 +12,7 @@ from palladium_ytdlp.packages import (  # noqa: E402
     build_package_update_lines,
     build_pip_install_args,
     parse_package_source,
+    versions_match,
 )
 from palladium_ytdlp.maintenance import (  # noqa: E402
     remove_managed_package_action,
@@ -142,6 +143,21 @@ class PackagePlanningTests(unittest.TestCase):
 
         self.assertEqual(packages, ["yt-dlp==2.0"])
         self.assertEqual(cleanup, ["yt-dlp"])
+
+    def test_equivalent_dev_version_spellings_are_not_updates(self):
+        source = parse_package_source(json.dumps({"mode": "nightly"}))
+        installed = {"yt-dlp": "2026.10.21.233146dev"}
+        indexed = {"yt-dlp": ["2026.10.21.233146.dev0"]}
+
+        packages, _cleanup = build_package_install_plan(installed, indexed, package_source=source)
+        lines = build_package_update_lines(installed, indexed, package_source=source)
+
+        self.assertNotIn("yt-dlp==2026.10.21.233146.dev0", packages)
+        self.assertFalse(any(line.startswith("yt-dlp:") for line in lines))
+
+    def test_unparseable_versions_fall_back_to_text_comparison(self):
+        self.assertTrue(versions_match("custom-build", " custom-build "))
+        self.assertFalse(versions_match("custom-build", "other-build"))
 
     def test_locked_version_prevents_latest_update(self):
         source = parse_package_source(json.dumps({
