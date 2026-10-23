@@ -132,6 +132,14 @@ final class BackgroundDownloadTask {
         task.updateTitle(Self.title, subtitle: wantedSubtitle)
     }
 
+    /// Whether a download stopped from the system progress UI still keeps its result.
+    ///
+    /// The stop can arrive after yt-dlp already finished, for example while a thumbnail is embedded, and the
+    /// interrupt it sends is then ignored. Files from a finished run are kept instead of being discarded.
+    static func keepsResult(afterStopWithResultKind resultKind: String, downloadedPathCount: Int) -> Bool {
+        (resultKind == "success" || resultKind == "partial") && downloadedPathCount > 0
+    }
+
     /// Ends background execution. When another queued download follows, the task is kept briefly so it can be reused.
     func end(success: Bool, nextDownloadExpected: Bool) {
         pendingEnd?.cancel()
