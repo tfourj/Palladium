@@ -14581,6 +14581,26 @@
         }
       }
     },
+    "settings.about.coffee.subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Support Palladium on Ko-fi"
+          }
+        }
+      }
+    },
+    "settings.about.coffee.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buy Me a Coffee"
+          }
+        }
+      }
+    },
     "settings.about.subtitle" : {
       "localizations" : {
         "en" : {
