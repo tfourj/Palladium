@@ -45,7 +45,9 @@ struct BackgroundDownloadProgress: Equatable {
         }
     }
 
+    /// Thumbnails are converted before any stream starts, and that step is not part of the download's progress.
     mutating func updateProcessing(percent: Double) {
+        guard !startedStreamFiles.isEmpty else { return }
         processingFraction = min(max(percent / 100, 0), 1)
     }
 
