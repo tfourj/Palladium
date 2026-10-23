@@ -66,6 +66,15 @@ final class BackgroundDownloadProgressTests: XCTestCase {
         XCTAssertEqual(progress.fraction, 0.4, accuracy: 0.0001)
     }
 
+    func testIgnoresThumbnailProcessingBeforeStreams() {
+        var progress = BackgroundDownloadProgress()
+        progress.handleLine("[info] abc123: Downloading 1 format(s): 137+140")
+        progress.updateProcessing(percent: 100)
+
+        XCTAssertFalse(progress.isProcessing)
+        XCTAssertEqual(progress.fraction, 0, accuracy: 0.0001)
+    }
+
     func testNextPlaylistItemResetsProgress() {
         var progress = BackgroundDownloadProgress()
         progress.handleLine("[info] first: Downloading 1 format(s): 22")

@@ -320,6 +320,7 @@ extension ContentView {
         statusText = "running"
         progressText = String(localized: "download.status.running", bundle: .app)
         downloadCancelRequested = false
+        downloadStoppedByBackgroundTask = false
         lastDownloadProgressPercent = nil
         backgroundDownloadProgress = BackgroundDownloadProgress()
         ffmpegProgressDurationSeconds = nil
@@ -460,10 +461,13 @@ extension ContentView {
         }
 
         BackgroundDownloadTask.shared.begin(
-            subtitle: backgroundDownloadDefaultSubtitle(for: targetURL),
+            subtitle: backgroundDownloadSubtitle,
             allowsContinuedProcessing: backgroundDownloadsEnabled,
             log: { appendConsoleText($0) },
-            onStop: { cancelDownloadFlow() }
+            onStop: {
+                downloadStoppedByBackgroundTask = true
+                cancelDownloadFlow()
+            }
         )
         if effectiveDownloadPreset == .images {
             appendConsoleText("[palladium] gallery-dl download started for \(gallerySelectionCountAtStart) image(s)\n")
@@ -521,7 +525,16 @@ extension ContentView {
             self.cancelMarkerURL = nil
             self.currentDownloadTask = nil
 
-            let cancelWasRequested = downloadCancelRequested
+            let outcomeResultKind = outcome.resultKind ?? outcome.statusText
+            let keepsResultAfterBackgroundStop = downloadStoppedByBackgroundTask
+                && BackgroundDownloadTask.keepsResult(
+                    afterStopWithResultKind: outcomeResultKind,
+                    downloadedPathCount: outcome.downloadedPaths.count
+                )
+            let cancelWasRequested = downloadCancelRequested && !keepsResultAfterBackgroundStop
+            if keepsResultAfterBackgroundStop {
+                appendConsoleText("[palladium] download finished before the background stop; keeping result\n")
+            }
             let galleryExpectedCountAtFinish = galleryDownloadExpectedCount
             let galleryCompletedCountAtFinish = max(
                 galleryDownloadCompletedCount,
@@ -535,6 +548,7 @@ extension ContentView {
             isRunning = false
             syncIdleTimerDisabled()
             downloadCancelRequested = false
+            downloadStoppedByBackgroundTask = false
             lastDownloadProgressPercent = nil
             ffmpegProgressDurationSeconds = nil
             pendingDownloadProgressLine = ""
@@ -552,7 +566,7 @@ extension ContentView {
                 useCookies = defaultUseCookies
             }
 
-            let finalResultKind = cancelWasRequested ? "cancelled" : (outcome.resultKind ?? outcome.statusText)
+            let finalResultKind = cancelWasRequested ? "cancelled" : outcomeResultKind
             statusText = finalResultKind
             let nextDownloadExpected = queuedItemID != nil
                 && finalResultKind != "cancelled"
@@ -957,20 +971,27 @@ extension ContentView {
         return min((Double(finishedCount) + itemFraction) / Double(expectedCount), 1)
     }
 
-    var backgroundDownloadSubtitle: String? {
+    /// Shows the live progress line when verbose progress is on, otherwise the completion percentage.
+    var backgroundDownloadSubtitle: String {
+        if detailedProgressEnabled {
+            return progressText
+        }
+        let percentText = backgroundDownloadFraction.formatted(.percent.precision(.fractionLength(0)))
+        let itemText = backgroundDownloadProgress.isProcessing
+            ? "\(String(localized: "download.status.processing", bundle: .app)) \(percentText)"
+            : percentText
         guard let playlistProgress,
               let expectedCount = playlistProgress.expectedCount,
               expectedCount > 1,
               let currentItemIndex = playlistProgress.currentItemIndex else {
-            return backgroundDownloadProgress.isProcessing
-                ? String(localized: "download.status.processing", bundle: .app)
-                : nil
+            return itemText
         }
-        return String(
+        let playlistItemText = String(
             format: String(localized: "download.background.playlist_item", bundle: .app),
             currentItemIndex,
             expectedCount
         )
+        return "\(playlistItemText) · \(itemText)"
     }
 
     func syncBackgroundDownloadProgress() {
@@ -979,11 +1000,6 @@ extension ContentView {
             fraction: backgroundDownloadFraction,
             subtitle: backgroundDownloadSubtitle
         )
-    }
-
-    private func backgroundDownloadDefaultSubtitle(for url: String) -> String {
-        guard let host = URL(string: url)?.host() else { return url }
-        return host.hasPrefix("www.") ? String(host.dropFirst(4)) : host
     }
 
     func updateProgress(from chunk: String) {
