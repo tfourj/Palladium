@@ -864,6 +864,35 @@ def normalized_version_text(value):
     return str(value or "").strip()
 
 
+def parse_package_version(value):
+    try:
+        from packaging.version import Version
+    except ImportError:
+        try:
+            from pip._vendor.packaging.version import Version
+        except ImportError:
+            return None
+
+    try:
+        return Version(normalized_version_text(value))
+    except Exception:
+        return None
+
+
+def versions_match(first, second):
+    """Compare versions by PEP 440 so 1.0.0dev and 1.0.0.dev0 are equal."""
+    first_text = normalized_version_text(first)
+    second_text = normalized_version_text(second)
+    if first_text == second_text:
+        return True
+
+    first_version = parse_package_version(first_text)
+    second_version = parse_package_version(second_text)
+    if first_version is None or second_version is None:
+        return False
+    return first_version == second_version
+
+
 def parse_package_source(source_json=None):
     source = {
         "mode": "stable",
@@ -1027,7 +1056,7 @@ def build_package_update_lines(installed_versions, indexed_versions, include_mis
                 lines.append(f"{package_name}: not installed -> {target_version}")
             continue
 
-        if target_version and target_version != current_version:
+        if target_version and not versions_match(target_version, current_version):
             lines.append(f"{package_name}: {current_version} -> {target_version}")
     return lines
 
@@ -1057,7 +1086,7 @@ def build_package_install_plan(installed_versions, indexed_versions, custom_vers
                 continue
 
             current_version = normalized_version_text(installed_versions.get(package_name))
-            if requested_version == current_version:
+            if versions_match(requested_version, current_version):
                 print(f"[palladium] skipping {package_name}; already on requested version {requested_version}")
                 continue
 
@@ -1084,7 +1113,7 @@ def build_package_install_plan(installed_versions, indexed_versions, custom_vers
                     cleanup_packages.append(package_name)
             continue
 
-        if target_version and target_version != current_version:
+        if target_version and not versions_match(target_version, current_version):
             packages.append(f"{package_name}=={target_version}")
             if package_name in runtime_packages:
                 cleanup_packages.append(package_name)
@@ -1194,7 +1223,7 @@ def check_package_updates(install_target=None, package_source=None, include_miss
             if installed_ver and installed_ver not in ("not installed", "unknown"):
                 old_ver = installed_ver
 
-            if old_ver == new_ver:
+            if versions_match(old_ver, new_ver):
                 continue
 
             lines.append(f"{name}: {old_ver} -> {new_ver}")
