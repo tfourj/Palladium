@@ -7,6 +7,8 @@ import Foundation
 import OSLog
 
 extension ContentView {
+    static let slowPackageUpdateDelay: Duration = .seconds(45)
+
     func cancelPackageFlow() {
         guard isPackageRunning else { return }
         requestActiveOperationCancellation()
@@ -28,6 +30,9 @@ extension ContentView {
         isAutomaticallyUpdatingPackages = isAutomaticUpdate || action == .reinstall
         syncIdleTimerDisabled()
         packageStatusText = action.initialStatusText
+        packageActivityText = nil
+        packageFlowStartDate = Date()
+        showsSlowPackageUpdateActions = false
         isLoadingPackageVersions = action == .indexVersions
 
         let logPipe = Pipe()
@@ -52,6 +57,9 @@ extension ContentView {
             guard !chunk.isEmpty else { return }
             Task { @MainActor in
                 enqueueConsoleChunk(chunk, trackProgress: false)
+                if let activity = PackageActivityLine.latest(in: chunk) {
+                    packageActivityText = activity
+                }
             }
         }
 
@@ -89,6 +97,9 @@ extension ContentView {
 
             isPackageRunning = false
             isAutomaticallyUpdatingPackages = false
+            packageActivityText = nil
+            packageFlowStartDate = nil
+            showsSlowPackageUpdateActions = false
             syncIdleTimerDisabled()
             isLoadingPackageVersions = false
             packageStatusText = outcome.statusText
@@ -144,6 +155,18 @@ extension ContentView {
 
         }
         currentPackageTask = task
+    }
+
+    func hideAutomaticPackageUpdate() {
+        guard isAutomaticallyUpdatingPackages else { return }
+        isAutomaticallyUpdatingPackages = false
+        appendConsoleText("[palladium] package update continues in the background\n")
+    }
+
+    func cancelAutomaticPackageUpdate() {
+        cancelPackageFlow()
+        // Python may take a while to stop, so never keep the app blocked behind the overlay.
+        isAutomaticallyUpdatingPackages = false
     }
 
     func refreshPackageVersions() {

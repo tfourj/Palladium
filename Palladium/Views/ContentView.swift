@@ -150,6 +150,9 @@ struct ContentView: View {
     @State var isLoadingPackageVersions = false
     @State var isPackageRunning = false
     @State var isAutomaticallyUpdatingPackages = false
+    @State var packageActivityText: String?
+    @State var packageFlowStartDate: Date?
+    @State var showsSlowPackageUpdateActions = false
     @State var hasLoadedPackageStatus = false
     @State var checkPackageUpdatesOnLaunch: Bool
     @State var autoUpdatePackagesOnLaunch: Bool
