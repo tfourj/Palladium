@@ -59,6 +59,7 @@ Palladium/
 | `Models/ImportedCookieFile.swift` | Imported cookie-file model. |
 | `Models/LinkHistory.swift` | Previously used link model and history storage data. |
 | `Models/PackageSourceMode.swift` | Package-source selection model. |
+| `Models/PackageActivityLine.swift` | Picks the latest readable package install step from log output. |
 | `Models/TemporaryDownloadRetentionPolicy.swift` | Decides whether completed temporary downloads are removed after saving. |
 | `Models/JavaScriptRuntime.swift` | Persisted JavaScript runtime choice, defaulting to Apple WebKit. |
 | `Models/YouTubePatchMode.swift` | Patch target setting model. |
