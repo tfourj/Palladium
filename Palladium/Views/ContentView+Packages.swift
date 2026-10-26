@@ -143,8 +143,10 @@ extension ContentView {
             self.hasLoadedPackageStatus = true
             Self.logger.info("package flow finished with status: \(outcome.statusText, privacy: .public)")
 
+            // A cancelled check reports no versions, which would look like missing packages.
+            let wasCancelled = outcome.statusText == "cancelled"
             let shouldAutomaticallyUpdate = updatesAvailable || outcome.runtimePackagesMissing == true
-            if action == .check, updateWhenAvailable, shouldAutomaticallyUpdate {
+            if action == .check, updateWhenAvailable, shouldAutomaticallyUpdate, !wasCancelled {
                 guard !isRunning, !isResolvingGallery else {
                     appendConsoleText("[palladium] automatic package update skipped because a download is starting\n")
                     return
