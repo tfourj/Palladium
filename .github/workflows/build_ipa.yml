@@ -26,6 +26,8 @@ jobs:
   build:
     runs-on: macos-latest
     timeout-minutes: 60
+    env:
+      EXPECTED_PYTHON_VERSION: "3.15"
 
     steps:
     - name: Checkout code
@@ -99,6 +101,20 @@ jobs:
 
         echo "✅ Installed Python.xcframework:"
         ls -la "$FRAMEWORKS_DIR/Python.xcframework"
+
+    - name: Check Python Apple Support version
+      run: |
+        set -euo pipefail
+
+        HEADER="$GITHUB_WORKSPACE/Frameworks/Python.xcframework/ios-arm64/Python.framework/Headers/patchlevel.h"
+        ACTUAL=$(sed -n 's/^#define PY_VERSION[[:space:]]*"\([0-9]*\.[0-9]*\).*"/\1/p' "$HEADER" | head -n 1)
+
+        if [ "$ACTUAL" != "$EXPECTED_PYTHON_VERSION" ]; then
+          echo "❌ Python.xcframework is Python ${ACTUAL:-unknown}, expected $EXPECTED_PYTHON_VERSION"
+          exit 1
+        fi
+
+        echo "✅ Python.xcframework is Python $ACTUAL"
 
     - name: Download SwiftFFmpeg-iOS
       uses: robinraju/release-downloader@v1
@@ -188,6 +204,28 @@ jobs:
 
         echo "✅ Installed SwiftCurlCffi-iOS:"
         ls -la "$TARGET_DIR"
+
+    - name: Check SwiftCurlCffi-iOS Python version
+      run: |
+        set -euo pipefail
+
+        PAYLOAD_PATH="$GITHUB_WORKSPACE/Frameworks/SwiftCurlCffi-iOS/Sources/SwiftCurlCffiIOS/Resources/curl_cffi_ios_payload.zip"
+        EXPECTED_TAG="cpython-$(echo "$EXPECTED_PYTHON_VERSION" | tr -d '.')"
+        EXTENSIONS=$(unzip -Z1 "$PAYLOAD_PATH" | grep '\.so$' || true)
+
+        if [ -z "$EXTENSIONS" ]; then
+          echo "❌ No extension modules found in curl-cffi payload"
+          exit 1
+        fi
+
+        MISMATCHED=$(echo "$EXTENSIONS" | grep -v "\.$EXPECTED_TAG-" || true)
+        if [ -n "$MISMATCHED" ]; then
+          echo "❌ curl-cffi payload was not built for $EXPECTED_TAG:"
+          echo "$MISMATCHED"
+          exit 1
+        fi
+
+        echo "✅ curl-cffi payload targets $EXPECTED_TAG"
 
     - name: Set up Xcode 26.2
       uses: maxim-lobanov/setup-xcode@v1

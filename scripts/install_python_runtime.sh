@@ -155,6 +155,21 @@ install_curl_cffi_payload() {
     exit 1
   fi
 
+  PYTHON_HEADER="$PROJECT_DIR/Frameworks/Python.xcframework/ios-arm64/Python.framework/Headers/patchlevel.h"
+  PYTHON_TAG=$(sed -n 's/^#define PY_VERSION[[:space:]]*"\([0-9]*\)\.\([0-9]*\).*"/cpython-\1\2/p' "$PYTHON_HEADER" | head -n 1)
+  if [ -z "$PYTHON_TAG" ]; then
+    echo "Could not read Python version from $PYTHON_HEADER"
+    exit 1
+  fi
+
+  MISMATCHED_EXTENSIONS=$(find "$SOURCE_PACKAGES" -name "*.so" ! -name "*.$PYTHON_TAG-*.so" -print)
+  if [ -n "$MISMATCHED_EXTENSIONS" ]; then
+    echo "curl-cffi payload was not built for $PYTHON_TAG:"
+    echo "$MISMATCHED_EXTENSIONS"
+    echo "Rebuild SwiftCurlCffi-iOS against Frameworks/Python.xcframework."
+    exit 1
+  fi
+
   rsync -au "$SOURCE_PACKAGES/" "$TARGET_PACKAGES/"
   echo "Installed curl-cffi payload from $PAYLOAD_SITE_PACKAGES"
 }

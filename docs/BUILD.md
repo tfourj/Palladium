@@ -86,6 +86,8 @@ cd ../SwiftCurlCffi-iOS
 Frameworks/SwiftCurlCffi-iOS/Sources/SwiftCurlCffiIOS/Resources/curl_cffi_ios_payload.zip
 ```
 
+- The payload must be built for the same Python version as `Frameworks/Python.xcframework`, or the build fails
+
 ## QuickJS-NG
 
 - Download the [QuickJS-NG v0.16.2 source archive](https://github.com/quickjs-ng/quickjs/archive/refs/tags/v0.16.2.tar.gz)
