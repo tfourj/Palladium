@@ -9258,6 +9258,16 @@
         }
       }
     },
+    "packages.auto_update.continue_in_background" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue in Background"
+          }
+        }
+      }
+    },
     "packages.auto_update.message" : {
       "localizations" : {
         "en" : {
@@ -9334,6 +9344,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "正在更新:%@"
+          }
+        }
+      }
+    },
+    "packages.auto_update.slow_message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This is taking longer than usual. You can keep it running in the background or cancel it."
           }
         }
       }
