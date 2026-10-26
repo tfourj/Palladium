@@ -7,6 +7,8 @@ import Foundation
 import OSLog
 
 extension ContentView {
+    static let slowPackageUpdateDelay: Duration = .seconds(45)
+
     func cancelPackageFlow() {
         guard isPackageRunning else { return }
         requestActiveOperationCancellation()
@@ -28,6 +30,9 @@ extension ContentView {
         isAutomaticallyUpdatingPackages = isAutomaticUpdate || action == .reinstall
         syncIdleTimerDisabled()
         packageStatusText = action.initialStatusText
+        packageActivityText = nil
+        packageFlowStartDate = Date()
+        showsSlowPackageUpdateActions = false
         isLoadingPackageVersions = action == .indexVersions
 
         let logPipe = Pipe()
@@ -52,6 +57,9 @@ extension ContentView {
             guard !chunk.isEmpty else { return }
             Task { @MainActor in
                 enqueueConsoleChunk(chunk, trackProgress: false)
+                if let activity = PackageActivityLine.latest(in: chunk) {
+                    packageActivityText = activity
+                }
             }
         }
 
@@ -89,6 +97,9 @@ extension ContentView {
 
             isPackageRunning = false
             isAutomaticallyUpdatingPackages = false
+            packageActivityText = nil
+            packageFlowStartDate = nil
+            showsSlowPackageUpdateActions = false
             syncIdleTimerDisabled()
             isLoadingPackageVersions = false
             packageStatusText = outcome.statusText
@@ -132,8 +143,10 @@ extension ContentView {
             self.hasLoadedPackageStatus = true
             Self.logger.info("package flow finished with status: \(outcome.statusText, privacy: .public)")
 
+            // A cancelled check reports no versions, which would look like missing packages.
+            let wasCancelled = outcome.statusText == "cancelled"
             let shouldAutomaticallyUpdate = updatesAvailable || outcome.runtimePackagesMissing == true
-            if action == .check, updateWhenAvailable, shouldAutomaticallyUpdate {
+            if action == .check, updateWhenAvailable, shouldAutomaticallyUpdate, !wasCancelled {
                 guard !isRunning, !isResolvingGallery else {
                     appendConsoleText("[palladium] automatic package update skipped because a download is starting\n")
                     return
@@ -144,6 +157,18 @@ extension ContentView {
 
         }
         currentPackageTask = task
+    }
+
+    func hideAutomaticPackageUpdate() {
+        guard isAutomaticallyUpdatingPackages else { return }
+        isAutomaticallyUpdatingPackages = false
+        appendConsoleText("[palladium] package update continues in the background\n")
+    }
+
+    func cancelAutomaticPackageUpdate() {
+        cancelPackageFlow()
+        // Python may take a while to stop, so never keep the app blocked behind the overlay.
+        isAutomaticallyUpdatingPackages = false
     }
 
     func refreshPackageVersions() {

@@ -150,6 +150,9 @@ struct ContentView: View {
     @State var isLoadingPackageVersions = false
     @State var isPackageRunning = false
     @State var isAutomaticallyUpdatingPackages = false
+    @State var packageActivityText: String?
+    @State var packageFlowStartDate: Date?
+    @State var showsSlowPackageUpdateActions = false
     @State var hasLoadedPackageStatus = false
     @State var checkPackageUpdatesOnLaunch: Bool
     @State var autoUpdatePackagesOnLaunch: Bool
@@ -719,42 +722,109 @@ private extension ContentView {
                 .ignoresSafeArea()
 
             VStack(spacing: 16) {
-                ProgressView()
-                    .controlSize(.large)
+                automaticPackageUpdateDetails
 
-                Text("packages.auto_update.title")
-                    .font(.headline)
-
-                Text("packages.auto_update.message")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-
-                if let packageNames = automaticPackageUpdatePackageNamesText {
-                    Text(
-                        String(
-                            format: String(localized: "packages.auto_update.packages", bundle: .app),
-                            packageNames
-                        )
-                    )
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.85)
-                    .truncationMode(.tail)
-                    .frame(maxWidth: .infinity)
+                if showsSlowPackageUpdateActions {
+                    automaticPackageUpdateSlowActions
+                        .transition(.opacity)
                 }
             }
             .padding(24)
             .frame(maxWidth: 280)
             .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14))
             .shadow(radius: 18)
-            .accessibilityElement(children: .combine)
+            .accessibilityElement(children: .contain)
             .accessibilityAddTraits(.isModal)
+            .animation(.default, value: showsSlowPackageUpdateActions)
         }
         .contentShape(Rectangle())
         .accessibilityIdentifier("automaticPackageUpdateOverlay")
+        .task {
+            try? await Task.sleep(for: Self.slowPackageUpdateDelay)
+            guard !Task.isCancelled else { return }
+            showsSlowPackageUpdateActions = true
+        }
+    }
+
+    var automaticPackageUpdateDetails: some View {
+        VStack(spacing: 16) {
+            ProgressView()
+                .controlSize(.large)
+
+            Text("packages.auto_update.title")
+                .font(.headline)
+
+            Text("packages.auto_update.message")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+
+            if let packageNames = automaticPackageUpdatePackageNamesText {
+                Text(
+                    String(
+                        format: String(localized: "packages.auto_update.packages", bundle: .app),
+                        packageNames
+                    )
+                )
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
+                .minimumScaleFactor(0.85)
+                .truncationMode(.tail)
+                .frame(maxWidth: .infinity)
+            }
+
+            if let packageActivityText {
+                Text(verbatim: packageActivityText)
+                    .font(.caption2.monospaced())
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(3)
+                    .truncationMode(.middle)
+                    .frame(maxWidth: .infinity)
+            }
+
+            if let packageFlowStartDate {
+                Label {
+                    Text(packageFlowStartDate, style: .timer)
+                        .monospacedDigit()
+                } icon: {
+                    Image(systemName: "clock")
+                }
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+            }
+        }
+        .accessibilityElement(children: .combine)
+    }
+
+    var automaticPackageUpdateSlowActions: some View {
+        VStack(spacing: 10) {
+            Text(String(localized: "packages.auto_update.slow_message", bundle: .app))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Button {
+                hideAutomaticPackageUpdate()
+            } label: {
+                Text(String(localized: "packages.auto_update.continue_in_background", bundle: .app))
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+            .accessibilityIdentifier("automaticPackageUpdateContinueInBackgroundButton")
+
+            Button(role: .destructive) {
+                cancelAutomaticPackageUpdate()
+            } label: {
+                Text(String(localized: "common.cancel", bundle: .app))
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+            .accessibilityIdentifier("automaticPackageUpdateCancelButton")
+        }
     }
 
     var automaticPackageUpdatePackageNamesText: String? {
