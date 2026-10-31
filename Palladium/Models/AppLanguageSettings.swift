@@ -7,7 +7,7 @@ nonisolated final class AppLanguageSettings: Observable {
     static let defaultsKey = "palladium.appLanguage"
     static let system = "system"
     // Only fully translated languages; add new Crowdin languages here once they are complete.
-    static let supportedLanguages = ["en", "ja", "ko", "zh-Hans"]
+    static let supportedLanguages = ["en", "es", "ja", "ko", "zh-Hans"]
 
     private let registrar = ObservationRegistrar()
     private let defaults: UserDefaults
