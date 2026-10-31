@@ -257,6 +257,10 @@ enum DownloadPreset: String, Codable, CaseIterable, Identifiable {
     var id: String { rawValue }
     var pythonValue: String { rawValue }
 
+    var supportsSponsorBlock: Bool {
+        self != .audio && self != .images
+    }
+
     var shareSheetMode: ShareSheetDownloadMode {
         switch self {
         case .autoVideo: return .autoVideo
