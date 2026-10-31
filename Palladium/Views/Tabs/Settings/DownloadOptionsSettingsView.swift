@@ -4,6 +4,7 @@ struct DownloadOptionsSettingsView: View {
     @Binding var defaultDownloadPlaylist: Bool
     @Binding var defaultDownloadSubtitles: Bool
     @Binding var defaultEmbedThumbnail: Bool
+    @Binding var defaultRemoveSponsorSegments: Bool
     @Binding var defaultUseCookies: Bool
     @Binding var restoreDownloadDefaults: Bool
 
@@ -19,6 +20,9 @@ struct DownloadOptionsSettingsView: View {
                     .disabled(isRunning)
 
                 Toggle("settings.download_defaults.thumbnail.default", isOn: $defaultEmbedThumbnail)
+                    .disabled(isRunning)
+
+                Toggle("settings.download_defaults.sponsorblock.default", isOn: $defaultRemoveSponsorSegments)
                     .disabled(isRunning)
 
                 Toggle("settings.download_defaults.cookies.default", isOn: $defaultUseCookies)

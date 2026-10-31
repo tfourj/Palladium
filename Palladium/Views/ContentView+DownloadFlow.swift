@@ -413,6 +413,8 @@ extension ContentView {
             postProcessingPreset = effectiveDownloadPreset
         }
         let postProcessingJSONAtStart = postProcessing.configurationJSON(for: postProcessingPreset)
+        let removeSponsorSegmentsAtStart = postProcessingPreset.supportsSponsorBlock
+            && (queuedConfiguration?.removeSponsorSegments ?? removeSponsorSegments)
         let afterDownloadBehaviorAtStart = afterDownloadOverride
             ?? queuedConfiguration?.afterDownloadBehavior
             ?? afterDownloadBehavior
@@ -501,7 +503,8 @@ extension ContentView {
                     packageSourceJSON: buildPackageSourceJSON(),
                     liveLogFD: liveLogFD,
                     filenameExportPreset: filenameExportPresetAtStart,
-                    customFilenameTemplate: customFilenameTemplateAtStart
+                    customFilenameTemplate: customFilenameTemplateAtStart,
+                    removeSponsorSegments: removeSponsorSegmentsAtStart
                 )
             }
 
@@ -563,6 +566,7 @@ extension ContentView {
                 downloadPlaylist = defaultDownloadPlaylist
                 downloadSubtitles = defaultDownloadSubtitles
                 embedThumbnail = defaultEmbedThumbnail
+                removeSponsorSegments = defaultRemoveSponsorSegments
                 useCookies = defaultUseCookies
             }
 

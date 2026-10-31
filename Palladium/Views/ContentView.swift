@@ -63,9 +63,11 @@ struct ContentView: View {
     static let downloadPlaylistDefaultsKey = "palladium.downloadPlaylist"
     static let downloadSubtitlesDefaultsKey = "palladium.downloadSubtitles"
     static let embedThumbnailDefaultsKey = "palladium.embedThumbnail"
+    static let removeSponsorSegmentsDefaultsKey = "palladium.removeSponsorSegments"
     static let defaultDownloadPlaylistDefaultsKey = "palladium.defaultDownloadPlaylist"
     static let defaultDownloadSubtitlesDefaultsKey = "palladium.defaultDownloadSubtitles"
     static let defaultEmbedThumbnailDefaultsKey = "palladium.defaultEmbedThumbnail"
+    static let defaultRemoveSponsorSegmentsDefaultsKey = "palladium.defaultRemoveSponsorSegments"
     static let defaultUseCookiesDefaultsKey = "palladium.defaultUseCookies"
     static let restoreDownloadDefaultsDefaultsKey = "palladium.restoreDownloadDefaults"
     static let autoRetryFailedDownloadsDefaultsKey = "palladium.autoRetryFailedDownloads"
@@ -121,9 +123,11 @@ struct ContentView: View {
     @State var downloadPlaylist: Bool
     @State var downloadSubtitles: Bool
     @State var embedThumbnail: Bool
+    @State var removeSponsorSegments: Bool
     @State var defaultDownloadPlaylist: Bool
     @State var defaultDownloadSubtitles: Bool
     @State var defaultEmbedThumbnail: Bool
+    @State var defaultRemoveSponsorSegments: Bool
     @State var defaultUseCookies: Bool
     @State var restoreDownloadDefaults: Bool
     @State var autoRetryFailedDownloads: Bool
@@ -254,13 +258,18 @@ struct ContentView: View {
         let defPlaylist = Self.loadDefaultDownloadPlaylist()
         let defSubtitles = Self.loadDefaultDownloadSubtitles()
         let defThumbnail = Self.loadDefaultEmbedThumbnail()
+        let defSponsorBlock = Self.loadDefaultRemoveSponsorSegments()
         let defCookies = Self.loadDefaultUseCookies()
         _downloadPlaylist = State(initialValue: restoreDefaults ? defPlaylist : Self.loadDownloadPlaylist())
         _downloadSubtitles = State(initialValue: restoreDefaults ? defSubtitles : Self.loadDownloadSubtitles())
         _embedThumbnail = State(initialValue: restoreDefaults ? defThumbnail : Self.loadEmbedThumbnail())
+        _removeSponsorSegments = State(
+            initialValue: restoreDefaults ? defSponsorBlock : Self.loadRemoveSponsorSegments()
+        )
         _defaultDownloadPlaylist = State(initialValue: defPlaylist)
         _defaultDownloadSubtitles = State(initialValue: defSubtitles)
         _defaultEmbedThumbnail = State(initialValue: defThumbnail)
+        _defaultRemoveSponsorSegments = State(initialValue: defSponsorBlock)
         _defaultUseCookies = State(initialValue: defCookies)
         _restoreDownloadDefaults = State(initialValue: restoreDefaults)
         _autoRetryFailedDownloads = State(initialValue: Self.loadAutoRetryFailedDownloads())
@@ -310,6 +319,7 @@ struct ContentView: View {
                     downloadPlaylist: $downloadPlaylist,
                     downloadSubtitles: $downloadSubtitles,
                     embedThumbnail: $embedThumbnail,
+                    removeSponsorSegments: $removeSponsorSegments,
                     subtitleLanguagePattern: $subtitleLanguagePattern,
                     customSubtitleLanguagePattern: $customSubtitleLanguagePattern,
                     useCookies: $useCookies,
@@ -399,6 +409,7 @@ struct ContentView: View {
                     defaultDownloadPlaylist: $defaultDownloadPlaylist,
                     defaultDownloadSubtitles: $defaultDownloadSubtitles,
                     defaultEmbedThumbnail: $defaultEmbedThumbnail,
+                    defaultRemoveSponsorSegments: $defaultRemoveSponsorSegments,
                     defaultUseCookies: $defaultUseCookies,
                     restoreDownloadDefaults: $restoreDownloadDefaults,
                     importedCookieFiles: importedCookieFiles,
@@ -550,6 +561,9 @@ struct ContentView: View {
         .onChange(of: embedThumbnail, initial: false) {
             persistPreferences()
         }
+        .onChange(of: removeSponsorSegments, initial: false) {
+            persistPreferences()
+        }
         .onChange(of: defaultDownloadPlaylist, initial: false) {
             if restoreDownloadDefaults { downloadPlaylist = defaultDownloadPlaylist }
             persistPreferences()
@@ -562,6 +576,10 @@ struct ContentView: View {
             if restoreDownloadDefaults { embedThumbnail = defaultEmbedThumbnail }
             persistPreferences()
         }
+        .onChange(of: defaultRemoveSponsorSegments, initial: false) {
+            if restoreDownloadDefaults { removeSponsorSegments = defaultRemoveSponsorSegments }
+            persistPreferences()
+        }
         .onChange(of: defaultUseCookies, initial: false) {
             if restoreDownloadDefaults { useCookies = defaultUseCookies }
             persistPreferences()
@@ -571,6 +589,7 @@ struct ContentView: View {
                 downloadPlaylist = defaultDownloadPlaylist
                 downloadSubtitles = defaultDownloadSubtitles
                 embedThumbnail = defaultEmbedThumbnail
+                removeSponsorSegments = defaultRemoveSponsorSegments
                 useCookies = defaultUseCookies
             }
             persistPreferences()

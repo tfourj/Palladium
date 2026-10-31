@@ -11,6 +11,7 @@ from .args import (
     apply_post_processing_args,
     build_output_args,
     build_preset_args,
+    build_sponsorblock_args,
     parse_custom_args,
     parse_extra_args,
     parse_preset_args_map,
@@ -630,6 +631,7 @@ def run_yt_dlp_flow(
     post_processing_json_override=None,
     filename_export_preset_override=None,
     custom_filename_template_override=None,
+    sponsorblock_remove_override=None,
 ):
     output = TailBuffer()
     console_stdout = sys.__stdout__ if sys.__stdout__ is not None else None
@@ -666,6 +668,10 @@ def run_yt_dlp_flow(
         custom_filename_template = os.environ.get("PALLADIUM_CUSTOM_FILENAME_TEMPLATE", "")
     else:
         custom_filename_template = str(custom_filename_template_override)
+    if sponsorblock_remove_override is None:
+        sponsorblock_remove = os.environ.get("PALLADIUM_SPONSORBLOCK_REMOVE", "").strip().lower() in ("1", "true", "yes", "on")
+    else:
+        sponsorblock_remove = bool(sponsorblock_remove_override)
     if download_playlist_override is None:
         download_playlist = os.environ.get("PALLADIUM_DOWNLOAD_PLAYLIST", "").strip().lower() in ("1", "true", "yes", "on")
     else:
@@ -860,6 +866,13 @@ def run_yt_dlp_flow(
 
                         if embed_thumbnail:
                             download_behavior_args.extend(["--convert-thumbnails", "png", "--embed-thumbnail"])
+
+                        sponsorblock_args = build_sponsorblock_args(
+                            sponsorblock_remove, download_preset, preset_args, extra_args
+                        )
+                        if sponsorblock_args:
+                            print(f"[palladium] sponsorblock remove: {sponsorblock_args[-1]}")
+                            download_behavior_args.extend(sponsorblock_args)
 
                         if cookie_file_path:
                             if os.path.isfile(cookie_file_path):

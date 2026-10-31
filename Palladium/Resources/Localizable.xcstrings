@@ -5086,6 +5086,28 @@
         }
       }
     },
+    "download.options.sponsorblock.help" : {
+      "comment" : "Subtitle for the download option that removes SponsorBlock sponsor segments.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cut sponsor segments from YouTube videos with SponsorBlock"
+          }
+        }
+      }
+    },
+    "download.options.sponsorblock.title" : {
+      "comment" : "Title for the download option that removes SponsorBlock sponsor segments.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove sponsors"
+          }
+        }
+      }
+    },
     "download.options.subtitles.help" : {
       "localizations" : {
         "en" : {
@@ -16757,6 +16779,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "下载后重置"
+          }
+        }
+      }
+    },
+    "settings.download_defaults.sponsorblock.default" : {
+      "comment" : "Default value toggle for removing SponsorBlock sponsor segments.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove Sponsors"
           }
         }
       }
