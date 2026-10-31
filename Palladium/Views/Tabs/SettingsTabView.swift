@@ -98,6 +98,7 @@ struct SettingsTabView: View {
     @Binding var defaultDownloadPlaylist: Bool
     @Binding var defaultDownloadSubtitles: Bool
     @Binding var defaultEmbedThumbnail: Bool
+    @Binding var defaultRemoveSponsorSegments: Bool
     @Binding var defaultUseCookies: Bool
     @Binding var restoreDownloadDefaults: Bool
     let importedCookieFiles: [ImportedCookieFile]
@@ -271,6 +272,7 @@ struct SettingsTabView: View {
                 defaultDownloadPlaylist: $defaultDownloadPlaylist,
                 defaultDownloadSubtitles: $defaultDownloadSubtitles,
                 defaultEmbedThumbnail: $defaultEmbedThumbnail,
+                defaultRemoveSponsorSegments: $defaultRemoveSponsorSegments,
                 defaultUseCookies: $defaultUseCookies,
                 restoreDownloadDefaults: $restoreDownloadDefaults,
                 isRunning: isRunning
@@ -659,6 +661,14 @@ struct SettingsTabView: View {
                 subtitle: "download.options.summary.default"
             ) { title in
                 AnyView(searchToggle(title, isOn: $defaultEmbedThumbnail, disabled: isRunning))
+            },
+            controlSetting(
+                id: "defaultSponsorBlock",
+                menu: .downloadOptions,
+                title: "settings.download_defaults.sponsorblock.default",
+                subtitle: "download.options.sponsorblock.help"
+            ) { title in
+                AnyView(searchToggle(title, isOn: $defaultRemoveSponsorSegments, disabled: isRunning))
             },
             controlSetting(
                 id: "defaultCookies",
