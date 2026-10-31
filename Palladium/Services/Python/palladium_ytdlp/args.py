@@ -28,6 +28,8 @@ SUBTITLE_CONTROL_FLAGS = {
     "--write-sub",
     "--write-subs",
 }
+SPONSORBLOCK_REMOVE_CATEGORIES = "sponsor"
+SPONSORBLOCK_SKIPPED_PRESETS = {"audio", "images"}
 THUMBNAIL_CONTROL_FLAGS = {
     "--convert-thumbnails",
     "--embed-thumbnail",
@@ -204,6 +206,20 @@ def apply_post_processing_args(preset_args, extra_args, configuration_json):
         if decoder_args:
             extra_args.extend(["--postprocessor-args", f"VideoConvertor+ffmpeg_i:{shlex.join(decoder_args)}"])
     return preset_args, extra_args
+
+
+def build_sponsorblock_args(enabled, download_preset, preset_args, extra_args):
+    if not enabled or download_preset in SPONSORBLOCK_SKIPPED_PRESETS:
+        return []
+
+    args = [str(arg) for arg in [*(preset_args or []), *(extra_args or [])]]
+    # Audio extraction stays untouched, matching the Audio preset.
+    if any(arg in ("-x", "--extract-audio") for arg in args):
+        return []
+    # SponsorBlock options in custom or extra arguments take precedence.
+    if any(arg.startswith(("--sponsorblock", "--no-sponsorblock")) for arg in args):
+        return []
+    return ["--sponsorblock-remove", SPONSORBLOCK_REMOVE_CATEGORIES]
 
 
 def strip_checkbox_owned_download_args(args):
