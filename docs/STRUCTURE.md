@@ -189,6 +189,7 @@ Palladium/
 | `scripts/python_tests/test_output_templates.py` | Filename preset selection and output-argument priority tests. |
 | `scripts/python_tests/test_post_processing.py` | Conversion override, codec and encoder resolution, stream-copy, and audio extraction tests. |
 | `scripts/python_tests/test_sponsorblock.py` | SponsorBlock removal argument, preset skipping, and user override tests. |
+| `scripts/python_tests/test_package_index.py` | Package index URL parsing and pip `--index-url` argument tests. |
 | `scripts/python_tests/test_staged_scripts.py` | Checks every Python package module is staged by `PythonScripts.swift`. |
 | `scripts/swift_tests/PostProcessingPreferencesTests.swift` | Video conversion defaults, codec and encoder resolution, and persistence. |
 | `scripts/swift_tests/DownloadPresetTests.swift` | Per-preset SponsorBlock support tests. |
@@ -206,6 +207,7 @@ Palladium/
 | `scripts/swift_tests/InstalledAppExporterTests.swift` | Installed-bundle .ipa layout, permissions, plist patching, and original bundle ID tests. |
 | `scripts/swift_tests/TemporaryDownloadRetentionPolicyTests.swift` | Temporary-download cleanup policy tests. |
 | `scripts/swift_tests/PackageActivityLineTests.swift` | Package install step parsing tests for the update overlay. |
+| `scripts/swift_tests/PackageIndexMirrorTests.swift` | Package index mirror defaults, preset URLs, and custom URL validation tests. |
 
 ## Other Files and Directories
 
