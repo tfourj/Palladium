@@ -83,6 +83,7 @@ struct SettingsTabView: View {
     @Binding var saveIncompleteDownloadsToHistory: Bool
     @Binding var detailedProgressEnabled: Bool
     @Binding var backgroundDownloadsEnabled: Bool
+    @Binding var backgroundDownloadMode: BackgroundDownloadMode
     @Binding var downloadPresetSettings: [DownloadPresetSetting]
     @Binding var shareSheetDownloadMode: ShareSheetDownloadMode
     @Binding var showShareSheetFormatButton: Bool
@@ -293,6 +294,7 @@ struct SettingsTabView: View {
         case .backgroundDownloads:
             BackgroundDownloadSettingsView(
                 backgroundDownloadsEnabled: $backgroundDownloadsEnabled,
+                backgroundDownloadMode: $backgroundDownloadMode,
                 isRunning: isRunning
             )
         case .downloadArguments:
@@ -760,8 +762,25 @@ struct SettingsTabView: View {
                     searchToggle(
                         title,
                         isOn: $backgroundDownloadsEnabled,
-                        disabled: isRunning || !BackgroundDownloadTask.isSupported
+                        disabled: isRunning || !BackgroundDownloadTask.isSupported(in: backgroundDownloadMode)
                     )
+                )
+            },
+            controlSetting(
+                id: "backgroundDownloadMode",
+                menu: .backgroundDownloads,
+                title: "settings.download_behavior.background.mode",
+                subtitle: "settings.download_behavior.background.mode.help"
+            ) { title in
+                AnyView(
+                    Picker(title, selection: $backgroundDownloadMode) {
+                        ForEach(BackgroundDownloadMode.allCases) { mode in
+                            Text(mode.title)
+                                .tag(mode)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .disabled(isRunning)
                 )
             },
             controlSetting(

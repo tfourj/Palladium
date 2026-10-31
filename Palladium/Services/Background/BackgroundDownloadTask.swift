@@ -64,6 +64,11 @@ final class BackgroundDownloadTask {
         return false
     }
 
+    /// Whether downloads can keep running in the background with `mode` on this system.
+    static func isSupported(in mode: BackgroundDownloadMode) -> Bool {
+        mode == .silentAudio || isSupported
+    }
+
     /// The bundle identifier this install runs under, which sideloading tools may have changed.
     static var bundleIdentifier: String {
         Bundle.main.bundleIdentifier ?? "unknown"

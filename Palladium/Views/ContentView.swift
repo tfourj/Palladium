@@ -384,6 +384,7 @@ struct ContentView: View {
                     saveIncompleteDownloadsToHistory: $saveIncompleteDownloadsToHistory,
                     detailedProgressEnabled: $detailedProgressEnabled,
                     backgroundDownloadsEnabled: $backgroundDownloadsEnabled,
+                    backgroundDownloadMode: $backgroundDownloadMode,
                     downloadPresetSettings: $downloadPresetSettings,
                     shareSheetDownloadMode: $shareSheetDownloadMode,
                     showShareSheetFormatButton: $showShareSheetFormatButton,

@@ -100,7 +100,7 @@ Palladium/
 | `Views/Tabs/Settings/DownloadArgumentsSettingsView.swift` | Custom yt-dlp argument settings screen. |
 | `Views/Tabs/Settings/WebsiteArgumentsSettingsView.swift` | Per-website yt-dlp argument rule list, editor, and link tester. |
 | `Views/Tabs/Settings/DownloadBehaviorSettingsView.swift` | Download behavior settings screen. |
-| `Views/Tabs/Settings/BackgroundDownloadSettingsView.swift` | Background download toggle, install status, and patched IPA tools for sideloaded installs. |
+| `Views/Tabs/Settings/BackgroundDownloadSettingsView.swift` | Background download toggle, mode picker, install status, and patched IPA tools for sideloaded installs. |
 | `Views/Tabs/Settings/DownloadModesSettingsView.swift` | Download-mode settings screen. |
 | `Views/Tabs/Settings/DownloadOptionsSettingsView.swift` | Download option settings screen. |
 | `Views/Tabs/Settings/DownloadQualitySettingsView.swift` | Default video and audio quality settings screen. |
