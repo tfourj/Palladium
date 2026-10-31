@@ -15786,7 +15786,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Keeps downloads running after you leave Palladium and shows their progress in system UI. Requires iOS 26 or later."
+            "value" : "Keeps downloads running after you leave Palladium."
           }
         },
         "es" : {
@@ -15817,6 +15817,56 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "离开 Palladium 后继续下载，并在系统界面中显示进度。需要 iOS 26 或更高版本。"
+          }
+        }
+      }
+    },
+    "settings.download_behavior.background.mode" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Background Mode"
+          }
+        }
+      }
+    },
+    "settings.download_behavior.background.mode.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "System Task uses iOS 26 background tasks and shows progress in system UI. Silent Audio plays silent audio to keep Palladium running, which also works in LiveContainer and on older iOS versions but uses more battery."
+          }
+        }
+      }
+    },
+    "settings.download_behavior.background.mode.livecontainer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Palladium is running in LiveContainer, which does not support system background tasks. Use Silent Audio instead."
+          }
+        }
+      }
+    },
+    "settings.download_behavior.background.mode.silent_audio" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Silent Audio"
+          }
+        }
+      }
+    },
+    "settings.download_behavior.background.mode.system_task" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "System Task"
           }
         }
       }
