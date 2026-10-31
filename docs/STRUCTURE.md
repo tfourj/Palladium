@@ -125,6 +125,7 @@ Palladium/
 | `Services/Background/IPABackgroundPatcher.swift` | Adds a background task identifier to an .ipa's Info.plist without touching other archive entries. |
 | `Services/Background/InstalledAppExporter.swift` | Packages the installed app bundle into a patched .ipa with Palladium's original bundle IDs. |
 | `Services/Background/PatchedIPABuilder.swift` | Downloads the latest stable release and patches it for the bundle ID this install runs with. |
+| `Services/Background/SilentAudioKeepAlive.swift` | Plays silent audio to keep downloads running where background tasks are unavailable, such as LiveContainer. |
 | `Services/Cookies/NetscapeCookieExporter.swift` | Converts browser cookies into Netscape cookie-file records. |
 | `Services/Debug/DeveloperDiagnostics.swift` | Debug-only version probes and framework checks for the developer menu. |
 | `Services/FFmpeg/SwiftFFmpegBridge.swift` | Swift interface to bundled FFmpeg functionality. |
