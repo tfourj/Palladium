@@ -397,10 +397,22 @@
             "value" : "Spanish"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Español"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "スペイン語"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "스페인어"
           }
         },
         "lt" : {
@@ -409,22 +421,10 @@
             "value" : "Spanish"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Español"
-          }
-        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "西班牙语"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "스페인어"
           }
         }
       }
@@ -5125,10 +5125,22 @@
             "value" : "Cut sponsor segments from YouTube videos with SponsorBlock"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recortar segmentos de patrocinadores de vídeos de YouTube con SponsorBlock"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "SponsorBlockでYouTube動画からスポンサー部分をカット"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SponsorBlock으로 YouTube 동영상의 스폰서 구간 잘라내기"
           }
         },
         "lt" : {
@@ -5137,22 +5149,10 @@
             "value" : "Cut sponsor segments from YouTube videos with SponsorBlock"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Recortar segmentos de patrocinadores de vídeos de YouTube con SponsorBlock"
-          }
-        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "使用 SponsorBlock 剪除 YouTube 视频中的赞助片段"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "SponsorBlock으로 YouTube 동영상의 스폰서 구간 잘라내기"
           }
         }
       }
@@ -5166,10 +5166,22 @@
             "value" : "Remove sponsors"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quitar patrocinios"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "スポンサーを削除"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "스폰서 제거"
           }
         },
         "lt" : {
@@ -5178,22 +5190,10 @@
             "value" : "Remove sponsors"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Quitar patrocinios"
-          }
-        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "移除赞助片段"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "스폰서 제거"
           }
         }
       }
@@ -9388,10 +9388,22 @@
             "value" : "Continue in Background"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuar en segundo plano"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "バック グラウンドで続行"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "백그라운드에서 계속"
           }
         },
         "lt" : {
@@ -9400,22 +9412,10 @@
             "value" : "Continue in Background"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Continuar en segundo plano"
-          }
-        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "在后台继续"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "백그라운드에서 계속"
           }
         }
       }
@@ -9508,10 +9508,22 @@
             "value" : "This is taking longer than usual. You can keep it running in the background or cancel it."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puede tardar más de lo normal. Puedes dejarlo ejecutándose en segundo plano o cancelarlo."
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "通常よりも時間がかかります。バックグラウンドで実行するかキャンセルできます。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "평소보다 시간이 오래 걸리고 있습니다. 백그라운드에서 계속 실행하거나 취소할 수 있습니다."
           }
         },
         "lt" : {
@@ -9520,22 +9532,10 @@
             "value" : "This is taking longer than usual. You can keep it running in the background or cancel it."
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Puede tardar más de lo normal. Puedes dejarlo ejecutándose en segundo plano o cancelarlo."
-          }
-        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "耗时比平时更长。您可以让它在后台继续运行，或将其取消。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "평소보다 시간이 오래 걸리고 있습니다. 백그라운드에서 계속 실행하거나 취소할 수 있습니다."
           }
         }
       }
@@ -14791,10 +14791,22 @@
             "value" : "Support Palladium on Ko-fi"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apoya a Palladium en Ko-fi"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ko-FiでPalladiumをサポートする"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ko-fi에서 Palladium 후원하기"
           }
         },
         "lt" : {
@@ -14803,22 +14815,10 @@
             "value" : "Support Palladium on Ko-fi"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apoya a Palladium en Ko-fi"
-          }
-        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "在 Ko-fi 上支持 Palladium"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ko-fi에서 Palladium 후원하기"
           }
         }
       }
@@ -14831,10 +14831,22 @@
             "value" : "Buy Me a Coffee"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buy Me a Coffee"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "コーヒーをご馳走する"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "커피 한 잔 사주기"
           }
         },
         "lt" : {
@@ -14843,22 +14855,10 @@
             "value" : "Buy Me a Coffee"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Buy Me a Coffee"
-          }
-        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "请我喝杯咖啡"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "커피 한 잔 사주기"
           }
         }
       }
@@ -15911,10 +15911,22 @@
             "value" : "Checks the clipboard for a link when you open Palladium and starts a download with the selected mode. Ask shows the download mode picker. iOS may ask for permission to paste."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revisa el portapapeles por un enlace cuando abres Palladium y empieza una descarga con el modo seleccionado. Preguntar muestra el selector de descargas. iOS puede que te pida permiso para pegar."
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Palladiumを開いて選択したモードでダウンロードを開始すると、クリップボードのリンクを確認します。「Ask」はダウンロードモードピッカーを表示します。iOSはペーストする権限を求める場合があります。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Palladium을 열 때 클립보드에서 링크를 확인하고 선택한 모드로 다운로드를 시작합니다. 묻기를 선택하면 다운로드 모드 선택기가 표시됩니다. iOS에서 붙여넣기 권한을 요청할 수 있습니다."
           }
         },
         "lt" : {
@@ -15923,22 +15935,10 @@
             "value" : "Checks the clipboard for a link when you open Palladium and starts a download with the selected mode. Ask shows the download mode picker. iOS may ask for permission to paste."
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Revisa el portapapeles por un enlace cuando abres Palladium y empieza una descarga con el modo seleccionado. Preguntar muestra el selector de descargas. iOS puede que te pida permiso para pegar."
-          }
-        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "打开 Palladium 时检查剪贴板中的链接，并使用所选模式开始下载。选择“请求”会显示下载模式选择器。iOS 可能会请求粘贴权限。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Palladium을 열 때 클립보드에서 링크를 확인하고 선택한 모드로 다운로드를 시작합니다. 묻기를 선택하면 다운로드 모드 선택기가 표시됩니다. iOS에서 붙여넣기 권한을 요청할 수 있습니다."
           }
         }
       }
@@ -15951,10 +15951,22 @@
             "value" : "Download mode"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modo de descarga"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "ダウンロードモード"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다운로드 모드"
           }
         },
         "lt" : {
@@ -15963,22 +15975,10 @@
             "value" : "Download mode"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Modo de descarga"
-          }
-        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "下载模式"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "다운로드 모드"
           }
         }
       }
@@ -15991,10 +15991,22 @@
             "value" : "Auto Paste Link"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pegar enlace automáticamente"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "リンクを自動貼り付け"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "링크 자동 붙여넣기"
           }
         },
         "lt" : {
@@ -16003,22 +16015,10 @@
             "value" : "Auto Paste Link"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pegar enlace automáticamente"
-          }
-        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "自动粘贴链接"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "링크 자동 붙여넣기"
           }
         }
       }
@@ -16031,10 +16031,22 @@
             "value" : "Auto paste link"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pegar enlace automáticamente"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "リンクを自動貼り付け"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "링크 자동 붙여넣기"
           }
         },
         "lt" : {
@@ -16043,22 +16055,10 @@
             "value" : "Auto paste link"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pegar enlace automáticamente"
-          }
-        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "自动粘贴链接"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "링크 자동 붙여넣기"
           }
         }
       }
@@ -16191,10 +16191,22 @@
             "value" : "Background Mode"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modo segundo plano"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "バックグラウンドモード"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "백그라운드 모드"
           }
         },
         "lt" : {
@@ -16203,22 +16215,10 @@
             "value" : "Background Mode"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Modo segundo plano"
-          }
-        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "后台模式"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "백그라운드 모드"
           }
         }
       }
@@ -16231,10 +16231,22 @@
             "value" : "System Task uses iOS 26 background tasks and shows progress in system UI. Silent Audio plays silent audio to keep Palladium running, which also works in LiveContainer and on older iOS versions but uses more battery."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tarea del sistema usa las tareas en segundo plano de iOS 26 y muestra el progreso en la interfaz. Audio silencioso reproduce un audio inaudible que mantiene a Palladium ejecutándose, que también funciona en LiveContainer y en versiones antiguas de iOS pero usa más batería."
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "システムタスクはiOS 26のバックグラウンドタスクを使用し、システムUIに進行状況を表示します。無音オーディオは無音の音声を再生してPalladiumの実行を維持します。LiveContainerや古いiOSバージョンでも動作しますが、バッテリーの消費が増えます。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "시스템 작업은 iOS 26 백그라운드 작업을 사용하며 시스템 UI에 진행 상황을 표시합니다. 무음 오디오는 무음 오디오를 재생해 Palladium을 계속 실행하며, LiveContainer와 이전 iOS 버전에서도 작동하지만 배터리를 더 많이 사용합니다."
           }
         },
         "lt" : {
@@ -16243,22 +16255,10 @@
             "value" : "System Task uses iOS 26 background tasks and shows progress in system UI. Silent Audio plays silent audio to keep Palladium running, which also works in LiveContainer and on older iOS versions but uses more battery."
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tarea del sistema usa las tareas en segundo plano de iOS 26 y muestra el progreso en la interfaz. Audio silencioso reproduce un audio inaudible que mantiene a Palladium ejecutándose, que también funciona en LiveContainer y en versiones antiguas de iOS pero usa más batería."
-          }
-        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "系统任务使用 iOS 26 后台任务，并在系统界面中显示进度。静音音频会播放无声音频以保持 Palladium 运行，也适用于 LiveContainer 和旧版 iOS，但耗电更多。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "시스템 작업은 iOS 26 백그라운드 작업을 사용하며 시스템 UI에 진행 상황을 표시합니다. 무음 오디오는 무음 오디오를 재생해 Palladium을 계속 실행하며, LiveContainer와 이전 iOS 버전에서도 작동하지만 배터리를 더 많이 사용합니다."
           }
         }
       }
@@ -16271,10 +16271,22 @@
             "value" : "Palladium is running in LiveContainer, which does not support system background tasks. Use Silent Audio instead."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Palladium se está ejecutando en LiveContainer, que no soporta las tareas del sistema en segundo plano. Usa Audio silencioso en su lugar."
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "PalladiumはLiveContainerで実行されています。LiveContainerはシステムのバックグラウンドタスクに対応していないため、代わりに無音オーディオを使用してください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Palladium이 LiveContainer에서 실행 중이며, LiveContainer는 시스템 백그라운드 작업을 지원하지 않습니다. 대신 무음 오디오를 사용하세요."
           }
         },
         "lt" : {
@@ -16283,22 +16295,10 @@
             "value" : "Palladium is running in LiveContainer, which does not support system background tasks. Use Silent Audio instead."
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Palladium se está ejecutando en LiveContainer, que no soporta las tareas del sistema en segundo plano. Usa Audio silencioso en su lugar."
-          }
-        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Palladium 正在 LiveContainer 中运行，LiveContainer 不支持系统后台任务。请改用静音音频。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Palladium이 LiveContainer에서 실행 중이며, LiveContainer는 시스템 백그라운드 작업을 지원하지 않습니다. 대신 무음 오디오를 사용하세요."
           }
         }
       }
@@ -16311,10 +16311,22 @@
             "value" : "Silent Audio"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio silencioso"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "無音オーディオ"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "무음 오디오"
           }
         },
         "lt" : {
@@ -16323,22 +16335,10 @@
             "value" : "Silent Audio"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Audio silencioso"
-          }
-        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "静音音频"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "무음 오디오"
           }
         }
       }
@@ -16351,10 +16351,22 @@
             "value" : "System Task"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tarea del sistema"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "システムタスク"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "시스템 작업"
           }
         },
         "lt" : {
@@ -16363,22 +16375,10 @@
             "value" : "System Task"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tarea del sistema"
-          }
-        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "系统任务"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "시스템 작업"
           }
         }
       }
@@ -17272,10 +17272,22 @@
             "value" : "Remove Sponsors"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quitar patrocinios"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "スポンサーを削除"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "스폰서 제거"
           }
         },
         "lt" : {
@@ -17284,22 +17296,10 @@
             "value" : "Remove Sponsors"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Quitar patrocinios"
-          }
-        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "移除赞助片段"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "스폰서 제거"
           }
         }
       }
