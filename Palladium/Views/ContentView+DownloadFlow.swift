@@ -462,7 +462,7 @@ extension ContentView {
 
         BackgroundDownloadTask.shared.begin(
             subtitle: backgroundDownloadSubtitle,
-            allowsContinuedProcessing: backgroundDownloadsEnabled,
+            mode: backgroundDownloadsEnabled ? backgroundDownloadMode : nil,
             log: { appendConsoleText($0) },
             onStop: {
                 downloadStoppedByBackgroundTask = true

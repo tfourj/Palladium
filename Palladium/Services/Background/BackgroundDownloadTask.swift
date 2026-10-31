@@ -5,8 +5,9 @@ import UIKit
 /// Keeps a running download alive while Palladium is in the background.
 ///
 /// On iOS 26 and later a download runs as a continued processing task, which shows system progress UI and lets
-/// the Python flow keep running after the app leaves the foreground. Older systems, or submissions the scheduler
-/// rejects, fall back to the short UIKit background time window.
+/// the Python flow keep running after the app leaves the foreground. The silent audio mode plays silence instead,
+/// which also works in LiveContainer and on older systems. Older systems, or submissions the scheduler or audio
+/// session rejects, fall back to the short UIKit background time window.
 final class BackgroundDownloadTask {
     static let shared = BackgroundDownloadTask()
 
@@ -92,12 +93,12 @@ final class BackgroundDownloadTask {
 
     /// Starts background execution for a download, or reuses the task that is still active from a previous one.
     ///
-    /// When `allowsContinuedProcessing` is false, only the short UIKit background time window is requested.
+    /// When `mode` is nil, only the short UIKit background time window is requested.
     ///
     /// `onStop` runs when the system progress UI's stop button ends the task while the app is in the background.
     func begin(
         subtitle: String,
-        allowsContinuedProcessing: Bool,
+        mode: BackgroundDownloadMode?,
         log: @escaping (String) -> Void,
         onStop: @escaping () -> Void
     ) {
@@ -107,7 +108,7 @@ final class BackgroundDownloadTask {
         self.onStop = onStop
         defaultSubtitle = subtitle
 
-        if continuedTask != nil || submittedIdentifier != nil {
+        if continuedTask != nil || submittedIdentifier != nil || SilentAudioKeepAlive.shared.isActive {
             resetProgress()
             update(fraction: 0, subtitle: nil)
             log("[palladium] reusing background download task\n")
@@ -116,7 +117,9 @@ final class BackgroundDownloadTask {
 
         currentFraction = 0
         wantedSubtitle = subtitle
-        if allowsContinuedProcessing, #available(iOS 26.0, *), submitContinuedProcessingTask(subtitle: subtitle) {
+        if mode == .systemTask, #available(iOS 26.0, *), submitContinuedProcessingTask(subtitle: subtitle) {
+            endLegacyTask()
+        } else if mode == .silentAudio, SilentAudioKeepAlive.shared.start(log: log) {
             endLegacyTask()
         } else if legacyTaskID == .invalid {
             beginLegacyTask()
@@ -396,6 +399,12 @@ final class BackgroundDownloadTask {
                 task.progress.completedUnitCount = task.progress.totalUnitCount
             }
             task.setTaskCompleted(success: success)
+        } else if SilentAudioKeepAlive.shared.isActive {
+            // Post-download actions need the same moment as above once the audio stops.
+            if UIApplication.shared.applicationState != .active, legacyTaskID == .invalid {
+                beginLegacyTask()
+            }
+            SilentAudioKeepAlive.shared.stop()
         } else {
             endLegacyTask()
         }
