@@ -86,6 +86,7 @@ struct SettingsAboutView: View {
                     creditBadge(name: "so-5699", initial: "S", language: "about.translators.japanese", flag: "🇯🇵")
                     creditBadge(name: "profs35", initial: "P", language: "about.translators.korean", flag: "🇰🇷")
                     creditBadge(name: "soci-art", initial: "S", language: "about.translators.chinese", flag: "🇨🇳")
+                    creditBadge(name: "Juan En", initial: "J", language: "about.translators.spanish", flag: "🇪🇸")
                 }
                 .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
             }

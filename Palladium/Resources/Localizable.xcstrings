@@ -389,6 +389,16 @@
         }
       }
     },
+    "about.translators.spanish" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spanish"
+          }
+        }
+      }
+    },
     "about.translators.title" : {
       "localizations" : {
         "en" : {
