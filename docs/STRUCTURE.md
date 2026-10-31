@@ -49,6 +49,7 @@ Palladium/
 | `AppIntents/ShortcutDownloadIntents.swift` | App Shortcuts intents for starting downloads. |
 | `Models/AppAppearanceMode.swift` | Appearance-mode setting model. |
 | `Models/AppLanguageSettings.swift` | Persisted app language, system-language resolution, and observable localization bundle. |
+| `Models/BackgroundDownloadMode.swift` | Background download mode setting and LiveContainer detection. |
 | `Models/BackgroundDownloadProgress.swift` | Combines yt-dlp stream and ffmpeg progress into one fraction for the system background task UI. |
 | `Models/ClipboardLinkDetector.swift` | Finds the first web link in clipboard text for auto paste downloads. |
 | `Models/DownloadServiceDomain.swift` | Canonical source-service domain resolver for saved-download folders. |
@@ -59,6 +60,7 @@ Palladium/
 | `Models/ImportedCookieFile.swift` | Imported cookie-file model. |
 | `Models/LinkHistory.swift` | Previously used link model and history storage data. |
 | `Models/PackageSourceMode.swift` | Package-source selection model. |
+| `Models/PackageActivityLine.swift` | Picks the latest readable package install step from log output. |
 | `Models/TemporaryDownloadRetentionPolicy.swift` | Decides whether completed temporary downloads are removed after saving. |
 | `Models/JavaScriptRuntime.swift` | Persisted JavaScript runtime choice, defaulting to Apple WebKit. |
 | `Models/YouTubePatchMode.swift` | Patch target setting model. |
@@ -98,7 +100,7 @@ Palladium/
 | `Views/Tabs/Settings/DownloadArgumentsSettingsView.swift` | Custom yt-dlp argument settings screen. |
 | `Views/Tabs/Settings/WebsiteArgumentsSettingsView.swift` | Per-website yt-dlp argument rule list, editor, and link tester. |
 | `Views/Tabs/Settings/DownloadBehaviorSettingsView.swift` | Download behavior settings screen. |
-| `Views/Tabs/Settings/BackgroundDownloadSettingsView.swift` | Background download toggle, install status, and patched IPA tools for sideloaded installs. |
+| `Views/Tabs/Settings/BackgroundDownloadSettingsView.swift` | Background download toggle, mode picker, install status, and patched IPA tools for sideloaded installs. |
 | `Views/Tabs/Settings/DownloadModesSettingsView.swift` | Download-mode settings screen. |
 | `Views/Tabs/Settings/DownloadOptionsSettingsView.swift` | Download option settings screen. |
 | `Views/Tabs/Settings/DownloadQualitySettingsView.swift` | Default video and audio quality settings screen. |
@@ -123,6 +125,7 @@ Palladium/
 | `Services/Background/IPABackgroundPatcher.swift` | Adds a background task identifier to an .ipa's Info.plist without touching other archive entries. |
 | `Services/Background/InstalledAppExporter.swift` | Packages the installed app bundle into a patched .ipa with Palladium's original bundle IDs. |
 | `Services/Background/PatchedIPABuilder.swift` | Downloads the latest stable release and patches it for the bundle ID this install runs with. |
+| `Services/Background/SilentAudioKeepAlive.swift` | Plays silent audio to keep downloads running where background tasks are unavailable, such as LiveContainer. |
 | `Services/Cookies/NetscapeCookieExporter.swift` | Converts browser cookies into Netscape cookie-file records. |
 | `Services/Debug/DeveloperDiagnostics.swift` | Debug-only version probes and framework checks for the developer menu. |
 | `Services/FFmpeg/SwiftFFmpegBridge.swift` | Swift interface to bundled FFmpeg functionality. |
@@ -156,13 +159,12 @@ Palladium/
 | --- | --- |
 | `Resources/Assets.xcassets/Contents.json` | Asset catalog metadata. |
 | `Resources/Assets.xcassets/AccentColor.colorset/Contents.json` | Accent color definition. |
-| `Resources/Assets.xcassets/AppIcon.appiconset/Contents.json` | App icon metadata. |
-| `Resources/Assets.xcassets/AppIcon.appiconset/*.png` | App icon variants. |
 | `Resources/Assets.xcassets/palladium_dark.imageset/Contents.json` | Dark logo metadata. |
 | `Resources/Assets.xcassets/palladium_dark.imageset/palladium_dark.png` | Dark logo image. |
 | `Resources/Assets.xcassets/palladium_light.imageset/Contents.json` | Light logo metadata. |
 | `Resources/Assets.xcassets/palladium_light.imageset/palladium_light.png` | Light logo image. |
 | `Resources/Localizable.xcstrings` | Localized app strings. |
+| `Resources/Palladium.icon` | Icon Composer app icon. |
 
 ## Share Extension: `ShareExtension/`
 
@@ -185,11 +187,15 @@ Palladium/
 | `scripts/python_tests/test_debug_diagnostics.py` | Debug diagnostic dispatch, Python snippet evaluation, and bridge probe tests. |
 | `scripts/python_tests/test_output_templates.py` | Filename preset selection and output-argument priority tests. |
 | `scripts/python_tests/test_post_processing.py` | Conversion override, codec and encoder resolution, stream-copy, and audio extraction tests. |
+| `scripts/python_tests/test_sponsorblock.py` | SponsorBlock removal argument, preset skipping, and user override tests. |
 | `scripts/python_tests/test_staged_scripts.py` | Checks every Python package module is staged by `PythonScripts.swift`. |
 | `scripts/swift_tests/PostProcessingPreferencesTests.swift` | Video conversion defaults, codec and encoder resolution, and persistence. |
+| `scripts/swift_tests/DownloadPresetTests.swift` | Per-preset SponsorBlock support tests. |
 | `scripts/swift_tests/AppLanguageSettingsTests.swift` | Language persistence, regional matching, English fallback, and view invalidation. |
 | `scripts/swift_tests/DeveloperDiagnosticsTests.swift` | Developer diagnostic parsing plus native FFmpeg and QuickJS check tests. |
+| `scripts/swift_tests/BackgroundDownloadModeTests.swift` | Background download mode defaults and per-mode support tests. |
 | `scripts/swift_tests/BackgroundDownloadProgressTests.swift` | Background download stream ordering, side-file, processing, and playlist progress tests. |
+| `scripts/swift_tests/BackgroundDownloadTaskTests.swift` | Background stop result keeping and stalled-progress heartbeat step tests. |
 | `scripts/swift_tests/DownloadServiceDomainTests.swift` | Saved-download service-domain canonicalization tests. |
 | `scripts/swift_tests/ClipboardLinkDetectorTests.swift` | Clipboard text link detection tests for auto paste downloads. |
 | `scripts/swift_tests/WebsiteArgumentRuleTests.swift` | Website argument rule matching priority, normalization, and persistence tests. |
@@ -198,6 +204,7 @@ Palladium/
 | `scripts/swift_tests/IPABackgroundPatcherTests.swift` | .ipa Info.plist patching, already-patched detection, and archive preservation tests. |
 | `scripts/swift_tests/InstalledAppExporterTests.swift` | Installed-bundle .ipa layout, permissions, plist patching, and original bundle ID tests. |
 | `scripts/swift_tests/TemporaryDownloadRetentionPolicyTests.swift` | Temporary-download cleanup policy tests. |
+| `scripts/swift_tests/PackageActivityLineTests.swift` | Package install step parsing tests for the update overlay. |
 
 ## Other Files and Directories
 

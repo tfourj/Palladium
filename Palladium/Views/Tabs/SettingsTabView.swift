@@ -83,6 +83,7 @@ struct SettingsTabView: View {
     @Binding var saveIncompleteDownloadsToHistory: Bool
     @Binding var detailedProgressEnabled: Bool
     @Binding var backgroundDownloadsEnabled: Bool
+    @Binding var backgroundDownloadMode: BackgroundDownloadMode
     @Binding var downloadPresetSettings: [DownloadPresetSetting]
     @Binding var shareSheetDownloadMode: ShareSheetDownloadMode
     @Binding var showShareSheetFormatButton: Bool
@@ -97,6 +98,7 @@ struct SettingsTabView: View {
     @Binding var defaultDownloadPlaylist: Bool
     @Binding var defaultDownloadSubtitles: Bool
     @Binding var defaultEmbedThumbnail: Bool
+    @Binding var defaultRemoveSponsorSegments: Bool
     @Binding var defaultUseCookies: Bool
     @Binding var restoreDownloadDefaults: Bool
     let importedCookieFiles: [ImportedCookieFile]
@@ -270,6 +272,7 @@ struct SettingsTabView: View {
                 defaultDownloadPlaylist: $defaultDownloadPlaylist,
                 defaultDownloadSubtitles: $defaultDownloadSubtitles,
                 defaultEmbedThumbnail: $defaultEmbedThumbnail,
+                defaultRemoveSponsorSegments: $defaultRemoveSponsorSegments,
                 defaultUseCookies: $defaultUseCookies,
                 restoreDownloadDefaults: $restoreDownloadDefaults,
                 isRunning: isRunning
@@ -293,6 +296,7 @@ struct SettingsTabView: View {
         case .backgroundDownloads:
             BackgroundDownloadSettingsView(
                 backgroundDownloadsEnabled: $backgroundDownloadsEnabled,
+                backgroundDownloadMode: $backgroundDownloadMode,
                 isRunning: isRunning
             )
         case .downloadArguments:
@@ -428,6 +432,7 @@ struct SettingsTabView: View {
             settingsNavigationLink(for: .downloadModes)
             settingsNavigationLink(for: .shareSheet)
             settingsNavigationLink(for: .downloadQuality)
+            settingsNavigationLink(for: .downloadOptions)
             settingsNavigationLink(for: .postProcessing)
             settingsNavigationLink(for: .afterDownload)
             settingsNavigationLink(for: .downloadBehavior)
@@ -659,6 +664,14 @@ struct SettingsTabView: View {
                 AnyView(searchToggle(title, isOn: $defaultEmbedThumbnail, disabled: isRunning))
             },
             controlSetting(
+                id: "defaultSponsorBlock",
+                menu: .downloadOptions,
+                title: "settings.download_defaults.sponsorblock.default",
+                subtitle: "download.options.sponsorblock.help"
+            ) { title in
+                AnyView(searchToggle(title, isOn: $defaultRemoveSponsorSegments, disabled: isRunning))
+            },
+            controlSetting(
                 id: "defaultCookies",
                 menu: .downloadOptions,
                 title: "settings.download_defaults.cookies.default",
@@ -760,8 +773,25 @@ struct SettingsTabView: View {
                     searchToggle(
                         title,
                         isOn: $backgroundDownloadsEnabled,
-                        disabled: isRunning || !BackgroundDownloadTask.isSupported
+                        disabled: isRunning || !BackgroundDownloadTask.isSupported(in: backgroundDownloadMode)
                     )
+                )
+            },
+            controlSetting(
+                id: "backgroundDownloadMode",
+                menu: .backgroundDownloads,
+                title: "settings.download_behavior.background.mode",
+                subtitle: "settings.download_behavior.background.mode.help"
+            ) { title in
+                AnyView(
+                    Picker(title, selection: $backgroundDownloadMode) {
+                        ForEach(BackgroundDownloadMode.allCases) { mode in
+                            Text(mode.title)
+                                .tag(mode)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .disabled(isRunning)
                 )
             },
             controlSetting(

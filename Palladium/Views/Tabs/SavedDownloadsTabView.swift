@@ -371,7 +371,12 @@ private struct SavedAVPlayerView: UIViewControllerRepresentable {
     static func dismantleUIViewController(_ controller: AVPlayerViewController, coordinator: ()) {
         controller.player?.pause()
         controller.player = nil
-        try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+        // A background download may still need its silent audio session.
+        if SilentAudioKeepAlive.shared.isActive {
+            SilentAudioKeepAlive.shared.resumeIfActive()
+        } else {
+            try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+        }
     }
 }
 

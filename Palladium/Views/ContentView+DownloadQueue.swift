@@ -27,7 +27,8 @@ extension ContentView {
             afterDownloadBehaviorRawValue: afterDownloadBehavior.rawValue,
             postProcessing: PostProcessingPreferences.load(),
             filenameExportPreset: filenameExportPreset,
-            customFilenameTemplate: customFilenameTemplate
+            customFilenameTemplate: customFilenameTemplate,
+            removeSponsorSegments: removeSponsorSegments
         )
     }
 

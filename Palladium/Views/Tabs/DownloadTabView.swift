@@ -11,6 +11,7 @@ struct DownloadTabView: View {
     @Binding var downloadPlaylist: Bool
     @Binding var downloadSubtitles: Bool
     @Binding var embedThumbnail: Bool
+    @Binding var removeSponsorSegments: Bool
     @Binding var subtitleLanguagePattern: String
     @Binding var customSubtitleLanguagePattern: String
     @Binding var useCookies: Bool
@@ -212,6 +213,20 @@ struct DownloadTabView: View {
                                         subtitle: String(localized: "download.options.thumbnail.help", bundle: .app),
                                         isOn: $embedThumbnail
                                     )
+
+                                    if selectedPreset.supportsSponsorBlock {
+                                        downloadOptionToggle(
+                                            title: String(
+                                                localized: "download.options.sponsorblock.title",
+                                                bundle: .app
+                                            ),
+                                            subtitle: String(
+                                                localized: "download.options.sponsorblock.help",
+                                                bundle: .app
+                                            ),
+                                            isOn: $removeSponsorSegments
+                                        )
+                                    }
                                 }
 
                                 cookieSelectionRow
@@ -725,6 +740,9 @@ struct DownloadTabView: View {
         }
         if embedThumbnail {
             parts.append(String(localized: "download.options.thumbnail.title", bundle: .app))
+        }
+        if removeSponsorSegments, selectedPreset.supportsSponsorBlock {
+            parts.append(String(localized: "download.options.sponsorblock.title", bundle: .app))
         }
         let selectedCookieName = selectedCookieFileName.trimmingCharacters(in: .whitespacesAndNewlines)
         if useCookies, !selectedCookieName.isEmpty {

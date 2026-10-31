@@ -63,15 +63,18 @@ struct ContentView: View {
     static let downloadPlaylistDefaultsKey = "palladium.downloadPlaylist"
     static let downloadSubtitlesDefaultsKey = "palladium.downloadSubtitles"
     static let embedThumbnailDefaultsKey = "palladium.embedThumbnail"
+    static let removeSponsorSegmentsDefaultsKey = "palladium.removeSponsorSegments"
     static let defaultDownloadPlaylistDefaultsKey = "palladium.defaultDownloadPlaylist"
     static let defaultDownloadSubtitlesDefaultsKey = "palladium.defaultDownloadSubtitles"
     static let defaultEmbedThumbnailDefaultsKey = "palladium.defaultEmbedThumbnail"
+    static let defaultRemoveSponsorSegmentsDefaultsKey = "palladium.defaultRemoveSponsorSegments"
     static let defaultUseCookiesDefaultsKey = "palladium.defaultUseCookies"
     static let restoreDownloadDefaultsDefaultsKey = "palladium.restoreDownloadDefaults"
     static let autoRetryFailedDownloadsDefaultsKey = "palladium.autoRetryFailedDownloads"
     static let saveIncompleteDownloadsToHistoryDefaultsKey = "palladium.saveIncompleteDownloadsToHistory"
     static let detailedProgressEnabledDefaultsKey = "palladium.detailedProgressEnabled"
     static let backgroundDownloadsEnabledDefaultsKey = "palladium.backgroundDownloadsEnabled"
+    static let backgroundDownloadModeDefaultsKey = "palladium.backgroundDownloadMode"
     static let subtitleLanguagePatternDefaultsKey = "palladium.subtitleLanguagePattern"
     static let customSubtitleLanguagePatternDefaultsKey = "palladium.customSubtitleLanguagePattern"
     static let useCookiesDefaultsKey = "palladium.useCookies"
@@ -120,15 +123,18 @@ struct ContentView: View {
     @State var downloadPlaylist: Bool
     @State var downloadSubtitles: Bool
     @State var embedThumbnail: Bool
+    @State var removeSponsorSegments: Bool
     @State var defaultDownloadPlaylist: Bool
     @State var defaultDownloadSubtitles: Bool
     @State var defaultEmbedThumbnail: Bool
+    @State var defaultRemoveSponsorSegments: Bool
     @State var defaultUseCookies: Bool
     @State var restoreDownloadDefaults: Bool
     @State var autoRetryFailedDownloads: Bool
     @State var saveIncompleteDownloadsToHistory: Bool
     @State var detailedProgressEnabled: Bool
     @State var backgroundDownloadsEnabled: Bool
+    @State var backgroundDownloadMode: BackgroundDownloadMode
     @State var subtitleLanguagePattern: String
     @State var customSubtitleLanguagePattern: String
     @State var useCookies: Bool
@@ -150,6 +156,9 @@ struct ContentView: View {
     @State var isLoadingPackageVersions = false
     @State var isPackageRunning = false
     @State var isAutomaticallyUpdatingPackages = false
+    @State var packageActivityText: String?
+    @State var packageFlowStartDate: Date?
+    @State var showsSlowPackageUpdateActions = false
     @State var hasLoadedPackageStatus = false
     @State var checkPackageUpdatesOnLaunch: Bool
     @State var autoUpdatePackagesOnLaunch: Bool
@@ -179,6 +188,7 @@ struct ContentView: View {
     @State var currentPackageTask: Task<Void, Never>?
     @State var cancelMarkerURL: URL?
     @State var downloadCancelRequested = false
+    @State var downloadStoppedByBackgroundTask = false
     @State var lastDownloadProgressPercent: Double?
     @State var backgroundDownloadProgress = BackgroundDownloadProgress()
     @State var ffmpegProgressDurationSeconds: Double?
@@ -248,19 +258,25 @@ struct ContentView: View {
         let defPlaylist = Self.loadDefaultDownloadPlaylist()
         let defSubtitles = Self.loadDefaultDownloadSubtitles()
         let defThumbnail = Self.loadDefaultEmbedThumbnail()
+        let defSponsorBlock = Self.loadDefaultRemoveSponsorSegments()
         let defCookies = Self.loadDefaultUseCookies()
         _downloadPlaylist = State(initialValue: restoreDefaults ? defPlaylist : Self.loadDownloadPlaylist())
         _downloadSubtitles = State(initialValue: restoreDefaults ? defSubtitles : Self.loadDownloadSubtitles())
         _embedThumbnail = State(initialValue: restoreDefaults ? defThumbnail : Self.loadEmbedThumbnail())
+        _removeSponsorSegments = State(
+            initialValue: restoreDefaults ? defSponsorBlock : Self.loadRemoveSponsorSegments()
+        )
         _defaultDownloadPlaylist = State(initialValue: defPlaylist)
         _defaultDownloadSubtitles = State(initialValue: defSubtitles)
         _defaultEmbedThumbnail = State(initialValue: defThumbnail)
+        _defaultRemoveSponsorSegments = State(initialValue: defSponsorBlock)
         _defaultUseCookies = State(initialValue: defCookies)
         _restoreDownloadDefaults = State(initialValue: restoreDefaults)
         _autoRetryFailedDownloads = State(initialValue: Self.loadAutoRetryFailedDownloads())
         _saveIncompleteDownloadsToHistory = State(initialValue: Self.loadSaveIncompleteDownloadsToHistory())
         _detailedProgressEnabled = State(initialValue: Self.loadDetailedProgressEnabled())
         _backgroundDownloadsEnabled = State(initialValue: Self.loadBackgroundDownloadsEnabled())
+        _backgroundDownloadMode = State(initialValue: Self.loadBackgroundDownloadMode())
         _subtitleLanguagePattern = State(initialValue: Self.loadSubtitleLanguagePattern())
         _customSubtitleLanguagePattern = State(initialValue: Self.loadCustomSubtitleLanguagePattern())
         _useCookies = State(initialValue: restoreDefaults ? defCookies : Self.loadUseCookies())
@@ -303,6 +319,7 @@ struct ContentView: View {
                     downloadPlaylist: $downloadPlaylist,
                     downloadSubtitles: $downloadSubtitles,
                     embedThumbnail: $embedThumbnail,
+                    removeSponsorSegments: $removeSponsorSegments,
                     subtitleLanguagePattern: $subtitleLanguagePattern,
                     customSubtitleLanguagePattern: $customSubtitleLanguagePattern,
                     useCookies: $useCookies,
@@ -377,6 +394,7 @@ struct ContentView: View {
                     saveIncompleteDownloadsToHistory: $saveIncompleteDownloadsToHistory,
                     detailedProgressEnabled: $detailedProgressEnabled,
                     backgroundDownloadsEnabled: $backgroundDownloadsEnabled,
+                    backgroundDownloadMode: $backgroundDownloadMode,
                     downloadPresetSettings: $downloadPresetSettings,
                     shareSheetDownloadMode: $shareSheetDownloadMode,
                     showShareSheetFormatButton: $showShareSheetFormatButton,
@@ -391,6 +409,7 @@ struct ContentView: View {
                     defaultDownloadPlaylist: $defaultDownloadPlaylist,
                     defaultDownloadSubtitles: $defaultDownloadSubtitles,
                     defaultEmbedThumbnail: $defaultEmbedThumbnail,
+                    defaultRemoveSponsorSegments: $defaultRemoveSponsorSegments,
                     defaultUseCookies: $defaultUseCookies,
                     restoreDownloadDefaults: $restoreDownloadDefaults,
                     importedCookieFiles: importedCookieFiles,
@@ -515,6 +534,9 @@ struct ContentView: View {
         .onChange(of: backgroundDownloadsEnabled, initial: false) {
             persistPreferences()
         }
+        .onChange(of: backgroundDownloadMode, initial: false) {
+            persistPreferences()
+        }
         .onChange(of: shareSheetDownloadMode, initial: false) {
             persistPreferences()
         }
@@ -539,6 +561,9 @@ struct ContentView: View {
         .onChange(of: embedThumbnail, initial: false) {
             persistPreferences()
         }
+        .onChange(of: removeSponsorSegments, initial: false) {
+            persistPreferences()
+        }
         .onChange(of: defaultDownloadPlaylist, initial: false) {
             if restoreDownloadDefaults { downloadPlaylist = defaultDownloadPlaylist }
             persistPreferences()
@@ -551,6 +576,10 @@ struct ContentView: View {
             if restoreDownloadDefaults { embedThumbnail = defaultEmbedThumbnail }
             persistPreferences()
         }
+        .onChange(of: defaultRemoveSponsorSegments, initial: false) {
+            if restoreDownloadDefaults { removeSponsorSegments = defaultRemoveSponsorSegments }
+            persistPreferences()
+        }
         .onChange(of: defaultUseCookies, initial: false) {
             if restoreDownloadDefaults { useCookies = defaultUseCookies }
             persistPreferences()
@@ -560,6 +589,7 @@ struct ContentView: View {
                 downloadPlaylist = defaultDownloadPlaylist
                 downloadSubtitles = defaultDownloadSubtitles
                 embedThumbnail = defaultEmbedThumbnail
+                removeSponsorSegments = defaultRemoveSponsorSegments
                 useCookies = defaultUseCookies
             }
             persistPreferences()
@@ -718,42 +748,109 @@ private extension ContentView {
                 .ignoresSafeArea()
 
             VStack(spacing: 16) {
-                ProgressView()
-                    .controlSize(.large)
+                automaticPackageUpdateDetails
 
-                Text("packages.auto_update.title")
-                    .font(.headline)
-
-                Text("packages.auto_update.message")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-
-                if let packageNames = automaticPackageUpdatePackageNamesText {
-                    Text(
-                        String(
-                            format: String(localized: "packages.auto_update.packages", bundle: .app),
-                            packageNames
-                        )
-                    )
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.85)
-                    .truncationMode(.tail)
-                    .frame(maxWidth: .infinity)
+                if showsSlowPackageUpdateActions {
+                    automaticPackageUpdateSlowActions
+                        .transition(.opacity)
                 }
             }
             .padding(24)
             .frame(maxWidth: 280)
             .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14))
             .shadow(radius: 18)
-            .accessibilityElement(children: .combine)
+            .accessibilityElement(children: .contain)
             .accessibilityAddTraits(.isModal)
+            .animation(.default, value: showsSlowPackageUpdateActions)
         }
         .contentShape(Rectangle())
         .accessibilityIdentifier("automaticPackageUpdateOverlay")
+        .task {
+            try? await Task.sleep(for: Self.slowPackageUpdateDelay)
+            guard !Task.isCancelled else { return }
+            showsSlowPackageUpdateActions = true
+        }
+    }
+
+    var automaticPackageUpdateDetails: some View {
+        VStack(spacing: 16) {
+            ProgressView()
+                .controlSize(.large)
+
+            Text("packages.auto_update.title")
+                .font(.headline)
+
+            Text("packages.auto_update.message")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+
+            if let packageNames = automaticPackageUpdatePackageNamesText {
+                Text(
+                    String(
+                        format: String(localized: "packages.auto_update.packages", bundle: .app),
+                        packageNames
+                    )
+                )
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
+                .minimumScaleFactor(0.85)
+                .truncationMode(.tail)
+                .frame(maxWidth: .infinity)
+            }
+
+            if let packageActivityText {
+                Text(verbatim: packageActivityText)
+                    .font(.caption2.monospaced())
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(3)
+                    .truncationMode(.middle)
+                    .frame(maxWidth: .infinity)
+            }
+
+            if let packageFlowStartDate {
+                Label {
+                    Text(packageFlowStartDate, style: .timer)
+                        .monospacedDigit()
+                } icon: {
+                    Image(systemName: "clock")
+                }
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+            }
+        }
+        .accessibilityElement(children: .combine)
+    }
+
+    var automaticPackageUpdateSlowActions: some View {
+        VStack(spacing: 10) {
+            Text(String(localized: "packages.auto_update.slow_message", bundle: .app))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Button {
+                hideAutomaticPackageUpdate()
+            } label: {
+                Text(String(localized: "packages.auto_update.continue_in_background", bundle: .app))
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+            .accessibilityIdentifier("automaticPackageUpdateContinueInBackgroundButton")
+
+            Button(role: .destructive) {
+                cancelAutomaticPackageUpdate()
+            } label: {
+                Text(String(localized: "common.cancel", bundle: .app))
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+            .accessibilityIdentifier("automaticPackageUpdateCancelButton")
+        }
     }
 
     var automaticPackageUpdatePackageNamesText: String? {

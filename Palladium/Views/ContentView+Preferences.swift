@@ -51,6 +51,7 @@ extension ContentView {
         defaults.set(autoDownloadOnPaste, forKey: Self.autoDownloadOnPasteDefaultsKey)
         defaults.set(detailedProgressEnabled, forKey: Self.detailedProgressEnabledDefaultsKey)
         defaults.set(backgroundDownloadsEnabled, forKey: Self.backgroundDownloadsEnabledDefaultsKey)
+        defaults.set(backgroundDownloadMode.rawValue, forKey: Self.backgroundDownloadModeDefaultsKey)
         defaults.set(shareSheetDownloadMode.rawValue, forKey: Self.shareSheetDownloadModeDefaultsKey)
         defaults.set(showShareSheetFormatButton, forKey: Self.showShareSheetFormatButtonDefaultsKey)
         defaults.set(showShareSheetFillURLButton, forKey: Self.showShareSheetFillURLButtonDefaultsKey)
@@ -59,9 +60,11 @@ extension ContentView {
         defaults.set(downloadPlaylist, forKey: Self.downloadPlaylistDefaultsKey)
         defaults.set(downloadSubtitles, forKey: Self.downloadSubtitlesDefaultsKey)
         defaults.set(embedThumbnail, forKey: Self.embedThumbnailDefaultsKey)
+        defaults.set(removeSponsorSegments, forKey: Self.removeSponsorSegmentsDefaultsKey)
         defaults.set(defaultDownloadPlaylist, forKey: Self.defaultDownloadPlaylistDefaultsKey)
         defaults.set(defaultDownloadSubtitles, forKey: Self.defaultDownloadSubtitlesDefaultsKey)
         defaults.set(defaultEmbedThumbnail, forKey: Self.defaultEmbedThumbnailDefaultsKey)
+        defaults.set(defaultRemoveSponsorSegments, forKey: Self.defaultRemoveSponsorSegmentsDefaultsKey)
         defaults.set(defaultUseCookies, forKey: Self.defaultUseCookiesDefaultsKey)
         defaults.set(restoreDownloadDefaults, forKey: Self.restoreDownloadDefaultsDefaultsKey)
         defaults.set(autoRetryFailedDownloads, forKey: Self.autoRetryFailedDownloadsDefaultsKey)
@@ -271,6 +274,14 @@ extension ContentView {
         return UserDefaults.standard.bool(forKey: backgroundDownloadsEnabledDefaultsKey)
     }
 
+    static func loadBackgroundDownloadMode() -> BackgroundDownloadMode {
+        guard let rawValue = UserDefaults.standard.string(forKey: backgroundDownloadModeDefaultsKey),
+              let mode = BackgroundDownloadMode(rawValue: rawValue) else {
+            return .defaultMode(isRunningInLiveContainer: BackgroundDownloadMode.isRunningInLiveContainer)
+        }
+        return mode
+    }
+
     static func loadDownloadPlaylist() -> Bool {
         if UserDefaults.standard.object(forKey: downloadPlaylistDefaultsKey) == nil {
             return false
@@ -292,6 +303,10 @@ extension ContentView {
         return UserDefaults.standard.bool(forKey: embedThumbnailDefaultsKey)
     }
 
+    static func loadRemoveSponsorSegments() -> Bool {
+        UserDefaults.standard.bool(forKey: removeSponsorSegmentsDefaultsKey)
+    }
+
     static func loadDefaultDownloadPlaylist() -> Bool {
         if UserDefaults.standard.object(forKey: defaultDownloadPlaylistDefaultsKey) == nil {
             return false
@@ -311,6 +326,10 @@ extension ContentView {
             return false
         }
         return UserDefaults.standard.bool(forKey: defaultEmbedThumbnailDefaultsKey)
+    }
+
+    static func loadDefaultRemoveSponsorSegments() -> Bool {
+        UserDefaults.standard.bool(forKey: defaultRemoveSponsorSegmentsDefaultsKey)
     }
 
     static func loadDefaultUseCookies() -> Bool {
