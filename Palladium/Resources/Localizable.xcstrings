@@ -389,6 +389,46 @@
         }
       }
     },
+    "about.translators.spanish" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spanish"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Español"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スペイン語"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "스페인어"
+          }
+        },
+        "lt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Spanish"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "西班牙语"
+          }
+        }
+      }
+    },
     "about.translators.title" : {
       "localizations" : {
         "en" : {
@@ -760,7 +800,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Restablecer"
+            "value" : "Limpiar"
           }
         },
         "ja" : {
@@ -5076,6 +5116,88 @@
         }
       }
     },
+    "download.options.sponsorblock.help" : {
+      "comment" : "Subtitle for the download option that removes SponsorBlock sponsor segments.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cut sponsor segments from YouTube videos with SponsorBlock"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recortar segmentos de patrocinadores de vídeos de YouTube con SponsorBlock"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SponsorBlockでYouTube動画からスポンサー部分をカット"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SponsorBlock으로 YouTube 동영상의 스폰서 구간 잘라내기"
+          }
+        },
+        "lt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Cut sponsor segments from YouTube videos with SponsorBlock"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使用 SponsorBlock 剪除 YouTube 视频中的赞助片段"
+          }
+        }
+      }
+    },
+    "download.options.sponsorblock.title" : {
+      "comment" : "Title for the download option that removes SponsorBlock sponsor segments.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove sponsors"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quitar patrocinios"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スポンサーを削除"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "스폰서 제거"
+          }
+        },
+        "lt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Remove sponsors"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "移除赞助片段"
+          }
+        }
+      }
+    },
     "download.options.subtitles.help" : {
       "localizations" : {
         "en" : {
@@ -5087,7 +5209,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Guardar los sidecars de los subtítulos con el\nmedio"
+            "value" : "Guardar los sidecars de los subtítulos con el archivo multimedia"
           }
         },
         "ja" : {
@@ -6415,8 +6537,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Pick max quality applies one choice to every pending download and asks again if a link lacks it. Choose for every link asks for each link before it downloads."
+            "state" : "translated",
+            "value" : "Escoger la máxima calidad aplica una opción a cada descarga pendiente y pregunta otra vez si un enlace no lo encuentra. Escoger para cada link pregunta para cada enlace antes de descargarlo."
           }
         },
         "ja" : {
@@ -6743,8 +6865,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Best Compatible prefers AAC audio for broader playback support. Best Quality keeps the best available source audio without preferring a codec."
+            "state" : "translated",
+            "value" : "Mejor compatible prefiere audio AAC para mayor compatibilidad de reproducción. Mejor calidad mantiene la mejor fuente de audio disponible sin preferir un códec."
           }
         },
         "ja" : {
@@ -6825,8 +6947,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "H.264 and H.265/HEVC in MP4 are compatible with the Photos app. H.264 is preferred when both are available."
+            "state" : "translated",
+            "value" : "H.264 y H.265/HEVC en MP4 son compatibles con la app de Fotos. H.264 se prefiere si ambos están disponibles."
           }
         },
         "ja" : {
@@ -7509,7 +7631,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Los medios guardados en Palladium/Saved aparecerán aquí."
+            "value" : "Los archivos multimedia guardados en Palladium/Saved aparecerán aquí."
           }
         },
         "ja" : {
@@ -7628,8 +7750,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "%lld media items"
+            "state" : "translated",
+            "value" : "%lld elementos de multimedia"
           }
         },
         "ja" : {
@@ -7668,8 +7790,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "This saved folder does not contain any supported media."
+            "state" : "translated",
+            "value" : "Esta carpeta no contiene ningun archivo multimedia soportado."
           }
         },
         "ja" : {
@@ -7708,8 +7830,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "No media in this folder"
+            "state" : "translated",
+            "value" : "No hay multimedia en esta carpeta"
           }
         },
         "ja" : {
@@ -7748,8 +7870,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Saved"
+            "state" : "translated",
+            "value" : "Guardado"
           }
         },
         "ja" : {
@@ -7788,8 +7910,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Temporary"
+            "state" : "translated",
+            "value" : "Temporal"
           }
         },
         "ja" : {
@@ -9258,6 +9380,46 @@
         }
       }
     },
+    "packages.auto_update.continue_in_background" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue in Background"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuar en segundo plano"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バック グラウンドで続行"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "백그라운드에서 계속"
+          }
+        },
+        "lt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Continue in Background"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在后台继续"
+          }
+        }
+      }
+    },
     "packages.auto_update.message" : {
       "localizations" : {
         "en" : {
@@ -9334,6 +9496,46 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "正在更新:%@"
+          }
+        }
+      }
+    },
+    "packages.auto_update.slow_message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This is taking longer than usual. You can keep it running in the background or cancel it."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puede tardar más de lo normal. Puedes dejarlo ejecutándose en segundo plano o cancelarlo."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "通常よりも時間がかかります。バックグラウンドで実行するかキャンセルできます。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "평소보다 시간이 오래 걸리고 있습니다. 백그라운드에서 계속 실행하거나 취소할 수 있습니다."
+          }
+        },
+        "lt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "This is taking longer than usual. You can keep it running in the background or cancel it."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "耗时比平时更长。您可以让它在后台继续运行，或将其取消。"
           }
         }
       }
@@ -10108,8 +10310,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Installs a local payload bundle from a ZIP or .whl file."
+            "state" : "translated",
+            "value" : "Instala un paquete de payload local de un ZIP o un archivo .whl."
           }
         },
         "ja" : {
@@ -10148,8 +10350,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Import Payload Bundle"
+            "state" : "translated",
+            "value" : "Importar paquete de payload"
           }
         },
         "ja" : {
@@ -10188,8 +10390,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Failed to import payload bundle: %@"
+            "state" : "translated",
+            "value" : "Error al importar el paquete de payload: %@"
           }
         },
         "ja" : {
@@ -10228,8 +10430,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Payload Bundle Import Failed"
+            "state" : "translated",
+            "value" : "La importación del paquete payload ha fallado"
           }
         },
         "ja" : {
@@ -10268,8 +10470,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Reload Available Versions"
+            "state" : "translated",
+            "value" : "Recargar versiones disponibles"
           }
         },
         "ja" : {
@@ -10308,8 +10510,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Restore Pip Packages"
+            "state" : "translated",
+            "value" : "Restaurar paquetes de Pip"
           }
         },
         "ja" : {
@@ -10348,8 +10550,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Restore"
+            "state" : "translated",
+            "value" : "Restaurar"
           }
         },
         "ja" : {
@@ -10388,8 +10590,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "This removes imported payload packages and user-added managed packages, then reinstalls the remaining packages from the configured source."
+            "state" : "translated",
+            "value" : "Esto elimina los paquetes de payload importados y los paquetes añadidos administrados por el usuario, y luego reinstala los paquetes restantes desde la fuente configurada."
           }
         },
         "ja" : {
@@ -10468,8 +10670,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Removes payload-installed and user-added managed packages, then reinstalls the remaining runtime packages with pip."
+            "state" : "translated",
+            "value" : "Elimina los paquetes payload administrados instalados y agregados por el usuario, y luego reinstala los paquetes restantes de tiempo de ejecución con pip."
           }
         },
         "ja" : {
@@ -11869,7 +12071,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No se puedo verificar la compatibilidad con el\nmedio."
+            "value" : "No se puedo verificar la compatibilidad con el\narchivo multimedia."
           }
         },
         "ja" : {
@@ -11989,7 +12191,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Error al inspeccionar el códec del medio."
+            "value" : "Error al inspeccionar el códec del archivo multimedia."
           }
         },
         "ja" : {
@@ -12189,7 +12391,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fotos solo tiene disponible un archivo de medio."
+            "value" : "Fotos solo está disponible para un archivo multimedia."
           }
         },
         "ja" : {
@@ -13349,7 +13551,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cola vaciada correctamente"
+            "value" : "Cola limpiada correctamente"
           }
         },
         "ja" : {
@@ -13949,8 +14151,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Resolving quality options..."
+            "state" : "translated",
+            "value" : "Resolviendo opciones de calidad..."
           }
         },
         "ja" : {
@@ -13990,8 +14192,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Choose quality for this link"
+            "state" : "translated",
+            "value" : "Escoge una calidad para este enlace"
           }
         },
         "ja" : {
@@ -14030,8 +14232,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Choose quality for all pending links"
+            "state" : "translated",
+            "value" : "Escoge una calidad para todos los enlaces pendientes"
           }
         },
         "ja" : {
@@ -14070,8 +14272,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Quality unavailable. Choose another"
+            "state" : "translated",
+            "value" : "Calidad no disponible. Escoge otra"
           }
         },
         "ja" : {
@@ -14110,8 +14312,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Resume Queue"
+            "state" : "translated",
+            "value" : "Reanudar cola"
           }
         },
         "ja" : {
@@ -14581,6 +14783,86 @@
         }
       }
     },
+    "settings.about.coffee.subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Support Palladium on Ko-fi"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apoya a Palladium en Ko-fi"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ko-FiでPalladiumをサポートする"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ko-fi에서 Palladium 후원하기"
+          }
+        },
+        "lt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Support Palladium on Ko-fi"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在 Ko-fi 上支持 Palladium"
+          }
+        }
+      }
+    },
+    "settings.about.coffee.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buy Me a Coffee"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buy Me a Coffee"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コーヒーをご馳走する"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "커피 한 잔 사주기"
+          }
+        },
+        "lt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Buy Me a Coffee"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请我喝杯咖啡"
+          }
+        }
+      }
+    },
     "settings.about.subtitle" : {
       "localizations" : {
         "en" : {
@@ -14591,8 +14873,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Version and quick help"
+            "state" : "translated",
+            "value" : "Versión y ayuda rápida"
           }
         },
         "ja" : {
@@ -14631,8 +14913,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "About"
+            "state" : "translated",
+            "value" : "Acerca de"
           }
         },
         "ja" : {
@@ -14671,7 +14953,7 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "JavaScript runtime"
           }
         },
@@ -14711,8 +14993,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Choose the JavaScript runtime for video downloads. Apple WebKit is the default."
+            "state" : "translated",
+            "value" : "Escoge el runtime de JavaScript para descargar vídeos. Apple WebKit está por defecto."
           }
         },
         "ja" : {
@@ -14751,7 +15033,7 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "QuickJS"
           }
         },
@@ -14791,7 +15073,7 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Apple WebKit"
           }
         },
@@ -14831,8 +15113,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Some installed runtime files still use a different YouTube patch mode. Review the package log and reinstall packages before downloading."
+            "state" : "translated",
+            "value" : "Algunos archivos del runtime instalados todavía usan un modo de parche de YouTube diferente. Revisa el regsitro de paquetes y reinstálalos antes de descargar."
           }
         },
         "ja" : {
@@ -14871,8 +15153,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Reinstall packages"
+            "state" : "translated",
+            "value" : "Reinstalar paquetes"
           }
         },
         "ja" : {
@@ -14911,8 +15193,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Reinstall the yt-dlp packages now so the installed runtime uses this setting."
+            "state" : "translated",
+            "value" : "Reinstala los paquetes de yt-dlp ahora para que el runtime instalado use este ajuste."
           }
         },
         "ja" : {
@@ -14951,8 +15233,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Reinstall packages?"
+            "state" : "translated",
+            "value" : "¿Reinstalar paquetes?"
           }
         },
         "ja" : {
@@ -14991,8 +15273,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Restart Palladium to apply the patch setting safely."
+            "state" : "translated",
+            "value" : "Reinicia Palladium para aplicar los ajustes del parche de forma segura."
           }
         },
         "ja" : {
@@ -15031,8 +15313,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Runtime compatibility controls"
+            "state" : "translated",
+            "value" : "Controles de compatibilidad de runtime"
           }
         },
         "ja" : {
@@ -15071,8 +15353,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Advanced"
+            "state" : "translated",
+            "value" : "Avanzado"
           }
         },
         "ja" : {
@@ -15111,8 +15393,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Patch target"
+            "state" : "translated",
+            "value" : "Destino del parche"
           }
         },
         "ja" : {
@@ -15151,8 +15433,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "EJS scripts"
+            "state" : "translated",
+            "value" : "Scripts EJS"
           }
         },
         "ja" : {
@@ -15191,8 +15473,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Reinstall packages to apply a changed runtime patch mode."
+            "state" : "translated",
+            "value" : "Reinstala paquetes para aplicar un modo de parche al runtime modificado."
           }
         },
         "ja" : {
@@ -15231,8 +15513,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Disabled"
+            "state" : "translated",
+            "value" : "Desactivado"
           }
         },
         "ja" : {
@@ -15271,8 +15553,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "WebKit JSI runtime (default)"
+            "state" : "translated",
+            "value" : "WebKit JSI runtime (por defecto)"
           }
         },
         "ja" : {
@@ -15311,8 +15593,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Choose what happens after a download finishes"
+            "state" : "translated",
+            "value" : "Escoge que pasa después de que una descarga termine"
           }
         },
         "ja" : {
@@ -15351,8 +15633,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Theme and display mode"
+            "state" : "translated",
+            "value" : "Tema y modo de visualización"
           }
         },
         "ja" : {
@@ -15391,8 +15673,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Keep downloads running after you leave Palladium"
+            "state" : "translated",
+            "value" : "Mantener descargas ejecutándose después de irse de Palladium"
           }
         },
         "ja" : {
@@ -15431,8 +15713,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "%lld imported cookie files"
+            "state" : "translated",
+            "value" : "%lld archivos de cookies importados"
           }
         },
         "ja" : {
@@ -15471,8 +15753,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Import Netscape cookie files"
+            "state" : "translated",
+            "value" : "Importar archivos de cookies de Netscape"
           }
         },
         "ja" : {
@@ -15511,7 +15793,7 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Cookies"
           }
         },
@@ -15551,8 +15833,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Custom and global yt-dlp args"
+            "state" : "translated",
+            "value" : "Argumentos personalizados y globales de yt-dlp"
           }
         },
         "ja" : {
@@ -15591,8 +15873,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download Arguments"
+            "state" : "translated",
+            "value" : "Argumentos de descarga"
           }
         },
         "ja" : {
@@ -15621,6 +15903,166 @@
         }
       }
     },
+    "settings.download_behavior.auto_paste.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Checks the clipboard for a link when you open Palladium and starts a download with the selected mode. Ask shows the download mode picker. iOS may ask for permission to paste."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revisa el portapapeles por un enlace cuando abres Palladium y empieza una descarga con el modo seleccionado. Preguntar muestra el selector de descargas. iOS puede que te pida permiso para pegar."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Palladiumを開いて選択したモードでダウンロードを開始すると、クリップボードのリンクを確認します。「Ask」はダウンロードモードピッカーを表示します。iOSはペーストする権限を求める場合があります。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Palladium을 열 때 클립보드에서 링크를 확인하고 선택한 모드로 다운로드를 시작합니다. 묻기를 선택하면 다운로드 모드 선택기가 표시됩니다. iOS에서 붙여넣기 권한을 요청할 수 있습니다."
+          }
+        },
+        "lt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Checks the clipboard for a link when you open Palladium and starts a download with the selected mode. Ask shows the download mode picker. iOS may ask for permission to paste."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打开 Palladium 时检查剪贴板中的链接，并使用所选模式开始下载。选择“请求”会显示下载模式选择器。iOS 可能会请求粘贴权限。"
+          }
+        }
+      }
+    },
+    "settings.download_behavior.auto_paste.mode" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download mode"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modo de descarga"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ダウンロードモード"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다운로드 모드"
+          }
+        },
+        "lt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Download mode"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下载模式"
+          }
+        }
+      }
+    },
+    "settings.download_behavior.auto_paste.section" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auto Paste Link"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pegar enlace automáticamente"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リンクを自動貼り付け"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "링크 자동 붙여넣기"
+          }
+        },
+        "lt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Auto Paste Link"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自动粘贴链接"
+          }
+        }
+      }
+    },
+    "settings.download_behavior.auto_paste.toggle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auto paste link"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pegar enlace automáticamente"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リンクを自動貼り付け"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "링크 자동 붙여넣기"
+          }
+        },
+        "lt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Auto paste link"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自动粘贴链接"
+          }
+        }
+      }
+    },
     "settings.download_behavior.background.bundle_id" : {
       "localizations" : {
         "en" : {
@@ -15631,8 +16073,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Bundle ID"
+            "state" : "translated",
+            "value" : "ID del paquete"
           }
         },
         "ja" : {
@@ -15671,8 +16113,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Copy Bundle ID"
+            "state" : "translated",
+            "value" : "Copiar ID del paquete"
           }
         },
         "ja" : {
@@ -15706,37 +16148,237 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Keeps downloads running after you leave Palladium and shows their progress in system UI. Requires iOS 26 or later."
+            "value" : "Keeps downloads running after you leave Palladium."
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Keeps downloads running after you leave Palladium and shows their progress in system UI. Requires iOS 26 or later."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "パラジウムを離れた後もダウンロードを続け、システムUIに進行状況を表示します。iOS 26以降が必要です。"
+            "value" : "Palladiumを離れた後もダウンロードを続けます。"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Palladium을 떠난 후에도 다운로드를 계속하고 시스템 UI에 진행 상황을 표시합니다. iOS 26 이상이 필요합니다."
+            "value" : "Palladium을 떠난 후에도 다운로드를 계속합니다."
           }
         },
         "lt" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Keeps downloads running after you leave Palladium and shows their progress in system UI. Requires iOS 26 or later."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "离开 Palladium 后继续下载，并在系统界面中显示进度。需要 iOS 26 或更高版本。"
+            "value" : "离开 Palladium 后继续下载。"
+          }
+        }
+      }
+    },
+    "settings.download_behavior.background.mode" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Background Mode"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modo segundo plano"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックグラウンドモード"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "백그라운드 모드"
+          }
+        },
+        "lt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Background Mode"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "后台模式"
+          }
+        }
+      }
+    },
+    "settings.download_behavior.background.mode.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "System Task uses iOS 26 background tasks and shows progress in system UI. Silent Audio plays silent audio to keep Palladium running, which also works in LiveContainer and on older iOS versions but uses more battery."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tarea del sistema usa las tareas en segundo plano de iOS 26 y muestra el progreso en la interfaz. Audio silencioso reproduce un audio inaudible que mantiene a Palladium ejecutándose, que también funciona en LiveContainer y en versiones antiguas de iOS pero usa más batería."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "システムタスクはiOS 26のバックグラウンドタスクを使用し、システムUIに進行状況を表示します。無音オーディオは無音の音声を再生してPalladiumの実行を維持します。LiveContainerや古いiOSバージョンでも動作しますが、バッテリーの消費が増えます。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "시스템 작업은 iOS 26 백그라운드 작업을 사용하며 시스템 UI에 진행 상황을 표시합니다. 무음 오디오는 무음 오디오를 재생해 Palladium을 계속 실행하며, LiveContainer와 이전 iOS 버전에서도 작동하지만 배터리를 더 많이 사용합니다."
+          }
+        },
+        "lt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "System Task uses iOS 26 background tasks and shows progress in system UI. Silent Audio plays silent audio to keep Palladium running, which also works in LiveContainer and on older iOS versions but uses more battery."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "系统任务使用 iOS 26 后台任务，并在系统界面中显示进度。静音音频会播放无声音频以保持 Palladium 运行，也适用于 LiveContainer 和旧版 iOS，但耗电更多。"
+          }
+        }
+      }
+    },
+    "settings.download_behavior.background.mode.livecontainer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Palladium is running in LiveContainer, which does not support system background tasks. Use Silent Audio instead."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Palladium se está ejecutando en LiveContainer, que no soporta las tareas del sistema en segundo plano. Usa Audio silencioso en su lugar."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PalladiumはLiveContainerで実行されています。LiveContainerはシステムのバックグラウンドタスクに対応していないため、代わりに無音オーディオを使用してください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Palladium이 LiveContainer에서 실행 중이며, LiveContainer는 시스템 백그라운드 작업을 지원하지 않습니다. 대신 무음 오디오를 사용하세요."
+          }
+        },
+        "lt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Palladium is running in LiveContainer, which does not support system background tasks. Use Silent Audio instead."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Palladium 正在 LiveContainer 中运行，LiveContainer 不支持系统后台任务。请改用静音音频。"
+          }
+        }
+      }
+    },
+    "settings.download_behavior.background.mode.silent_audio" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Silent Audio"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio silencioso"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無音オーディオ"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "무음 오디오"
+          }
+        },
+        "lt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Silent Audio"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "静音音频"
+          }
+        }
+      }
+    },
+    "settings.download_behavior.background.mode.system_task" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "System Task"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tarea del sistema"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "システムタスク"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "시스템 작업"
+          }
+        },
+        "lt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "System Task"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "系统任务"
           }
         }
       }
@@ -15751,8 +16393,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Open Web IPA Patcher"
+            "state" : "translated",
+            "value" : "Abrir parcheador de IPA web"
           }
         },
         "ja" : {
@@ -15791,8 +16433,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Your sideloading tool changed the bundle ID, so iOS blocks background downloads. Tap Patch IPA Automatically to create a patched copy of this version, then install it with the same tool. To patch a different build, use the web IPA patcher with this bundle ID."
+            "state" : "translated",
+            "value" : "Tu herramienta de sideload cambió el ID del paquete, por lo que iOS bloquea las descargas en segundo lugar. Pulse Parchear IPA automáticamente para crear una copia parcheada de esta versión, y luego instalarla con la misma herramienta. Para parchear una compilación diferente, utilice el patcher IPA web con este paquete de ID."
           }
         },
         "ja" : {
@@ -15831,8 +16473,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Patch IPA Automatically"
+            "state" : "translated",
+            "value" : "Parchear IPA automáticamente"
           }
         },
         "ja" : {
@@ -16511,8 +17153,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Restore defaults after download"
+            "state" : "translated",
+            "value" : "Restaurar valores a los predeterminados al después de descargar"
           }
         },
         "ja" : {
@@ -16551,8 +17193,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "When on, options reset to their default values after each download."
+            "state" : "translated",
+            "value" : "Cuando esté activado, las opciones se restablecen a sus valores por defecto después de cada descarga."
           }
         },
         "ja" : {
@@ -16591,8 +17233,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Reset After Download"
+            "state" : "translated",
+            "value" : "Restablecer después de la descarga"
           }
         },
         "ja" : {
@@ -16621,6 +17263,47 @@
         }
       }
     },
+    "settings.download_defaults.sponsorblock.default" : {
+      "comment" : "Default value toggle for removing SponsorBlock sponsor segments.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove Sponsors"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quitar patrocinios"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スポンサーを削除"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "스폰서 제거"
+          }
+        },
+        "lt" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Remove Sponsors"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "移除赞助片段"
+          }
+        }
+      }
+    },
     "settings.download_defaults.subtitles.default" : {
       "localizations" : {
         "en" : {
@@ -16631,8 +17314,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download Subtitles"
+            "state" : "translated",
+            "value" : "Descargar subtítulos"
           }
         },
         "ja" : {
@@ -16671,8 +17354,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Embed Thumbnail"
+            "state" : "translated",
+            "value" : "Miniatura incrustada"
           }
         },
         "ja" : {
@@ -16711,8 +17394,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Default Download Options"
+            "state" : "translated",
+            "value" : "Ajustes de descarga por defecto"
           }
         },
         "ja" : {
@@ -16751,8 +17434,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Customize Options"
+            "state" : "translated",
+            "value" : "Personalizar opciones"
           }
         },
         "ja" : {
@@ -16791,8 +17474,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Drag to reorder. Turn an option off to hide it from the download pickers. At least one option must stay visible."
+            "state" : "translated",
+            "value" : "Arrastre para reordenar. Desactive una opción para ocultarla de los selectores de descarga. Al menos una opción debe permanecer visible."
           }
         },
         "ja" : {
@@ -16831,8 +17514,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Customize Options"
+            "state" : "translated",
+            "value" : "Personalizar opciones"
           }
         },
         "ja" : {
@@ -16871,8 +17554,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Controls the default picker on the Download tab. If remembering is off, the app starts with Video selected."
+            "state" : "translated",
+            "value" : "Controla el selector predeterminado de la pestaña Descarga. Si el recordatorio está apagado, la aplicación comienza con el vídeo seleccionado."
           }
         },
         "ja" : {
@@ -16911,8 +17594,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download Tab"
+            "state" : "translated",
+            "value" : "Pestaña de descargas"
           }
         },
         "ja" : {
@@ -16951,8 +17634,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Controls the mode used when a link is sent to Palladium from another app."
+            "state" : "translated",
+            "value" : "Controla el modo usado cuando un enlace es enviado de Palladium a otra aplicación."
           }
         },
         "ja" : {
@@ -16991,8 +17674,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Default mode and visible download options"
+            "state" : "translated",
+            "value" : "Modo por defecto y ajustes de descarga visibles"
           }
         },
         "ja" : {
@@ -17031,8 +17714,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download Modes"
+            "state" : "translated",
+            "value" : "Modos de descarga"
           }
         },
         "ja" : {
@@ -17072,8 +17755,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Default video and audio formats, codecs, and quality"
+            "state" : "translated",
+            "value" : "Formatos de vídeo y audio, códecs y calidad por defecto"
           }
         },
         "ja" : {
@@ -17113,8 +17796,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download Quality"
+            "state" : "translated",
+            "value" : "Calidad de descarga"
           }
         },
         "ja" : {
@@ -17153,8 +17836,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Modes, actions, behavior, arguments, and cookies"
+            "state" : "translated",
+            "value" : "Modos, acciones, comportamineto, argumentos y cookies"
           }
         },
         "ja" : {
@@ -17193,8 +17876,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download Settings"
+            "state" : "translated",
+            "value" : "Ajustes de descarga"
           }
         },
         "ja" : {
@@ -17233,8 +17916,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Control what appears in Downloads"
+            "state" : "translated",
+            "value" : "Controla que aparece en Descargas"
           }
         },
         "ja" : {
@@ -17273,8 +17956,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Downloads Tab"
+            "state" : "translated",
+            "value" : "Pestaña de descargas"
           }
         },
         "ja" : {
@@ -17314,8 +17997,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Choose how downloaded files are named"
+            "state" : "translated",
+            "value" : "Escoge como los archivos descargados se nombran"
           }
         },
         "ja" : {
@@ -17355,8 +18038,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Filename Settings"
+            "state" : "translated",
+            "value" : "Ajustes del nombre del archivo"
           }
         },
         "ja" : {
@@ -17395,7 +18078,7 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "General"
           }
         },
@@ -17435,8 +18118,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Recent links and history limit"
+            "state" : "translated",
+            "value" : "Enlaces recientes y límite del historial"
           }
         },
         "ja" : {
@@ -17475,8 +18158,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "System uses your preferred supported language, or English when no translation is available."
+            "state" : "translated",
+            "value" : "Sistema usa tu idioma preferido soportado, o Inglés cuando no hay traducción disponible."
           }
         },
         "ja" : {
@@ -17515,8 +18198,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "App language and system default"
+            "state" : "translated",
+            "value" : "Idioma de la app y sistema por defecto"
           }
         },
         "ja" : {
@@ -17555,8 +18238,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "System"
+            "state" : "translated",
+            "value" : "Sistema"
           }
         },
         "ja" : {
@@ -17595,8 +18278,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Language"
+            "state" : "translated",
+            "value" : "Idioma"
           }
         },
         "ja" : {
@@ -17635,8 +18318,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Maintenance"
+            "state" : "translated",
+            "value" : "Mantenimiento"
           }
         },
         "ja" : {
@@ -17675,8 +18358,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "A notification is sent when a download finishes and the app is not active."
+            "state" : "translated",
+            "value" : "Se envía una notificación cuando una descarga finaliza y la aplicación no esté activa."
           }
         },
         "ja" : {
@@ -17715,8 +18398,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download Notifications"
+            "state" : "translated",
+            "value" : "Notificaciones de descarga"
           }
         },
         "ja" : {
@@ -17755,8 +18438,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Background completion alerts"
+            "state" : "translated",
+            "value" : "Alertas de finalización en segundo plano"
           }
         },
         "ja" : {
@@ -17795,8 +18478,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Notifications"
+            "state" : "translated",
+            "value" : "Notificaciones"
           }
         },
         "ja" : {
@@ -17835,8 +18518,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Notify when downloads finish in background"
+            "state" : "translated",
+            "value" : "Notificar cuando las descargas se terminan en segundo plano"
           }
         },
         "ja" : {
@@ -17875,8 +18558,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Notify when download completes in background"
+            "state" : "translated",
+            "value" : "Notificar cuando la descarga se termine en segundo plano"
           }
         },
         "ja" : {
@@ -17915,8 +18598,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Package Manager Settings"
+            "state" : "translated",
+            "value" : "Ajustes del administrador de paquetes"
           }
         },
         "ja" : {
@@ -17955,8 +18638,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Check and update yt-dlp and pip"
+            "state" : "translated",
+            "value" : "Revisar y actualizar yt-dlp y pip"
           }
         },
         "ja" : {
@@ -17995,8 +18678,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Updates available!"
+            "state" : "translated",
+            "value" : "¡Actualizaciones disponibles!"
           }
         },
         "ja" : {
@@ -18035,8 +18718,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Package Manager"
+            "state" : "translated",
+            "value" : "Gestor de paquetes"
           }
         },
         "ja" : {
@@ -18075,8 +18758,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Update Checks"
+            "state" : "translated",
+            "value" : "Comprobar si hay actualizaciones"
           }
         },
         "ja" : {
@@ -18115,8 +18798,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Always re-encode"
+            "state" : "translated",
+            "value" : "Codificar siempre"
           }
         },
         "ja" : {
@@ -18155,8 +18838,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "When off, videos that already use the chosen codec are copied without quality loss, and the quality setting only applies to videos that need re-encoding."
+            "state" : "translated",
+            "value" : "Cuando está apagado, los vídeos que ya utilizan el código elegido se copian sin pérdida de calidad, y la configuración de calidad sólo se aplica a los vídeos que necesitan recodificación."
           }
         },
         "ja" : {
@@ -18195,8 +18878,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Auto"
+            "state" : "translated",
+            "value" : "Automático"
           }
         },
         "ja" : {
@@ -18235,8 +18918,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Video codec"
+            "state" : "translated",
+            "value" : "Códec de vídeo"
           }
         },
         "ja" : {
@@ -18275,8 +18958,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Convert final video"
+            "state" : "translated",
+            "value" : "Convertir vídeo final"
           }
         },
         "ja" : {
@@ -18315,8 +18998,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Encoder"
+            "state" : "translated",
+            "value" : "Codificador"
           }
         },
         "ja" : {
@@ -18355,7 +19038,7 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Hardware"
           }
         },
@@ -18395,7 +19078,7 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Software"
           }
         },
@@ -18435,8 +19118,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Encoding"
+            "state" : "translated",
+            "value" : "Codificación"
           }
         },
         "ja" : {
@@ -18475,8 +19158,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Auto uses Apple's hardware encoder when the codec supports it and software otherwise. Hardware decoding falls back to software for sources the device cannot decode. Current encoder: %@"
+            "state" : "translated",
+            "value" : "Automático usa el codificador de hardware de Apple cuando el códec lo soporta y el software de otra forma. La decodificación por hardware vuelve a software para fuentes que el dispositivo no puede decodificar. Codificador actual: %@"
           }
         },
         "ja" : {
@@ -18515,8 +19198,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Output format"
+            "state" : "translated",
+            "value" : "Formato de salida"
           }
         },
         "ja" : {
@@ -18555,8 +19238,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Hardware decoding"
+            "state" : "translated",
+            "value" : "Descodificación por hardware"
           }
         },
         "ja" : {
@@ -18595,8 +19278,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Conversion method"
+            "state" : "translated",
+            "value" : "Método de conversión"
           }
         },
         "ja" : {
@@ -18635,8 +19318,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Quality"
+            "state" : "translated",
+            "value" : "Calidad"
           }
         },
         "ja" : {
@@ -18675,8 +19358,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "High"
+            "state" : "translated",
+            "value" : "Alto"
           }
         },
         "ja" : {
@@ -18715,8 +19398,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Low"
+            "state" : "translated",
+            "value" : "Bajo"
           }
         },
         "ja" : {
@@ -18755,8 +19438,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Maximum"
+            "state" : "translated",
+            "value" : "Máximo"
           }
         },
         "ja" : {
@@ -18795,8 +19478,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Medium"
+            "state" : "translated",
+            "value" : "Medio"
           }
         },
         "ja" : {
@@ -18835,8 +19518,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Re-encode"
+            "state" : "translated",
+            "value" : "Recodificar"
           }
         },
         "ja" : {
@@ -18875,8 +19558,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Remux"
+            "state" : "translated",
+            "value" : "Remodelar"
           }
         },
         "ja" : {
@@ -18915,8 +19598,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Remuxing changes the container without re-encoding, so it is faster and preserves quality. It can fail if the selected container does not support the original codecs."
+            "state" : "translated",
+            "value" : "La remodelación cambia el contenedor sin volver a codificar, por lo que es más rápido y conserva calidad. Puede fallar si el contenedor seleccionado no soporta los códecs originales."
           }
         },
         "ja" : {
@@ -18955,8 +19638,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Applies to video downloads, including format selections. Audio-only and image downloads are unchanged. Enabled conversion overrides video container and conversion arguments. Queued downloads keep the settings chosen when added."
+            "state" : "translated",
+            "value" : "Aplica a descargas de vídeos, incluyendo selecciones de formato. Las descargas de solo audio o imágenes no serán afectados. La conversión activa reemplaza el contenedor del vídeo y los argumentos de conversión. Descargas en cola mantienen los ajustes que se les atribuyeron al añadirlos."
           }
         },
         "ja" : {
@@ -18995,8 +19678,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Re-encode or remux downloaded videos into another format"
+            "state" : "translated",
+            "value" : "Vuelve a codificar o a remodelar los vídeos descargados a otro formato"
           }
         },
         "ja" : {
@@ -19035,8 +19718,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Post Processing"
+            "state" : "translated",
+            "value" : "Post-procesado"
           }
         },
         "ja" : {
@@ -19075,8 +19758,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Off by default. Re-encoding increases battery use and processing time, and may reduce quality. Videos already in the chosen format and codec are not re-encoded."
+            "state" : "translated",
+            "value" : "Desactivado por defecto. Volver a codificarlo aumenta el uso de batería y el tiempo de procesamiento, y puede reducir la calidad. Los vídeos que ya se han seleccionado en un formato y códec no serán codificados de nuevo."
           }
         },
         "ja" : {
@@ -19115,8 +19798,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Always create a folder"
+            "state" : "translated",
+            "value" : "Crear siempre una carpeta"
           }
         },
         "ja" : {
@@ -19155,8 +19838,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Service folders add a parent based on the source service. Subdomains and known short-link domains share one folder. Collections still use their own folder; single downloads use one only when Always create a folder is enabled."
+            "state" : "translated",
+            "value" : "Las carpetas de servicio añaden un padre basado en el servicio de origen. Los subdominios y los dominios de enlace corto conocidos comparten una carpeta. Las colecciones todavía utilizan su propia carpeta; las descargas solas utilizan una sólo cuando siempre se crea una carpeta."
           }
         },
         "ja" : {
@@ -19195,8 +19878,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Organize by service"
+            "state" : "translated",
+            "value" : "Organizar por servicio"
           }
         },
         "ja" : {
@@ -19235,8 +19918,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Saved downloads"
+            "state" : "translated",
+            "value" : "Descargas guardadas"
           }
         },
         "ja" : {
@@ -19275,8 +19958,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Menus"
+            "state" : "translated",
+            "value" : "Menús"
           }
         },
         "ja" : {
@@ -19315,8 +19998,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Search Settings"
+            "state" : "translated",
+            "value" : "Ajustes de búsqueda"
           }
         },
         "ja" : {
@@ -19355,8 +20038,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "These buttons appear when Share Sheet Mode is set to Ask."
+            "state" : "translated",
+            "value" : "Estos botones aparecen cuando el modo de compartir hoja está en Preguntar."
           }
         },
         "ja" : {
@@ -19395,8 +20078,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Ask Picker Buttons"
+            "state" : "translated",
+            "value" : "Preguntar botones de selección"
           }
         },
         "ja" : {
@@ -19435,8 +20118,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Incoming Links"
+            "state" : "translated",
+            "value" : "Enlaces entrantes"
           }
         },
         "ja" : {
@@ -19475,8 +20158,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Show Fill URL"
+            "state" : "translated",
+            "value" : "Mostrar rellenar URL"
           }
         },
         "ja" : {
@@ -19515,8 +20198,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Show Choose Format"
+            "state" : "translated",
+            "value" : "Mostrar Escoger formato"
           }
         },
         "ja" : {
@@ -19555,8 +20238,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Incoming link behavior and picker buttons"
+            "state" : "translated",
+            "value" : "Comportamiento de link entrante y botones de seleción"
           }
         },
         "ja" : {
@@ -19595,8 +20278,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Share Sheet"
+            "state" : "translated",
+            "value" : "Compartir hoja"
           }
         },
         "ja" : {
@@ -19635,8 +20318,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "The cache stores yt-dlp metadata and web assets. Clearing it may make the next run a little slower."
+            "state" : "translated",
+            "value" : "La caché almacena metadatos y recursos web de yt-dlp. Limpiarla puede hacer que la siguiente ejecución sea un poco más lenta."
           }
         },
         "ja" : {
@@ -19675,8 +20358,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "yt-dlp Cache"
+            "state" : "translated",
+            "value" : "Caché de yt-dlp"
           }
         },
         "ja" : {
@@ -19715,8 +20398,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Storage actions are disabled while a download or package task is running."
+            "state" : "translated",
+            "value" : "Las acciones de almacenamiento están desactivadas mientras se ejecuta una tarea de descarga o paquete."
           }
         },
         "ja" : {
@@ -19755,8 +20438,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "This only affects Palladium's temporary download folder. Use it to remove stale run folders without touching Saved Files."
+            "state" : "translated",
+            "value" : "Esto solo afecta a la carpeta de descargas temporales de Palladium. Úsalo para quitar carpetas obsoletas de ejecuciones sin tocar los archivos guardados."
           }
         },
         "ja" : {
@@ -19795,8 +20478,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Temporary Downloads"
+            "state" : "translated",
+            "value" : "Descargas temporales"
           }
         },
         "ja" : {
@@ -19835,8 +20518,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Temporary Downloads stores active and recent run folders. Saved Files keeps copies made with Save to App Folder."
+            "state" : "translated",
+            "value" : "Las descargas temporales almacenan carpetas activas y recientes de ejecución. Los archivos guardados mantienen copias hechas con Guardar en la carpeta de la aplicación."
           }
         },
         "ja" : {
@@ -19875,8 +20558,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Overview"
+            "state" : "translated",
+            "value" : "Resumen"
           }
         },
         "ja" : {
@@ -19915,8 +20598,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Refresh Usage"
+            "state" : "translated",
+            "value" : "Actualizar uso"
           }
         },
         "ja" : {
@@ -19955,8 +20638,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Saved Files contains downloads you explicitly kept. Clearing this section removes those copies from Palladium storage."
+            "state" : "translated",
+            "value" : "Archivos guardados contienen descargas que explícitamente mantienes. Limpiar esta sección elimina esas copias del almacenamiento de Palladum."
           }
         },
         "ja" : {
@@ -19995,8 +20678,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Saved Files"
+            "state" : "translated",
+            "value" : "Archivos guardados"
           }
         },
         "ja" : {
@@ -20035,8 +20718,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Storage"
+            "state" : "translated",
+            "value" : "Almacenamiento"
           }
         },
         "ja" : {
@@ -20075,8 +20758,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "%@ across temp, saved, and cache"
+            "state" : "translated",
+            "value" : "%@ a través de temp, saved, y cache"
           }
         },
         "ja" : {
@@ -20115,8 +20798,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download Storage"
+            "state" : "translated",
+            "value" : "Descargar alamcenamiento"
           }
         },
         "ja" : {
@@ -20155,7 +20838,7 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Total"
           }
         },
@@ -20195,8 +20878,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Ask shows the same action picker after each successful download. Other options run automatically."
+            "state" : "translated",
+            "value" : "Preguntar muestra el mismo selector de acción después de cada descarga exitosa. Otras opciones se ejecutan automáticamente."
           }
         },
         "ja" : {
@@ -20235,8 +20918,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "After download"
+            "state" : "translated",
+            "value" : "Tras la descarga"
           }
         },
         "ja" : {
@@ -20275,8 +20958,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "After Download"
+            "state" : "translated",
+            "value" : "Tras la descarga"
           }
         },
         "ja" : {
@@ -20315,8 +20998,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "System uses the phone setting by default."
+            "state" : "translated",
+            "value" : "Sistema usa los ajustes del teléfono por defecto."
           }
         },
         "ja" : {
@@ -20355,8 +21038,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "App theme"
+            "state" : "translated",
+            "value" : "Tema de la aplicación"
           }
         },
         "ja" : {
@@ -20395,8 +21078,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Appearance"
+            "state" : "translated",
+            "value" : "Apariencia"
           }
         },
         "ja" : {
@@ -20435,8 +21118,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "When enabled, Palladium keeps completed downloads in Palladium/Temp and shows them in the Downloads tab. Saving to Saved Files copies them without removing the temporary originals."
+            "state" : "translated",
+            "value" : "Cuando está activado, Palladium mantiene las descargas completadas en Palladio/Temp y las muestra en la pestaña Descargas. Guardando en Archivos Guardados los copia sin eliminar los originales temporales."
           }
         },
         "ja" : {
@@ -20475,8 +21158,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Downloads Tab"
+            "state" : "translated",
+            "value" : "Pestaña de descargas"
           }
         },
         "ja" : {
@@ -20515,8 +21198,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Show temporary downloads"
+            "state" : "translated",
+            "value" : "Mostrar descargas temporales"
           }
         },
         "ja" : {
@@ -20555,8 +21238,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Enable link history"
+            "state" : "translated",
+            "value" : "Activar historial de enlaces"
           }
         },
         "ja" : {
@@ -20595,8 +21278,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Stores recent links with mode and title. Set it from 0 to 50."
+            "state" : "translated",
+            "value" : "Guarda enlaces recientes con modo y título. Establécelo de 0 a 50."
           }
         },
         "ja" : {
@@ -20635,8 +21318,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Hide history count"
+            "state" : "translated",
+            "value" : "Ocultar contador de historial"
           }
         },
         "ja" : {
@@ -20675,8 +21358,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Links to keep"
+            "state" : "translated",
+            "value" : "Enlaces a mantener"
           }
         },
         "ja" : {
@@ -20715,8 +21398,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "History"
+            "state" : "translated",
+            "value" : "Historial"
           }
         },
         "ja" : {
@@ -20755,8 +21438,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Normal download mode matches the main picker on the Download tab. If memory is off, it resets to Video when the app launches."
+            "state" : "translated",
+            "value" : "El modo de descarga normal coincide con el selector principal de la pestaña de descarga. Si la memoria está apagada, se reinicia al vídeo cuando se inicia la aplicación."
           }
         },
         "ja" : {
@@ -20795,8 +21478,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Normal download mode"
+            "state" : "translated",
+            "value" : "Modo de descarga normal"
           }
         },
         "ja" : {
@@ -20835,8 +21518,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Remember picker options"
+            "state" : "translated",
+            "value" : "Recordar opciones del selector"
           }
         },
         "ja" : {
@@ -20875,8 +21558,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download Modes"
+            "state" : "translated",
+            "value" : "Modos de descargas"
           }
         },
         "ja" : {
@@ -20915,8 +21598,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Share sheet mode"
+            "state" : "translated",
+            "value" : "Modo de compartir hoja"
           }
         },
         "ja" : {
@@ -20955,8 +21638,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Check for package updates on launch"
+            "state" : "translated",
+            "value" : "Buscar actualizaciones de paquetes al iniciar"
           }
         },
         "ja" : {
@@ -20995,8 +21678,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Automatically checks for yt-dlp and pip updates when the app opens."
+            "state" : "translated",
+            "value" : "Automáticamente revisa actualizaciones para yt-dlp y pip cuando se abre la aplicación."
           }
         },
         "ja" : {
@@ -21035,8 +21718,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Automatically install package updates"
+            "state" : "translated",
+            "value" : "Instalar actualizaciones de paquete automáticamente"
           }
         },
         "ja" : {
@@ -21075,8 +21758,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Installs available package updates after the launch-time check completes."
+            "state" : "translated",
+            "value" : "Instala paquetes de actualizaciones disponibles después de que la revisión de inicio termine."
           }
         },
         "ja" : {
@@ -21115,8 +21798,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Auto download on paste"
+            "state" : "translated",
+            "value" : "Descarga automática al pegar"
           }
         },
         "ja" : {
@@ -21155,8 +21838,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Starts download immediately after pasting a URL from the Download tab."
+            "state" : "translated",
+            "value" : "Inicia la descarga inmediatamente después de pegar una URL desde la pestaña de descarga."
           }
         },
         "ja" : {
@@ -21195,8 +21878,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Paste"
+            "state" : "translated",
+            "value" : "Pegar"
           }
         },
         "ja" : {
@@ -21235,8 +21918,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Shows most live yt-dlp, Palladium, and downloader log lines in the main progress label while a download is running."
+            "state" : "translated",
+            "value" : "Muestra la mayoría de las líneas en vivo yt-dlp, Palladium y de registro de descargas en la etiqueta de progreso principal mientras se ejecuta una descarga."
           }
         },
         "ja" : {
@@ -21275,8 +21958,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Progress"
+            "state" : "translated",
+            "value" : "Progreso"
           }
         },
         "ja" : {
@@ -21315,8 +21998,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Show verbose progress lines"
+            "state" : "translated",
+            "value" : "Mostrar líneas de progreso detalladas"
           }
         },
         "ja" : {
@@ -21355,8 +22038,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Automatically retries playlist items that fail because of thumbnail download or thumbnail embedding by rerunning them once without thumbnail options."
+            "state" : "translated",
+            "value" : "Reintenta automáticamente los elementos de la lista de reproducción que fallan debido a la descarga en miniatura o la incrustación en miniatura reiniciándolos una vez sin opciones de miniatura."
           }
         },
         "ja" : {
@@ -21395,8 +22078,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Automatically retry failed downloads"
+            "state" : "translated",
+            "value" : "Reintentar automáticamente descargas fallidas"
           }
         },
         "ja" : {
@@ -21435,8 +22118,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download behavior and share sheet flow"
+            "state" : "translated",
+            "value" : "Descargar comportamiento y compartir flujo de hojas"
           }
         },
         "ja" : {
@@ -21475,8 +22158,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "User Interface"
+            "state" : "translated",
+            "value" : "Interfaz de usuario"
           }
         },
         "ja" : {
@@ -21516,8 +22199,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Add Rule"
+            "state" : "translated",
+            "value" : "Añadir regla"
           }
         },
         "ja" : {
@@ -21557,8 +22240,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Added after global extra args for links that match this rule."
+            "state" : "translated",
+            "value" : "Añadido después de los argumentos extra globales para estos enlaces que coinciden con esta regla."
           }
         },
         "ja" : {
@@ -21598,7 +22281,7 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "--no-mtime"
           }
         },
@@ -21639,8 +22322,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Arguments"
+            "state" : "translated",
+            "value" : "Argumentos"
           }
         },
         "ja" : {
@@ -21680,8 +22363,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Off"
+            "state" : "translated",
+            "value" : "Desactivado"
           }
         },
         "ja" : {
@@ -21721,8 +22404,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Edit Rule"
+            "state" : "translated",
+            "value" : "Editar regla"
           }
         },
         "ja" : {
@@ -21762,8 +22445,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "No website rules yet."
+            "state" : "translated",
+            "value" : "No hay reglas de sitios web todavía."
           }
         },
         "ja" : {
@@ -21803,8 +22486,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Enabled"
+            "state" : "translated",
+            "value" : "Activado"
           }
         },
         "ja" : {
@@ -21844,8 +22527,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Add yt-dlp args that only apply to links from specific websites."
+            "state" : "translated",
+            "value" : "Añadir argumentos de yt-dlp que solo se aplican a enlaces de páginas específicas."
           }
         },
         "ja" : {
@@ -21885,8 +22568,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Match"
+            "state" : "translated",
+            "value" : "Coincidir"
           }
         },
         "ja" : {
@@ -21926,8 +22609,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Regex"
+            "state" : "translated",
+            "value" : "Expresiones regulares (Regex)"
           }
         },
         "ja" : {
@@ -21967,8 +22650,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Website"
+            "state" : "translated",
+            "value" : "Sitio web"
           }
         },
         "ja" : {
@@ -22008,8 +22691,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "New Rule"
+            "state" : "translated",
+            "value" : "Nueva regla"
           }
         },
         "ja" : {
@@ -22049,8 +22732,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Matched against the full link, ignoring case."
+            "state" : "translated",
+            "value" : "Emparejado con el enlace completo, ignorando el caso."
           }
         },
         "ja" : {
@@ -22090,8 +22773,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "This regular expression is not valid."
+            "state" : "translated",
+            "value" : "Esta expresión regular es inválida."
           }
         },
         "ja" : {
@@ -22131,8 +22814,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "https?://example.com/watch.*"
+            "state" : "translated",
+            "value" : "https?://ejemplo.es/watch.*"
           }
         },
         "ja" : {
@@ -22172,8 +22855,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Matches this website and all of its subdomains."
+            "state" : "translated",
+            "value" : "Coincide con el sitio web y todos sus subdominios."
           }
         },
         "ja" : {
@@ -22213,8 +22896,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Enter a website like example.com."
+            "state" : "translated",
+            "value" : "Inserta un sitio web como ejemplo.es."
           }
         },
         "ja" : {
@@ -22254,8 +22937,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "example.com"
+            "state" : "translated",
+            "value" : "ejemplo.es"
           }
         },
         "ja" : {
@@ -22295,8 +22978,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Only one rule applies to each link. Regex rules are checked first, from top to bottom. Otherwise the most specific website wins, so test.example.com is used before example.com. Website args are added after global extra args."
+            "state" : "translated",
+            "value" : "Solo se aplica una regla a cada enlace. Las reglas Regex se comprueban primero, de arriba a abajo. De lo contrario, el sitio web más específico gana, así que prueba.ejemplo.es se utiliza antes de ejemplo.es. Los argumentos del sitio web se añaden después de los argumentos adicionales globales."
           }
         },
         "ja" : {
@@ -22336,8 +23019,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Rules"
+            "state" : "translated",
+            "value" : "Reglas"
           }
         },
         "ja" : {
@@ -22377,8 +23060,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "yt-dlp args for specific websites"
+            "state" : "translated",
+            "value" : "Argumentos de yt-dlp para sitios web específicos"
           }
         },
         "ja" : {
@@ -22418,8 +23101,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Uses %@"
+            "state" : "translated",
+            "value" : "Usa %@"
           }
         },
         "ja" : {
@@ -22459,8 +23142,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "No rule matches this link."
+            "state" : "translated",
+            "value" : "No hay reglas que coincidan con este enlace."
           }
         },
         "ja" : {
@@ -22500,8 +23183,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "https://example.com/video"
+            "state" : "translated",
+            "value" : "https://ejemplo.es/video"
           }
         },
         "ja" : {
@@ -22541,8 +23224,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Test a Link"
+            "state" : "translated",
+            "value" : "Probar un enlace"
           }
         },
         "ja" : {
@@ -22582,8 +23265,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Website Arguments"
+            "state" : "translated",
+            "value" : "Argumentos del sitio web"
           }
         },
         "ja" : {
@@ -22622,8 +23305,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "What to Download"
+            "state" : "translated",
+            "value" : "Que descargar"
           }
         },
         "ja" : {
@@ -22662,8 +23345,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Another download or package task is already running. Palladium filled in the shortcut URL, but you need to start it again after the current task finishes."
+            "state" : "translated",
+            "value" : "Otra descarga o tarea de un paquete se está ejecutando. Palladium rellenó el acceso directo URL, pero necesitas empezarlo de nuevo después de que la tarea actual termine."
           }
         },
         "ja" : {
@@ -22702,8 +23385,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "What to Download"
+            "state" : "translated",
+            "value" : "Que descargar"
           }
         },
         "ja" : {
@@ -22742,8 +23425,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Where to Save"
+            "state" : "translated",
+            "value" : "Donde guardar"
           }
         },
         "ja" : {
@@ -22782,7 +23465,7 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "URL"
           }
         },
@@ -22822,8 +23505,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Where to Save"
+            "state" : "translated",
+            "value" : "Donde guardarlo"
           }
         },
         "ja" : {
@@ -22862,8 +23545,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Open Palladium and start a download with the selected preset and save destination."
+            "state" : "translated",
+            "value" : "Abrir Palladium y empezar una descarga con los preajustes seleccionados y guardar destino."
           }
         },
         "ja" : {
@@ -22902,8 +23585,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Opening Palladium to start the download."
+            "state" : "translated",
+            "value" : "Abriendo Palladium para empezar la descarga."
           }
         },
         "ja" : {
@@ -22942,8 +23625,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Start Download"
+            "state" : "translated",
+            "value" : "Empezar descarga"
           }
         },
         "ja" : {
@@ -22982,8 +23665,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Shortcut URL loaded into Palladium."
+            "state" : "translated",
+            "value" : "Acceso directo URL cargado a Palladium."
           }
         },
         "ja" : {
@@ -23022,8 +23705,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Clear cache"
+            "state" : "translated",
+            "value" : "Limpiar caché"
           }
         },
         "ja" : {
@@ -23062,8 +23745,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Clear download folder"
+            "state" : "translated",
+            "value" : "Limpiar carpeta de descargas"
           }
         },
         "ja" : {
@@ -23102,8 +23785,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Clear saved folder"
+            "state" : "translated",
+            "value" : "Limpiar carpeta guardada"
           }
         },
         "ja" : {
@@ -23142,8 +23825,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "This removes everything in Palladium/Documents/Temp, including old run folders."
+            "state" : "translated",
+            "value" : "Esto elimina todo en Palladium/Documents/Temp, incluyendo antiguas carpetas de ejecución."
           }
         },
         "ja" : {
@@ -23182,8 +23865,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Clear the temporary download folder?"
+            "state" : "translated",
+            "value" : "¿Limpiar la carpeta temporal de descargas?"
           }
         },
         "ja" : {
@@ -23222,8 +23905,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "This removes everything in Palladium/Documents/Saved."
+            "state" : "translated",
+            "value" : "Esto elimina todo en Palladium/Documents/Saved."
           }
         },
         "ja" : {
@@ -23262,8 +23945,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Clear the saved folder?"
+            "state" : "translated",
+            "value" : "¿Limpiar la carpeta guardada?"
           }
         },
         "ja" : {
@@ -23302,8 +23985,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Failed to clear cache: %@"
+            "state" : "translated",
+            "value" : "Error al limpiar la caché: %@"
           }
         },
         "ja" : {
@@ -23342,8 +24025,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Failed to clear download folder: %@"
+            "state" : "translated",
+            "value" : "Error al limpiar la carpeta de descargas: %@"
           }
         },
         "ja" : {
@@ -23382,8 +24065,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Failed to clear saved folder: %@"
+            "state" : "translated",
+            "value" : "Error al limpiar la carpeta guardada: %@"
           }
         },
         "ja" : {
@@ -23422,8 +24105,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Failed to remove old cache files: %@"
+            "state" : "translated",
+            "value" : "Error al quitar archivos antiguos de caché: %@"
           }
         },
         "ja" : {
@@ -23462,8 +24145,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Failed to remove old downloads: %@"
+            "state" : "translated",
+            "value" : "Error al quitar descargas antiguas: %@"
           }
         },
         "ja" : {
@@ -23502,8 +24185,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Failed to remove old saved files: %@"
+            "state" : "translated",
+            "value" : "Error al quitar archivos antiguos guardados: %@"
           }
         },
         "ja" : {
@@ -23542,8 +24225,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Failed to refresh storage summary: %@"
+            "state" : "translated",
+            "value" : "Error al actualizar el resumen del almacenamiento: %@"
           }
         },
         "ja" : {
@@ -23582,8 +24265,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "%lld items"
+            "state" : "translated",
+            "value" : "%lld elementos"
           }
         },
         "ja" : {
@@ -23622,8 +24305,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "1 item"
+            "state" : "translated",
+            "value" : "1 elemento"
           }
         },
         "ja" : {
@@ -23662,7 +24345,7 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Library/Caches/yt-dlp"
           }
         },
@@ -23702,7 +24385,7 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Documents/Saved"
           }
         },
@@ -23742,7 +24425,7 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Documents/Temp"
           }
         },
@@ -23782,8 +24465,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "1 day"
+            "state" : "translated",
+            "value" : "1 día"
           }
         },
         "ja" : {
@@ -23822,8 +24505,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "7 days"
+            "state" : "translated",
+            "value" : "7 días"
           }
         },
         "ja" : {
@@ -23862,8 +24545,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "30 days"
+            "state" : "translated",
+            "value" : "30 días"
           }
         },
         "ja" : {
@@ -23902,8 +24585,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "90 days"
+            "state" : "translated",
+            "value" : "90 días"
           }
         },
         "ja" : {
@@ -23942,8 +24625,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Remove older than"
+            "state" : "translated",
+            "value" : "Eliminar más antiguo que"
           }
         },
         "ja" : {
@@ -23982,8 +24665,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Cleared cache"
+            "state" : "translated",
+            "value" : "Caché limpiado"
           }
         },
         "ja" : {
@@ -24022,8 +24705,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Cache already empty"
+            "state" : "translated",
+            "value" : "La caché ya se ha limpiado"
           }
         },
         "ja" : {
@@ -24062,8 +24745,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Cleared download folder"
+            "state" : "translated",
+            "value" : "Carpeta de descargas limpiada"
           }
         },
         "ja" : {
@@ -24102,8 +24785,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download folder already empty"
+            "state" : "translated",
+            "value" : "La carpeta de descarga ya está limpiada"
           }
         },
         "ja" : {
@@ -24142,8 +24825,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Nothing to remove"
+            "state" : "translated",
+            "value" : "Nada para quitar"
           }
         },
         "ja" : {
@@ -24182,8 +24865,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Removed %lld old item(s)"
+            "state" : "translated",
+            "value" : "%lld elemento(s) antiguos eliminados"
           }
         },
         "ja" : {
@@ -24222,8 +24905,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Cleared saved folder"
+            "state" : "translated",
+            "value" : "Carpeta guardada limpiada"
           }
         },
         "ja" : {
@@ -24262,8 +24945,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Saved folder already empty"
+            "state" : "translated",
+            "value" : "La carpeta guardada ya está limpiada"
           }
         },
         "ja" : {
@@ -24302,8 +24985,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "All Available"
+            "state" : "translated",
+            "value" : "Todos disponibles"
           }
         },
         "ja" : {
@@ -24342,8 +25025,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Arabic"
+            "state" : "translated",
+            "value" : "Árabe"
           }
         },
         "ja" : {
@@ -24382,8 +25065,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Chinese"
+            "state" : "translated",
+            "value" : "Chino"
           }
         },
         "ja" : {
@@ -24422,8 +25105,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "English"
+            "state" : "translated",
+            "value" : "Inglés"
           }
         },
         "ja" : {
@@ -24462,8 +25145,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "French"
+            "state" : "translated",
+            "value" : "Francés"
           }
         },
         "ja" : {
@@ -24502,8 +25185,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "German"
+            "state" : "translated",
+            "value" : "Alemán"
           }
         },
         "ja" : {
@@ -24542,8 +25225,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Italian"
+            "state" : "translated",
+            "value" : "Italiano"
           }
         },
         "ja" : {
@@ -24582,8 +25265,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Japanese"
+            "state" : "translated",
+            "value" : "Japonés"
           }
         },
         "ja" : {
@@ -24622,8 +25305,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Korean"
+            "state" : "translated",
+            "value" : "Coreano"
           }
         },
         "ja" : {
@@ -24662,8 +25345,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Portuguese"
+            "state" : "translated",
+            "value" : "Portugués"
           }
         },
         "ja" : {
@@ -24702,8 +25385,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Russian"
+            "state" : "translated",
+            "value" : "Ruso"
           }
         },
         "ja" : {
@@ -24742,8 +25425,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Spanish"
+            "state" : "translated",
+            "value" : "Español"
           }
         },
         "ja" : {
@@ -24782,8 +25465,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Console"
+            "state" : "translated",
+            "value" : "Consola"
           }
         },
         "ja" : {
@@ -24822,8 +25505,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Download"
+            "state" : "translated",
+            "value" : "Descarga"
           }
         },
         "ja" : {
@@ -24862,8 +25545,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Downloads"
+            "state" : "translated",
+            "value" : "Descargas"
           }
         },
         "ja" : {
@@ -24902,8 +25585,8 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Settings"
+            "state" : "translated",
+            "value" : "Ajustes"
           }
         },
         "ja" : {
