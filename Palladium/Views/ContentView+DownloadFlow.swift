@@ -563,6 +563,7 @@ extension ContentView {
                 downloadPlaylist = defaultDownloadPlaylist
                 downloadSubtitles = defaultDownloadSubtitles
                 embedThumbnail = defaultEmbedThumbnail
+                removeSponsorSegments = defaultRemoveSponsorSegments
                 useCookies = defaultUseCookies
             }
 
