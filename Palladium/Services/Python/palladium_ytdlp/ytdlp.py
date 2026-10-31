@@ -760,6 +760,7 @@ def run_yt_dlp_flow(
                             packages,
                             install_target=install_target,
                             allow_prereleases=bool(package_source.get("allow_prereleases")),
+                            index_url=package_source.get("index_url"),
                         )
                         if packages:
                             pip_result = pip_main(pip_args)

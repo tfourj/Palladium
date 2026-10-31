@@ -33,6 +33,7 @@ def ensure_gallery_dl_installed(install_target, package_source):
         packages,
         install_target=install_target,
         allow_prereleases=bool(package_source.get("allow_prereleases")),
+        index_url=package_source.get("index_url"),
     )
     result = pip_main(pip_args)
     exit_code = 0 if result is None else int(result)
