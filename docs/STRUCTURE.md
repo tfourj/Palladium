@@ -49,6 +49,7 @@ Palladium/
 | `AppIntents/ShortcutDownloadIntents.swift` | App Shortcuts intents for starting downloads. |
 | `Models/AppAppearanceMode.swift` | Appearance-mode setting model. |
 | `Models/AppLanguageSettings.swift` | Persisted app language, system-language resolution, and observable localization bundle. |
+| `Models/BackgroundDownloadMode.swift` | Background download mode setting and LiveContainer detection. |
 | `Models/BackgroundDownloadProgress.swift` | Combines yt-dlp stream and ffmpeg progress into one fraction for the system background task UI. |
 | `Models/ClipboardLinkDetector.swift` | Finds the first web link in clipboard text for auto paste downloads. |
 | `Models/DownloadServiceDomain.swift` | Canonical source-service domain resolver for saved-download folders. |
@@ -99,7 +100,7 @@ Palladium/
 | `Views/Tabs/Settings/DownloadArgumentsSettingsView.swift` | Custom yt-dlp argument settings screen. |
 | `Views/Tabs/Settings/WebsiteArgumentsSettingsView.swift` | Per-website yt-dlp argument rule list, editor, and link tester. |
 | `Views/Tabs/Settings/DownloadBehaviorSettingsView.swift` | Download behavior settings screen. |
-| `Views/Tabs/Settings/BackgroundDownloadSettingsView.swift` | Background download toggle, install status, and patched IPA tools for sideloaded installs. |
+| `Views/Tabs/Settings/BackgroundDownloadSettingsView.swift` | Background download toggle, mode picker, install status, and patched IPA tools for sideloaded installs. |
 | `Views/Tabs/Settings/DownloadModesSettingsView.swift` | Download-mode settings screen. |
 | `Views/Tabs/Settings/DownloadOptionsSettingsView.swift` | Download option settings screen. |
 | `Views/Tabs/Settings/DownloadQualitySettingsView.swift` | Default video and audio quality settings screen. |
@@ -124,6 +125,7 @@ Palladium/
 | `Services/Background/IPABackgroundPatcher.swift` | Adds a background task identifier to an .ipa's Info.plist without touching other archive entries. |
 | `Services/Background/InstalledAppExporter.swift` | Packages the installed app bundle into a patched .ipa with Palladium's original bundle IDs. |
 | `Services/Background/PatchedIPABuilder.swift` | Downloads the latest stable release and patches it for the bundle ID this install runs with. |
+| `Services/Background/SilentAudioKeepAlive.swift` | Plays silent audio to keep downloads running where background tasks are unavailable, such as LiveContainer. |
 | `Services/Cookies/NetscapeCookieExporter.swift` | Converts browser cookies into Netscape cookie-file records. |
 | `Services/Debug/DeveloperDiagnostics.swift` | Debug-only version probes and framework checks for the developer menu. |
 | `Services/FFmpeg/SwiftFFmpegBridge.swift` | Swift interface to bundled FFmpeg functionality. |
@@ -189,6 +191,7 @@ Palladium/
 | `scripts/swift_tests/PostProcessingPreferencesTests.swift` | Video conversion defaults, codec and encoder resolution, and persistence. |
 | `scripts/swift_tests/AppLanguageSettingsTests.swift` | Language persistence, regional matching, English fallback, and view invalidation. |
 | `scripts/swift_tests/DeveloperDiagnosticsTests.swift` | Developer diagnostic parsing plus native FFmpeg and QuickJS check tests. |
+| `scripts/swift_tests/BackgroundDownloadModeTests.swift` | Background download mode defaults and per-mode support tests. |
 | `scripts/swift_tests/BackgroundDownloadProgressTests.swift` | Background download stream ordering, side-file, processing, and playlist progress tests. |
 | `scripts/swift_tests/BackgroundDownloadTaskTests.swift` | Background stop result keeping and stalled-progress heartbeat step tests. |
 | `scripts/swift_tests/DownloadServiceDomainTests.swift` | Saved-download service-domain canonicalization tests. |

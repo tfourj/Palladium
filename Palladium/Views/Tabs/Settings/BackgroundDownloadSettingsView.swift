@@ -2,6 +2,7 @@ import SwiftUI
 
 struct BackgroundDownloadSettingsView: View {
     @Binding var backgroundDownloadsEnabled: Bool
+    @Binding var backgroundDownloadMode: BackgroundDownloadMode
 
     let isRunning: Bool
 
@@ -17,9 +18,27 @@ struct BackgroundDownloadSettingsView: View {
                         backgroundStatusIcon
                     }
                 }
-                .disabled(isRunning || !BackgroundDownloadTask.isSupported)
+                .disabled(isRunning || !BackgroundDownloadTask.isSupported(in: backgroundDownloadMode))
             } footer: {
                 Text("settings.download_behavior.background.help")
+            }
+
+            Section {
+                Picker("settings.download_behavior.background.mode", selection: $backgroundDownloadMode) {
+                    ForEach(BackgroundDownloadMode.allCases) { mode in
+                        Text(mode.title)
+                            .tag(mode)
+                    }
+                }
+                .disabled(isRunning)
+            } footer: {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("settings.download_behavior.background.mode.help")
+                    if showsLiveContainerHint {
+                        Text("settings.download_behavior.background.mode.livecontainer")
+                            .foregroundStyle(.orange)
+                    }
+                }
             }
 
             if showsPatchInstructions {
@@ -57,12 +76,27 @@ struct BackgroundDownloadSettingsView: View {
     private static let patcherURL = URL(string: "https://getpalladium.app/patcher")!
 
     private var backgroundDownloadsWork: Bool {
-        BackgroundDownloadTask.isSupported && BackgroundDownloadTask.isPermittedOnThisInstall
+        switch backgroundDownloadMode {
+        case .silentAudio:
+            return true
+        case .systemTask:
+            return BackgroundDownloadTask.isSupported
+                && BackgroundDownloadTask.isPermittedOnThisInstall
+                && !BackgroundDownloadMode.isRunningInLiveContainer
+        }
     }
 
-    /// Only installs whose bundle identifier was changed can be fixed by patching the IPA.
+    /// Only installs whose bundle identifier was changed can be fixed by patching the IPA. LiveContainer installs
+    /// cannot, since the system checks LiveContainer's own Info.plist.
     private var showsPatchInstructions: Bool {
-        BackgroundDownloadTask.isSupported && !BackgroundDownloadTask.isPermittedOnThisInstall
+        backgroundDownloadMode == .systemTask
+            && BackgroundDownloadTask.isSupported
+            && !BackgroundDownloadTask.isPermittedOnThisInstall
+            && !BackgroundDownloadMode.isRunningInLiveContainer
+    }
+
+    private var showsLiveContainerHint: Bool {
+        backgroundDownloadMode == .systemTask && BackgroundDownloadMode.isRunningInLiveContainer
     }
 
     @ViewBuilder

@@ -72,6 +72,7 @@ struct ContentView: View {
     static let saveIncompleteDownloadsToHistoryDefaultsKey = "palladium.saveIncompleteDownloadsToHistory"
     static let detailedProgressEnabledDefaultsKey = "palladium.detailedProgressEnabled"
     static let backgroundDownloadsEnabledDefaultsKey = "palladium.backgroundDownloadsEnabled"
+    static let backgroundDownloadModeDefaultsKey = "palladium.backgroundDownloadMode"
     static let subtitleLanguagePatternDefaultsKey = "palladium.subtitleLanguagePattern"
     static let customSubtitleLanguagePatternDefaultsKey = "palladium.customSubtitleLanguagePattern"
     static let useCookiesDefaultsKey = "palladium.useCookies"
@@ -129,6 +130,7 @@ struct ContentView: View {
     @State var saveIncompleteDownloadsToHistory: Bool
     @State var detailedProgressEnabled: Bool
     @State var backgroundDownloadsEnabled: Bool
+    @State var backgroundDownloadMode: BackgroundDownloadMode
     @State var subtitleLanguagePattern: String
     @State var customSubtitleLanguagePattern: String
     @State var useCookies: Bool
@@ -265,6 +267,7 @@ struct ContentView: View {
         _saveIncompleteDownloadsToHistory = State(initialValue: Self.loadSaveIncompleteDownloadsToHistory())
         _detailedProgressEnabled = State(initialValue: Self.loadDetailedProgressEnabled())
         _backgroundDownloadsEnabled = State(initialValue: Self.loadBackgroundDownloadsEnabled())
+        _backgroundDownloadMode = State(initialValue: Self.loadBackgroundDownloadMode())
         _subtitleLanguagePattern = State(initialValue: Self.loadSubtitleLanguagePattern())
         _customSubtitleLanguagePattern = State(initialValue: Self.loadCustomSubtitleLanguagePattern())
         _useCookies = State(initialValue: restoreDefaults ? defCookies : Self.loadUseCookies())
@@ -381,6 +384,7 @@ struct ContentView: View {
                     saveIncompleteDownloadsToHistory: $saveIncompleteDownloadsToHistory,
                     detailedProgressEnabled: $detailedProgressEnabled,
                     backgroundDownloadsEnabled: $backgroundDownloadsEnabled,
+                    backgroundDownloadMode: $backgroundDownloadMode,
                     downloadPresetSettings: $downloadPresetSettings,
                     shareSheetDownloadMode: $shareSheetDownloadMode,
                     showShareSheetFormatButton: $showShareSheetFormatButton,
@@ -517,6 +521,9 @@ struct ContentView: View {
             persistPreferences()
         }
         .onChange(of: backgroundDownloadsEnabled, initial: false) {
+            persistPreferences()
+        }
+        .onChange(of: backgroundDownloadMode, initial: false) {
             persistPreferences()
         }
         .onChange(of: shareSheetDownloadMode, initial: false) {
