@@ -23,11 +23,13 @@ final class AppLanguageSettingsTests: XCTestCase {
         defer { defaults.removePersistentDomain(forName: suiteName) }
         let language = AppLanguageSettings(defaults: defaults)
 
-        XCTAssertEqual(language.availableLanguages, ["en", "ja", "ko", "zh-Hans"])
+        XCTAssertEqual(language.availableLanguages, ["en", "es", "ja", "ko", "zh-Hans"])
         language.selection = "lt"
         XCTAssertEqual(language.selection, "system")
         XCTAssertEqual(AppLanguageSettings.resolve(selection: "system", preferredLanguages: ["lt-LT"],
                                                    availableLanguages: language.availableLanguages), "en")
+        XCTAssertEqual(AppLanguageSettings.resolve(selection: "system", preferredLanguages: ["es-MX"],
+                                                   availableLanguages: language.availableLanguages), "es")
     }
 
     func testSelectionPersistsAndSystemCanBeRestored() throws {
