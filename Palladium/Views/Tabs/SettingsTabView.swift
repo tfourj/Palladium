@@ -109,6 +109,7 @@ struct SettingsTabView: View {
     @Binding var additionalManagedPackageNames: [String]
     @Binding var lockedPackageVersions: [String: String]
     @AppStorage(JavaScriptRuntime.defaultsKey) private var javascriptRuntime = JavaScriptRuntime.defaultValue
+    @AppStorage(PackageIndexMirror.defaultsKey) private var packageIndexMirror = PackageIndexMirror.defaultValue
     @Binding var youtubePatchMode: YouTubePatchMode
     let packageStatusText: String
     let versionsText: String
@@ -867,6 +868,23 @@ struct SettingsTabView: View {
                     } message: {
                         Text("packages.source.nightly.warning.message")
                     }
+                )
+            },
+            controlSetting(
+                id: "packageIndexMirror",
+                menu: .packageManager,
+                title: "packages.index.picker",
+                subtitle: "packages.index.help",
+                keywords: PackageIndexMirror.allCases.map(\.title) + ["pip", "PyPI"]
+            ) { title in
+                AnyView(
+                    Picker(title, selection: $packageIndexMirror) {
+                        ForEach(PackageIndexMirror.allCases) { mirror in
+                            Text(mirror.title).tag(mirror)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .disabled(isPackageRunning)
                 )
             },
             controlSetting(
