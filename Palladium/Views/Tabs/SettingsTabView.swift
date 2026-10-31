@@ -432,6 +432,7 @@ struct SettingsTabView: View {
             settingsNavigationLink(for: .downloadModes)
             settingsNavigationLink(for: .shareSheet)
             settingsNavigationLink(for: .downloadQuality)
+            settingsNavigationLink(for: .downloadOptions)
             settingsNavigationLink(for: .postProcessing)
             settingsNavigationLink(for: .afterDownload)
             settingsNavigationLink(for: .downloadBehavior)
