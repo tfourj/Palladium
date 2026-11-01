@@ -6,7 +6,7 @@ This map covers tracked source and configuration files. Generated build products
 
 ```text
 Palladium/
-├── .github/                 GitHub funding and build automation
+├── .github/                 GitHub funding, build automation, and README assets
 ├── docs/                    Project documentation
 ├── Palladium/               Main iOS app target
 ├── Palladium.xcodeproj/     Xcode project and Swift Package resolution
@@ -25,6 +25,7 @@ Palladium/
 | Path | Purpose |
 | --- | --- |
 | `.github/FUNDING.yml` | GitHub Sponsors configuration. |
+| `.github/assets/fmhy.svg` | FMHY badge shown in the README. |
 | `.github/workflows/build_ipa.yml` | GitHub Actions workflow that runs Python tests, downloads dependencies, and builds the IPA. |
 | `.gitignore` | Files and local dependencies excluded from Git. |
 | `Palladium.xcodeproj/project.pbxproj` | Targets, build phases, build settings, and file references for Xcode. |

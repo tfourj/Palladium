@@ -14,6 +14,10 @@ On-device iOS media downloader powered by `yt-dlp`, `gallery-dl`, `ffmpeg`, and 
   </a>
   <br>
   <br>
+  <a href="https://fmhy.net/mobile#ios-tools">
+    <img src=".github/assets/fmhy.svg" alt="Listed on FMHY" height="48">
+  </a>
+  <br>
   <a href="https://apps.apple.com/us/app/palladium-media-manager/id6760206193">
     <img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83" alt="Download on the App Store" height="48">
   </a>
