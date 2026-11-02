@@ -2,6 +2,8 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 struct PackageManagerSettingsView: View {
+    @AppStorage(PackageIndexMirror.defaultsKey) private var packageIndexMirror = PackageIndexMirror.defaultValue
+    @AppStorage(PackageIndexMirror.customURLDefaultsKey) private var packageIndexCustomURL = ""
     @Binding var checkPackageUpdatesOnLaunch: Bool
     @Binding var autoUpdatePackagesOnLaunch: Bool
     @Binding var packageSourceMode: PackageSourceMode
@@ -50,6 +52,39 @@ struct PackageManagerSettingsView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
+            }
+
+            Section {
+                Picker("packages.index.picker", selection: $packageIndexMirror) {
+                    ForEach(PackageIndexMirror.allCases) { mirror in
+                        Text(mirror.title).tag(mirror)
+                    }
+                }
+                .disabled(isRunning)
+
+                if packageIndexMirror == .custom {
+                    TextField("packages.index.custom_url.placeholder", text: $packageIndexCustomURL)
+                        .keyboardType(.URL)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                        .font(.system(.footnote, design: .monospaced))
+                        .disabled(isRunning)
+                }
+
+                if let indexURL = packageIndexMirror.indexURL(customURL: packageIndexCustomURL) {
+                    Text(indexURL)
+                        .font(.system(.caption, design: .monospaced))
+                        .foregroundStyle(.secondary)
+                        .textSelection(.enabled)
+                } else if packageIndexMirror == .custom {
+                    Text("packages.index.custom_url.invalid")
+                        .font(.caption)
+                        .foregroundStyle(.orange)
+                }
+            } header: {
+                Text("packages.index.title")
+            } footer: {
+                Text("packages.index.help")
             }
 
             Section {

@@ -11340,6 +11340,96 @@
         }
       }
     },
+    "packages.index.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Package Index"
+          }
+        }
+      }
+    },
+    "packages.index.picker" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Repository"
+          }
+        }
+      }
+    },
+    "packages.index.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose where pip downloads packages from. A mirror can be faster when PyPI is slow or blocked in your region."
+          }
+        }
+      }
+    },
+    "packages.index.pypi" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PyPI (Default)"
+          }
+        }
+      }
+    },
+    "packages.index.tsinghua" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tsinghua University Mirror (China)"
+          }
+        }
+      }
+    },
+    "packages.index.aliyun" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alibaba Cloud Mirror (China)"
+          }
+        }
+      }
+    },
+    "packages.index.custom" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Custom URL"
+          }
+        }
+      }
+    },
+    "packages.index.custom_url.placeholder" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://example.com/simple"
+          }
+        }
+      }
+    },
+    "packages.index.custom_url.invalid" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter a valid http or https URL. PyPI is used until then."
+          }
+        }
+      }
+    },
     "packages.status.checking" : {
       "localizations" : {
         "en" : {

@@ -10,6 +10,7 @@ import traceback
 import zipfile
 import importlib.metadata as importlib_metadata
 from email.parser import Parser
+from urllib.parse import urlsplit
 
 from .patching import DEFAULT_YOUTUBE_PATCH_MODE, normalize_youtube_patch_mode
 from .shared import (
@@ -901,6 +902,7 @@ def parse_package_source(source_json=None):
         "locked_versions": dict(MANAGED_PACKAGE_LOCKS),
         "allow_prereleases": False,
         "patch_mode": DEFAULT_YOUTUBE_PATCH_MODE,
+        "index_url": "",
     }
     if not source_json:
         return source
@@ -956,7 +958,32 @@ def parse_package_source(source_json=None):
     source["locked_versions"] = locked_versions
     source["allow_prereleases"] = mode == "nightly"
     source["patch_mode"] = patch_mode
+    source["index_url"] = normalized_index_url(parsed.get("index_url"))
     return source
+
+
+def normalized_index_url(value):
+    url = str(value or "").strip()
+    if not url:
+        return ""
+    try:
+        parts = urlsplit(url)
+    except ValueError:
+        return ""
+    if parts.scheme.lower() not in ("http", "https") or not parts.hostname:
+        return ""
+    return url
+
+
+def pip_index_args(index_url=None):
+    url = normalized_index_url(index_url)
+    if not url:
+        return []
+    args = ["--index-url", url]
+    parts = urlsplit(url)
+    if parts.scheme.lower() == "http":
+        args.extend(["--trusted-host", parts.hostname])
+    return args
 
 
 def build_pip_install_args(
@@ -965,6 +992,7 @@ def build_pip_install_args(
     allow_prereleases=False,
     upgrade=False,
     force_reinstall=False,
+    index_url=None,
 ):
     args = ["install"]
     if install_target:
@@ -982,6 +1010,7 @@ def build_pip_install_args(
         "off",
         "--no-color",
     ])
+    args.extend(pip_index_args(index_url))
     args.extend(list(package_specs or []))
     return args
 
@@ -1169,6 +1198,7 @@ def check_package_updates(install_target=None, package_source=None, include_miss
         pip_args = ["list", "--outdated", "--format=json"]
         if install_target:
             pip_args.extend(["--path", install_target])
+        pip_args.extend(pip_index_args(package_source.get("index_url")))
 
         capture = io.StringIO()
         with contextlib.redirect_stdout(capture):
@@ -1285,6 +1315,7 @@ def fetch_package_index_versions(
         return {}
 
     resolved = {}
+    index_args = pip_index_args((package_source or {}).get("index_url"))
     for package_name in managed_package_names(package_source):
         if is_bundled_runtime_package(package_name):
             print(f"[palladium] skipping index versions for bundled {package_name}")
@@ -1297,6 +1328,7 @@ def fetch_package_index_versions(
                 "versions",
                 "--disable-pip-version-check",
                 "--no-color",
+                *index_args,
                 package_name,
             ]
             if allow_prereleases:

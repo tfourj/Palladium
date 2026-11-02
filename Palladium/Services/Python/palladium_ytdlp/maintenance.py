@@ -268,6 +268,7 @@ def install_package_updates(action, install_target, package_source, custom_versi
         allow_prereleases=bool(package_source.get("allow_prereleases")),
         upgrade=True,
         force_reinstall=action == ACTION_REINSTALL,
+        index_url=package_source.get("index_url"),
     )
     pip_result = pip_main(pip_args)
     pip_exit_code = 0 if pip_result is None else int(pip_result)

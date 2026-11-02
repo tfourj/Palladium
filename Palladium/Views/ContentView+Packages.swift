@@ -250,7 +250,7 @@ extension ContentView {
         let additionalPackages = PackageSourceDefaults.normalizedAdditionalPackageNames(
             additionalManagedPackageNames
         )
-        let payload: [String: Any] = [
+        var payload: [String: Any] = [
             "mode": packageSourceMode.rawValue,
             "custom_specs": specs,
             "additional_packages": additionalPackages,
@@ -260,6 +260,9 @@ extension ContentView {
             ),
             "youtube_patch_mode": youtubePatchMode.rawValue
         ]
+        if let indexURL = PackageIndexMirror.selectedIndexURL() {
+            payload["index_url"] = indexURL
+        }
         guard let data = try? JSONSerialization.data(withJSONObject: payload),
               let text = String(data: data, encoding: .utf8) else {
             return "{\"mode\":\"stable\",\"custom_specs\":[]}"
