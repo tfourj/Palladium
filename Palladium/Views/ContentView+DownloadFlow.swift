@@ -429,6 +429,8 @@ extension ContentView {
         let filenameExportPresetAtStart = queuedConfiguration?.filenameExportPreset ?? filenameExportPreset
         let customFilenameTemplateAtStart = queuedConfiguration?.customFilenameTemplate ?? customFilenameTemplate
         let downloadSubtitlesAtStart = queuedConfiguration?.downloadSubtitles ?? downloadSubtitles
+        let embedSubtitlesAtStart = postProcessingPreset.supportsEmbeddedSubtitles
+            && (queuedConfiguration?.embedSubtitles ?? embedSubtitles)
         let embedThumbnailAtStart = queuedConfiguration?.embedThumbnail ?? embedThumbnail
         let autoRetryFailedDownloadsAtStart = queuedConfiguration?.autoRetryFailedDownloads
             ?? autoRetryFailedDownloads
@@ -504,7 +506,8 @@ extension ContentView {
                     liveLogFD: liveLogFD,
                     filenameExportPreset: filenameExportPresetAtStart,
                     customFilenameTemplate: customFilenameTemplateAtStart,
-                    removeSponsorSegments: removeSponsorSegmentsAtStart
+                    removeSponsorSegments: removeSponsorSegmentsAtStart,
+                    embedSubtitles: embedSubtitlesAtStart
                 )
             }
 
