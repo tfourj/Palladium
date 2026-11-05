@@ -261,6 +261,10 @@ enum DownloadPreset: String, Codable, CaseIterable, Identifiable {
         self != .audio && self != .images
     }
 
+    var supportsEmbeddedSubtitles: Bool {
+        self != .audio && self != .images
+    }
+
     var shareSheetMode: ShareSheetDownloadMode {
         switch self {
         case .autoVideo: return .autoVideo
