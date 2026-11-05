@@ -191,10 +191,11 @@ Palladium/
 | `scripts/python_tests/test_output_templates.py` | Filename preset selection and output-argument priority tests. |
 | `scripts/python_tests/test_post_processing.py` | Conversion override, codec and encoder resolution, stream-copy, and audio extraction tests. |
 | `scripts/python_tests/test_sponsorblock.py` | SponsorBlock removal argument, preset skipping, and user override tests. |
+| `scripts/python_tests/test_embed_subtitles.py` | Subtitle embedding arguments, preset skipping, and audio extraction tests. |
 | `scripts/python_tests/test_package_index.py` | Package index URL parsing and pip `--index-url` argument tests. |
 | `scripts/python_tests/test_staged_scripts.py` | Checks every Python package module is staged by `PythonScripts.swift`. |
 | `scripts/swift_tests/PostProcessingPreferencesTests.swift` | Video conversion defaults, codec and encoder resolution, and persistence. |
-| `scripts/swift_tests/DownloadPresetTests.swift` | Per-preset SponsorBlock support tests. |
+| `scripts/swift_tests/DownloadPresetTests.swift` | Per-preset SponsorBlock and subtitle embedding support tests. |
 | `scripts/swift_tests/AppLanguageSettingsTests.swift` | Language persistence, regional matching, English fallback, and view invalidation. |
 | `scripts/swift_tests/DeveloperDiagnosticsTests.swift` | Developer diagnostic parsing plus native FFmpeg and QuickJS check tests. |
 | `scripts/swift_tests/BackgroundDownloadModeTests.swift` | Background download mode defaults and per-mode support tests. |

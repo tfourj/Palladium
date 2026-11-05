@@ -9,4 +9,12 @@ final class DownloadPresetTests: XCTestCase {
         XCTAssertFalse(DownloadPreset.audio.supportsSponsorBlock)
         XCTAssertFalse(DownloadPreset.images.supportsSponsorBlock)
     }
+
+    func testEmbeddedSubtitlesApplyOnlyToVideoPresets() {
+        XCTAssertTrue(DownloadPreset.autoVideo.supportsEmbeddedSubtitles)
+        XCTAssertTrue(DownloadPreset.mute.supportsEmbeddedSubtitles)
+        XCTAssertTrue(DownloadPreset.custom.supportsEmbeddedSubtitles)
+        XCTAssertFalse(DownloadPreset.audio.supportsEmbeddedSubtitles)
+        XCTAssertFalse(DownloadPreset.images.supportsEmbeddedSubtitles)
+    }
 }
