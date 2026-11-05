@@ -321,6 +321,7 @@ struct ContentView: View {
                     visibleDownloadPresets: visibleDownloadPresets,
                     downloadPlaylist: $downloadPlaylist,
                     downloadSubtitles: $downloadSubtitles,
+                    embedSubtitles: $embedSubtitles,
                     embedThumbnail: $embedThumbnail,
                     removeSponsorSegments: $removeSponsorSegments,
                     subtitleLanguagePattern: $subtitleLanguagePattern,

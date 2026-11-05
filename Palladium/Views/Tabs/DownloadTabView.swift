@@ -10,6 +10,7 @@ struct DownloadTabView: View {
     let visibleDownloadPresets: [DownloadPreset]
     @Binding var downloadPlaylist: Bool
     @Binding var downloadSubtitles: Bool
+    @Binding var embedSubtitles: Bool
     @Binding var embedThumbnail: Bool
     @Binding var removeSponsorSegments: Bool
     @Binding var subtitleLanguagePattern: String
@@ -643,6 +644,15 @@ struct DownloadTabView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 6))
                     .disabled(isRunning)
             }
+
+            if downloadSubtitles, selectedPreset.supportsEmbeddedSubtitles {
+                downloadOptionToggle(
+                    title: String(localized: "download.options.subtitles.embed.title", bundle: .app),
+                    subtitle: String(localized: "download.options.subtitles.embed.help", bundle: .app),
+                    isOn: $embedSubtitles
+                )
+                .padding(.leading, 29)
+            }
         }
     }
 
@@ -737,6 +747,9 @@ struct DownloadTabView: View {
         }
         if downloadSubtitles {
             parts.append(String(format: String(localized: "download.options.subtitles.value", bundle: .app), subtitleSummaryText))
+        }
+        if downloadSubtitles, embedSubtitles, selectedPreset.supportsEmbeddedSubtitles {
+            parts.append(String(localized: "download.options.subtitles.embed.title", bundle: .app))
         }
         if embedThumbnail {
             parts.append(String(localized: "download.options.thumbnail.title", bundle: .app))
