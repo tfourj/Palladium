@@ -59,6 +59,7 @@ extension ContentView {
         defaults.set(autoPasteDownloadMode.rawValue, forKey: Self.autoPasteDownloadModeDefaultsKey)
         defaults.set(downloadPlaylist, forKey: Self.downloadPlaylistDefaultsKey)
         defaults.set(downloadSubtitles, forKey: Self.downloadSubtitlesDefaultsKey)
+        defaults.set(embedSubtitles, forKey: Self.embedSubtitlesDefaultsKey)
         defaults.set(embedThumbnail, forKey: Self.embedThumbnailDefaultsKey)
         defaults.set(removeSponsorSegments, forKey: Self.removeSponsorSegmentsDefaultsKey)
         defaults.set(defaultDownloadPlaylist, forKey: Self.defaultDownloadPlaylistDefaultsKey)
@@ -294,6 +295,10 @@ extension ContentView {
             return false
         }
         return UserDefaults.standard.bool(forKey: downloadSubtitlesDefaultsKey)
+    }
+
+    static func loadEmbedSubtitles() -> Bool {
+        UserDefaults.standard.bool(forKey: embedSubtitlesDefaultsKey)
     }
 
     static func loadEmbedThumbnail() -> Bool {
