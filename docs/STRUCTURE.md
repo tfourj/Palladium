@@ -50,6 +50,7 @@ Palladium/
 | `AppIntents/ShortcutDownloadIntents.swift` | App Shortcuts intents for starting downloads. |
 | `Models/AppAppearanceMode.swift` | Appearance-mode setting model. |
 | `Models/AppLanguageSettings.swift` | Persisted app language, system-language resolution, and observable localization bundle. |
+| `Models/AutoPastePolicy.swift` | Decides when the link field clears after a download. |
 | `Models/BackgroundDownloadMode.swift` | Background download mode setting and LiveContainer detection. |
 | `Models/BackgroundDownloadProgress.swift` | Combines yt-dlp stream and ffmpeg progress into one fraction for the system background task UI. |
 | `Models/ClipboardLinkDetector.swift` | Finds the first web link in clipboard text for auto paste downloads. |
@@ -200,6 +201,7 @@ Palladium/
 | `scripts/swift_tests/BackgroundDownloadProgressTests.swift` | Background download stream ordering, side-file, processing, and playlist progress tests. |
 | `scripts/swift_tests/BackgroundDownloadTaskTests.swift` | Background stop result keeping and stalled-progress heartbeat step tests. |
 | `scripts/swift_tests/DownloadServiceDomainTests.swift` | Saved-download service-domain canonicalization tests. |
+| `scripts/swift_tests/AutoPastePolicyTests.swift` | Link field clearing tests after downloads. |
 | `scripts/swift_tests/ClipboardLinkDetectorTests.swift` | Clipboard text link detection tests for auto paste downloads. |
 | `scripts/swift_tests/WebsiteArgumentRuleTests.swift` | Website argument rule matching priority, normalization, and persistence tests. |
 | `scripts/swift_tests/DownloadQueueTests.swift` | Download queue parsing, state transition, ordering, and persistence tests. |
