@@ -5198,6 +5198,28 @@
         }
       }
     },
+    "download.options.subtitles.embed.help" : {
+      "comment" : "Subtitle for the download option that embeds downloaded subtitles into the video file.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add subtitle tracks to the video instead of separate files"
+          }
+        }
+      }
+    },
+    "download.options.subtitles.embed.title" : {
+      "comment" : "Title for the download option that embeds downloaded subtitles into the video file.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Embed subtitles"
+          }
+        }
+      }
+    },
     "download.options.subtitles.help" : {
       "localizations" : {
         "en" : {
