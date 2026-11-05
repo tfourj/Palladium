@@ -651,6 +651,13 @@ extension ContentView {
                         outputText: outcome.outputText
                     )
                 }
+                if AutoPastePolicy.shouldClearLinkField(
+                    linkText: urlText,
+                    finishedURL: targetURL,
+                    resultKind: finalResultKind
+                ) {
+                    urlText = ""
+                }
                 completedDownloadResult = result
                 downloadErrorText = nil
                 if let queuedItemID {
