@@ -9,7 +9,11 @@ import yt_dlp
 from scripts.python_tests import helpers  # noqa: F401
 
 from palladium_ytdlp.ytdlp import list_yt_dlp_formats, resolve_picker_formats  # noqa: E402
-from palladium_ytdlp.args import apply_post_processing_args, build_output_args  # noqa: E402
+from palladium_ytdlp.args import (  # noqa: E402
+    apply_post_processing_args,
+    build_embed_subtitle_args,
+    build_output_args,
+)
 from palladium_ytdlp.video_conversion import (  # noqa: E402
     codec_aware_video_conversion,
     parse_video_conversion_settings,
@@ -82,6 +86,20 @@ class PostProcessingIntegrationTests(unittest.TestCase):
         run.assert_not_called()
         self.assertEqual(deleted, [])
         self.assertEqual(result["filepath"], "/tmp/video.mp4")
+
+
+class SubtitleEmbedIntegrationTests(unittest.TestCase):
+    def test_embedding_writes_all_subtitles_and_deletes_sidecars(self):
+        embed_args = build_embed_subtitle_args(True, "auto_video", [], [])
+        options = yt_dlp.parse_options([
+            "--ignore-config", "--write-subs", "--write-auto-subs", "--sub-langs", "en", *embed_args,
+        ]).ydl_opts
+        embed_processors = [pp for pp in options["postprocessors"] if pp["key"] == "FFmpegEmbedSubtitle"]
+
+        self.assertTrue(options["writesubtitles"])
+        self.assertTrue(options["writeautomaticsub"])
+        self.assertEqual(len(embed_processors), 1)
+        self.assertFalse(embed_processors[0]["already_have_subtitle"])
 
 
 class CodecAwareConversionTests(unittest.TestCase):

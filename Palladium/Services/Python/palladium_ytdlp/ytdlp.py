@@ -9,6 +9,7 @@ import urllib.parse
 
 from .args import (
     apply_post_processing_args,
+    build_embed_subtitle_args,
     build_output_args,
     build_preset_args,
     build_sponsorblock_args,
@@ -632,6 +633,7 @@ def run_yt_dlp_flow(
     filename_export_preset_override=None,
     custom_filename_template_override=None,
     sponsorblock_remove_override=None,
+    embed_subtitles_override=None,
 ):
     output = TailBuffer()
     console_stdout = sys.__stdout__ if sys.__stdout__ is not None else None
@@ -672,6 +674,10 @@ def run_yt_dlp_flow(
         sponsorblock_remove = os.environ.get("PALLADIUM_SPONSORBLOCK_REMOVE", "").strip().lower() in ("1", "true", "yes", "on")
     else:
         sponsorblock_remove = bool(sponsorblock_remove_override)
+    if embed_subtitles_override is None:
+        embed_subtitles = os.environ.get("PALLADIUM_EMBED_SUBTITLES", "").strip().lower() in ("1", "true", "yes", "on")
+    else:
+        embed_subtitles = bool(embed_subtitles_override)
     if download_playlist_override is None:
         download_playlist = os.environ.get("PALLADIUM_DOWNLOAD_PLAYLIST", "").strip().lower() in ("1", "true", "yes", "on")
     else:
@@ -864,6 +870,13 @@ def run_yt_dlp_flow(
                                 download_behavior_args.append("--all-subs")
                             else:
                                 download_behavior_args.extend(["--sub-langs", subtitle_language_pattern])
+
+                            embed_subtitle_args = build_embed_subtitle_args(
+                                embed_subtitles, download_preset, preset_args, extra_args
+                            )
+                            if embed_subtitle_args:
+                                print("[palladium] embedding subtitles")
+                                download_behavior_args.extend(embed_subtitle_args)
 
                         if embed_thumbnail:
                             download_behavior_args.extend(["--convert-thumbnails", "png", "--embed-thumbnail"])

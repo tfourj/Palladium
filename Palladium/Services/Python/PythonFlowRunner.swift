@@ -209,7 +209,8 @@ enum PythonFlowRunner {
         liveLogFD: Int32?,
         filenameExportPreset: FilenameExportPreset,
         customFilenameTemplate: String,
-        removeSponsorSegments: Bool
+        removeSponsorSegments: Bool,
+        embedSubtitles: Bool
     ) async -> PythonFlowOutcome {
         await runOnPythonThread {
             let payload: String
@@ -235,7 +236,8 @@ enum PythonFlowRunner {
                         postProcessingJSON,
                         filenameExportPreset.rawValue,
                         customFilenameTemplate,
-                        removeSponsorSegments
+                        removeSponsorSegments,
+                        embedSubtitles
                     ]
                 )
                 payload = String(result) ?? ""

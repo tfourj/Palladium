@@ -505,6 +505,7 @@ final class DownloadQueueTests: XCTestCase {
         XCTAssertEqual(decoded.items.first?.url, "https://example.com/one")
         XCTAssertNil(decoded.items.first?.configuration.batchQuality)
         XCTAssertNil(decoded.items.first?.configuration.removeSponsorSegments)
+        XCTAssertNil(decoded.items.first?.configuration.embedSubtitles)
     }
 
     func testSponsorBlockChoicePersistsWithQueuedConfiguration() throws {
@@ -527,5 +528,27 @@ final class DownloadQueueTests: XCTestCase {
         let decoded = try JSONDecoder().decode(QueuedDownloadConfiguration.self, from: data)
 
         XCTAssertEqual(decoded.removeSponsorSegments, true)
+    }
+
+    func testEmbedSubtitlesChoicePersistsWithQueuedConfiguration() throws {
+        let configuration = QueuedDownloadConfiguration(
+            presetRawValue: DownloadPreset.autoVideo.rawValue,
+            presetArgumentsJSON: "{}",
+            extraArguments: "",
+            downloadPlaylist: false,
+            downloadSubtitles: true,
+            embedThumbnail: false,
+            autoRetryFailedDownloads: false,
+            subtitleLanguagePattern: "en",
+            useCookies: false,
+            cookieFileName: "",
+            afterDownloadBehaviorRawValue: AfterDownloadBehavior.ask.rawValue,
+            embedSubtitles: true
+        )
+
+        let data = try JSONEncoder().encode(configuration)
+        let decoded = try JSONDecoder().decode(QueuedDownloadConfiguration.self, from: data)
+
+        XCTAssertEqual(decoded.embedSubtitles, true)
     }
 }

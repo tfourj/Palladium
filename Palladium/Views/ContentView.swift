@@ -62,6 +62,7 @@ struct ContentView: View {
     static let autoPasteLastLinkDefaultsKey = "palladium.autoPasteLastLink"
     static let downloadPlaylistDefaultsKey = "palladium.downloadPlaylist"
     static let downloadSubtitlesDefaultsKey = "palladium.downloadSubtitles"
+    static let embedSubtitlesDefaultsKey = "palladium.embedSubtitles"
     static let embedThumbnailDefaultsKey = "palladium.embedThumbnail"
     static let removeSponsorSegmentsDefaultsKey = "palladium.removeSponsorSegments"
     static let defaultDownloadPlaylistDefaultsKey = "palladium.defaultDownloadPlaylist"
@@ -122,6 +123,7 @@ struct ContentView: View {
     @State var autoPasteDownloadMode: ShareSheetDownloadMode
     @State var downloadPlaylist: Bool
     @State var downloadSubtitles: Bool
+    @State var embedSubtitles: Bool
     @State var embedThumbnail: Bool
     @State var removeSponsorSegments: Bool
     @State var defaultDownloadPlaylist: Bool
@@ -262,6 +264,7 @@ struct ContentView: View {
         let defCookies = Self.loadDefaultUseCookies()
         _downloadPlaylist = State(initialValue: restoreDefaults ? defPlaylist : Self.loadDownloadPlaylist())
         _downloadSubtitles = State(initialValue: restoreDefaults ? defSubtitles : Self.loadDownloadSubtitles())
+        _embedSubtitles = State(initialValue: Self.loadEmbedSubtitles())
         _embedThumbnail = State(initialValue: restoreDefaults ? defThumbnail : Self.loadEmbedThumbnail())
         _removeSponsorSegments = State(
             initialValue: restoreDefaults ? defSponsorBlock : Self.loadRemoveSponsorSegments()
@@ -318,6 +321,7 @@ struct ContentView: View {
                     visibleDownloadPresets: visibleDownloadPresets,
                     downloadPlaylist: $downloadPlaylist,
                     downloadSubtitles: $downloadSubtitles,
+                    embedSubtitles: $embedSubtitles,
                     embedThumbnail: $embedThumbnail,
                     removeSponsorSegments: $removeSponsorSegments,
                     subtitleLanguagePattern: $subtitleLanguagePattern,
@@ -556,6 +560,9 @@ struct ContentView: View {
             persistPreferences()
         }
         .onChange(of: downloadSubtitles, initial: false) {
+            persistPreferences()
+        }
+        .onChange(of: embedSubtitles, initial: false) {
             persistPreferences()
         }
         .onChange(of: embedThumbnail, initial: false) {

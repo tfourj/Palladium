@@ -30,6 +30,7 @@ SUBTITLE_CONTROL_FLAGS = {
 }
 SPONSORBLOCK_REMOVE_CATEGORIES = "sponsor"
 SPONSORBLOCK_SKIPPED_PRESETS = {"audio", "images"}
+SUBTITLE_EMBED_SKIPPED_PRESETS = {"audio", "images"}
 THUMBNAIL_CONTROL_FLAGS = {
     "--convert-thumbnails",
     "--embed-thumbnail",
@@ -220,6 +221,18 @@ def build_sponsorblock_args(enabled, download_preset, preset_args, extra_args):
     if any(arg.startswith(("--sponsorblock", "--no-sponsorblock")) for arg in args):
         return []
     return ["--sponsorblock-remove", SPONSORBLOCK_REMOVE_CATEGORIES]
+
+
+def build_embed_subtitle_args(enabled, download_preset, preset_args, extra_args):
+    if not enabled or download_preset in SUBTITLE_EMBED_SKIPPED_PRESETS:
+        return []
+
+    args = [str(arg) for arg in [*(preset_args or []), *(extra_args or [])]]
+    # Audio files cannot hold subtitle tracks, so keep the sidecar files.
+    if any(arg in ("-x", "--extract-audio") for arg in args):
+        return []
+    # no-keep-subs deletes sidecars only after yt-dlp embeds them.
+    return ["--embed-subs", "--compat-options", "no-keep-subs"]
 
 
 def strip_checkbox_owned_download_args(args):

@@ -28,7 +28,8 @@ extension ContentView {
             postProcessing: PostProcessingPreferences.load(),
             filenameExportPreset: filenameExportPreset,
             customFilenameTemplate: customFilenameTemplate,
-            removeSponsorSegments: removeSponsorSegments
+            removeSponsorSegments: removeSponsorSegments,
+            embedSubtitles: embedSubtitles
         )
     }
 

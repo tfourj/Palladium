@@ -81,6 +81,7 @@ struct QueuedDownloadConfiguration: Codable, Equatable {
     var filenameExportPresetRawValue: String?
     var customFilenameTemplate: String?
     var removeSponsorSegments: Bool?
+    var embedSubtitles: Bool?
 
     init(
         presetRawValue: String,
@@ -98,7 +99,8 @@ struct QueuedDownloadConfiguration: Codable, Equatable {
         postProcessing: PostProcessingPreferences? = nil,
         filenameExportPreset: FilenameExportPreset = .default,
         customFilenameTemplate: String = "",
-        removeSponsorSegments: Bool = false
+        removeSponsorSegments: Bool = false,
+        embedSubtitles: Bool = false
     ) {
         self.presetRawValue = presetRawValue
         self.presetArgumentsJSON = presetArgumentsJSON
@@ -116,6 +118,7 @@ struct QueuedDownloadConfiguration: Codable, Equatable {
         self.filenameExportPresetRawValue = filenameExportPreset.rawValue
         self.customFilenameTemplate = customFilenameTemplate
         self.removeSponsorSegments = removeSponsorSegments
+        self.embedSubtitles = embedSubtitles
     }
 
     var preset: DownloadPreset {
