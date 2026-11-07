@@ -50,6 +50,7 @@ extension ContentView {
         defaults.set(notificationsEnabled, forKey: Self.notificationsEnabledDefaultsKey)
         defaults.set(autoDownloadOnPaste, forKey: Self.autoDownloadOnPasteDefaultsKey)
         defaults.set(detailedProgressEnabled, forKey: Self.detailedProgressEnabledDefaultsKey)
+        defaults.set(linkPreviewEnabled, forKey: Self.linkPreviewEnabledDefaultsKey)
         defaults.set(backgroundDownloadsEnabled, forKey: Self.backgroundDownloadsEnabledDefaultsKey)
         defaults.set(backgroundDownloadMode.rawValue, forKey: Self.backgroundDownloadModeDefaultsKey)
         defaults.set(shareSheetDownloadMode.rawValue, forKey: Self.shareSheetDownloadModeDefaultsKey)
@@ -356,6 +357,11 @@ extension ContentView {
             return false
         }
         return UserDefaults.standard.bool(forKey: autoRetryFailedDownloadsDefaultsKey)
+    }
+
+    static func loadLinkPreviewEnabled() -> Bool {
+        // Off by default because each preview runs an extra yt-dlp extraction.
+        UserDefaults.standard.bool(forKey: linkPreviewEnabledDefaultsKey)
     }
 
     static func loadSaveIncompleteDownloadsToHistory() -> Bool {
