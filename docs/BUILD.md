@@ -108,6 +108,7 @@ Frameworks/QuickJS
 - Select scheme `Palladium`
 - Set your signing team in Signing & Capabilities
 - Choose an iPhone or Generic iOS Device
+- On an Apple Silicon Mac, you can also choose `My Mac (Designed for iPad)`
 - Press `Run` or `Product -> Build`
 
 ## Run Tests
