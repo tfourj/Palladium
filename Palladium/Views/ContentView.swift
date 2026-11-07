@@ -220,6 +220,9 @@ struct ContentView: View {
     @State var formatPickerTitle = ""
     @State var showFormatPicker = false
     @State var isResolvingFormats = false
+    @State var linkPreviewState: LinkPreviewState?
+    @State var linkPreviewTask: Task<Void, Never>?
+    @State var linkPreviewCache: [LinkPreviewRequest: CachedLinkPreview] = [:]
     @State var downloadQueue: DownloadQueue
     @State var awaitingQueueItemID: UUID?
     @State var awaitingQueueItemWasPartial = false
@@ -541,6 +544,9 @@ struct ContentView: View {
         }
         .onChange(of: linkPreviewEnabled, initial: false) {
             persistPreferences()
+        }
+        .onChange(of: linkPreviewInput, initial: true) { oldInput, newInput in
+            refreshLinkPreview(debounce: LinkPreviewPolicy.shouldDebounce(from: oldInput.text, to: newInput.text))
         }
         .onChange(of: backgroundDownloadsEnabled, initial: false) {
             persistPreferences()

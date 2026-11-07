@@ -79,6 +79,7 @@ Palladium/
 | `Views/ContentView+DownloadFlow.swift` | Download initiation and progress flow. |
 | `Views/ContentView+DownloadQueue.swift` | Persistent sequential queue coordination and queue state actions. |
 | `Views/ContentView+History.swift` | Download and link history behavior. |
+| `Views/ContentView+LinkPreview.swift` | Debounced link preview fetching, caching, and history checks. |
 | `Views/ContentView+Notifications.swift` | Local notification handling. |
 | `Views/ContentView+Packages.swift` | Python package management behavior. |
 | `Views/ContentView+PostDownload.swift` | Actions performed after a download completes. |
