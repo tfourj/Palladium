@@ -8,7 +8,7 @@ import yt_dlp
 
 from scripts.python_tests import helpers  # noqa: F401
 
-from palladium_ytdlp.ytdlp import list_yt_dlp_formats, resolve_picker_formats  # noqa: E402
+from palladium_ytdlp.ytdlp import list_yt_dlp_formats, preview_yt_dlp_link, resolve_picker_formats  # noqa: E402
 from palladium_ytdlp.args import (  # noqa: E402
     apply_post_processing_args,
     build_embed_subtitle_args,
@@ -340,4 +340,109 @@ class FormatResolutionTests(unittest.TestCase):
 
         self.assertFalse(result["success"])
         self.assertEqual(result["formats"], [])
+        self.assertEqual(result["error_message"], "Unavailable")
+
+
+class LinkPreviewTests(unittest.TestCase):
+    def preview(self, info, **kwargs):
+        with mock.patch.object(yt_dlp.YoutubeDL, "extract_info", autospec=True, return_value=info) as extract:
+            result = json.loads(preview_yt_dlp_link("https://example.com/watch", **kwargs))
+        return result, extract
+
+    def test_video_details_and_merged_size_are_reported(self):
+        result, _ = self.preview({
+            "title": "Example video",
+            "uploader": "Example channel",
+            "extractor_key": "Youtube",
+            "duration": 212,
+            "thumbnails": [{"url": "https://example.com/small.jpg"}, {"url": "https://example.com/large.jpg"}],
+            "requested_formats": [{"filesize": 3000}, {"filesize_approx": 1000}],
+        })
+
+        self.assertTrue(result["success"])
+        self.assertEqual(result["title"], "Example video")
+        self.assertEqual(result["uploader"], "Example channel")
+        self.assertEqual(result["site"], "Youtube")
+        self.assertEqual(result["duration"], 212)
+        self.assertEqual(result["thumbnail"], "https://example.com/large.jpg")
+        self.assertEqual(result["filesize"], 4000)
+        self.assertTrue(result["filesize_is_approximate"])
+        self.assertFalse(result["is_playlist"])
+        self.assertIsNone(result["entry_count"])
+
+    def test_unknown_stream_size_is_not_guessed(self):
+        result, _ = self.preview({"title": "Video", "requested_formats": [{"filesize": 3000}, {}]})
+
+        self.assertIsNone(result["filesize"])
+        self.assertFalse(result["filesize_is_approximate"])
+
+    def test_playlist_reports_count_and_first_entry_thumbnail(self):
+        result, _ = self.preview({
+            "_type": "playlist",
+            "title": "Example playlist",
+            "entries": [{"thumbnails": [{"url": "https://example.com/first.jpg"}]}, {}],
+        }, download_playlist=True)
+
+        self.assertTrue(result["is_playlist"])
+        self.assertEqual(result["entry_count"], 2)
+        self.assertEqual(result["thumbnail"], "https://example.com/first.jpg")
+        self.assertIsNone(result["filesize"])
+
+    def test_playlist_setting_controls_flat_extraction(self):
+        _, extract = self.preview({"title": "Video"}, download_playlist=False)
+        downloader = extract.call_args.args[0]
+
+        self.assertTrue(downloader.params["noplaylist"])
+        self.assertEqual(downloader.params["extract_flat"], "in_playlist")
+        self.assertFalse(extract.call_args.kwargs["download"])
+
+    def test_preview_skips_js_challenges_and_manifests(self):
+        _, extract = self.preview({"title": "Video"})
+        params = extract.call_args.args[0].params
+
+        self.assertEqual(params["js_runtimes"], {})
+        self.assertEqual(params["extractor_args"]["youtube"]["player_skip"], ["js"])
+        self.assertEqual(params["extractor_args"]["youtube"]["skip"], ["hls", "dash"])
+
+    def test_preset_quality_settings_drive_format_selection(self):
+        presets = json.dumps({"auto_video": "-f 'bv*[height<=480]+ba/b' -S res"})
+        _, extract = self.preview({"title": "Video"}, download_preset="auto_video", preset_args_json=presets)
+        params = extract.call_args.args[0].params
+
+        self.assertEqual(params["format"], "bv*[height<=480]+ba/b")
+        self.assertEqual(params["format_sort"], ["res"])
+
+    def test_built_in_preset_is_used_without_overrides(self):
+        _, extract = self.preview({"title": "Video"}, download_preset="mute")
+        params = extract.call_args.args[0].params
+
+        self.assertEqual(params["format"], "bv/bestvideo")
+        self.assertIn("vcodec:h264", params["format_sort"])
+
+    def test_extra_args_override_preset_format(self):
+        _, extract = self.preview({"title": "Video"}, download_preset="auto_video", extra_args_text="-f 18")
+
+        self.assertEqual(extract.call_args.args[0].params["format"], "18")
+
+    def test_audio_extraction_marks_size_approximate(self):
+        result, _ = self.preview(
+            {"title": "Song", "requested_formats": [{"filesize": 4000}]},
+            download_preset="audio",
+        )
+
+        self.assertEqual(result["filesize"], 4000)
+        self.assertTrue(result["filesize_is_approximate"])
+
+    def test_invalid_preset_args_keep_default_selection(self):
+        presets = json.dumps({"custom": "--not-a-real-option"})
+        result, extract = self.preview({"title": "Video"}, download_preset="custom", preset_args_json=presets)
+
+        self.assertTrue(result["success"])
+        self.assertNotIn("format", extract.call_args.args[0].params)
+
+    def test_extraction_error_is_reported(self):
+        with mock.patch.object(yt_dlp.YoutubeDL, "extract_info", side_effect=ValueError("Unavailable")):
+            result = json.loads(preview_yt_dlp_link("https://example.com/watch"))
+
+        self.assertFalse(result["success"])
         self.assertEqual(result["error_message"], "Unavailable")
