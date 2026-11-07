@@ -61,6 +61,7 @@ Palladium/
 | `Models/DownloadQueue.swift` | Sequential download queue models, batch quality selection, state transitions, and persistence. |
 | `Models/ImportedCookieFile.swift` | Imported cookie-file model. |
 | `Models/LinkHistory.swift` | Previously used link model and history storage data. |
+| `Models/LinkPreview.swift` | Link preview details, fetch request identity and cache entries, and link, typing, and history checks. |
 | `Models/PackageSourceMode.swift` | Package-source selection model. |
 | `Models/PackageIndexMirror.swift` | Persisted pip repository choice, preset mirror URLs, and custom URL validation. |
 | `Models/PackageActivityLine.swift` | Picks the latest readable package install step from log output. |
