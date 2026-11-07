@@ -6180,6 +6180,61 @@
         }
       }
     },
+    "download.preview.already_downloaded" : {
+      "comment" : "Badge on the link preview card when the pasted link is already in link history.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Already downloaded"
+          }
+        }
+      }
+    },
+    "download.preview.failed" : {
+      "comment" : "Shown in the link preview card when the link details could not be loaded.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't load a preview for this link."
+          }
+        }
+      }
+    },
+    "download.preview.loading" : {
+      "comment" : "Shown in the link preview card while link details are loading.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading link preview..."
+          }
+        }
+      }
+    },
+    "download.preview.playlist.many" : {
+      "comment" : "Link preview detail for a playlist with several items. The value is the item count.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Playlist · %lld items"
+          }
+        }
+      }
+    },
+    "download.preview.playlist.one" : {
+      "comment" : "Link preview detail for a playlist with one item.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Playlist · 1 item"
+          }
+        }
+      }
+    },
     "download.prompt.idle" : {
       "localizations" : {
         "en" : {
@@ -17011,6 +17066,39 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "将未完成的内容保存到历史记录"
+          }
+        }
+      }
+    },
+    "settings.download_behavior.link_preview.help" : {
+      "comment" : "Footer for the link preview setting.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shows the title, thumbnail, length, and estimated size of a pasted link before you download it. Loading a preview uses extra data and can briefly delay a download that starts right after pasting."
+          }
+        }
+      }
+    },
+    "settings.download_behavior.link_preview.section" : {
+      "comment" : "Section header for the link preview setting.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link Preview"
+          }
+        }
+      }
+    },
+    "settings.download_behavior.link_preview.toggle" : {
+      "comment" : "Toggle that shows link details before downloading.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preview links before downloading"
           }
         }
       }
