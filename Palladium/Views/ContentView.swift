@@ -339,6 +339,8 @@ struct ContentView: View {
                     progressText: progressText,
                     playlistProgress: playlistProgress,
                     downloadErrorText: downloadErrorText,
+                    linkPreviewState: linkPreviewState,
+                    linkPreviewIsInHistory: linkPreviewIsInHistory,
                     onDownload: { runDownloadFlow() },
                     onChooseFormat: resolveFormatSelection,
                     onCancel: cancelDownloadFlow,

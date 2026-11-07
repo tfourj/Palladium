@@ -23,6 +23,8 @@ struct DownloadTabView: View {
     let progressText: String
     let playlistProgress: PlaylistProgressSnapshot?
     let downloadErrorText: String?
+    let linkPreviewState: LinkPreviewState?
+    let linkPreviewIsInHistory: Bool
     let onDownload: () -> Void
     let onChooseFormat: () -> Void
     let onCancel: () -> Void
@@ -125,6 +127,13 @@ struct DownloadTabView: View {
                                 .background(cardElementBackground)
                                 .clipShape(RoundedRectangle(cornerRadius: 8))
                         }
+                    }
+                    .padding(.horizontal, 20)
+                    .frame(maxHeight: .infinity)
+                } else if let linkPreviewState {
+                    VStack(spacing: 0) {
+                        LinkPreviewCardView(state: linkPreviewState, isInHistory: linkPreviewIsInHistory)
+                        Spacer(minLength: 0)
                     }
                     .padding(.horizontal, 20)
                     .frame(maxHeight: .infinity)

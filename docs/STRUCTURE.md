@@ -90,6 +90,7 @@ Palladium/
 | `Views/Debug/DeveloperDebugMenuView.swift` | Debug-only developer menu, check results, and shared diagnostic result views. |
 | `Views/Debug/DeveloperFrameworkDebugView.swift` | Per-framework version info, checks, and Python, FFmpeg, curl-cffi, and QuickJS playgrounds. |
 | `Views/Tabs/DownloadTabView.swift` | Main download screen. |
+| `Views/Tabs/LinkPreviewCardView.swift` | Link preview card with thumbnail, title, length, size, and history badge. |
 | `Views/Tabs/GalleryVideoPreview.swift` | Gallery picker video thumbnail, loading state, and fallback icon. |
 | `Views/Tabs/FormatPickerSheetView.swift` | Shared yt-dlp format and quality picker sheet. |
 | `Views/Tabs/DownloadQueueSheetView.swift` | Multiline queue editor, controls, ordering, and item statuses. |
