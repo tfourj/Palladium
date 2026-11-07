@@ -199,6 +199,7 @@ Palladium/
 | `scripts/python_tests/test_staged_scripts.py` | Checks every Python package module is staged by `PythonScripts.swift`. |
 | `scripts/swift_tests/PostProcessingPreferencesTests.swift` | Video conversion defaults, codec and encoder resolution, and persistence. |
 | `scripts/swift_tests/DownloadPresetTests.swift` | Per-preset SponsorBlock and subtitle embedding support tests. |
+| `scripts/swift_tests/LinkPreviewTests.swift` | Link preview link and typing checks, history matching, formatting, and payload decoding. |
 | `scripts/swift_tests/AppLanguageSettingsTests.swift` | Language persistence, regional matching, English fallback, and view invalidation. |
 | `scripts/swift_tests/DeveloperDiagnosticsTests.swift` | Developer diagnostic parsing plus native FFmpeg and QuickJS check tests. |
 | `scripts/swift_tests/BackgroundDownloadModeTests.swift` | Background download mode defaults and per-mode support tests. |
