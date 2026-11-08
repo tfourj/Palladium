@@ -7697,6 +7697,17 @@
         }
       }
     },
+    "downloads.empty.custom_message" : {
+      "comment" : "Empty Downloads tab message when a custom saved files folder is chosen. %@ is the folder path.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Media saved to %@ will appear here."
+          }
+        }
+      }
+    },
     "downloads.empty.message" : {
       "localizations" : {
         "en" : {
@@ -12823,6 +12834,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "将整个下载文件夹保留在 Palladium/Saved 目录下"
+          }
+        }
+      }
+    },
+    "post_download.action.save_folder.custom_collection_help" : {
+      "comment" : "Subtitle for Save to App Folder on collections when a custom saved files folder is chosen. %@ is the folder path.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep the whole download folder in %@"
+          }
+        }
+      }
+    },
+    "post_download.action.save_folder.custom_help" : {
+      "comment" : "Subtitle for Save to App Folder when a custom saved files folder is chosen. %@ is the folder path.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep a copy in %@"
           }
         }
       }
