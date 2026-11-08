@@ -191,7 +191,6 @@ Palladium/
 | `scripts/python_tests/test_quickjs_bridge.py` | Bridge error handling, response ownership, cancellation, and default option tests. |
 | `scripts/swift_tests/QuickJSBridgeTests.swift` | App-hosted bridge export, staging, and evaluation tests. |
 | `scripts/test_format_resolution.py` | Offline yt-dlp integration tests for format resolution, link previews, codec-aware conversion, and output paths. |
-| `scripts/python_tests/test_debug_diagnostics.py` | Debug diagnostic dispatch, Python snippet evaluation, and bridge probe tests. |
 | `scripts/python_tests/test_output_templates.py` | Filename preset selection and output-argument priority tests. |
 | `scripts/python_tests/test_post_processing.py` | Conversion override, codec and encoder resolution, stream-copy, and audio extraction tests. |
 | `scripts/python_tests/test_sponsorblock.py` | SponsorBlock removal argument, preset skipping, and user override tests. |
