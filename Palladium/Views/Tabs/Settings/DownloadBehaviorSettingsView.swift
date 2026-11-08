@@ -7,6 +7,7 @@ struct DownloadBehaviorSettingsView: View {
     @Binding var autoRetryFailedDownloads: Bool
     @Binding var saveIncompleteDownloadsToHistory: Bool
     @Binding var detailedProgressEnabled: Bool
+    @Binding var linkPreviewEnabled: Bool
 
     let downloadPresetSettings: [DownloadPresetSetting]
     let isRunning: Bool
@@ -69,6 +70,15 @@ struct DownloadBehaviorSettingsView: View {
                 Text("settings.ui.progress.section")
             } footer: {
                 Text("settings.ui.progress.help")
+            }
+
+            Section {
+                Toggle("settings.download_behavior.link_preview.toggle", isOn: $linkPreviewEnabled)
+                    .disabled(isRunning)
+            } header: {
+                Text("settings.download_behavior.link_preview.section")
+            } footer: {
+                Text("settings.download_behavior.link_preview.help")
             }
         }
         .navigationTitle("settings.download_behavior.title")

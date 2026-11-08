@@ -290,6 +290,36 @@ enum PythonFlowRunner {
         }
     }
 
+    static func resolveLinkPreview(
+        _ request: LinkPreviewRequest,
+        cookieFilePath: String?,
+        presetArgsJSON: String
+    ) async -> LinkPreviewResolution {
+        await runOnPythonThread {
+            do {
+                let module = try loadYtDlpModule()
+                let function = try pythonMember(module, named: "preview_yt_dlp_link")
+                let result = try function.throwing.dynamicallyCall(
+                    withArguments: [
+                        request.url,
+                        cookieFilePath ?? "",
+                        request.downloadPlaylist,
+                        request.preset.pythonValue,
+                        presetArgsJSON,
+                        request.extraArgs
+                    ]
+                )
+                return decodeLinkPreview(String(result) ?? "")
+            } catch {
+                return LinkPreviewResolution(
+                    preview: nil,
+                    outputText: String(describing: error),
+                    errorMessage: String(describing: error)
+                )
+            }
+        }
+    }
+
     static func executeGalleryDownloadFlow(
         url: String,
         selectionRange: String,
@@ -608,6 +638,34 @@ enum PythonFlowRunner {
             success: result["success"] as? Bool ?? false,
             errorMessage: result["error_message"] as? String
         )
+    }
+
+    static func decodeLinkPreview(_ payload: String) -> LinkPreviewResolution {
+        guard let data = payload.data(using: .utf8),
+              let result = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] else {
+            return LinkPreviewResolution(preview: nil, outputText: payload, errorMessage: nil)
+        }
+        let outputText = result["output"] as? String ?? ""
+        guard result["success"] as? Bool == true else {
+            return LinkPreviewResolution(
+                preview: nil,
+                outputText: outputText,
+                errorMessage: result["error_message"] as? String
+            )
+        }
+        let thumbnail = (result["thumbnail"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let preview = LinkPreview(
+            title: result["title"] as? String ?? "",
+            uploader: result["uploader"] as? String ?? "",
+            site: result["site"] as? String ?? "",
+            duration: (result["duration"] as? NSNumber)?.doubleValue,
+            thumbnailURL: thumbnail.isEmpty ? nil : URL(string: thumbnail),
+            fileSize: (result["filesize"] as? NSNumber)?.int64Value,
+            fileSizeIsApproximate: result["filesize_is_approximate"] as? Bool ?? false,
+            isPlaylist: result["is_playlist"] as? Bool ?? false,
+            entryCount: (result["entry_count"] as? NSNumber)?.intValue
+        )
+        return LinkPreviewResolution(preview: preview, outputText: outputText, errorMessage: nil)
     }
 
     private static func decodePackagePayload(

@@ -82,6 +82,7 @@ struct SettingsTabView: View {
     @Binding var autoRetryFailedDownloads: Bool
     @Binding var saveIncompleteDownloadsToHistory: Bool
     @Binding var detailedProgressEnabled: Bool
+    @Binding var linkPreviewEnabled: Bool
     @Binding var backgroundDownloadsEnabled: Bool
     @Binding var backgroundDownloadMode: BackgroundDownloadMode
     @Binding var downloadPresetSettings: [DownloadPresetSetting]
@@ -291,6 +292,7 @@ struct SettingsTabView: View {
                 autoRetryFailedDownloads: $autoRetryFailedDownloads,
                 saveIncompleteDownloadsToHistory: $saveIncompleteDownloadsToHistory,
                 detailedProgressEnabled: $detailedProgressEnabled,
+                linkPreviewEnabled: $linkPreviewEnabled,
                 downloadPresetSettings: downloadPresetSettings,
                 isRunning: isRunning
             )
@@ -763,6 +765,15 @@ struct SettingsTabView: View {
                 subtitle: "settings.ui.progress.help"
             ) { title in
                 AnyView(searchToggle(title, isOn: $detailedProgressEnabled, disabled: isRunning))
+            },
+            controlSetting(
+                id: "linkPreview",
+                menu: .downloadBehavior,
+                title: "settings.download_behavior.link_preview.toggle",
+                subtitle: "settings.download_behavior.link_preview.help",
+                keywords: [String(localized: "settings.download_behavior.link_preview.section", bundle: .app)]
+            ) { title in
+                AnyView(searchToggle(title, isOn: $linkPreviewEnabled, disabled: isRunning))
             },
             controlSetting(
                 id: "backgroundDownloads",

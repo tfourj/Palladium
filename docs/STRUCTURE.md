@@ -61,6 +61,7 @@ Palladium/
 | `Models/DownloadQueue.swift` | Sequential download queue models, batch quality selection, state transitions, and persistence. |
 | `Models/ImportedCookieFile.swift` | Imported cookie-file model. |
 | `Models/LinkHistory.swift` | Previously used link model and history storage data. |
+| `Models/LinkPreview.swift` | Link preview details, fetch request identity and cache entries, and link, typing, and history checks. |
 | `Models/PackageSourceMode.swift` | Package-source selection model. |
 | `Models/PackageIndexMirror.swift` | Persisted pip repository choice, preset mirror URLs, and custom URL validation. |
 | `Models/PackageActivityLine.swift` | Picks the latest readable package install step from log output. |
@@ -78,6 +79,7 @@ Palladium/
 | `Views/ContentView+DownloadFlow.swift` | Download initiation and progress flow. |
 | `Views/ContentView+DownloadQueue.swift` | Persistent sequential queue coordination and queue state actions. |
 | `Views/ContentView+History.swift` | Download and link history behavior. |
+| `Views/ContentView+LinkPreview.swift` | Debounced link preview fetching, caching, and history checks. |
 | `Views/ContentView+Notifications.swift` | Local notification handling. |
 | `Views/ContentView+Packages.swift` | Python package management behavior. |
 | `Views/ContentView+PostDownload.swift` | Actions performed after a download completes. |
@@ -88,6 +90,7 @@ Palladium/
 | `Views/Debug/DeveloperDebugMenuView.swift` | Debug-only developer menu, check results, and shared diagnostic result views. |
 | `Views/Debug/DeveloperFrameworkDebugView.swift` | Per-framework version info, checks, and Python, FFmpeg, curl-cffi, and QuickJS playgrounds. |
 | `Views/Tabs/DownloadTabView.swift` | Main download screen. |
+| `Views/Tabs/LinkPreviewCardView.swift` | Link preview card with thumbnail, title, length, size, and history badge. |
 | `Views/Tabs/GalleryVideoPreview.swift` | Gallery picker video thumbnail, loading state, and fallback icon. |
 | `Views/Tabs/FormatPickerSheetView.swift` | Shared yt-dlp format and quality picker sheet. |
 | `Views/Tabs/DownloadQueueSheetView.swift` | Multiline queue editor, controls, ordering, and item statuses. |
@@ -186,7 +189,7 @@ Palladium/
 | `scripts/fixtures/quickjs_player.js` | Synthetic player fixture for EJS preprocessing and signature/n challenge tests. |
 | `scripts/python_tests/test_quickjs_bridge.py` | Bridge error handling, response ownership, cancellation, and default option tests. |
 | `scripts/swift_tests/QuickJSBridgeTests.swift` | App-hosted bridge export, evaluation, and isolation tests. |
-| `scripts/test_format_resolution.py` | Offline yt-dlp integration tests for format resolution, codec-aware conversion, and output paths. |
+| `scripts/test_format_resolution.py` | Offline yt-dlp integration tests for format resolution, link previews, codec-aware conversion, and output paths. |
 | `scripts/python_tests/test_debug_diagnostics.py` | Debug diagnostic dispatch, Python snippet evaluation, and bridge probe tests. |
 | `scripts/python_tests/test_output_templates.py` | Filename preset selection and output-argument priority tests. |
 | `scripts/python_tests/test_post_processing.py` | Conversion override, codec and encoder resolution, stream-copy, and audio extraction tests. |
@@ -196,6 +199,7 @@ Palladium/
 | `scripts/python_tests/test_staged_scripts.py` | Checks every Python package module is staged by `PythonScripts.swift`. |
 | `scripts/swift_tests/PostProcessingPreferencesTests.swift` | Video conversion defaults, codec and encoder resolution, and persistence. |
 | `scripts/swift_tests/DownloadPresetTests.swift` | Per-preset SponsorBlock and subtitle embedding support tests. |
+| `scripts/swift_tests/LinkPreviewTests.swift` | Link preview link and typing checks, history matching, formatting, and payload decoding. |
 | `scripts/swift_tests/AppLanguageSettingsTests.swift` | Language persistence, regional matching, English fallback, and view invalidation. |
 | `scripts/swift_tests/DeveloperDiagnosticsTests.swift` | Developer diagnostic parsing plus native FFmpeg and QuickJS check tests. |
 | `scripts/swift_tests/BackgroundDownloadModeTests.swift` | Background download mode defaults and per-mode support tests. |

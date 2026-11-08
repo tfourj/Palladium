@@ -1,5 +1,6 @@
 from palladium_ytdlp.entrypoints import (
     list_yt_dlp_formats,
+    preview_yt_dlp_link,
     run_debug_diagnostic,
     run_gallery_dl_flow,
     run_gallery_dl_resolver,
@@ -9,6 +10,7 @@ from palladium_ytdlp.entrypoints import (
 
 __all__ = [
     "list_yt_dlp_formats",
+    "preview_yt_dlp_link",
     "run_debug_diagnostic",
     "run_gallery_dl_flow",
     "run_gallery_dl_resolver",

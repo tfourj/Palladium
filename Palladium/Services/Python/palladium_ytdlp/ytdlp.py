@@ -267,6 +267,144 @@ def list_yt_dlp_formats(download_url, cookie_file_path=""):
         })
 
 
+def _preview_thumbnail_url(info):
+    thumbnail = str(info.get("thumbnail") or "").strip()
+    if thumbnail:
+        return thumbnail
+    # yt-dlp sorts thumbnails from worst to best, so prefer the last usable one.
+    for item in reversed(info.get("thumbnails") or []):
+        url = str((item or {}).get("url") or "").strip()
+        if url:
+            return url
+    return ""
+
+
+def _preview_file_size(info):
+    """Return (bytes, is_approximate) for yt-dlp's default selection."""
+    selected = info.get("requested_formats") or [info]
+    total = 0
+    approximate = False
+    for item in selected:
+        exact = item.get("filesize")
+        estimate = item.get("filesize_approx")
+        if exact:
+            total += int(exact)
+        elif estimate:
+            total += int(estimate)
+            approximate = True
+        else:
+            return None, False
+    return (total, approximate) if total > 0 else (None, False)
+
+
+# Previews only need metadata, so skip YouTube's player JS challenges and the
+# HLS/DASH manifests. Title, length, thumbnail, and sizes do not depend on them.
+PREVIEW_EXTRACTOR_ARGS = {"youtube": {"player_skip": ["js"], "skip": ["hls", "dash"]}}
+
+
+def preview_format_options(yt_dlp, download_preset="", preset_args_json="", extra_args_text=""):
+    """Return the format selection a download with this preset would use.
+
+    Mirrors the preset and extra-argument handling in run_yt_dlp_flow so the
+    preview size matches the chosen preset. Returns ({}, False) when no preset
+    is given or the arguments cannot be parsed, keeping yt-dlp's defaults.
+    """
+    download_preset = str(download_preset or "").strip()
+    if not download_preset:
+        return {}, False
+    selected_args = parse_preset_args_map(preset_args_json).get(download_preset, "")
+    if selected_args:
+        preset_args = parse_custom_args(selected_args)
+    elif download_preset == "custom":
+        preset_args = []
+    else:
+        preset_args = build_preset_args(download_preset)
+    preset_args = strip_checkbox_owned_download_args(preset_args)
+    extra_args = strip_checkbox_owned_download_args(parse_extra_args(extra_args_text))
+    try:
+        parsed = yt_dlp.parse_options(["--ignore-config", *preset_args, *extra_args]).ydl_opts
+    except BaseException:
+        traceback.print_exc()
+        return {}, False
+
+    options = {key: parsed[key] for key in ("format", "format_sort", "format_sort_force") if parsed.get(key)}
+    # Extracted audio is re-encoded, so the source stream size is only an estimate.
+    extracts_audio = any(pp.get("key") == "FFmpegExtractAudio" for pp in parsed.get("postprocessors") or [])
+    return options, extracts_audio
+
+
+def preview_yt_dlp_link(
+    download_url,
+    cookie_file_path="",
+    download_playlist=False,
+    download_preset="",
+    preset_args_json="",
+    extra_args_text="",
+):
+    """Return lightweight link details shown before a download starts."""
+    output = TailBuffer()
+    try:
+        import yt_dlp
+
+        with contextlib.redirect_stdout(output), contextlib.redirect_stderr(output):
+            format_options, extracts_audio = preview_format_options(
+                yt_dlp, download_preset, preset_args_json, extra_args_text
+            )
+
+        options = {
+            **format_options,
+            **runtime_default_options(),
+            "js_runtimes": {},
+            "extractor_args": PREVIEW_EXTRACTOR_ARGS,
+            "quiet": True,
+            "no_warnings": True,
+            "skip_download": True,
+            "check_formats": False,
+            "noplaylist": not bool(download_playlist),
+            "extract_flat": "in_playlist",
+            "nocheckcertificate": True,
+        }
+        cookie_path = str(cookie_file_path or "").strip()
+        if cookie_path and os.path.isfile(cookie_path):
+            options["cookiefile"] = cookie_path
+
+        with contextlib.redirect_stdout(output), contextlib.redirect_stderr(output):
+            with yt_dlp.YoutubeDL(options) as downloader:
+                info = downloader.extract_info(str(download_url).strip(), download=False) or {}
+
+        is_playlist = info.get("_type") == "playlist" or "entries" in info
+        entries = list(info.get("entries") or []) if is_playlist else []
+        entry_count = (info.get("playlist_count") or len(entries)) if is_playlist else None
+        file_size, file_size_is_approximate = (None, False) if is_playlist else _preview_file_size(info)
+        file_size_is_approximate = file_size_is_approximate or (file_size is not None and extracts_audio)
+        thumbnail = _preview_thumbnail_url(info)
+        if not thumbnail and entries:
+            thumbnail = _preview_thumbnail_url(entries[0] or {})
+        duration = info.get("duration")
+
+        return json.dumps({
+            "success": True,
+            "title": str(info.get("title") or "").strip(),
+            "uploader": str(info.get("uploader") or info.get("channel") or "").strip(),
+            "site": str(info.get("extractor_key") or info.get("extractor") or "").strip(),
+            "duration": float(duration) if isinstance(duration, (int, float)) and duration > 0 else None,
+            "thumbnail": thumbnail,
+            "filesize": file_size,
+            "filesize_is_approximate": file_size_is_approximate,
+            "is_playlist": is_playlist,
+            "entry_count": entry_count,
+            "output": output.getvalue(),
+            "error_message": None,
+        })
+    except BaseException as error:
+        traceback.print_exc(file=output)
+        return json.dumps({
+            "success": False,
+            "output": output.getvalue(),
+            "error_message": str(error),
+        })
+
+
 class PlaylistProgressCollector:
     playlist_title_pattern = re.compile(r"^\[download\] Downloading playlist: (?P<title>.+)$")
     playlist_count_pattern = re.compile(

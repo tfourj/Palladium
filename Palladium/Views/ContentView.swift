@@ -74,6 +74,7 @@ struct ContentView: View {
     static let autoRetryFailedDownloadsDefaultsKey = "palladium.autoRetryFailedDownloads"
     static let saveIncompleteDownloadsToHistoryDefaultsKey = "palladium.saveIncompleteDownloadsToHistory"
     static let detailedProgressEnabledDefaultsKey = "palladium.detailedProgressEnabled"
+    static let linkPreviewEnabledDefaultsKey = "palladium.linkPreviewEnabled"
     static let backgroundDownloadsEnabledDefaultsKey = "palladium.backgroundDownloadsEnabled"
     static let backgroundDownloadModeDefaultsKey = "palladium.backgroundDownloadMode"
     static let subtitleLanguagePatternDefaultsKey = "palladium.subtitleLanguagePattern"
@@ -135,6 +136,7 @@ struct ContentView: View {
     @State var autoRetryFailedDownloads: Bool
     @State var saveIncompleteDownloadsToHistory: Bool
     @State var detailedProgressEnabled: Bool
+    @State var linkPreviewEnabled: Bool
     @State var backgroundDownloadsEnabled: Bool
     @State var backgroundDownloadMode: BackgroundDownloadMode
     @State var subtitleLanguagePattern: String
@@ -218,6 +220,9 @@ struct ContentView: View {
     @State var formatPickerTitle = ""
     @State var showFormatPicker = false
     @State var isResolvingFormats = false
+    @State var linkPreviewState: LinkPreviewState?
+    @State var linkPreviewTask: Task<Void, Never>?
+    @State var linkPreviewCache: [LinkPreviewRequest: CachedLinkPreview] = [:]
     @State var downloadQueue: DownloadQueue
     @State var awaitingQueueItemID: UUID?
     @State var awaitingQueueItemWasPartial = false
@@ -278,6 +283,7 @@ struct ContentView: View {
         _autoRetryFailedDownloads = State(initialValue: Self.loadAutoRetryFailedDownloads())
         _saveIncompleteDownloadsToHistory = State(initialValue: Self.loadSaveIncompleteDownloadsToHistory())
         _detailedProgressEnabled = State(initialValue: Self.loadDetailedProgressEnabled())
+        _linkPreviewEnabled = State(initialValue: Self.loadLinkPreviewEnabled())
         _backgroundDownloadsEnabled = State(initialValue: Self.loadBackgroundDownloadsEnabled())
         _backgroundDownloadMode = State(initialValue: Self.loadBackgroundDownloadMode())
         _subtitleLanguagePattern = State(initialValue: Self.loadSubtitleLanguagePattern())
@@ -333,6 +339,8 @@ struct ContentView: View {
                     progressText: progressText,
                     playlistProgress: playlistProgress,
                     downloadErrorText: downloadErrorText,
+                    linkPreviewState: linkPreviewState,
+                    linkPreviewIsInHistory: linkPreviewIsInHistory,
                     onDownload: { runDownloadFlow() },
                     onChooseFormat: resolveFormatSelection,
                     onCancel: cancelDownloadFlow,
@@ -397,6 +405,7 @@ struct ContentView: View {
                     autoRetryFailedDownloads: $autoRetryFailedDownloads,
                     saveIncompleteDownloadsToHistory: $saveIncompleteDownloadsToHistory,
                     detailedProgressEnabled: $detailedProgressEnabled,
+                    linkPreviewEnabled: $linkPreviewEnabled,
                     backgroundDownloadsEnabled: $backgroundDownloadsEnabled,
                     backgroundDownloadMode: $backgroundDownloadMode,
                     downloadPresetSettings: $downloadPresetSettings,
@@ -534,6 +543,12 @@ struct ContentView: View {
         }
         .onChange(of: detailedProgressEnabled, initial: false) {
             persistPreferences()
+        }
+        .onChange(of: linkPreviewEnabled, initial: false) {
+            persistPreferences()
+        }
+        .onChange(of: linkPreviewInput, initial: true) { oldInput, newInput in
+            refreshLinkPreview(debounce: LinkPreviewPolicy.shouldDebounce(from: oldInput.text, to: newInput.text))
         }
         .onChange(of: backgroundDownloadsEnabled, initial: false) {
             persistPreferences()
