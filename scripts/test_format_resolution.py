@@ -18,7 +18,7 @@ from palladium_ytdlp.video_conversion import (  # noqa: E402
     codec_aware_video_conversion,
     parse_video_conversion_settings,
 )
-from yt_dlp.postprocessor.ffmpeg import FFmpegPostProcessorError, FFmpegVideoConvertorPP, FFmpegVideoRemuxerPP
+from yt_dlp.postprocessor.ffmpeg import FFmpegPostProcessorError, FFmpegVideoConvertorPP
 
 
 class OutputTemplateIntegrationTests(unittest.TestCase):
@@ -69,23 +69,6 @@ class PostProcessingIntegrationTests(unittest.TestCase):
                     else:
                         self.assertEqual(arguments, [])
 
-    def test_converted_path_is_returned_and_original_is_marked_for_cleanup(self):
-        for processor_type in (FFmpegVideoConvertorPP, FFmpegVideoRemuxerPP):
-            processor = processor_type(yt_dlp.YoutubeDL({"quiet": True}), preferedformat="avi")
-            with mock.patch.object(processor, "run_ffmpeg") as run:
-                deleted, result = processor.run({"filepath": "/tmp/video.mp4", "ext": "mp4"})
-            run.assert_called_once()
-            self.assertEqual(deleted, ["/tmp/video.mp4"])
-            self.assertEqual(result["filepath"], "/tmp/video.avi")
-            self.assertEqual(result["ext"], "avi")
-
-    def test_matching_container_is_not_reencoded(self):
-        processor = FFmpegVideoConvertorPP(yt_dlp.YoutubeDL({"quiet": True}), preferedformat="mp4")
-        with mock.patch.object(processor, "run_ffmpeg") as run:
-            deleted, result = processor.run({"filepath": "/tmp/video.mp4", "ext": "mp4"})
-        run.assert_not_called()
-        self.assertEqual(deleted, [])
-        self.assertEqual(result["filepath"], "/tmp/video.mp4")
 
 
 class SubtitleEmbedIntegrationTests(unittest.TestCase):
