@@ -56,9 +56,7 @@ extension ContentView {
                 if completedDownloadAllowsSaveToApplicationFolder {
                     downloadCompleteActionButton(
                         title: String(localized: "post_download.action.save_folder.title", bundle: .app),
-                        subtitle: completedResultIsCollection
-                            ? String(localized: "post_download.action.save_folder.collection_help", bundle: .app)
-                            : String(localized: "post_download.action.save_folder.help", bundle: .app),
+                        subtitle: saveToApplicationFolderButtonSubtitle,
                         icon: "folder.badge.plus",
                         color: .orange
                     ) {
@@ -191,6 +189,19 @@ extension ContentView {
             return String(format: String(localized: "post_download.summary.collection_count", bundle: .app), result.items.count)
         }
         return String(localized: "post_download.summary.single", bundle: .app)
+    }
+
+    var saveToApplicationFolderButtonSubtitle: String {
+        let locationStore = SavedDownloadLocationStore.shared
+        guard case .custom = locationStore.state else {
+            return completedResultIsCollection
+                ? String(localized: "post_download.action.save_folder.collection_help", bundle: .app)
+                : String(localized: "post_download.action.save_folder.help", bundle: .app)
+        }
+        let format = completedResultIsCollection
+            ? String(localized: "post_download.action.save_folder.custom_collection_help", bundle: .app)
+            : String(localized: "post_download.action.save_folder.custom_help", bundle: .app)
+        return String(format: format, locationStore.displayPath)
     }
 
     var saveToPhotosButtonSubtitle: String {
