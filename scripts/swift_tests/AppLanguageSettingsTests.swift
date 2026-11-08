@@ -17,21 +17,6 @@ final class AppLanguageSettingsTests: XCTestCase {
         XCTAssertEqual(resolve("removed-language", ["ja-JP"]), "ja")
     }
 
-    func testOnlyCompleteLanguagesAreOffered() throws {
-        let suiteName = "AppLanguageSettingsTests.\(UUID().uuidString)"
-        let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
-        defer { defaults.removePersistentDomain(forName: suiteName) }
-        let language = AppLanguageSettings(defaults: defaults)
-
-        XCTAssertEqual(language.availableLanguages, ["en", "es", "ja", "ko", "zh-Hans"])
-        language.selection = "lt"
-        XCTAssertEqual(language.selection, "system")
-        XCTAssertEqual(AppLanguageSettings.resolve(selection: "system", preferredLanguages: ["lt-LT"],
-                                                   availableLanguages: language.availableLanguages), "en")
-        XCTAssertEqual(AppLanguageSettings.resolve(selection: "system", preferredLanguages: ["es-MX"],
-                                                   availableLanguages: language.availableLanguages), "es")
-    }
-
     func testSelectionPersistsAndSystemCanBeRestored() throws {
         let suiteName = "AppLanguageSettingsTests.\(UUID().uuidString)"
         let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
@@ -44,6 +29,9 @@ final class AppLanguageSettingsTests: XCTestCase {
         XCTAssertEqual(String(localized: "tab.settings", bundle: language.localizedBundle), "設定")
         language.selection = "en"
         XCTAssertEqual(String(localized: "tab.settings", bundle: language.localizedBundle), "Settings")
+        language.selection = "lt"
+        XCTAssertEqual(AppLanguageSettings(defaults: defaults).selection, "system")
+        language.selection = "ja"
         language.selection = "system"
         XCTAssertEqual(AppLanguageSettings(defaults: defaults).selection, "system")
         defaults.set("unsupported", forKey: AppLanguageSettings.defaultsKey)

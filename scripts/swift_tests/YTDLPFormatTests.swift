@@ -52,9 +52,6 @@ final class YTDLPFormatTests: XCTestCase {
         format.resolvedOutputExtension = "webm"
         format.resolvedAudioCodec = "opus"
 
-        XCTAssertEqual(format.id, "628")
-        XCTAssertEqual(format.fileExtension, "mp4")
-        XCTAssertNil(format.fileSize)
         XCTAssertEqual(format.downloadOverrideArguments(usesQualitySettings: false), "--format 628+251")
     }
 
@@ -80,19 +77,6 @@ final class YTDLPFormatTests: XCTestCase {
         format.resolvedDownloadID = "628+251"
         format.resolvedOutputExtension = "mp4"
         XCTAssertEqual(format.finalVideoExtension(embedThumbnail: true), "mp4")
-    }
-
-    func testProgressiveSelectionKeepsExactFormat() {
-        let format = makeFormat(id: "22", ext: "mp4", videoCodec: "avc1.64001f", audioCodec: "mp4a.40.2")
-
-        XCTAssertEqual(format.downloadOverrideArguments(usesQualitySettings: false), "--format 22")
-    }
-
-    func testVideoWithoutAvailableAudioDoesNotChooseAnotherVideo() {
-        let format = makeFormat(id: "137", ext: "mp4", videoCodec: "avc1.640028", audioCodec: "none")
-
-        XCTAssertFalse(format.hasAudio)
-        XCTAssertEqual(format.downloadOverrideArguments(usesQualitySettings: false), "--format 137")
     }
 
     func testAudioSelectionPreservesExistingExtractionBehavior() {

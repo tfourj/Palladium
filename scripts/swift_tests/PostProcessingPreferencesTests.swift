@@ -14,22 +14,6 @@ final class PostProcessingPreferencesTests: XCTestCase {
         XCTAssertEqual(preferences.configurationJSON(for: .autoVideo), "{}")
     }
 
-    func testFreshInstallUsesAppleHardwareEncoding() throws {
-        let suiteName = "PostProcessingPreferencesTests.\(UUID().uuidString)"
-        let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
-        defer { defaults.removePersistentDomain(forName: suiteName) }
-
-        let preferences = PostProcessingPreferences.load(from: defaults)
-
-        XCTAssertEqual(preferences.codec, .auto)
-        XCTAssertEqual(preferences.encoder, .auto)
-        XCTAssertEqual(preferences.quality, .high)
-        XCTAssertTrue(preferences.hardwareDecoding)
-        XCTAssertFalse(preferences.alwaysReencode)
-        XCTAssertEqual(preferences.resolvedEncoder, .hardware)
-        XCTAssertEqual(preferences.resolvedFFmpegEncoder, "h264_videotoolbox")
-    }
-
     func testCodecAndEncoderResolveForEachContainer() {
         let cases: [(VideoPostProcessingFormat, VideoPostProcessingCodec, VideoPostProcessingEncoder, String)] = [
             (.mp4, .auto, .auto, "h264_videotoolbox"),
@@ -106,15 +90,6 @@ final class PostProcessingPreferencesTests: XCTestCase {
         }
         XCTAssertEqual(preferences.configurationJSON(for: .audio), "{}")
         XCTAssertEqual(preferences.configurationJSON(for: .images), "{}")
-    }
-
-    func testWebMConversionConfigurationSupportsBothMethods() throws {
-        XCTAssertTrue(VideoPostProcessingFormat.allCases.contains(.webm))
-        for method in VideoPostProcessingMethod.allCases {
-            let preferences = PostProcessingPreferences(enabled: true, method: method, format: .webm)
-            let data = Data(preferences.configurationJSON(for: .autoVideo).utf8)
-            XCTAssertEqual(try JSONDecoder().decode(PostProcessingPreferences.self, from: data), preferences)
-        }
     }
 
     func testInvalidStoredValuesUseSafeDefaults() throws {

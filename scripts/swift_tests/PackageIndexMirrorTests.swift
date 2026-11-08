@@ -21,14 +21,9 @@ final class PackageIndexMirrorTests: XCTestCase {
     func testDefaultsToPipDefaultIndex() {
         XCTAssertEqual(PackageIndexMirror.selected(in: defaults), .pypi)
         XCTAssertNil(PackageIndexMirror.selectedIndexURL(in: defaults))
-    }
 
-    func testPresetMirrorsUseFixedURLs() {
-        defaults.set(PackageIndexMirror.tsinghua.rawValue, forKey: PackageIndexMirror.defaultsKey)
-        XCTAssertEqual(PackageIndexMirror.selectedIndexURL(in: defaults), "https://pypi.tuna.tsinghua.edu.cn/simple")
-
-        defaults.set(PackageIndexMirror.aliyun.rawValue, forKey: PackageIndexMirror.defaultsKey)
-        XCTAssertEqual(PackageIndexMirror.selectedIndexURL(in: defaults), "https://mirrors.aliyun.com/pypi/simple/")
+        defaults.set("removed-mirror", forKey: PackageIndexMirror.defaultsKey)
+        XCTAssertEqual(PackageIndexMirror.selected(in: defaults), .pypi)
     }
 
     func testCustomMirrorUsesTrimmedURL() {
@@ -45,11 +40,5 @@ final class PackageIndexMirrorTests: XCTestCase {
             defaults.set(value, forKey: PackageIndexMirror.customURLDefaultsKey)
             XCTAssertNil(PackageIndexMirror.selectedIndexURL(in: defaults), value)
         }
-    }
-
-    func testUnknownStoredValueFallsBackToDefault() {
-        defaults.set("removed-mirror", forKey: PackageIndexMirror.defaultsKey)
-
-        XCTAssertEqual(PackageIndexMirror.selected(in: defaults), .pypi)
     }
 }

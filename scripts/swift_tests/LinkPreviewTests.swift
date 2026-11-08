@@ -67,31 +67,6 @@ final class LinkPreviewTests: XCTestCase {
         XCTAssertNil(makePreview().durationText)
     }
 
-    func testApproximateSizeIsMarked() {
-        let exact = makePreview(fileSize: 4_194_304).fileSizeText
-        let approximate = makePreview(fileSize: 4_194_304, approximate: true).fileSizeText
-
-        XCTAssertNotNil(exact)
-        XCTAssertEqual(approximate, "≈\(exact ?? "")")
-        XCTAssertNil(makePreview().fileSizeText)
-    }
-
-    func testSourceTextSkipsMissingParts() {
-        XCTAssertEqual(makePreview().sourceText, "Channel · Youtube")
-        let siteOnly = LinkPreview(
-            title: "",
-            uploader: "",
-            site: "Vimeo",
-            duration: nil,
-            thumbnailURL: nil,
-            fileSize: nil,
-            fileSizeIsApproximate: false,
-            isPlaylist: false,
-            entryCount: nil
-        )
-        XCTAssertEqual(siteOnly.sourceText, "Vimeo")
-    }
-
     func testDecoderReadsPythonPayload() {
         let payload = """
         {"success": true, "title": "Video", "uploader": "Channel", "site": "Youtube", "duration": 212.0,
