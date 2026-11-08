@@ -65,6 +65,7 @@ Palladium/
 | `Models/PackageSourceMode.swift` | Package-source selection model. |
 | `Models/PackageIndexMirror.swift` | Persisted pip repository choice, preset mirror URLs, and custom URL validation. |
 | `Models/PackageActivityLine.swift` | Picks the latest readable package install step from log output. |
+| `Models/SavedDownloadLocation.swift` | Saved-files folder choice, Files folder bookmarks, and fallback to Documents/Saved. |
 | `Models/TemporaryDownloadRetentionPolicy.swift` | Decides whether completed temporary downloads are removed after saving. |
 | `Models/JavaScriptRuntime.swift` | Persisted JavaScript runtime choice, defaulting to Apple WebKit. |
 | `Models/YouTubePatchMode.swift` | Patch target setting model. |
@@ -213,6 +214,7 @@ Palladium/
 | `scripts/swift_tests/YTDLPFormatTests.swift` | Resolved format selection, Photos compatibility, and exact download argument tests. |
 | `scripts/swift_tests/IPABackgroundPatcherTests.swift` | .ipa Info.plist patching, already-patched detection, and archive preservation tests. |
 | `scripts/swift_tests/InstalledAppExporterTests.swift` | Installed-bundle .ipa layout, permissions, plist patching, and original bundle ID tests. |
+| `scripts/swift_tests/SavedDownloadLocationTests.swift` | Saved-files folder defaults, chosen folder bookmarks, persistence, reset, and unavailable fallback tests. |
 | `scripts/swift_tests/TemporaryDownloadRetentionPolicyTests.swift` | Temporary-download cleanup policy tests. |
 | `scripts/swift_tests/PackageActivityLineTests.swift` | Package install step parsing tests for the update overlay. |
 | `scripts/swift_tests/PackageIndexMirrorTests.swift` | Package index mirror defaults, preset URLs, and custom URL validation tests. |

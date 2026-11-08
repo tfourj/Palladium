@@ -26,7 +26,7 @@ struct SavedDownloadsTabView: View {
                     ContentUnavailableView(
                         String(localized: "downloads.empty.title", bundle: .app),
                         systemImage: "tray",
-                        description: Text("downloads.empty.message")
+                        description: emptyMessage
                     )
                 } else {
                     List {
@@ -100,9 +100,25 @@ struct SavedDownloadsTabView: View {
         .onChange(of: showsTemporaryDownloads) {
             loadItems()
         }
+        .onChange(of: savedDirectory) {
+            loadItems()
+        }
         .sheet(item: $playbackItem) { item in
             SavedMediaPlayerView(item: item)
         }
+    }
+
+    private var emptyMessage: Text {
+        let locationStore = SavedDownloadLocationStore.shared
+        guard case .custom = locationStore.state else {
+            return Text("downloads.empty.message")
+        }
+        return Text(
+            String(
+                format: String(localized: "downloads.empty.custom_message", bundle: .app),
+                locationStore.displayPath
+            )
+        )
     }
 
     private func loadItems() {

@@ -120,9 +120,14 @@ extension ContentView {
     func buildStorageManagementSummary() throws -> StorageManagementSummary {
         StorageManagementSummary(
             downloads: try summarizeDirectory(at: try downloadsDirectoryURL(), locationLabel: String(localized: "storage.path.temp", bundle: .app)),
-            saved: try summarizeDirectory(at: try savedDirectoryURL(), locationLabel: String(localized: "storage.path.saved", bundle: .app)),
+            saved: try summarizeDirectory(at: try savedDirectoryURL(), locationLabel: savedLocationLabel()),
             cache: try summarizeDirectory(at: try cacheDirectoryURL(), locationLabel: String(localized: "storage.path.cache", bundle: .app))
         )
+    }
+
+    func savedLocationLabel() -> String {
+        let store = SavedDownloadLocationStore.shared
+        return store.state == .appFolder ? String(localized: "storage.path.saved", bundle: .app) : store.displayPath
     }
 
     func summarizeDirectory(at directoryURL: URL, locationLabel: String) throws -> StorageLocationSummary {
@@ -201,11 +206,13 @@ extension ContentView {
     }
 
     func savedDirectoryURL() throws -> URL {
-        try documentsDirectoryURL().appendingPathComponent("Saved", isDirectory: true)
+        let savedURL = SavedDownloadLocationStore.shared.directoryURL
+        try FileManager.default.createDirectory(at: savedURL, withIntermediateDirectories: true)
+        return savedURL
     }
 
     func savedDownloadsDirectoryForView() -> URL {
-        (try? savedDirectoryURL()) ?? FileManager.default.temporaryDirectory.appendingPathComponent("Saved", isDirectory: true)
+        SavedDownloadLocationStore.shared.directoryURL
     }
 
     func temporaryDownloadsDirectoryForView() -> URL {

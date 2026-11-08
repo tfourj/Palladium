@@ -751,6 +751,7 @@ struct ContentView: View {
                 rememberClipboardChangeCount()
             }
             guard newPhase == .active else { return }
+            SavedDownloadLocationStore.shared.reloadIfUnavailable()
             syncIdleTimerDisabled()
             consumePendingShortcutDownloadRequestIfNeeded()
             checkClipboardForAutoPasteLink()

@@ -7697,6 +7697,17 @@
         }
       }
     },
+    "downloads.empty.custom_message" : {
+      "comment" : "Empty Downloads tab message when a custom saved files folder is chosen. %@ is the folder path.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Media saved to %@ will appear here."
+          }
+        }
+      }
+    },
     "downloads.empty.message" : {
       "localizations" : {
         "en" : {
@@ -12823,6 +12834,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "将整个下载文件夹保留在 Palladium/Saved 目录下"
+          }
+        }
+      }
+    },
+    "post_download.action.save_folder.custom_collection_help" : {
+      "comment" : "Subtitle for Save to App Folder on collections when a custom saved files folder is chosen. %@ is the folder path.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep the whole download folder in %@"
+          }
+        }
+      }
+    },
+    "post_download.action.save_folder.custom_help" : {
+      "comment" : "Subtitle for Save to App Folder when a custom saved files folder is chosen. %@ is the folder path.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep a copy in %@"
           }
         }
       }
@@ -20868,6 +20901,83 @@
         }
       }
     },
+    "settings.storage.saved.location.app_folder" : {
+      "comment" : "Saved files location option for the default Documents/Saved folder inside the app.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Palladium Folder"
+          }
+        }
+      }
+    },
+    "settings.storage.saved.location.choose" : {
+      "comment" : "Menu action that opens the Files picker to choose a folder for saved files.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose Folder…"
+          }
+        }
+      }
+    },
+    "settings.storage.saved.location.help" : {
+      "comment" : "Footer explaining how a custom saved files location works.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a folder in Files, like iCloud Drive. Palladium saves into a Palladium folder inside it. Existing saved files are not moved."
+          }
+        }
+      }
+    },
+    "settings.storage.saved.location.reset" : {
+      "comment" : "Menu action that switches saved files back to the default app folder.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use Palladium Folder"
+          }
+        }
+      }
+    },
+    "settings.storage.saved.location.title" : {
+      "comment" : "Label for the row that shows and changes where saved files are stored.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Location"
+          }
+        }
+      }
+    },
+    "settings.storage.saved.location.unavailable" : {
+      "comment" : "Shown as the saved files location when the chosen folder can no longer be reached.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unavailable"
+          }
+        }
+      }
+    },
+    "settings.storage.saved.location.unavailable_help" : {
+      "comment" : "Footer shown when the chosen saved files folder is unavailable. %@ is the folder name.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ can't be reached right now, so files are saved to Documents/Saved until it's available again."
+          }
+        }
+      }
+    },
     "settings.storage.saved.title" : {
       "localizations" : {
         "en" : {
@@ -24095,6 +24205,17 @@
         }
       }
     },
+    "storage.confirm.saved.custom_message" : {
+      "comment" : "Confirmation message before clearing a custom saved files folder. %@ is the folder path.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This removes everything in %@."
+          }
+        }
+      }
+    },
     "storage.confirm.saved.message" : {
       "localizations" : {
         "en" : {
@@ -24171,6 +24292,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "清除已保存的文件夹？"
+          }
+        }
+      }
+    },
+    "storage.error.choose_folder" : {
+      "comment" : "Error shown when the chosen saved files folder can't be used. %@ is the error message.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't use that folder: %@"
           }
         }
       }

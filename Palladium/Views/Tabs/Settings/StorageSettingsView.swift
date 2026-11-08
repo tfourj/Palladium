@@ -1,4 +1,5 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct StorageSettingsView: View {
     let summary: StorageManagementSummary
@@ -14,6 +15,10 @@ struct StorageSettingsView: View {
 
     @State private var showClearDownloadsConfirmation = false
     @State private var showClearSavedConfirmation = false
+    @State private var showFolderPicker = false
+    @State private var folderErrorMessage: String?
+
+    private let locationStore = SavedDownloadLocationStore.shared
 
     var body: some View {
         Form {
@@ -78,6 +83,20 @@ struct StorageSettingsView: View {
             }
 
             Section {
+                LabeledContent("settings.storage.saved.location.title") {
+                    Menu {
+                        Button("settings.storage.saved.location.choose") {
+                            showFolderPicker = true
+                        }
+                        if locationStore.isCustom {
+                            Button("settings.storage.saved.location.reset", action: resetSavedLocation)
+                        }
+                    } label: {
+                        Text(savedLocationTitle)
+                    }
+                }
+                .disabled(isBusy)
+
                 Button("storage.action.clear_saved", role: .destructive) {
                     showClearSavedConfirmation = true
                 }
@@ -94,7 +113,7 @@ struct StorageSettingsView: View {
             } header: {
                 Text("settings.storage.saved.title")
             } footer: {
-                Text("settings.storage.saved.help")
+                savedSectionFooter
             }
 
             Section {
@@ -135,9 +154,77 @@ struct StorageSettingsView: View {
             Button("common.cancel", role: .cancel) {}
             Button("common.clear", role: .destructive, action: onClearSaved)
         } message: {
-            Text("storage.confirm.saved.message")
+            savedClearConfirmationMessage
+        }
+        .alert(
+            Text(folderErrorMessage ?? ""),
+            isPresented: Binding(
+                get: { folderErrorMessage != nil },
+                set: { if !$0 { folderErrorMessage = nil } }
+            )
+        ) {
+            Button("common.ok", role: .cancel) {}
+        }
+        .fileImporter(isPresented: $showFolderPicker, allowedContentTypes: [.folder]) { result in
+            handlePickedFolder(result)
         }
         .onAppear(perform: onAppear)
+    }
+
+    private var savedLocationTitle: String {
+        switch locationStore.state {
+        case .appFolder:
+            return String(localized: "settings.storage.saved.location.app_folder", bundle: .app)
+        case .custom(let folderName):
+            return folderName
+        case .unavailable:
+            return String(localized: "settings.storage.saved.location.unavailable", bundle: .app)
+        }
+    }
+
+    @ViewBuilder
+    private var savedSectionFooter: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            if case .unavailable(let folderName) = locationStore.state {
+                Text(
+                    String(
+                        format: String(localized: "settings.storage.saved.location.unavailable_help", bundle: .app),
+                        folderName
+                    )
+                )
+            }
+            Text("settings.storage.saved.help")
+            Text("settings.storage.saved.location.help")
+        }
+    }
+
+    private var savedClearConfirmationMessage: Text {
+        guard case .custom = locationStore.state else {
+            return Text("storage.confirm.saved.message")
+        }
+        return Text(
+            String(
+                format: String(localized: "storage.confirm.saved.custom_message", bundle: .app),
+                locationStore.displayPath
+            )
+        )
+    }
+
+    private func handlePickedFolder(_ result: Result<URL, Error>) {
+        do {
+            try locationStore.useFolder(try result.get())
+            onRefresh()
+        } catch {
+            folderErrorMessage = String(
+                format: String(localized: "storage.error.choose_folder", bundle: .app),
+                error.localizedDescription
+            )
+        }
+    }
+
+    private func resetSavedLocation() {
+        locationStore.resetToAppFolder()
+        onRefresh()
     }
 
     private func summaryRow(
