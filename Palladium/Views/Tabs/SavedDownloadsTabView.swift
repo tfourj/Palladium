@@ -100,6 +100,9 @@ struct SavedDownloadsTabView: View {
         .onChange(of: showsTemporaryDownloads) {
             loadItems()
         }
+        .onChange(of: savedDirectory) {
+            loadItems()
+        }
         .sheet(item: $playbackItem) { item in
             SavedMediaPlayerView(item: item)
         }

@@ -516,14 +516,7 @@ extension ContentView {
     @discardableResult
     func saveDownloadedFileToApplicationFolder(_ result: CompletedDownloadResult) -> Bool {
         do {
-            let documents = try FileManager.default.url(
-                for: .documentDirectory,
-                in: .userDomainMask,
-                appropriateFor: nil,
-                create: true
-            )
-            var appFolder = documents.appendingPathComponent("Saved", isDirectory: true)
-            try FileManager.default.createDirectory(at: appFolder, withIntermediateDirectories: true)
+            var appFolder = try savedDirectoryURL()
             let preferences = SavedDownloadPreferences.load()
             if preferences.organizeByService {
                 guard let serviceFolderName = result.serviceFolderName else {
