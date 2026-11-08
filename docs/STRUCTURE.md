@@ -199,11 +199,9 @@ Palladium/
 | `scripts/python_tests/test_package_index.py` | Package index URL parsing and pip `--index-url` argument tests. |
 | `scripts/python_tests/test_staged_scripts.py` | Checks every Python package module is staged by `PythonScripts.swift`. |
 | `scripts/swift_tests/PostProcessingPreferencesTests.swift` | Video conversion defaults, codec and encoder resolution, and persistence. |
-| `scripts/swift_tests/DownloadPresetTests.swift` | Per-preset SponsorBlock and subtitle embedding support tests. |
 | `scripts/swift_tests/LinkPreviewTests.swift` | Link preview link and typing checks, history matching, formatting, and payload decoding. |
 | `scripts/swift_tests/AppLanguageSettingsTests.swift` | Language persistence, regional matching, English fallback, and view invalidation. |
 | `scripts/swift_tests/DeveloperDiagnosticsTests.swift` | Developer diagnostic parsing plus native FFmpeg and QuickJS check tests. |
-| `scripts/swift_tests/BackgroundDownloadModeTests.swift` | Background download mode defaults and per-mode support tests. |
 | `scripts/swift_tests/BackgroundDownloadProgressTests.swift` | Background download stream ordering, side-file, processing, and playlist progress tests. |
 | `scripts/swift_tests/BackgroundDownloadTaskTests.swift` | Background stop result keeping and stalled-progress heartbeat step tests. |
 | `scripts/swift_tests/DownloadServiceDomainTests.swift` | Saved-download service-domain canonicalization tests. |
@@ -215,7 +213,6 @@ Palladium/
 | `scripts/swift_tests/IPABackgroundPatcherTests.swift` | .ipa Info.plist patching, already-patched detection, and archive preservation tests. |
 | `scripts/swift_tests/InstalledAppExporterTests.swift` | Installed-bundle .ipa layout, permissions, plist patching, and original bundle ID tests. |
 | `scripts/swift_tests/SavedDownloadLocationTests.swift` | Saved-files folder defaults, chosen folder bookmarks, persistence, reset, and unavailable fallback tests. |
-| `scripts/swift_tests/TemporaryDownloadRetentionPolicyTests.swift` | Temporary-download cleanup policy tests. |
 | `scripts/swift_tests/PackageActivityLineTests.swift` | Package install step parsing tests for the update overlay. |
 | `scripts/swift_tests/PackageIndexMirrorTests.swift` | Package index mirror defaults, preset URLs, and custom URL validation tests. |
 
