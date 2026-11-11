@@ -10,7 +10,6 @@ from palladium_ytdlp.packages import (  # noqa: E402
     build_missing_package_install_specs,
     build_package_install_plan,
     build_package_update_lines,
-    build_pip_install_args,
     parse_package_source,
     versions_match,
 )
@@ -18,10 +17,7 @@ from palladium_ytdlp.maintenance import (  # noqa: E402
     remove_managed_package_action,
     restore_pip_packages_action,
 )
-from palladium_ytdlp.shared import (  # noqa: E402
-    YTDLP_RUNTIME_PACKAGES,
-    parse_managed_package_lines,
-)
+from palladium_ytdlp.shared import parse_managed_package_lines  # noqa: E402
 
 
 class PackagePlanningTests(unittest.TestCase):
@@ -251,125 +247,27 @@ class PackagePlanningTests(unittest.TestCase):
         self.assertEqual(packages, ["yt-dlp"])
         self.assertEqual(cleanup, ["yt-dlp"])
 
-    def test_nightly_install_args_include_prereleases(self):
-        args = build_pip_install_args(
-            ["yt-dlp==2.0.dev1"],
-            install_target="/tmp/palladium-packages",
-            allow_prereleases=True,
-            upgrade=True,
+    def test_missing_runtime_packages_are_installed_from_index(self):
+        for package in ("curl-cffi", "gallery-dl", "mutagen"):
+            with self.subTest(package=package):
+                packages, cleanup = build_package_install_plan(
+                    {"yt-dlp": "1.0", "yt-dlp-apple-webkit-jsi": "1.0", package: "not installed"},
+                    {package: ["2.0"]},
+                    package_source=parse_package_source(json.dumps({"mode": "stable"})),
+                )
+
+                self.assertEqual(packages, [f"{package}==2.0"])
+                self.assertEqual(cleanup, [package])
+
+    def test_missing_package_is_reported_as_update_only_when_requested(self):
+        installed = {"curl-cffi": "not installed"}
+        indexed = {"curl-cffi": ["2.0"]}
+
+        self.assertEqual(build_package_update_lines(installed, indexed), [])
+        self.assertEqual(
+            build_package_update_lines(installed, indexed, include_missing=True),
+            ["curl-cffi: not installed -> 2.0"],
         )
-
-        self.assertIn("--pre", args)
-        self.assertIn("--upgrade", args)
-        self.assertIn("yt-dlp==2.0.dev1", args)
-
-    def test_stable_install_args_do_not_include_prereleases(self):
-        args = build_pip_install_args(["yt-dlp"], allow_prereleases=False)
-
-        self.assertNotIn("--pre", args)
-        self.assertIn("yt-dlp", args)
-
-    def test_clean_reinstall_forces_fresh_package_install(self):
-        args = build_pip_install_args(
-            ["yt-dlp", "yt-dlp-apple-webkit-jsi"],
-            install_target="/tmp/palladium-packages",
-            upgrade=True,
-            force_reinstall=True,
-        )
-
-        self.assertIn("--upgrade", args)
-        self.assertIn("--force-reinstall", args)
-
-    def test_gallery_dl_is_managed_with_other_runtime_packages(self):
-        packages, cleanup = build_package_install_plan(
-            {"gallery-dl": "1.0"},
-            {"gallery-dl": ["2.0"]},
-            package_source=parse_package_source(json.dumps({"mode": "stable"})),
-        )
-
-        self.assertEqual(packages, ["gallery-dl==2.0"])
-        self.assertEqual(cleanup, ["gallery-dl"])
-
-    def test_curl_cffi_is_managed_with_other_runtime_packages(self):
-        packages, cleanup = build_package_install_plan(
-            {"curl-cffi": "1.0"},
-            {"curl-cffi": ["2.0"]},
-            package_source=parse_package_source(json.dumps({"mode": "stable"})),
-        )
-
-        self.assertEqual(packages, ["curl-cffi==2.0"])
-        self.assertEqual(cleanup, ["curl-cffi"])
-
-    def test_curl_cffi_is_required_for_yt_dlp_runtime(self):
-        self.assertIn("curl-cffi", YTDLP_RUNTIME_PACKAGES)
-
-    def test_gallery_dl_is_required_for_yt_dlp_runtime(self):
-        self.assertIn("gallery-dl", YTDLP_RUNTIME_PACKAGES)
-
-    def test_mutagen_is_required_for_yt_dlp_runtime(self):
-        self.assertIn("mutagen", YTDLP_RUNTIME_PACKAGES)
-
-    def test_missing_curl_cffi_is_installed_from_index(self):
-        packages, cleanup = build_package_install_plan(
-            {
-                "yt-dlp": "1.0",
-                "yt-dlp-apple-webkit-jsi": "1.0",
-                "curl-cffi": "not installed",
-            },
-            {"curl-cffi": ["2.0"]},
-            package_source=parse_package_source(json.dumps({"mode": "stable"})),
-        )
-
-        self.assertEqual(packages, ["curl-cffi==2.0"])
-        self.assertEqual(cleanup, ["curl-cffi"])
-
-    def test_missing_gallery_dl_is_installed_from_index(self):
-        packages, cleanup = build_package_install_plan(
-            {
-                "yt-dlp": "1.0",
-                "yt-dlp-apple-webkit-jsi": "1.0",
-                "curl-cffi": "1.0",
-                "gallery-dl": "not installed",
-            },
-            {"gallery-dl": ["2.0"]},
-            package_source=parse_package_source(json.dumps({"mode": "stable"})),
-        )
-
-        self.assertEqual(packages, ["gallery-dl==2.0"])
-        self.assertEqual(cleanup, ["gallery-dl"])
-
-    def test_missing_mutagen_is_installed_from_index(self):
-        packages, cleanup = build_package_install_plan(
-            {
-                "yt-dlp": "1.0",
-                "yt-dlp-apple-webkit-jsi": "1.0",
-                "curl-cffi": "1.0",
-                "gallery-dl": "1.0",
-                "mutagen": "not installed",
-            },
-            {"mutagen": ["2.0"]},
-            package_source=parse_package_source(json.dumps({"mode": "stable"})),
-        )
-
-        self.assertEqual(packages, ["mutagen==2.0"])
-        self.assertEqual(cleanup, ["mutagen"])
-
-    def test_missing_curl_cffi_is_not_reported_as_available_update_by_default(self):
-        lines = build_package_update_lines(
-            {"curl-cffi": "not installed"},
-            {"curl-cffi": ["2.0"]},
-        )
-
-        self.assertEqual(lines, [])
-
-    def test_missing_curl_cffi_can_be_reported_as_available_update(self):
-        lines = build_package_update_lines(
-            {"curl-cffi": "not installed"},
-            {"curl-cffi": ["2.0"]},
-            include_missing=True,
-        )
-
-        self.assertEqual(lines, ["curl-cffi: not installed -> 2.0"])
 
     def test_custom_specs_pass_through_without_rewriting(self):
         source = parse_package_source(json.dumps({

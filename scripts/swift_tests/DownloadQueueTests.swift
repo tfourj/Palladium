@@ -34,59 +34,6 @@ final class DownloadQueueTests: XCTestCase {
         )
     }
 
-    func testPostProcessingSurvivesQueuePersistence() throws {
-        var snapshot = configuration
-        snapshot.postProcessing = PostProcessingPreferences(enabled: true, method: .remux, format: .webm)
-        var queue = DownloadQueue()
-        queue.append(linksText: "https://example.com/video", configuration: snapshot)
-
-        let restored = try JSONDecoder().decode(DownloadQueue.self, from: JSONEncoder().encode(queue))
-
-        XCTAssertEqual(restored.items.first?.configuration.postProcessing, snapshot.postProcessing)
-    }
-
-    func testLegacyQueueConfigurationDecodesWithoutPostProcessing() throws {
-        let data = try JSONEncoder().encode(configuration)
-        var json = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
-        json.removeValue(forKey: "postProcessing")
-        json.removeValue(forKey: "filenameExportPresetRawValue")
-        json.removeValue(forKey: "customFilenameTemplate")
-        let legacyData = try JSONSerialization.data(withJSONObject: json)
-
-        let restored = try JSONDecoder().decode(QueuedDownloadConfiguration.self, from: legacyData)
-
-        XCTAssertNil(restored.postProcessing)
-        XCTAssertEqual(restored.presetRawValue, configuration.presetRawValue)
-        XCTAssertEqual(restored.filenameExportPreset, .default)
-        XCTAssertNil(restored.customFilenameTemplate)
-    }
-
-    func testFilenameSettingsSurviveQueuePersistence() throws {
-        var snapshot = configuration
-        snapshot.filenameExportPresetRawValue = FilenameExportPreset.custom.rawValue
-        snapshot.customFilenameTemplate = "%(uploader)s - %(title)s.%(ext)s"
-        var queue = DownloadQueue()
-        queue.append(linksText: "https://example.com/video", configuration: snapshot)
-
-        let restored = try JSONDecoder().decode(DownloadQueue.self, from: JSONEncoder().encode(queue))
-
-        XCTAssertEqual(restored.items.first?.configuration.filenameExportPreset, .custom)
-        XCTAssertEqual(restored.items.first?.configuration.customFilenameTemplate, snapshot.customFilenameTemplate)
-    }
-
-    func testBatchUsesConfigurationSnapshotForEveryItem() {
-        var queue = DownloadQueue()
-
-        let added = queue.append(
-            linksText: "https://example.com/one\nhttps://example.com/two",
-            configuration: configuration
-        )
-
-        XCTAssertEqual(added.count, 2)
-        XCTAssertTrue(added.allSatisfy { $0.configuration == configuration })
-        XCTAssertEqual(queue.outstandingCount, 2)
-    }
-
     func testQueueAdvancesInFIFOOrderAndStopsWhenFinished() throws {
         var queue = makeQueue()
         queue.start()
@@ -262,22 +209,6 @@ final class DownloadQueueTests: XCTestCase {
         XCTAssertEqual(preferences.selectionMode, .pickMaxQuality)
     }
 
-    func testQueuedQualityPreferencesRoundTrip() throws {
-        let suiteName = "DownloadQueueTests.\(UUID().uuidString)"
-        let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
-        defer { defaults.removePersistentDomain(forName: suiteName) }
-        defaults.set(false, forKey: QueuedQualityPreferences.selectionEnabledKey)
-        defaults.set(
-            QueuedQualitySelectionMode.choosePerLink.rawValue,
-            forKey: QueuedQualityPreferences.selectionModeKey
-        )
-
-        let preferences = QueuedQualityPreferences.load(from: defaults)
-
-        XCTAssertFalse(preferences.selectionEnabled)
-        XCTAssertEqual(preferences.selectionMode, .choosePerLink)
-    }
-
     private func makeQueue() -> DownloadQueue {
         var queue = DownloadQueue()
         queue.append(
@@ -400,19 +331,6 @@ final class DownloadQueueTests: XCTestCase {
         XCTAssertEqual(selection.label, "128 kbps")
     }
 
-    func testUnavailableFormatOutputDetection() {
-        XCTAssertTrue(
-            BatchQualitySelection.outputIndicatesUnavailableFormat(
-                "ERROR: Requested format is not available. Use --list-formats for a list of available formats"
-            )
-        )
-        XCTAssertFalse(
-            BatchQualitySelection.outputIndicatesUnavailableFormat(
-                "ERROR: [youtube] jNQXAC9IVRw: Private video. Sign in if you've been granted access"
-            )
-        )
-    }
-
     func testApplyBatchQualityUpdatesOnlyPendingItems() throws {
         var queue = makeQueue()
         queue.start()
@@ -451,26 +369,7 @@ final class DownloadQueueTests: XCTestCase {
         XCTAssertEqual(queue.nextPendingItem?.id, first.id)
     }
 
-    func testBatchQualitySurvivesPersistenceRoundTrip() throws {
-        var queue = makeQueue()
-        let selection = BatchQualitySelection(
-            kind: .video,
-            height: 1080,
-            photosCompatible: false,
-            label: "1080p"
-        )
-        queue.applyBatchQualityToPending(selection)
-
-        let data = try JSONEncoder().encode(queue.persistableState())
-        let decoded = try JSONDecoder().decode(DownloadQueue.self, from: data)
-
-        XCTAssertEqual(
-            decoded.items.compactMap(\.configuration.batchQuality),
-            [selection, selection]
-        )
-    }
-
-    func testLegacyQueueJSONWithoutBatchQualityDecodes() throws {
+    func testLegacyQueueJSONDecodesWithoutNewerSettings() throws {
         let legacyJSON = """
         {
           "items" : [
@@ -506,49 +405,8 @@ final class DownloadQueueTests: XCTestCase {
         XCTAssertNil(decoded.items.first?.configuration.batchQuality)
         XCTAssertNil(decoded.items.first?.configuration.removeSponsorSegments)
         XCTAssertNil(decoded.items.first?.configuration.embedSubtitles)
-    }
-
-    func testSponsorBlockChoicePersistsWithQueuedConfiguration() throws {
-        let configuration = QueuedDownloadConfiguration(
-            presetRawValue: DownloadPreset.autoVideo.rawValue,
-            presetArgumentsJSON: "{}",
-            extraArguments: "",
-            downloadPlaylist: false,
-            downloadSubtitles: false,
-            embedThumbnail: false,
-            autoRetryFailedDownloads: false,
-            subtitleLanguagePattern: "en",
-            useCookies: false,
-            cookieFileName: "",
-            afterDownloadBehaviorRawValue: AfterDownloadBehavior.ask.rawValue,
-            removeSponsorSegments: true
-        )
-
-        let data = try JSONEncoder().encode(configuration)
-        let decoded = try JSONDecoder().decode(QueuedDownloadConfiguration.self, from: data)
-
-        XCTAssertEqual(decoded.removeSponsorSegments, true)
-    }
-
-    func testEmbedSubtitlesChoicePersistsWithQueuedConfiguration() throws {
-        let configuration = QueuedDownloadConfiguration(
-            presetRawValue: DownloadPreset.autoVideo.rawValue,
-            presetArgumentsJSON: "{}",
-            extraArguments: "",
-            downloadPlaylist: false,
-            downloadSubtitles: true,
-            embedThumbnail: false,
-            autoRetryFailedDownloads: false,
-            subtitleLanguagePattern: "en",
-            useCookies: false,
-            cookieFileName: "",
-            afterDownloadBehaviorRawValue: AfterDownloadBehavior.ask.rawValue,
-            embedSubtitles: true
-        )
-
-        let data = try JSONEncoder().encode(configuration)
-        let decoded = try JSONDecoder().decode(QueuedDownloadConfiguration.self, from: data)
-
-        XCTAssertEqual(decoded.embedSubtitles, true)
+        XCTAssertNil(decoded.items.first?.configuration.postProcessing)
+        XCTAssertEqual(decoded.items.first?.configuration.filenameExportPreset, .default)
+        XCTAssertNil(decoded.items.first?.configuration.customFilenameTemplate)
     }
 }

@@ -189,9 +189,8 @@ Palladium/
 | `scripts/test_quickjs_runtime.py` | Offline native QuickJS and real yt-dlp/EJS integration tests on arm64 macOS. |
 | `scripts/fixtures/quickjs_player.js` | Synthetic player fixture for EJS preprocessing and signature/n challenge tests. |
 | `scripts/python_tests/test_quickjs_bridge.py` | Bridge error handling, response ownership, cancellation, and default option tests. |
-| `scripts/swift_tests/QuickJSBridgeTests.swift` | App-hosted bridge export, evaluation, and isolation tests. |
+| `scripts/swift_tests/QuickJSBridgeTests.swift` | App-hosted bridge export, staging, and evaluation tests. |
 | `scripts/test_format_resolution.py` | Offline yt-dlp integration tests for format resolution, link previews, codec-aware conversion, and output paths. |
-| `scripts/python_tests/test_debug_diagnostics.py` | Debug diagnostic dispatch, Python snippet evaluation, and bridge probe tests. |
 | `scripts/python_tests/test_output_templates.py` | Filename preset selection and output-argument priority tests. |
 | `scripts/python_tests/test_post_processing.py` | Conversion override, codec and encoder resolution, stream-copy, and audio extraction tests. |
 | `scripts/python_tests/test_sponsorblock.py` | SponsorBlock removal argument, preset skipping, and user override tests. |
@@ -199,13 +198,11 @@ Palladium/
 | `scripts/python_tests/test_package_index.py` | Package index URL parsing and pip `--index-url` argument tests. |
 | `scripts/python_tests/test_staged_scripts.py` | Checks every Python package module is staged by `PythonScripts.swift`. |
 | `scripts/swift_tests/PostProcessingPreferencesTests.swift` | Video conversion defaults, codec and encoder resolution, and persistence. |
-| `scripts/swift_tests/DownloadPresetTests.swift` | Per-preset SponsorBlock and subtitle embedding support tests. |
-| `scripts/swift_tests/LinkPreviewTests.swift` | Link preview link and typing checks, history matching, formatting, and payload decoding. |
+| `scripts/swift_tests/LinkPreviewTests.swift` | Link preview link and typing checks, history matching, duration formatting, and payload decoding. |
 | `scripts/swift_tests/AppLanguageSettingsTests.swift` | Language persistence, regional matching, English fallback, and view invalidation. |
-| `scripts/swift_tests/DeveloperDiagnosticsTests.swift` | Developer diagnostic parsing plus native FFmpeg and QuickJS check tests. |
-| `scripts/swift_tests/BackgroundDownloadModeTests.swift` | Background download mode defaults and per-mode support tests. |
+| `scripts/swift_tests/DeveloperDiagnosticsTests.swift` | Native FFmpeg encode and probe smoke test through the developer diagnostics. |
 | `scripts/swift_tests/BackgroundDownloadProgressTests.swift` | Background download stream ordering, side-file, processing, and playlist progress tests. |
-| `scripts/swift_tests/BackgroundDownloadTaskTests.swift` | Background stop result keeping and stalled-progress heartbeat step tests. |
+| `scripts/swift_tests/BackgroundDownloadTaskTests.swift` | Stalled-progress heartbeat tests that keep progress below complete. |
 | `scripts/swift_tests/DownloadServiceDomainTests.swift` | Saved-download service-domain canonicalization tests. |
 | `scripts/swift_tests/AutoPastePolicyTests.swift` | Link field clearing tests after downloads. |
 | `scripts/swift_tests/ClipboardLinkDetectorTests.swift` | Clipboard text link detection tests for auto paste downloads. |
@@ -215,9 +212,8 @@ Palladium/
 | `scripts/swift_tests/IPABackgroundPatcherTests.swift` | .ipa Info.plist patching, already-patched detection, and archive preservation tests. |
 | `scripts/swift_tests/InstalledAppExporterTests.swift` | Installed-bundle .ipa layout, permissions, plist patching, and original bundle ID tests. |
 | `scripts/swift_tests/SavedDownloadLocationTests.swift` | Saved-files folder defaults, chosen folder bookmarks, persistence, reset, and unavailable fallback tests. |
-| `scripts/swift_tests/TemporaryDownloadRetentionPolicyTests.swift` | Temporary-download cleanup policy tests. |
 | `scripts/swift_tests/PackageActivityLineTests.swift` | Package install step parsing tests for the update overlay. |
-| `scripts/swift_tests/PackageIndexMirrorTests.swift` | Package index mirror defaults, preset URLs, and custom URL validation tests. |
+| `scripts/swift_tests/PackageIndexMirrorTests.swift` | Package index mirror defaults and custom URL validation tests. |
 
 ## Other Files and Directories
 

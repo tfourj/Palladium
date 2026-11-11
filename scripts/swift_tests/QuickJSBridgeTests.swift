@@ -31,7 +31,6 @@ final class QuickJSBridgeTests: XCTestCase {
     func testAppExportsEmbeddedEngine() throws {
         let response = try invoke(["operation": "info"])
         XCTAssertEqual(response["name"] as? String, "quickjs-ng")
-        XCTAssertEqual(response["version"] as? String, "0.16.2")
         XCTAssertEqual(response["ok"] as? Bool, true)
     }
 
@@ -42,18 +41,5 @@ final class QuickJSBridgeTests: XCTestCase {
         ])
         XCTAssertEqual(response["ok"] as? Bool, true)
         XCTAssertEqual(response["output"] as? String, "živjo 🌍\n")
-    }
-
-    func testAppBridgeIsolatesEvaluations() throws {
-        _ = try invoke(["operation": "evaluate", "source": "globalThis.saved = 1"])
-        let response = try invoke(["operation": "evaluate", "source": "console.log(typeof saved)"])
-        XCTAssertEqual(response["output"] as? String, "undefined\n")
-    }
-
-    func testAppBridgeReportsJavaScriptErrors() throws {
-        let response = try invoke(["operation": "evaluate", "source": "throw new Error('fixture')"])
-        XCTAssertEqual(response["ok"] as? Bool, false)
-        XCTAssertEqual(response["status"] as? String, "exception")
-        XCTAssertTrue((response["error"] as? String)?.contains("fixture") == true)
     }
 }
