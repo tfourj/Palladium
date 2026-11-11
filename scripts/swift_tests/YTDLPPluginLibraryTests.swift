@@ -117,6 +117,58 @@ final class YTDLPPluginLibraryTests: XCTestCase {
         XCTAssertEqual(try YTDLPPluginLibrary.plugins(in: pluginsURL), [])
     }
 
+    func testMapsGitHubRepositoryLinksToSourceArchives() throws {
+        let cases = [
+            ("https://github.com/owner/plugin", "https://github.com/owner/plugin/archive/HEAD.zip"),
+            ("https://github.com/owner/plugin.git", "https://github.com/owner/plugin/archive/HEAD.zip"),
+            ("https://www.github.com/owner/plugin/", "https://github.com/owner/plugin/archive/HEAD.zip"),
+            ("https://github.com/owner/plugin/tree/dev", "https://github.com/owner/plugin/archive/dev.zip"),
+        ]
+        for (link, expected) in cases {
+            let archive = YTDLPPluginLibrary.gitHubRepositoryArchive(for: try XCTUnwrap(URL(string: link)))
+            XCTAssertEqual(archive?.url.absoluteString, expected, link)
+            XCTAssertEqual(archive?.name, "plugin", link)
+        }
+
+        for link in [
+            "https://github.com/owner",
+            "https://github.com/owner/plugin/archive/master.zip",
+            "https://github.com/owner/plugin/releases/download/v1/plugin.zip",
+            "https://example.com/owner/plugin",
+        ] {
+            XCTAssertNil(YTDLPPluginLibrary.gitHubRepositoryArchive(for: try XCTUnwrap(URL(string: link))), link)
+        }
+    }
+
+    func testGitHubRepositoryLinkImportsDefaultBranchUnderRepositoryName() async throws {
+        let sha = String(repeating: "a", count: 40)
+        let archive = makeArchive(files: [
+            ("plugin-\(sha)/README.md", Data()),
+            ("plugin-\(sha)/yt_dlp_plugins/extractor/site.py", Data("pass\n".utf8)),
+        ])
+        StubURLProtocol.requestedURLs = []
+        StubURLProtocol.response = (200, ["Content-Disposition": "attachment; filename=plugin-\(sha).zip"], archive)
+
+        try await YTDLPPluginLibrary.importPlugin(
+            fromLink: "https://github.com/owner/plugin.git",
+            into: pluginsURL,
+            session: StubURLProtocol.session
+        )
+        try await YTDLPPluginLibrary.importPlugin(
+            fromLink: "https://github.com/owner/plugin",
+            into: pluginsURL,
+            session: StubURLProtocol.session
+        )
+
+        XCTAssertEqual(
+            StubURLProtocol.requestedURLs.map(\.absoluteString),
+            Array(repeating: "https://github.com/owner/plugin/archive/HEAD.zip", count: 2)
+        )
+        let plugins = try YTDLPPluginLibrary.plugins(in: pluginsURL)
+        XCTAssertEqual(plugins.map(\.fileName), ["plugin"])
+        XCTAssertEqual(plugins.first?.kinds, [.extractor])
+    }
+
     private func assertLinkImportFails(
         with expected: YTDLPPluginLibrary.ImportError,
         link: String = "https://example.com/plugin.zip",
@@ -273,6 +325,7 @@ private extension Data {
 
 private final class StubURLProtocol: URLProtocol {
     nonisolated(unsafe) static var response: (status: Int, headers: [String: String], body: Data) = (200, [:], Data())
+    nonisolated(unsafe) static var requestedURLs: [URL] = []
 
     static let session: URLSession = {
         let configuration = URLSessionConfiguration.ephemeral
@@ -285,6 +338,9 @@ private final class StubURLProtocol: URLProtocol {
     override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
 
     override func startLoading() {
+        if let url = request.url {
+            Self.requestedURLs.append(url)
+        }
         guard let url = request.url,
               let response = HTTPURLResponse(
                 url: url,
