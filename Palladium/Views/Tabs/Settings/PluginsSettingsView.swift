@@ -6,6 +6,9 @@ struct PluginsSettingsView: View {
 
     @State private var plugins: [YTDLPPlugin] = []
     @State private var showFileImporter = false
+    @State private var showLinkPrompt = false
+    @State private var pluginLink = ""
+    @State private var isDownloading = false
     @State private var errorMessage: String?
 
     private static let importContentTypes: [UTType] = [.zip, .folder]
@@ -22,7 +25,21 @@ struct PluginsSettingsView: View {
                 Button("plugins.import.button") {
                     showFileImporter = true
                 }
-                .disabled(isBusy)
+                .disabled(isBusy || isDownloading)
+
+                Button {
+                    pluginLink = ""
+                    showLinkPrompt = true
+                } label: {
+                    HStack {
+                        Label("plugins.link.button", systemImage: "link")
+                        if isDownloading {
+                            Spacer()
+                            ProgressView()
+                        }
+                    }
+                }
+                .disabled(isBusy || isDownloading)
 
                 Button("plugins.refresh.button", action: refresh)
                     .disabled(isBusy)
@@ -60,6 +77,16 @@ struct PluginsSettingsView: View {
             allowsMultipleSelection: true
         ) { result in
             importPlugins(from: result)
+        }
+        .alert("plugins.link.title", isPresented: $showLinkPrompt) {
+            TextField("plugins.link.placeholder", text: $pluginLink)
+                .keyboardType(.URL)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+            Button("common.cancel", role: .cancel) {}
+            Button("plugins.link.import") {
+                importPlugin(fromLink: pluginLink)
+            }
         }
         .alert(String(localized: "common.result", bundle: .app), isPresented: Binding(
             get: { errorMessage != nil },
@@ -125,6 +152,20 @@ struct PluginsSettingsView: View {
             errorMessage = error.localizedDescription
         }
         refresh()
+    }
+
+    private func importPlugin(fromLink link: String) {
+        isDownloading = true
+        Task {
+            do {
+                let directory = try YTDLPPluginLibrary.directoryURL()
+                try await YTDLPPluginLibrary.importPlugin(fromLink: link, into: directory)
+            } catch {
+                errorMessage = error.localizedDescription
+            }
+            isDownloading = false
+            refresh()
+        }
     }
 
     private func delete(_ plugin: YTDLPPlugin) {

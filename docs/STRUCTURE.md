@@ -120,7 +120,7 @@ Palladium/
 | `Views/Tabs/Settings/NotificationsSettingsView.swift` | Notification settings screen. |
 | `Views/Tabs/Settings/PackageManagerSettingsView.swift` | Package-manager settings screen. |
 | `Views/Tabs/Settings/PackagesSettingsView.swift` | Package source and package settings screen. |
-| `Views/Tabs/Settings/PluginsSettingsView.swift` | yt-dlp plugin list, import, and delete screen for Documents/Plugins. |
+| `Views/Tabs/Settings/PluginsSettingsView.swift` | yt-dlp plugin list, file and link import, and delete screen for Documents/Plugins. |
 | `Views/Tabs/Settings/ShareSheetSettingsView.swift` | Incoming share behavior and picker-button settings screen. |
 | `Views/Tabs/Settings/StorageSettingsView.swift` | Storage settings screen. |
 | `Views/Tabs/Settings/UseInterfaceSettingsView.swift` | Interface-use settings screen. |
