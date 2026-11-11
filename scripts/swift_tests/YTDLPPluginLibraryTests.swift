@@ -84,6 +84,55 @@ final class YTDLPPluginLibraryTests: XCTestCase {
         XCTAssertEqual(try YTDLPPluginLibrary.plugins(in: pluginsURL), [])
     }
 
+    func testDownloadedFileNamePrefersServerArchiveName() throws {
+        let url = try XCTUnwrap(URL(string: "https://example.com/download?id=1"))
+
+        XCTAssertEqual(
+            YTDLPPluginLibrary.downloadedFileName(suggestedName: "site-plugin.zip", url: url),
+            "site-plugin.zip"
+        )
+        XCTAssertEqual(
+            YTDLPPluginLibrary.downloadedFileName(
+                suggestedName: "download",
+                url: try XCTUnwrap(URL(string: "https://example.com/files/other.whl"))
+            ),
+            "other.whl"
+        )
+        XCTAssertEqual(
+            YTDLPPluginLibrary.downloadedFileName(suggestedName: "../.hidden.zip", url: url),
+            "hidden.zip"
+        )
+        XCTAssertNil(YTDLPPluginLibrary.downloadedFileName(suggestedName: "page.html", url: url))
+    }
+
+    func testLinkImportReportsFailedDownloadsAndRejectedFiles() async throws {
+        StubURLProtocol.response = (404, [:], Data())
+        await assertLinkImportFails(with: .downloadFailed)
+
+        StubURLProtocol.response = (200, [:], Data("<html></html>".utf8))
+        await assertLinkImportFails(with: .unsupportedFile, link: "https://example.com/page.html")
+
+        await assertLinkImportFails(with: .invalidLink, link: "ftp://example.com/plugin.zip")
+        XCTAssertEqual(try YTDLPPluginLibrary.plugins(in: pluginsURL), [])
+    }
+
+    private func assertLinkImportFails(
+        with expected: YTDLPPluginLibrary.ImportError,
+        link: String = "https://example.com/plugin.zip",
+        line: UInt = #line
+    ) async {
+        do {
+            try await YTDLPPluginLibrary.importPlugin(
+                fromLink: link,
+                into: pluginsURL,
+                session: StubURLProtocol.session
+            )
+            XCTFail("expected \(expected)", line: line)
+        } catch {
+            XCTAssertEqual(error as? YTDLPPluginLibrary.ImportError, expected, line: line)
+        }
+    }
+
     /// Builds a stored ZIP archive with empty entries.
     private func makeArchive(names: [String]) -> Data {
         var local = Data()
@@ -129,4 +178,37 @@ private extension Data {
     mutating func append(uint32 value: UInt32) {
         append(contentsOf: (0..<4).map { UInt8((value >> (8 * UInt32($0))) & 0xff) })
     }
+}
+
+private final class StubURLProtocol: URLProtocol {
+    nonisolated(unsafe) static var response: (status: Int, headers: [String: String], body: Data) = (200, [:], Data())
+
+    static let session: URLSession = {
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [StubURLProtocol.self]
+        return URLSession(configuration: configuration)
+    }()
+
+    override class func canInit(with request: URLRequest) -> Bool { true }
+
+    override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
+
+    override func startLoading() {
+        guard let url = request.url,
+              let response = HTTPURLResponse(
+                url: url,
+                statusCode: Self.response.status,
+                httpVersion: "HTTP/1.1",
+                headerFields: Self.response.headers
+              )
+        else {
+            client?.urlProtocol(self, didFailWithError: URLError(.badURL))
+            return
+        }
+        client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+        client?.urlProtocol(self, didLoad: Self.response.body)
+        client?.urlProtocolDidFinishLoading(self)
+    }
+
+    override func stopLoading() {}
 }
