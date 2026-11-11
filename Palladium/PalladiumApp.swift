@@ -78,6 +78,9 @@ private enum PythonRuntimeBootstrap {
         if let executablePath = bundle.executableURL?.path {
             setenv("PALLADIUM_EXECUTABLE_PATH", executablePath, 1)
         }
+        if let pluginsPath = try? YTDLPPluginLibrary.directoryURL().path {
+            setenv(YTDLPPluginLibrary.environmentKey, pluginsPath, 1)
+        }
         setenv("PALLADIUM_MANAGED_PIP_PACKAGES", PackageSourceDefaults.manifestURL.path, 1)
 
         setenv("PYTHONHOME", pythonRoot.path, 1)
@@ -160,6 +163,7 @@ private enum PythonRuntimeBootstrap {
                 Temp: temporary video/audio output files
                 Saved: files copied via "Save to App Folder"
                 Cookies: imported Netscape cookie files for yt-dlp
+                Plugins: yt-dlp plugin .zip files and folders
                 """
                 try text.write(to: readmeURL, atomically: true, encoding: .utf8)
             }
