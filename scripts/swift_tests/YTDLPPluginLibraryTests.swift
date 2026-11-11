@@ -1,3 +1,4 @@
+import Compression
 import XCTest
 @testable import Palladium
 
@@ -133,24 +134,100 @@ final class YTDLPPluginLibraryTests: XCTestCase {
         }
     }
 
+    func testFindsPluginFolderWrappedInOneTopLevelFolder() {
+        XCTAssertEqual(
+            YTDLPPluginLibrary.wrappedPluginRoot(inEntryNames: [
+                "repo-main/",
+                "repo-main/pyproject.toml",
+                "repo-main/yt_dlp_plugins/extractor/site.py",
+                "__MACOSX/repo-main/._pyproject.toml",
+            ]),
+            "repo-main"
+        )
+        XCTAssertNil(YTDLPPluginLibrary.wrappedPluginRoot(inEntryNames: [
+            "repo-main/yt_dlp_plugins/extractor/site.py",
+            "other/README.md",
+        ]))
+        XCTAssertNil(YTDLPPluginLibrary.wrappedPluginRoot(inEntryNames: ["repo-main/README.md"]))
+    }
+
+    func testImportsSourceArchiveAsFolderPlugin() throws {
+        let source = Data("from yt_dlp.extractor.common import InfoExtractor\n".utf8)
+        let sourceURL = rootURL.appendingPathComponent("repo-main.zip")
+        try makeArchive(
+            files: [
+                ("repo-main/", Data()),
+                ("repo-main/pyproject.toml", Data("[project]\nname = \"repo\"\n".utf8)),
+                ("repo-main/yt_dlp_plugins/extractor/site.py", source),
+                ("repo-main/yt_dlp_plugins/postprocessor/tagger.py", Data()),
+            ],
+            deflate: true
+        ).write(to: sourceURL)
+
+        try YTDLPPluginLibrary.importPlugin(from: sourceURL, into: pluginsURL)
+
+        let plugin = try XCTUnwrap(YTDLPPluginLibrary.plugins(in: pluginsURL).first)
+        XCTAssertEqual(plugin.fileName, "repo-main")
+        XCTAssertTrue(plugin.isFolder)
+        XCTAssertEqual(plugin.kinds, [.extractor, .postprocessor])
+        let pluginURL = pluginsURL.appendingPathComponent("repo-main/yt_dlp_plugins/extractor/site.py")
+        XCTAssertEqual(try Data(contentsOf: pluginURL), source)
+        XCTAssertFalse(FileManager.default.fileExists(
+            atPath: pluginsURL.appendingPathComponent("repo-main/pyproject.toml").path
+        ))
+        XCTAssertEqual(try FileManager.default.contentsOfDirectory(atPath: pluginsURL.path), ["repo-main"])
+    }
+
+    func testSourceArchiveWithUnsafePathsIsNotImported() throws {
+        let sourceURL = rootURL.appendingPathComponent("repo-main.zip")
+        try makeArchive(files: [
+            ("repo-main/yt_dlp_plugins/extractor/site.py", Data("pass\n".utf8)),
+            ("repo-main/yt_dlp_plugins/../../escape.py", Data("pass\n".utf8)),
+        ]).write(to: sourceURL)
+
+        XCTAssertThrowsError(try YTDLPPluginLibrary.importPlugin(from: sourceURL, into: pluginsURL)) { error in
+            XCTAssertEqual(error as? YTDLPPluginLibrary.ImportError, .unreadableArchive)
+        }
+        XCTAssertEqual(try FileManager.default.contentsOfDirectory(atPath: pluginsURL.path), [])
+        XCTAssertFalse(FileManager.default.fileExists(atPath: rootURL.appendingPathComponent("escape.py").path))
+    }
+
     /// Builds a stored ZIP archive with empty entries.
     private func makeArchive(names: [String]) -> Data {
+        makeArchive(files: names.map { ($0, Data()) })
+    }
+
+    /// Builds a ZIP archive, deflating non-empty file contents when `deflate` is set.
+    private func makeArchive(files: [(name: String, contents: Data)], deflate: Bool = false) -> Data {
         var local = Data()
         var central = Data()
-        for name in names {
-            let nameBytes = Data(name.utf8)
+        for file in files {
+            let nameBytes = Data(file.name.utf8)
+            let compresses = deflate && !file.contents.isEmpty
+            let stored = compresses ? deflated(file.contents) : file.contents
+            let method: UInt16 = compresses ? 8 : 0
             let offset = UInt32(local.count)
+
             local.append(uint32: 0x0403_4b50)
             local.append(uint16: 20)
-            local.append(Data(count: 20))
+            local.append(uint16: 0)
+            local.append(uint16: method)
+            local.append(Data(count: 8))
+            local.append(uint32: UInt32(stored.count))
+            local.append(uint32: UInt32(file.contents.count))
             local.append(uint16: UInt16(nameBytes.count))
             local.append(uint16: 0)
             local.append(nameBytes)
+            local.append(stored)
 
             central.append(uint32: 0x0201_4b50)
             central.append(uint16: 20)
             central.append(uint16: 20)
-            central.append(Data(count: 20))
+            central.append(uint16: 0)
+            central.append(uint16: method)
+            central.append(Data(count: 8))
+            central.append(uint32: UInt32(stored.count))
+            central.append(uint32: UInt32(file.contents.count))
             central.append(uint16: UInt16(nameBytes.count))
             central.append(Data(count: 12))
             central.append(uint32: offset)
@@ -161,12 +238,26 @@ final class YTDLPPluginLibraryTests: XCTestCase {
         archive.append(central)
         archive.append(uint32: 0x0605_4b50)
         archive.append(Data(count: 4))
-        archive.append(uint16: UInt16(names.count))
-        archive.append(uint16: UInt16(names.count))
+        archive.append(uint16: UInt16(files.count))
+        archive.append(uint16: UInt16(files.count))
         archive.append(uint32: UInt32(central.count))
         archive.append(uint32: UInt32(local.count))
         archive.append(uint16: 0)
         return archive
+    }
+
+    private func deflated(_ data: Data) -> Data {
+        let source = [UInt8](data)
+        var destination = [UInt8](repeating: 0, count: source.count + 64)
+        let size = compression_encode_buffer(
+            &destination,
+            destination.count,
+            source,
+            source.count,
+            nil,
+            COMPRESSION_ZLIB
+        )
+        return Data(destination.prefix(size))
     }
 }
 
