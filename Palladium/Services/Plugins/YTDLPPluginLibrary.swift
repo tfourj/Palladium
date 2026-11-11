@@ -6,6 +6,8 @@ nonisolated enum YTDLPPluginLibrary {
         case unsupportedFile
         case notPlugin
         case unreadableArchive
+        case invalidLink
+        case downloadFailed
 
         var errorDescription: String? {
             switch self {
@@ -15,6 +17,10 @@ nonisolated enum YTDLPPluginLibrary {
                 return String(localized: "plugins.error.not_plugin", bundle: .app)
             case .unreadableArchive:
                 return String(localized: "plugins.error.unreadable_archive", bundle: .app)
+            case .invalidLink:
+                return String(localized: "plugins.error.invalid_link", bundle: .app)
+            case .downloadFailed:
+                return String(localized: "plugins.error.download_failed", bundle: .app)
             }
         }
     }
@@ -103,6 +109,70 @@ nonisolated enum YTDLPPluginLibrary {
             throw error
         }
         return destinationURL
+    }
+
+    /// Downloads a plugin archive from an http or https link and imports it into `directory`.
+    @discardableResult
+    static func importPlugin(
+        fromLink link: String,
+        into directory: URL,
+        session: URLSession = .shared,
+        fileManager: FileManager = .default
+    ) async throws -> URL {
+        guard let remoteURL = remoteURL(from: link) else { throw ImportError.invalidLink }
+
+        let downloadedURL: URL
+        let response: URLResponse
+        do {
+            (downloadedURL, response) = try await session.download(from: remoteURL)
+        } catch {
+            throw ImportError.downloadFailed
+        }
+        defer { try? fileManager.removeItem(at: downloadedURL) }
+
+        guard let httpResponse = response as? HTTPURLResponse, (200..<300).contains(httpResponse.statusCode) else {
+            throw ImportError.downloadFailed
+        }
+        guard let fileName = downloadedFileName(
+            suggestedName: response.suggestedFilename,
+            url: response.url ?? remoteURL
+        ) else {
+            throw ImportError.unsupportedFile
+        }
+
+        let stagingURL = fileManager.temporaryDirectory
+            .appendingPathComponent("plugin-download-\(UUID().uuidString)", isDirectory: true)
+        try fileManager.createDirectory(at: stagingURL, withIntermediateDirectories: true)
+        defer { try? fileManager.removeItem(at: stagingURL) }
+
+        let namedURL = stagingURL.appendingPathComponent(fileName, isDirectory: false)
+        try fileManager.moveItem(at: downloadedURL, to: namedURL)
+        return try importPlugin(from: namedURL, into: directory, fileManager: fileManager)
+    }
+
+    static func remoteURL(from link: String) -> URL? {
+        let trimmed = link.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let url = URL(string: trimmed),
+              let scheme = url.scheme?.lowercased(),
+              ["http", "https"].contains(scheme),
+              url.host?.isEmpty == false
+        else {
+            return nil
+        }
+        return url
+    }
+
+    /// Picks a plugin archive name from the server's suggestion or the final link path.
+    static func downloadedFileName(suggestedName: String?, url: URL) -> String? {
+        let candidates = [suggestedName, url.lastPathComponent].compactMap { name -> String? in
+            guard let name else { return nil }
+            let cleaned = URL(fileURLWithPath: name).lastPathComponent
+                .trimmingCharacters(in: CharacterSet(charactersIn: ".").union(.whitespacesAndNewlines))
+            return cleaned.isEmpty ? nil : cleaned
+        }
+        return candidates.first { candidate in
+            archiveExtensions.contains(URL(fileURLWithPath: candidate).pathExtension.lowercased())
+        }
     }
 
     static func delete(_ plugin: YTDLPPlugin, fileManager: FileManager = .default) throws {
