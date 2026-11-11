@@ -69,6 +69,7 @@ Palladium/
 | `Models/TemporaryDownloadRetentionPolicy.swift` | Decides whether completed temporary downloads are removed after saving. |
 | `Models/JavaScriptRuntime.swift` | Persisted JavaScript runtime choice, defaulting to Apple WebKit. |
 | `Models/YouTubePatchMode.swift` | Patch target setting model. |
+| `Models/YTDLPPlugin.swift` | Installed yt-dlp plugin archive or folder and the plugin types it contains. |
 
 ### Views
 
@@ -138,6 +139,7 @@ Palladium/
 | `Services/FFmpeg/SwiftFFmpegBridge.swift` | Swift interface to bundled FFmpeg functionality. |
 | `Services/QuickJS/` | Bounded JavaScript evaluation and the Foundation JSON bridge callable from Python. |
 | `Services/Logging/ConsoleLogStore.swift` | Store backing the in-app console. |
+| `Services/Plugins/YTDLPPluginLibrary.swift` | Lists, validates, imports, and deletes yt-dlp plugins in Documents/Plugins. |
 | `Services/Media/GalleryVideoThumbnailLoader.swift` | Cached remote video previews using metadata thumbnails or generated frames. |
 | `Services/Shortcuts/ShortcutDownloadRequestStore.swift` | Transfers download requests from App Shortcuts into the app. |
 | `Services/Python/PythonFlowRunner.swift` | Runs bundled Python flows from Swift. |
