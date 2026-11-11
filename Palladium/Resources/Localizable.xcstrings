@@ -12818,6 +12818,26 @@
         }
       }
     },
+    "plugins.error.download_failed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The plugin could not be downloaded."
+          }
+        }
+      }
+    },
+    "plugins.error.invalid_link" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter an http or https link to a plugin .zip file."
+          }
+        }
+      }
+    },
     "plugins.error.not_plugin" : {
       "localizations" : {
         "en" : {
@@ -12884,6 +12904,46 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Not a yt-dlp plugin"
+          }
+        }
+      }
+    },
+    "plugins.link.button" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import from Link"
+          }
+        }
+      }
+    },
+    "plugins.link.import" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import"
+          }
+        }
+      }
+    },
+    "plugins.link.placeholder" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://example.com/plugin.zip"
+          }
+        }
+      }
+    },
+    "plugins.link.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import from Link"
           }
         }
       }
