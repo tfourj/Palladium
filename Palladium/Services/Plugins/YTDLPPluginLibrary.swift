@@ -1,3 +1,4 @@
+import Compression
 import Foundation
 
 /// Lists, imports, and removes yt-dlp plugins in `Documents/Plugins`, which Python passes to `--plugin-dirs`.
@@ -31,6 +32,7 @@ nonisolated enum YTDLPPluginLibrary {
     static let archiveExtensions: Set<String> = ["zip", "whl", "egg"]
 
     private static let packageDirectoryName = "yt_dlp_plugins"
+    private static let localHeaderSignature: UInt32 = 0x0403_4b50
     private static let centralHeaderSignature: UInt32 = 0x0201_4b50
     private static let endOfCentralDirectorySignature: UInt32 = 0x0605_4b50
 
@@ -90,15 +92,84 @@ nonisolated enum YTDLPPluginLibrary {
             throw ImportError.unsupportedFile
         }
         guard try !kinds(at: sourceURL, isFolder: isFolder, fileManager: fileManager).isEmpty else {
-            throw ImportError.notPlugin
+            guard !isFolder else { throw ImportError.notPlugin }
+            return try importWrappedArchive(at: sourceURL, into: directory, fileManager: fileManager)
         }
 
         try fileManager.createDirectory(at: directory, withIntermediateDirectories: true)
         let destinationURL = directory.appendingPathComponent(sourceURL.lastPathComponent, isDirectory: isFolder)
         guard destinationURL.standardizedFileURL != sourceURL.standardizedFileURL else { return destinationURL }
 
-        let stagingURL = directory.appendingPathComponent(".import-\(UUID().uuidString)", isDirectory: isFolder)
+        let stagingURL = stagingURL(in: directory, isFolder: isFolder)
         try fileManager.copyItem(at: sourceURL, to: stagingURL)
+        return try install(stagedAt: stagingURL, as: destinationURL, fileManager: fileManager)
+    }
+
+    /// The single top-level folder that holds `yt_dlp_plugins`, as in GitHub source archives.
+    static func wrappedPluginRoot(inEntryNames names: [String]) -> String? {
+        let contentNames = names.filter { !$0.hasPrefix("__MACOSX/") }
+        let roots = Set(contentNames.compactMap { $0.split(separator: "/").first.map(String.init) })
+        guard roots.count == 1,
+              let root = roots.first,
+              root != ".",
+              root != "..",
+              contentNames.allSatisfy({ $0.hasPrefix("\(root)/") })
+        else {
+            return nil
+        }
+        let innerNames = contentNames.map { String($0.dropFirst(root.count + 1)) }
+        return kinds(inEntryNames: innerNames).isEmpty ? nil : root
+    }
+
+    /// Unpacks `yt_dlp_plugins` from an archive that wraps it in one folder into a folder plugin,
+    /// because yt-dlp only loads archives that have it at the root.
+    private static func importWrappedArchive(
+        at url: URL,
+        into directory: URL,
+        fileManager: FileManager
+    ) throws -> URL {
+        let bytes = [UInt8](try Data(contentsOf: url, options: .mappedIfSafe))
+        let entries = try archiveEntries(in: bytes)
+        guard let root = wrappedPluginRoot(inEntryNames: entries.map(\.name)) else {
+            throw ImportError.notPlugin
+        }
+
+        try fileManager.createDirectory(at: directory, withIntermediateDirectories: true)
+        let stagingURL = stagingURL(in: directory, isFolder: true)
+        do {
+            let packagePrefix = "\(root)/\(packageDirectoryName)/"
+            for entry in entries where entry.name.hasPrefix(packagePrefix) && !entry.name.hasSuffix("/") {
+                let relativePath = String(entry.name.dropFirst(root.count + 1))
+                let components = relativePath.split(separator: "/", omittingEmptySubsequences: false)
+                guard !components.contains(where: { $0.isEmpty || $0 == "." || $0 == ".." }) else {
+                    throw ImportError.unreadableArchive
+                }
+                let fileURL = stagingURL.appendingPathComponent(relativePath, isDirectory: false)
+                try fileManager.createDirectory(
+                    at: fileURL.deletingLastPathComponent(),
+                    withIntermediateDirectories: true
+                )
+                try extractedData(for: entry, in: bytes).write(to: fileURL)
+            }
+        } catch {
+            try? fileManager.removeItem(at: stagingURL)
+            throw error
+        }
+
+        let destinationURL = directory.appendingPathComponent(root, isDirectory: true)
+        return try install(stagedAt: stagingURL, as: destinationURL, fileManager: fileManager)
+    }
+
+    private static func stagingURL(in directory: URL, isFolder: Bool) -> URL {
+        directory.appendingPathComponent(".import-\(UUID().uuidString)", isDirectory: isFolder)
+    }
+
+    /// Moves a staged plugin into place, replacing a plugin with the same name.
+    private static func install(
+        stagedAt stagingURL: URL,
+        as destinationURL: URL,
+        fileManager: FileManager
+    ) throws -> URL {
         do {
             if fileManager.fileExists(atPath: destinationURL.path) {
                 try fileManager.removeItem(at: destinationURL)
@@ -196,7 +267,18 @@ nonisolated enum YTDLPPluginLibrary {
 
     /// Reads entry names from a ZIP central directory without extracting the archive.
     static func archiveEntryNames(in data: Data) throws -> [String] {
-        let bytes = [UInt8](data)
+        try archiveEntries(in: [UInt8](data)).map(\.name)
+    }
+
+    private struct ArchiveEntry {
+        let name: String
+        let method: UInt16
+        let compressedSize: Int
+        let uncompressedSize: Int
+        let localOffset: Int
+    }
+
+    private static func archiveEntries(in bytes: [UInt8]) throws -> [ArchiveEntry] {
         guard bytes.count >= 22 else { throw ImportError.unreadableArchive }
         let lowestOffset = max(0, bytes.count - 22 - 0xffff)
         guard let endOffset = stride(from: bytes.count - 22, through: lowestOffset, by: -1)
@@ -209,7 +291,7 @@ nonisolated enum YTDLPPluginLibrary {
         var position = Int(uint32(bytes, at: endOffset + 16))
         guard position < endOffset else { throw ImportError.unreadableArchive }
 
-        var names: [String] = []
+        var entries: [ArchiveEntry] = []
         for _ in 0..<count {
             guard position + 46 <= endOffset, uint32(bytes, at: position) == centralHeaderSignature else {
                 throw ImportError.unreadableArchive
@@ -218,10 +300,58 @@ nonisolated enum YTDLPPluginLibrary {
             let extraLength = Int(uint16(bytes, at: position + 30))
             let commentLength = Int(uint16(bytes, at: position + 32))
             guard position + 46 + nameLength <= endOffset else { throw ImportError.unreadableArchive }
-            names.append(String(decoding: bytes[position + 46..<position + 46 + nameLength], as: UTF8.self))
+            entries.append(
+                ArchiveEntry(
+                    name: String(decoding: bytes[position + 46..<position + 46 + nameLength], as: UTF8.self),
+                    method: uint16(bytes, at: position + 10),
+                    compressedSize: Int(uint32(bytes, at: position + 20)),
+                    uncompressedSize: Int(uint32(bytes, at: position + 24)),
+                    localOffset: Int(uint32(bytes, at: position + 42))
+                )
+            )
             position += 46 + nameLength + extraLength + commentLength
         }
-        return names
+        return entries
+    }
+
+    private static func extractedData(for entry: ArchiveEntry, in bytes: [UInt8]) throws -> Data {
+        let offset = entry.localOffset
+        guard offset + 30 <= bytes.count, uint32(bytes, at: offset) == localHeaderSignature else {
+            throw ImportError.unreadableArchive
+        }
+        let dataStart = offset + 30 + Int(uint16(bytes, at: offset + 26)) + Int(uint16(bytes, at: offset + 28))
+        let dataEnd = dataStart + entry.compressedSize
+        guard dataEnd <= bytes.count else { throw ImportError.unreadableArchive }
+        let compressed = Array(bytes[dataStart..<dataEnd])
+
+        switch entry.method {
+        case 0:
+            return Data(compressed)
+        case 8:
+            return try inflate(compressed, expectedSize: entry.uncompressedSize)
+        default:
+            throw ImportError.unreadableArchive
+        }
+    }
+
+    private static func inflate(_ compressed: [UInt8], expectedSize: Int) throws -> Data {
+        guard expectedSize > 0 else { return Data() }
+        guard !compressed.isEmpty else { throw ImportError.unreadableArchive }
+        var output = [UInt8](repeating: 0, count: expectedSize)
+        let decodedSize = compressed.withUnsafeBufferPointer { source in
+            output.withUnsafeMutableBufferPointer { destination in
+                compression_decode_buffer(
+                    destination.baseAddress!,
+                    expectedSize,
+                    source.baseAddress!,
+                    compressed.count,
+                    nil,
+                    COMPRESSION_ZLIB
+                )
+            }
+        }
+        guard decodedSize == expectedSize else { throw ImportError.unreadableArchive }
+        return Data(output)
     }
 
     private static func kinds(at url: URL, isFolder: Bool, fileManager: FileManager) throws -> [YTDLPPlugin.Kind] {
