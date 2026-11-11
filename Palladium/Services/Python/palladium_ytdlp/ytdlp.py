@@ -35,6 +35,7 @@ from .packages import (
     runtime_package_names,
 )
 from .patching import apply_youtube_patches
+from .plugins import import_yt_dlp_with_plugins, plugin_dir_args, prepare_plugin_imports
 from .quickjs_bridge import embedded_quickjs, runtime_default_args, runtime_default_options
 from .runtime import raise_if_cancel_requested
 from .shared import TailBuffer, Tee, open_live_log_stream
@@ -186,7 +187,7 @@ def list_yt_dlp_formats(download_url, cookie_file_path=""):
     """Return source rows as in -F, with resolved download selections alongside."""
     output = TailBuffer()
     try:
-        import yt_dlp
+        yt_dlp = import_yt_dlp_with_plugins()
 
         options = {
             **runtime_default_options(),
@@ -344,7 +345,7 @@ def preview_yt_dlp_link(
     """Return lightweight link details shown before a download starts."""
     output = TailBuffer()
     try:
-        import yt_dlp
+        yt_dlp = import_yt_dlp_with_plugins()
 
         with contextlib.redirect_stdout(output), contextlib.redirect_stderr(output):
             format_options, extracts_audio = preview_format_options(
@@ -720,6 +721,7 @@ def run_retry_without_thumbnails(
         "--remote-components",
         "ejs:github",
         *runtime_default_args(),
+        *plugin_dir_args(),
         "--cache-dir",
         cache_dir if cache_dir else os.path.join(".", ".cache"),
         "--force-overwrites",
@@ -933,6 +935,9 @@ def run_yt_dlp_flow(
 
             raise_if_cancel_requested(cancel_file_path, "[palladium] cancellation requested before youtube patches")
             apply_youtube_patches(install_target, package_source.get("patch_mode"))
+            plugin_dir = prepare_plugin_imports()
+            if plugin_dir:
+                print(f"[palladium] yt-dlp plugin folder: {plugin_dir}")
 
             if not download_url:
                 print("[palladium] no URL provided")
@@ -1040,6 +1045,7 @@ def run_yt_dlp_flow(
                             "--remote-components",
                             "ejs:github",
                             *runtime_default_args(),
+                            *plugin_dir_args(),
                             "--cache-dir",
                             cache_dir if cache_dir else os.path.join(downloads_dir if downloads_dir else ".", ".cache"),
                             "--force-overwrites",
