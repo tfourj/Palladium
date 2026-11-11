@@ -17,13 +17,44 @@ On-device iOS media downloader powered by `yt-dlp`, `gallery-dl`, `ffmpeg`, and 
   <a href="https://fmhy.net/mobile#ios-tools">
     <img src=".github/assets/fmhy.svg" alt="Listed on FMHY" height="48">
   </a>
-  <br>
-  <a href="https://apps.apple.com/us/app/palladium-media-manager/id6760206193">
-    <img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83" alt="Download on the App Store" height="48">
-  </a>
-  <br>
-  <sub>(AppStore is limited to v1.3.0, to get latest version download from <a href="https://getpalladium.app/downloads">getpalladium.app</a>)</sub>
 </div>
+
+<table align="center">
+  <tr>
+    <th>AltStore PAL</th>
+    <th>AltSource</th>
+    <th>.ipa</th>
+    <th>App Store</th>
+  </tr>
+  <tr>
+    <td align="center">
+      <a href="https://getpalladium.app/downloads/altstore">
+        <img src=".github/assets/altstore_badge.avif" alt="Download on AltStore PAL" width="150" height="48">
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://getpalladium.app/downloads/altstore-classic">
+        <img src=".github/assets/altsource_badge.png" alt="Add AltSource" width="150" height="48">
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://getpalladium.app/downloads/stable">
+        <img src=".github/assets/ipa_badge.png" alt="Download .ipa" width="150" height="48">
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://getpalladium.app/downloads/appstore">
+        <img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83" alt="Download on the App Store" width="150" height="48">
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">✅ Updated</td>
+    <td align="center">✅ Updated</td>
+    <td align="center">✅ Updated</td>
+    <td align="center">⚠️ Outdated (v1.3.0)</td>
+  </tr>
+</table>
 
 ## App Screenshots
 
