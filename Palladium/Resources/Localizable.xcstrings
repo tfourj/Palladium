@@ -12798,6 +12798,196 @@
         }
       }
     },
+    "plugins.empty.subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import a yt-dlp plugin .zip file or folder to use it in downloads."
+          }
+        }
+      }
+    },
+    "plugins.empty.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No plugins"
+          }
+        }
+      }
+    },
+    "plugins.error.download_failed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The plugin could not be downloaded."
+          }
+        }
+      }
+    },
+    "plugins.error.invalid_link" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter an http or https link to a plugin .zip file."
+          }
+        }
+      }
+    },
+    "plugins.error.not_plugin" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This item does not contain a yt_dlp_plugins folder."
+          }
+        }
+      }
+    },
+    "plugins.error.unreadable_archive" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The plugin archive could not be read."
+          }
+        }
+      }
+    },
+    "plugins.error.unsupported_file" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a .zip, .whl, or .egg file, or a folder."
+          }
+        }
+      }
+    },
+    "plugins.import.button" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import Plugin"
+          }
+        }
+      }
+    },
+    "plugins.kind.extractor" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Extractor"
+          }
+        }
+      }
+    },
+    "plugins.kind.postprocessor" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Post-processor"
+          }
+        }
+      }
+    },
+    "plugins.kind.unrecognized" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not a yt-dlp plugin"
+          }
+        }
+      }
+    },
+    "plugins.link.button" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import from Link"
+          }
+        }
+      }
+    },
+    "plugins.link.import" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import"
+          }
+        }
+      }
+    },
+    "plugins.link.placeholder" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://example.com/plugin.zip"
+          }
+        }
+      }
+    },
+    "plugins.link.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import from Link"
+          }
+        }
+      }
+    },
+    "plugins.path.documents" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Documents/Plugins"
+          }
+        }
+      }
+    },
+    "plugins.path.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App folder"
+          }
+        }
+      }
+    },
+    "plugins.refresh.button" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Refresh"
+          }
+        }
+      }
+    },
+    "plugins.settings.help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plugins are .zip files or folders that contain a yt_dlp_plugins folder. Changes apply to the next download."
+          }
+        }
+      }
+    },
     "post_download.action.save_folder.collection_help" : {
       "localizations" : {
         "en" : {
@@ -19017,6 +19207,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "检查更新"
+          }
+        }
+      }
+    },
+    "settings.plugins.subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add yt-dlp extractor and post-processor plugins"
+          }
+        }
+      }
+    },
+    "settings.plugins.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plugins"
           }
         }
       }

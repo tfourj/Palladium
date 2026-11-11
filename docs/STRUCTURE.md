@@ -69,6 +69,7 @@ Palladium/
 | `Models/TemporaryDownloadRetentionPolicy.swift` | Decides whether completed temporary downloads are removed after saving. |
 | `Models/JavaScriptRuntime.swift` | Persisted JavaScript runtime choice, defaulting to Apple WebKit. |
 | `Models/YouTubePatchMode.swift` | Patch target setting model. |
+| `Models/YTDLPPlugin.swift` | Installed yt-dlp plugin archive or folder and the plugin types it contains. |
 
 ### Views
 
@@ -119,6 +120,7 @@ Palladium/
 | `Views/Tabs/Settings/NotificationsSettingsView.swift` | Notification settings screen. |
 | `Views/Tabs/Settings/PackageManagerSettingsView.swift` | Package-manager settings screen. |
 | `Views/Tabs/Settings/PackagesSettingsView.swift` | Package source and package settings screen. |
+| `Views/Tabs/Settings/PluginsSettingsView.swift` | yt-dlp plugin list, file and link import, and delete screen for Documents/Plugins. |
 | `Views/Tabs/Settings/ShareSheetSettingsView.swift` | Incoming share behavior and picker-button settings screen. |
 | `Views/Tabs/Settings/StorageSettingsView.swift` | Storage settings screen. |
 | `Views/Tabs/Settings/UseInterfaceSettingsView.swift` | Interface-use settings screen. |
@@ -138,6 +140,7 @@ Palladium/
 | `Services/FFmpeg/SwiftFFmpegBridge.swift` | Swift interface to bundled FFmpeg functionality. |
 | `Services/QuickJS/` | Bounded JavaScript evaluation and the Foundation JSON bridge callable from Python. |
 | `Services/Logging/ConsoleLogStore.swift` | Store backing the in-app console. |
+| `Services/Plugins/YTDLPPluginLibrary.swift` | Lists, validates, imports from files, links, or GitHub repositories, unpacks source archives, and deletes yt-dlp plugins in Documents/Plugins. |
 | `Services/Media/GalleryVideoThumbnailLoader.swift` | Cached remote video previews using metadata thumbnails or generated frames. |
 | `Services/Shortcuts/ShortcutDownloadRequestStore.swift` | Transfers download requests from App Shortcuts into the app. |
 | `Services/Python/PythonFlowRunner.swift` | Runs bundled Python flows from Swift. |
@@ -153,6 +156,7 @@ Palladium/
 | `Services/Python/palladium_ytdlp/maintenance.py` | Python runtime package maintenance flow. |
 | `Services/Python/palladium_ytdlp/packages.py` | Python package installation and source helpers. |
 | `Services/Python/palladium_ytdlp/patching.py` | EJS solver script patcher and patch mode dispatcher. |
+| `Services/Python/palladium_ytdlp/plugins.py` | yt-dlp plugin folder arguments and plugin import cache resets between runs. |
 | `Services/Python/palladium_ytdlp/quickjs_bridge.py` | Embedded QuickJS runtime detection, evaluation, and scoped yt-dlp provider hooks. |
 | `Services/Python/palladium_ytdlp/runtime.py` | Runtime reset, module invalidation, and cancellation helpers. |
 | `Services/Python/palladium_ytdlp/shared.py` | Shared Python helpers and constants. |
@@ -191,6 +195,8 @@ Palladium/
 | `scripts/python_tests/test_quickjs_bridge.py` | Bridge error handling, response ownership, cancellation, and default option tests. |
 | `scripts/swift_tests/QuickJSBridgeTests.swift` | App-hosted bridge export, staging, and evaluation tests. |
 | `scripts/test_format_resolution.py` | Offline yt-dlp integration tests for format resolution, link previews, codec-aware conversion, and output paths. |
+| `scripts/test_plugin_loading.py` | Offline yt-dlp integration tests for zip plugins being added, replaced, and removed between runs. |
+| `scripts/python_tests/test_plugins.py` | Plugin folder arguments, change detection, and plugin import cache reset tests. |
 | `scripts/python_tests/test_output_templates.py` | Filename preset selection and output-argument priority tests. |
 | `scripts/python_tests/test_post_processing.py` | Conversion override, codec and encoder resolution, stream-copy, and audio extraction tests. |
 | `scripts/python_tests/test_sponsorblock.py` | SponsorBlock removal argument, preset skipping, and user override tests. |
@@ -213,6 +219,7 @@ Palladium/
 | `scripts/swift_tests/InstalledAppExporterTests.swift` | Installed-bundle .ipa layout, permissions, plist patching, and original bundle ID tests. |
 | `scripts/swift_tests/SavedDownloadLocationTests.swift` | Saved-files folder defaults, chosen folder bookmarks, persistence, reset, and unavailable fallback tests. |
 | `scripts/swift_tests/PackageActivityLineTests.swift` | Package install step parsing tests for the update overlay. |
+| `scripts/swift_tests/YTDLPPluginLibraryTests.swift` | Plugin archive and folder detection, file, link, and GitHub repository import, source archive unpacking, and replacement tests. |
 | `scripts/swift_tests/PackageIndexMirrorTests.swift` | Package index mirror defaults and custom URL validation tests. |
 
 ## Other Files and Directories

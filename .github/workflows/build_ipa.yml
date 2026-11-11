@@ -44,6 +44,7 @@ jobs:
         python3 -m venv "$python_test_env"
         "$python_test_env/bin/python" -m pip install yt-dlp==2026.8.19
         PYTHONDONTWRITEBYTECODE=1 "$python_test_env/bin/python" -m unittest scripts.test_format_resolution
+        PYTHONDONTWRITEBYTECODE=1 "$python_test_env/bin/python" -m unittest scripts.test_plugin_loading
 
     - name: Install QuickJS-NG sources
       run: |
