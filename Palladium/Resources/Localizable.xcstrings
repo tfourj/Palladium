@@ -12908,6 +12908,16 @@
         }
       }
     },
+    "plugins.refresh.button" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Refresh"
+          }
+        }
+      }
+    },
     "plugins.settings.help" : {
       "localizations" : {
         "en" : {
