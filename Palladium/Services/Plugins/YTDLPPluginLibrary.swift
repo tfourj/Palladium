@@ -74,10 +74,12 @@ nonisolated enum YTDLPPluginLibrary {
     }
 
     /// Copies a plugin archive or folder into `directory`, replacing a plugin with the same name.
+    /// `wrappedFolderName` names the folder an unpacked source archive is saved as.
     @discardableResult
     static func importPlugin(
         from sourceURL: URL,
         into directory: URL,
+        wrappedFolderName: String? = nil,
         fileManager: FileManager = .default
     ) throws -> URL {
         let shouldStopAccessing = sourceURL.startAccessingSecurityScopedResource()
@@ -93,7 +95,12 @@ nonisolated enum YTDLPPluginLibrary {
         }
         guard try !kinds(at: sourceURL, isFolder: isFolder, fileManager: fileManager).isEmpty else {
             guard !isFolder else { throw ImportError.notPlugin }
-            return try importWrappedArchive(at: sourceURL, into: directory, fileManager: fileManager)
+            return try importWrappedArchive(
+                at: sourceURL,
+                into: directory,
+                folderName: wrappedFolderName,
+                fileManager: fileManager
+            )
         }
 
         try fileManager.createDirectory(at: directory, withIntermediateDirectories: true)
@@ -126,6 +133,7 @@ nonisolated enum YTDLPPluginLibrary {
     private static func importWrappedArchive(
         at url: URL,
         into directory: URL,
+        folderName: String?,
         fileManager: FileManager
     ) throws -> URL {
         let bytes = [UInt8](try Data(contentsOf: url, options: .mappedIfSafe))
@@ -156,7 +164,7 @@ nonisolated enum YTDLPPluginLibrary {
             throw error
         }
 
-        let destinationURL = directory.appendingPathComponent(root, isDirectory: true)
+        let destinationURL = directory.appendingPathComponent(folderName ?? root, isDirectory: true)
         return try install(stagedAt: stagingURL, as: destinationURL, fileManager: fileManager)
     }
 
@@ -190,7 +198,9 @@ nonisolated enum YTDLPPluginLibrary {
         session: URLSession = .shared,
         fileManager: FileManager = .default
     ) async throws -> URL {
-        guard let remoteURL = remoteURL(from: link) else { throw ImportError.invalidLink }
+        guard let linkURL = remoteURL(from: link) else { throw ImportError.invalidLink }
+        let repositoryArchive = gitHubRepositoryArchive(for: linkURL)
+        let remoteURL = repositoryArchive?.url ?? linkURL
 
         let downloadedURL: URL
         let response: URLResponse
@@ -218,7 +228,45 @@ nonisolated enum YTDLPPluginLibrary {
 
         let namedURL = stagingURL.appendingPathComponent(fileName, isDirectory: false)
         try fileManager.moveItem(at: downloadedURL, to: namedURL)
-        return try importPlugin(from: namedURL, into: directory, fileManager: fileManager)
+        return try importPlugin(
+            from: namedURL,
+            into: directory,
+            wrappedFolderName: repositoryArchive?.name,
+            fileManager: fileManager
+        )
+    }
+
+    /// Maps a GitHub repository link, with or without `.git` or a `/tree/<ref>` path, to its source archive.
+    /// Default-branch archives are named after a commit, so the repository name keeps re-imports in place.
+    static func gitHubRepositoryArchive(for url: URL) -> (url: URL, name: String)? {
+        guard let host = url.host?.lowercased(), host == "github.com" || host == "www.github.com" else {
+            return nil
+        }
+        let parts = url.path.split(separator: "/").map(String.init)
+        guard parts.count >= 2 else { return nil }
+
+        let owner = parts[0]
+        var repository = parts[1]
+        if repository.lowercased().hasSuffix(".git") {
+            repository = String(repository.dropLast(4))
+        }
+
+        let reference: String
+        if parts.count == 2 {
+            reference = "HEAD"
+        } else if parts.count >= 4, parts[2] == "tree" {
+            reference = parts[3...].joined(separator: "/")
+        } else {
+            return nil
+        }
+        guard !owner.isEmpty, !repository.isEmpty, repository != ".", repository != ".." else { return nil }
+
+        var components = URLComponents()
+        components.scheme = "https"
+        components.host = "github.com"
+        components.path = "/\(owner)/\(repository)/archive/\(reference).zip"
+        guard let archiveURL = components.url else { return nil }
+        return (archiveURL, repository)
     }
 
     static func remoteURL(from link: String) -> URL? {
