@@ -24,6 +24,7 @@ struct SettingsTabView: View {
         case storage
         case packages
         case packageManager
+        case plugins
         case customizeDownloadOptions
         case advanced
         case about
@@ -185,6 +186,7 @@ struct SettingsTabView: View {
                 settingsNavigationLink(for: .userInterface)
                 settingsNavigationLink(for: .downloadSettings)
                 settingsNavigationLink(for: .packages)
+                settingsNavigationLink(for: .plugins)
                 settingsNavigationLink(for: .advanced)
             }
 
@@ -402,6 +404,8 @@ struct SettingsTabView: View {
                 isRunning: isPackageRunning,
                 onInstallPayloadZip: onInstallPackagePayloadZip
             )
+        case .plugins:
+            PluginsSettingsView(isBusy: isRunning || isPackageRunning)
         case .customizeDownloadOptions:
             DownloadOptionsOrderSettingsView(
                 settings: $downloadPresetSettings,
@@ -1089,6 +1093,7 @@ struct SettingsTabView: View {
             .cookies,
             .packages,
             .packageManager,
+            .plugins,
             .advanced,
             .storage,
             .about
@@ -1292,6 +1297,14 @@ struct SettingsTabView: View {
                 subtitle: String(localized: "settings.packages.subtitle", bundle: .app),
                 icon: "gearshape.fill",
                 color: .indigo
+            )
+        case .plugins:
+            return SearchableSetting(
+                route: route,
+                title: String(localized: "settings.plugins.title", bundle: .app),
+                subtitle: String(localized: "settings.plugins.subtitle", bundle: .app),
+                icon: "puzzlepiece.extension.fill",
+                color: .green
             )
         case .advanced:
             return SearchableSetting(
