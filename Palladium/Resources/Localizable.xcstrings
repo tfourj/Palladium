@@ -4447,8 +4447,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Add subtitle tracks to the video instead of separate files"
+            "state" : "translated",
+            "value" : "将字幕轨道嵌入视频，而不是保存为单独的文件"
           }
         }
       }
@@ -4482,8 +4482,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Embed subtitles"
+            "state" : "translated",
+            "value" : "嵌入字幕"
           }
         }
       }
@@ -5333,8 +5333,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Already downloaded"
+            "state" : "translated",
+            "value" : "已下载"
           }
         }
       }
@@ -5368,8 +5368,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Couldn't load a preview for this link."
+            "state" : "translated",
+            "value" : "无法加载此链接的预览。"
           }
         }
       }
@@ -5403,8 +5403,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Loading link preview..."
+            "state" : "translated",
+            "value" : "正在加载链接预览……"
           }
         }
       }
@@ -5438,8 +5438,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Playlist · %lld items"
+            "state" : "translated",
+            "value" : "播放列表 · %lld 项"
           }
         }
       }
@@ -5473,8 +5473,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Playlist · 1 item"
+            "state" : "translated",
+            "value" : "播放列表 · 1 项"
           }
         }
       }
@@ -6686,7 +6686,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "—格式最佳—无播放列表"
+            "value" : "—format best —no-playlist"
           }
         }
       }
@@ -6754,8 +6754,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Media saved to %@ will appear here."
+            "state" : "translated",
+            "value" : "保存到 %@ 的媒体内容将显示在此处。"
           }
         }
       }
@@ -9950,8 +9950,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Package Index"
+            "state" : "translated",
+            "value" : "软件包索引"
           }
         }
       }
@@ -9984,8 +9984,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Repository"
+            "state" : "translated",
+            "value" : "软件源"
           }
         }
       }
@@ -10018,8 +10018,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Choose where pip downloads packages from. A mirror can be faster when PyPI is slow or blocked in your region."
+            "state" : "translated",
+            "value" : "选择 pip 下载软件包的来源。当 PyPI 在你所在的地区速度较慢或被屏蔽时，使用镜像可能更快。"
           }
         }
       }
@@ -10052,8 +10052,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "PyPI (Default)"
+            "state" : "translated",
+            "value" : "PyPI（默认）"
           }
         }
       }
@@ -10075,7 +10075,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "清華大学 Mirror （中国）"
+            "value" : "清華大学ミラー（中国）"
           }
         },
         "ko" : {
@@ -10086,8 +10086,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Tsinghua University Mirror (China)"
+            "state" : "translated",
+            "value" : "清华大学镜像（中国）"
           }
         }
       }
@@ -10120,8 +10120,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Alibaba Cloud Mirror (China)"
+            "state" : "translated",
+            "value" : "阿里云镜像（中国）"
           }
         }
       }
@@ -10154,8 +10154,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Custom URL"
+            "state" : "translated",
+            "value" : "自定义 URL"
           }
         }
       }
@@ -10188,7 +10188,7 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "https://example.com/simple"
           }
         }
@@ -10222,8 +10222,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Enter a valid http or https URL. PyPI is used until then."
+            "state" : "translated",
+            "value" : "请输入有效的 http 或 https URL。在此之前将使用 PyPI。"
           }
         }
       }
@@ -11332,8 +11332,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Import a yt-dlp plugin .zip file or folder to use it in downloads."
+            "state" : "translated",
+            "value" : "yt-dlp プラグインの .zip ファイルまたはフォルダをインポートすると、ダウンロードで使用できます。"
           }
         },
         "ko" : {
@@ -11344,8 +11344,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Import a yt-dlp plugin .zip file or folder to use it in downloads."
+            "state" : "translated",
+            "value" : "导入 yt-dlp 插件 .zip 文件或文件夹，即可在下载时使用。"
           }
         }
       }
@@ -11366,8 +11366,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "No plugins"
+            "state" : "translated",
+            "value" : "プラグインがありません"
           }
         },
         "ko" : {
@@ -11378,8 +11378,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "No plugins"
+            "state" : "translated",
+            "value" : "没有插件"
           }
         }
       }
@@ -11400,8 +11400,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "The plugin could not be downloaded."
+            "state" : "translated",
+            "value" : "プラグインをダウンロードできませんでした。"
           }
         },
         "ko" : {
@@ -11412,8 +11412,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "The plugin could not be downloaded."
+            "state" : "translated",
+            "value" : "无法下载该插件。"
           }
         }
       }
@@ -11434,8 +11434,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Enter an http or https link to a plugin .zip file."
+            "state" : "translated",
+            "value" : "プラグインの .zip ファイルへの http または https リンクを入力してください。"
           }
         },
         "ko" : {
@@ -11446,8 +11446,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Enter an http or https link to a plugin .zip file."
+            "state" : "translated",
+            "value" : "请输入指向插件 .zip 文件的 http 或 https 链接。"
           }
         }
       }
@@ -11468,8 +11468,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "This item does not contain a yt_dlp_plugins folder."
+            "state" : "translated",
+            "value" : "この項目には yt_dlp_plugins フォルダが含まれていません。"
           }
         },
         "ko" : {
@@ -11480,8 +11480,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "This item does not contain a yt_dlp_plugins folder."
+            "state" : "translated",
+            "value" : "此项目不包含 yt_dlp_plugins 文件夹。"
           }
         }
       }
@@ -11502,8 +11502,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "The plugin archive could not be read."
+            "state" : "translated",
+            "value" : "プラグインのアーカイブを読み込めませんでした。"
           }
         },
         "ko" : {
@@ -11514,8 +11514,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "The plugin archive could not be read."
+            "state" : "translated",
+            "value" : "无法读取插件压缩包。"
           }
         }
       }
@@ -11536,8 +11536,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Choose a .zip, .whl, or .egg file, or a folder."
+            "state" : "translated",
+            "value" : ".zip、.whl、.egg ファイル、またはフォルダを選択してください。"
           }
         },
         "ko" : {
@@ -11548,8 +11548,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Choose a .zip, .whl, or .egg file, or a folder."
+            "state" : "translated",
+            "value" : "请选择 .zip、.whl 或 .egg 文件，或一个文件夹。"
           }
         }
       }
@@ -11570,8 +11570,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Import Plugin"
+            "state" : "translated",
+            "value" : "プラグインをインポート"
           }
         },
         "ko" : {
@@ -11582,8 +11582,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Import Plugin"
+            "state" : "translated",
+            "value" : "导入插件"
           }
         }
       }
@@ -11604,8 +11604,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Extractor"
+            "state" : "translated",
+            "value" : "エクストラクタ"
           }
         },
         "ko" : {
@@ -11616,8 +11616,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Extractor"
+            "state" : "translated",
+            "value" : "提取器"
           }
         }
       }
@@ -11638,8 +11638,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Post-processor"
+            "state" : "translated",
+            "value" : "ポストプロセッサ"
           }
         },
         "ko" : {
@@ -11650,8 +11650,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Post-processor"
+            "state" : "translated",
+            "value" : "后处理器"
           }
         }
       }
@@ -11672,8 +11672,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Not a yt-dlp plugin"
+            "state" : "translated",
+            "value" : "yt-dlp プラグインではありません"
           }
         },
         "ko" : {
@@ -11684,8 +11684,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Not a yt-dlp plugin"
+            "state" : "translated",
+            "value" : "不是 yt-dlp 插件"
           }
         }
       }
@@ -11706,8 +11706,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Import from Link"
+            "state" : "translated",
+            "value" : "リンクからインポート"
           }
         },
         "ko" : {
@@ -11718,8 +11718,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Import from Link"
+            "state" : "translated",
+            "value" : "从链接导入"
           }
         }
       }
@@ -11740,8 +11740,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Import"
+            "state" : "translated",
+            "value" : "インポート"
           }
         },
         "ko" : {
@@ -11752,8 +11752,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Import"
+            "state" : "translated",
+            "value" : "导入"
           }
         }
       }
@@ -11774,7 +11774,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "https://example.com/plugin.zip"
           }
         },
@@ -11786,7 +11786,7 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "https://example.com/plugin.zip"
           }
         }
@@ -11808,8 +11808,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Import from Link"
+            "state" : "translated",
+            "value" : "リンクからインポート"
           }
         },
         "ko" : {
@@ -11820,8 +11820,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Import from Link"
+            "state" : "translated",
+            "value" : "从链接导入"
           }
         }
       }
@@ -11842,7 +11842,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Documents/Plugins"
           }
         },
@@ -11854,7 +11854,7 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Documents/Plugins"
           }
         }
@@ -11876,8 +11876,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "App folder"
+            "state" : "translated",
+            "value" : "App フォルダ"
           }
         },
         "ko" : {
@@ -11888,8 +11888,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "App folder"
+            "state" : "translated",
+            "value" : "应用文件夹"
           }
         }
       }
@@ -11910,8 +11910,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Refresh"
+            "state" : "translated",
+            "value" : "更新"
           }
         },
         "ko" : {
@@ -11922,8 +11922,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Refresh"
+            "state" : "translated",
+            "value" : "刷新"
           }
         }
       }
@@ -11944,8 +11944,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Plugins are .zip files or folders that contain a yt_dlp_plugins folder. Changes apply to the next download."
+            "state" : "translated",
+            "value" : "プラグインは、yt_dlp_plugins フォルダを含む .zip ファイルまたはフォルダです。変更は次回のダウンロードから適用されます。"
           }
         },
         "ko" : {
@@ -11956,8 +11956,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Plugins are .zip files or folders that contain a yt_dlp_plugins folder. Changes apply to the next download."
+            "state" : "translated",
+            "value" : "插件是包含 yt_dlp_plugins 文件夹的 .zip 文件或文件夹。更改将在下次下载时生效。"
           }
         }
       }
@@ -12025,8 +12025,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Keep the whole download folder in %@"
+            "state" : "translated",
+            "value" : "将整个下载文件夹保留在 %@ 中"
           }
         }
       }
@@ -12060,8 +12060,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Keep a copy in %@"
+            "state" : "translated",
+            "value" : "在 %@ 中保留一份副本"
           }
         }
       }
@@ -15702,8 +15702,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Shows the title, thumbnail, length, and estimated size of a pasted link before you download it. Loading a preview uses extra data and can briefly delay a download that starts right after pasting."
+            "state" : "translated",
+            "value" : "在下载前显示所粘贴链接的标题、缩略图、时长和预估大小。加载预览会消耗额外流量，并可能使粘贴后立即开始的下载略有延迟。"
           }
         }
       }
@@ -15737,8 +15737,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Link Preview"
+            "state" : "translated",
+            "value" : "链接预览"
           }
         }
       }
@@ -15772,8 +15772,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Preview links before downloading"
+            "state" : "translated",
+            "value" : "下载前预览链接"
           }
         }
       }
@@ -17397,8 +17397,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Add yt-dlp extractor and post-processor plugins"
+            "state" : "translated",
+            "value" : "yt-dlp のエクストラクタとポストプロセッサのプラグインを追加"
           }
         },
         "ko" : {
@@ -17409,8 +17409,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Add yt-dlp extractor and post-processor plugins"
+            "state" : "translated",
+            "value" : "添加 yt-dlp 提取器和后处理器插件"
           }
         }
       }
@@ -17431,8 +17431,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Plugins"
+            "state" : "translated",
+            "value" : "プラグイン"
           }
         },
         "ko" : {
@@ -17443,8 +17443,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Plugins"
+            "state" : "translated",
+            "value" : "插件"
           }
         }
       }
@@ -19076,8 +19076,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Palladium Folder"
+            "state" : "translated",
+            "value" : "Palladium 文件夹"
           }
         }
       }
@@ -19111,8 +19111,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Choose Folder…"
+            "state" : "translated",
+            "value" : "选择文件夹…"
           }
         }
       }
@@ -19146,8 +19146,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Choose a folder in Files, like iCloud Drive. Palladium saves into a Palladium folder inside it. Existing saved files are not moved."
+            "state" : "translated",
+            "value" : "在“文件”中选择一个文件夹，例如 iCloud 云盘。Palladium 会保存到其中的 Palladium 文件夹内。已保存的现有文件不会被移动。"
           }
         }
       }
@@ -19181,8 +19181,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Use Palladium Folder"
+            "state" : "translated",
+            "value" : "使用 Palladium 文件夹"
           }
         }
       }
@@ -19216,8 +19216,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Location"
+            "state" : "translated",
+            "value" : "位置"
           }
         }
       }
@@ -19251,8 +19251,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Unavailable"
+            "state" : "translated",
+            "value" : "不可用"
           }
         }
       }
@@ -19286,8 +19286,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "%@ can't be reached right now, so files are saved to Documents/Saved until it's available again."
+            "state" : "translated",
+            "value" : "目前无法访问 %@，因此文件将保存到 Documents/Saved，直到其恢复可用。"
           }
         }
       }
@@ -22068,8 +22068,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "This removes everything in %@."
+            "state" : "translated",
+            "value" : "这将删除 %@ 中的所有内容。"
           }
         }
       }
@@ -22171,8 +22171,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Couldn't use that folder: %@"
+            "state" : "translated",
+            "value" : "无法使用该文件夹：%@"
           }
         }
       }
@@ -22954,7 +22954,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "已移除 %lld 个旧项目()"
+            "value" : "已移除 %lld 个旧项目"
           }
         }
       }
